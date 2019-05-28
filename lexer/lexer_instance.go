@@ -10,20 +10,28 @@ type LexerInstance struct {
 	index        int
 }
 
+func (l *LexerInstance) HasNull() bool {
+	for _, vocabulary := range l.vocabularies {
+		if vocabulary.GetSource() == nil {
+			return true
+		}
+	}
+	return false
+}
+
 func (l *LexerInstance) ToString() string {
 	var toString string = ""
 	l.Reset()
 	for vocabulary := l.Next(); vocabulary != nil; vocabulary = l.Next() {
-        toString += vocabulary.GetWord()
+		toString += vocabulary.GetWord()
+		toString += "("
+		if vocabulary.GetSource() != nil {
+			toString += vocabulary.GetSource().GetName()
+		} else {
+			toString += "nil"
+		}
+		toString += ")"
 		toString += " "
-        // toString += " ( "
-        // if vocabulary.GetSource()!= nil {
-        //     toString += vocabulary.GetSource().GetName()
-        // }else{
-        //     toString += "nil"
-        // }
-		// toString += " ) "
-
 	}
 	return toString
 }
@@ -63,6 +71,13 @@ func (l *LexerInstance) Reset() {
 }
 
 func (l *LexerInstance) AddVocabulary(vocabulary *tree.Vocabulary) {
+	if len(l.vocabularies) != 0 {
+		var last *tree.Vocabulary = l.vocabularies[len(l.vocabularies)-1]
+		if last.GetSource() == nil && vocabulary.GetSource() == nil {
+			l.vocabularies[len(l.vocabularies)-1] = tree.NewVocabulary(last.GetWord()+vocabulary.GetWord(), nil)
+			return
+		}
+	}
 	l.vocabularies = append(l.vocabularies, vocabulary)
 }
 
