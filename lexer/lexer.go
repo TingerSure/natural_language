@@ -1,9 +1,10 @@
 package lexer
 
 import (
+	"github.com/TingerSure/natural_language/library/nl_string"
 	"github.com/TingerSure/natural_language/source"
 	"github.com/TingerSure/natural_language/tree"
-	"strings"
+	"github.com/TingerSure/natural_language/word"
 )
 
 type Lexer struct {
@@ -12,10 +13,10 @@ type Lexer struct {
 }
 
 func (l *Lexer) getVocabulariesBySources(character string, sources map[string]source.Source, vocabularies []*tree.Vocabulary) []*tree.Vocabulary {
-	for index := range sources {
-		var words []string = sources[index].GetWords(character)
-		for i := 0; i < len(words); i++ {
-			vocabularies = append(vocabularies, tree.NewVocabulary(words[i], sources[index]))
+	for _, source := range sources {
+		var words []*word.Word = source.GetWords(character)
+		for _, word := range words {
+			vocabularies = append(vocabularies, tree.NewVocabulary(word, source))
 		}
 	}
 	return vocabularies
@@ -29,39 +30,43 @@ func (l *Lexer) getVocabulary(character string) []*tree.Vocabulary {
 }
 
 func (l *Lexer) instanceStep(sentence string, index int, now *LexerInstance, group *LexerInstanceGroup) {
-	if index >= len(sentence) {
+	if index >= nl_string.Len(sentence) {
 		return
 	}
-	var firstCharacter string = string([]rune(sentence[index:])[0:1])
+	var indexSentence string = nl_string.SubStringFrom(sentence, index)
+	//sentence[index:]
+	var firstCharacter string = nl_string.SubString(indexSentence, 0, 1)
+	// string([]rune(indexSentence)[0:1])
 	var vocabularies []*tree.Vocabulary = l.getVocabulary(firstCharacter)
 	var count int = 0
 	var base *LexerInstance = now.Copy()
 
 	for _, vocabulary := range vocabularies {
-		if strings.Index(sentence[index:], vocabulary.GetWord()) != 0 {
+		if !vocabulary.GetWord().StartFor(indexSentence) {
 			continue
 		}
 		if count == 0 {
 			now.AddVocabulary(vocabulary)
-			l.instanceStep(sentence, index+len(vocabulary.GetWord()), now, group)
+			l.instanceStep(sentence, index+vocabulary.GetWord().Len(), now, group)
 		} else {
 			var new *LexerInstance = base.Copy()
 			group.AddInstance(new)
 			new.AddVocabulary(vocabulary)
-			l.instanceStep(sentence, index+len(vocabulary.GetWord()), new, group)
+			l.instanceStep(sentence, index+vocabulary.GetWord().Len(), new, group)
 		}
 		count++
 	}
 	if count == 0 {
-		var vocabulary *tree.Vocabulary = tree.NewVocabulary(firstCharacter, nil)
+		var vocabulary *tree.Vocabulary = tree.NewVocabulary(word.NewUnknownWord(firstCharacter), nil)
 		now.AddVocabulary(vocabulary)
-		l.instanceStep(sentence, index+len(vocabulary.GetWord()), now, group)
+		l.instanceStep(sentence, index+vocabulary.GetWord().Len(), now, group)
 	}
 }
 
 func (l *Lexer) Instances(sentence string) *LexerInstanceGroup {
 	var group *LexerInstanceGroup = NewLexerInstanceGroup()
 	var now *LexerInstance = NewLexerInstance()
+	now.SetSentence(sentence)
 	group.AddInstance(now)
 	l.instanceStep(sentence, 0, now, group)
 	return group
@@ -75,8 +80,8 @@ func (l *Lexer) RemoveNaturalSource(name string) {
 	l.naturalSources[name] = nil
 }
 
-func (l *Lexer) AddSource(name string, source source.Source) {
-	l.sources[name] = source
+func (l *Lexer) AddSource(source source.Source) {
+	l.sources[source.GetName()] = source
 }
 
 func (l *Lexer) RemoveSource(name string) {

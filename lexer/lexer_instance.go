@@ -2,12 +2,24 @@ package lexer
 
 import (
 	"github.com/TingerSure/natural_language/tree"
+	"github.com/TingerSure/natural_language/word"
 )
 
 type LexerInstance struct {
 	sentence     string
 	vocabularies []*tree.Vocabulary
 	index        int
+}
+
+func (l *LexerInstance) ValidLength() int {
+	var valid int = 0
+	for _, vocabulary := range l.vocabularies {
+		if vocabulary.GetSource() == nil {
+			return valid
+		}
+		valid += vocabulary.GetWord().Len()
+	}
+	return valid
 }
 
 func (l *LexerInstance) HasNull() bool {
@@ -23,7 +35,7 @@ func (l *LexerInstance) ToString() string {
 	var toString string = ""
 	l.Reset()
 	for vocabulary := l.Next(); vocabulary != nil; vocabulary = l.Next() {
-		toString += vocabulary.GetWord()
+		toString += vocabulary.GetWord().GetContext()
 		toString += "("
 		if vocabulary.GetSource() != nil {
 			toString += vocabulary.GetSource().GetName()
@@ -49,7 +61,7 @@ func (l *LexerInstance) SetSentence(sentence string) {
 	l.sentence = sentence
 }
 
-func (l *LexerInstance) GetSentence(sentence string) string {
+func (l *LexerInstance) GetSentence() string {
 	return l.sentence
 }
 
@@ -74,7 +86,7 @@ func (l *LexerInstance) AddVocabulary(vocabulary *tree.Vocabulary) {
 	if len(l.vocabularies) != 0 {
 		var last *tree.Vocabulary = l.vocabularies[len(l.vocabularies)-1]
 		if last.GetSource() == nil && vocabulary.GetSource() == nil {
-			l.vocabularies[len(l.vocabularies)-1] = tree.NewVocabulary(last.GetWord()+vocabulary.GetWord(), nil)
+			l.vocabularies[len(l.vocabularies)-1] = tree.NewVocabulary(word.NewUnknownWord(last.GetWord().GetContext()+vocabulary.GetWord().GetContext()), nil)
 			return
 		}
 	}
