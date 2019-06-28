@@ -21,6 +21,11 @@ func (w *Word) StartFor(sentence string) bool {
 	return 0 == nl_string.Index(sentence, w.context)
 }
 
+func (w *Word) StartWith(first string) bool {
+	return 0 == nl_string.Index(w.context, first)
+
+}
+
 func (w *Word) Len() int {
 	return nl_string.Len(w.context)
 }
@@ -32,7 +37,18 @@ func NewWord(context string, types int) *Word {
 	})
 
 }
+
 func NewUnknownWord(context string) *Word {
 	return NewWord(context, UnknownType)
+}
 
+func WordsFilter(words []*Word, firstCharacter string) []*Word {
+	var targets []*Word
+
+	for _, word := range words {
+		if word.StartWith(firstCharacter) {
+			targets = append(targets, word)
+		}
+	}
+	return targets
 }

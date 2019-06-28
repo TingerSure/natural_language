@@ -29,17 +29,15 @@ func (l *Lexer) getVocabulary(character string) []*tree.Vocabulary {
 	return vocabularies
 }
 
-func (l *Lexer) instanceStep(sentence string, index int, now *LexerInstance, group *LexerInstanceGroup) {
+func (l *Lexer) instanceStep(sentence string, index int, now *Flow, group *FlowGroup) {
 	if index >= nl_string.Len(sentence) {
 		return
 	}
 	var indexSentence string = nl_string.SubStringFrom(sentence, index)
-	//sentence[index:]
 	var firstCharacter string = nl_string.SubString(indexSentence, 0, 1)
-	// string([]rune(indexSentence)[0:1])
 	var vocabularies []*tree.Vocabulary = l.getVocabulary(firstCharacter)
 	var count int = 0
-	var base *LexerInstance = now.Copy()
+	var base *Flow = now.Copy()
 
 	for _, vocabulary := range vocabularies {
 		if !vocabulary.GetWord().StartFor(indexSentence) {
@@ -49,7 +47,7 @@ func (l *Lexer) instanceStep(sentence string, index int, now *LexerInstance, gro
 			now.AddVocabulary(vocabulary)
 			l.instanceStep(sentence, index+vocabulary.GetWord().Len(), now, group)
 		} else {
-			var new *LexerInstance = base.Copy()
+			var new *Flow = base.Copy()
 			group.AddInstance(new)
 			new.AddVocabulary(vocabulary)
 			l.instanceStep(sentence, index+vocabulary.GetWord().Len(), new, group)
@@ -63,17 +61,17 @@ func (l *Lexer) instanceStep(sentence string, index int, now *LexerInstance, gro
 	}
 }
 
-func (l *Lexer) Instances(sentence string) *LexerInstanceGroup {
-	var group *LexerInstanceGroup = NewLexerInstanceGroup()
-	var now *LexerInstance = NewLexerInstance()
+func (l *Lexer) Instances(sentence string) *FlowGroup {
+	var group *FlowGroup = NewFlowGroup()
+	var now *Flow = NewFlow()
 	now.SetSentence(sentence)
 	group.AddInstance(now)
 	l.instanceStep(sentence, 0, now, group)
 	return group
 }
 
-func (l *Lexer) AddNaturalSource(name string, source source.Source) {
-	l.naturalSources[name] = source
+func (l *Lexer) AddNaturalSource(source source.Source) {
+	l.naturalSources[source.GetName()] = source
 }
 
 func (l *Lexer) RemoveNaturalSource(name string) {

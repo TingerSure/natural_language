@@ -5,13 +5,13 @@ import (
 	"github.com/TingerSure/natural_language/word"
 )
 
-type LexerInstance struct {
+type Flow struct {
 	sentence     string
 	vocabularies []*tree.Vocabulary
 	index        int
 }
 
-func (l *LexerInstance) ValidLength() int {
+func (l *Flow) ValidLength() int {
 	var valid int = 0
 	for _, vocabulary := range l.vocabularies {
 		if vocabulary.GetSource() == nil {
@@ -22,7 +22,7 @@ func (l *LexerInstance) ValidLength() int {
 	return valid
 }
 
-func (l *LexerInstance) HasNull() bool {
+func (l *Flow) HasNull() bool {
 	for _, vocabulary := range l.vocabularies {
 		if vocabulary.GetSource() == nil {
 			return true
@@ -31,7 +31,7 @@ func (l *LexerInstance) HasNull() bool {
 	return false
 }
 
-func (l *LexerInstance) ToString() string {
+func (l *Flow) ToString() string {
 	var toString string = ""
 	l.Reset()
 	for vocabulary := l.Next(); vocabulary != nil; vocabulary = l.Next() {
@@ -48,7 +48,7 @@ func (l *LexerInstance) ToString() string {
 	return toString
 }
 
-func (l *LexerInstance) Next() *tree.Vocabulary {
+func (l *Flow) Next() *tree.Vocabulary {
 	if l.IsEnd() {
 		return nil
 	}
@@ -57,16 +57,16 @@ func (l *LexerInstance) Next() *tree.Vocabulary {
 	return now
 }
 
-func (l *LexerInstance) SetSentence(sentence string) {
+func (l *Flow) SetSentence(sentence string) {
 	l.sentence = sentence
 }
 
-func (l *LexerInstance) GetSentence() string {
+func (l *Flow) GetSentence() string {
 	return l.sentence
 }
 
-func (l *LexerInstance) Copy() *LexerInstance {
-	newInstance := NewLexerInstance()
+func (l *Flow) Copy() *Flow {
+	newInstance := NewFlow()
 	newInstance.sentence = l.sentence
 	for i := 0; i < len(l.vocabularies); i++ {
 		newInstance.vocabularies = append(newInstance.vocabularies, l.vocabularies[i])
@@ -74,15 +74,15 @@ func (l *LexerInstance) Copy() *LexerInstance {
 	return newInstance
 }
 
-func (l *LexerInstance) IsEnd() bool {
+func (l *Flow) IsEnd() bool {
 	return (l.index >= len(l.vocabularies))
 }
 
-func (l *LexerInstance) Reset() {
+func (l *Flow) Reset() {
 	l.index = 0
 }
 
-func (l *LexerInstance) AddVocabulary(vocabulary *tree.Vocabulary) {
+func (l *Flow) AddVocabulary(vocabulary *tree.Vocabulary) {
 	if len(l.vocabularies) != 0 {
 		var last *tree.Vocabulary = l.vocabularies[len(l.vocabularies)-1]
 		if last.GetSource() == nil && vocabulary.GetSource() == nil {
@@ -93,10 +93,10 @@ func (l *LexerInstance) AddVocabulary(vocabulary *tree.Vocabulary) {
 	l.vocabularies = append(l.vocabularies, vocabulary)
 }
 
-func (l *LexerInstance) init() *LexerInstance {
+func (l *Flow) init() *Flow {
 	return l
 }
 
-func NewLexerInstance() *LexerInstance {
-	return (&LexerInstance{}).init()
+func NewFlow() *Flow {
+	return (&Flow{}).init()
 }
