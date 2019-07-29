@@ -45,11 +45,11 @@ func (p *Target) GetWords(firstCharacter string) []*word.Word {
 
 func (p *Target) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
-		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) *tree.Phrase {
+		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) tree.Phrase {
 			if treasure.GetSource() != p {
 				return nil
 			}
-			return tree.NewPhrase(targetRuleType, treasure, 0)
+			return tree.NewPhraseVocabularyAdaptor(treasure)
 		}, targetPronounName),
 	}
 }

@@ -2,7 +2,7 @@ package tree
 
 type StructRule struct {
 	size  int
-	logic func(treasures []*Phrase) *Phrase
+	logic func(treasures []Phrase) Phrase
 	from  string
 }
 
@@ -14,7 +14,7 @@ func (r *StructRule) GetFrom() string {
 	return r.from
 }
 
-func (r *StructRule) Logic(treasures []*Phrase) *Phrase {
+func (r *StructRule) Logic(treasures []Phrase) Phrase {
 	if len(treasures) < r.size {
 		return nil
 	}
@@ -26,7 +26,7 @@ func (r *StructRule) Logic(treasures []*Phrase) *Phrase {
 }
 
 func NewStructRule(
-	logic func(treasures []*Phrase) *Phrase,
+	logic func(treasures []Phrase) Phrase,
 	size int,
 	from string,
 ) *StructRule {

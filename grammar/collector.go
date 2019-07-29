@@ -5,7 +5,7 @@ import (
 )
 
 type Collector struct {
-	phrases []*tree.Phrase
+	phrases []tree.Phrase
 	length  int
 }
 
@@ -17,12 +17,12 @@ func (c *Collector) Copy() *Collector {
 	return substitute
 }
 
-func (c *Collector) Push(treasure *tree.Phrase) {
+func (c *Collector) Push(treasure tree.Phrase) {
 	c.phrases = append(c.phrases, treasure)
 	c.length++
 }
 
-func (c *Collector) Pop() *tree.Phrase {
+func (c *Collector) Pop() tree.Phrase {
 	if c.length <= 0 {
 		return nil
 	}
@@ -31,7 +31,7 @@ func (c *Collector) Pop() *tree.Phrase {
 	c.phrases = c.phrases[:c.length]
 	return peek
 }
-func (c *Collector) PopMultiple(size int) []*tree.Phrase {
+func (c *Collector) PopMultiple(size int) []tree.Phrase {
 	if c.length < size {
 		return nil
 	}
@@ -40,13 +40,13 @@ func (c *Collector) PopMultiple(size int) []*tree.Phrase {
 	c.phrases = c.phrases[:c.length-size]
 	return peek
 }
-func (c *Collector) Peek() *tree.Phrase {
+func (c *Collector) Peek() tree.Phrase {
 	if c.length <= 0 {
 		return nil
 	}
 	return c.phrases[c.length-1]
 }
-func (c *Collector) PeekMultiple(size int) []*tree.Phrase {
+func (c *Collector) PeekMultiple(size int) []tree.Phrase {
 	if c.length < size {
 		return nil
 	}

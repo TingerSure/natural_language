@@ -89,7 +89,7 @@ func (l *Grammar) instanceStep(flow *lexer.Flow, wait *Collector) (bool, error) 
 	return false, nil
 }
 
-func (l *Grammar) Instances(flow *lexer.Flow) (*tree.Phrase, error) {
+func (l *Grammar) Instances(flow *lexer.Flow) (tree.Phrase, error) {
 	flow.Reset()
 	wait := NewCollector()
 	for {
