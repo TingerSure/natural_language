@@ -1,6 +1,7 @@
 package auxiliary
 
 import (
+	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/word"
 )
 
@@ -24,6 +25,14 @@ func (p *Belong) GetWords(firstCharacter string) []*word.Word {
 	return word.WordsFilter([]*word.Word{
 		word.NewWord(BelongTo, belongType),
 	}, firstCharacter)
+}
+
+func (p *Belong) GetVocabularyRules() []*tree.VocabularyRule {
+	return []*tree.VocabularyRule{}
+}
+
+func (p *Belong) GetStructRules() []*tree.StructRule {
+	return []*tree.StructRule{}
 }
 
 func NewBelong() *Belong {

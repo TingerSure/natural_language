@@ -2,17 +2,17 @@ package lexer
 
 import (
 	"github.com/TingerSure/natural_language/library/nl_string"
-	"github.com/TingerSure/natural_language/source"
+	// "github.com/TingerSure/natural_language/source"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/word"
 )
 
 type Lexer struct {
-	sources        map[string]source.Source
-	naturalSources map[string]source.Source
+	sources        map[string]tree.Source
+	naturalSources map[string]tree.Source
 }
 
-func (l *Lexer) getVocabulariesBySources(character string, sources map[string]source.Source, vocabularies []*tree.Vocabulary) []*tree.Vocabulary {
+func (l *Lexer) getVocabulariesBySources(character string, sources map[string]tree.Source, vocabularies []*tree.Vocabulary) []*tree.Vocabulary {
 	for _, source := range sources {
 		var words []*word.Word = source.GetWords(character)
 		for _, word := range words {
@@ -70,7 +70,7 @@ func (l *Lexer) Instances(sentence string) *FlowGroup {
 	return group
 }
 
-func (l *Lexer) AddNaturalSource(source source.Source) {
+func (l *Lexer) AddNaturalSource(source tree.Source) {
 	l.naturalSources[source.GetName()] = source
 }
 
@@ -78,7 +78,7 @@ func (l *Lexer) RemoveNaturalSource(name string) {
 	l.naturalSources[name] = nil
 }
 
-func (l *Lexer) AddSource(source source.Source) {
+func (l *Lexer) AddSource(source tree.Source) {
 	l.sources[source.GetName()] = source
 }
 
@@ -87,8 +87,8 @@ func (l *Lexer) RemoveSource(name string) {
 }
 
 func (l *Lexer) init() *Lexer {
-	l.sources = map[string]source.Source{}
-	l.naturalSources = map[string]source.Source{}
+	l.sources = map[string]tree.Source{}
+	l.naturalSources = map[string]tree.Source{}
 	return l
 }
 

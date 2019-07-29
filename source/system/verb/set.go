@@ -1,6 +1,7 @@
 package verb
 
 import (
+	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/word"
 )
 
@@ -25,7 +26,13 @@ func (s *Set) GetWords(firstCharacter string) []*word.Word {
 		word.NewWord(Is, setType),
 	}, firstCharacter)
 }
+func (p *Set) GetVocabularyRules() []*tree.VocabularyRule {
+	return []*tree.VocabularyRule{}
+}
 
+func (p *Set) GetStructRules() []*tree.StructRule {
+	return []*tree.StructRule{}
+}
 func NewSet() *Set {
 	return (&Set{})
 }

@@ -11,6 +11,10 @@ type Flow struct {
 	index        int
 }
 
+func (l *Flow) Len() int {
+	return len(l.vocabularies)
+}
+
 func (l *Flow) ValidLength() int {
 	var valid int = 0
 	for _, vocabulary := range l.vocabularies {
@@ -46,6 +50,13 @@ func (l *Flow) ToString() string {
 		toString += " "
 	}
 	return toString
+}
+
+func (l *Flow) Index(index int) *tree.Vocabulary {
+	if index < 0 || index >= l.Len() {
+		return nil
+	}
+	return l.vocabularies[index]
 }
 
 func (l *Flow) Next() *tree.Vocabulary {
