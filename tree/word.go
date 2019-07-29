@@ -1,4 +1,4 @@
-package word
+package tree
 
 import (
 	"github.com/TingerSure/natural_language/library/nl_string"

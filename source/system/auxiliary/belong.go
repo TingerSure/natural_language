@@ -2,12 +2,11 @@ package auxiliary
 
 import (
 	"github.com/TingerSure/natural_language/tree"
-	"github.com/TingerSure/natural_language/word"
 )
 
 const (
 	belongAuxiliaryName string = "system.auxiliary.belong"
-	belongType          int    = word.AuxiliaryBelong
+	belongType          int    = tree.AuxiliaryBelong
 )
 
 const (
@@ -21,9 +20,9 @@ func (p *Belong) GetName() string {
 	return belongAuxiliaryName
 }
 
-func (p *Belong) GetWords(firstCharacter string) []*word.Word {
-	return word.WordsFilter([]*word.Word{
-		word.NewWord(BelongTo, belongType),
+func (p *Belong) GetWords(firstCharacter string) []*tree.Word {
+	return tree.WordsFilter([]*tree.Word{
+		tree.NewWord(BelongTo, belongType),
 	}, firstCharacter)
 }
 

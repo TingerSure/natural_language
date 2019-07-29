@@ -2,9 +2,7 @@ package lexer
 
 import (
 	"github.com/TingerSure/natural_language/library/nl_string"
-	// "github.com/TingerSure/natural_language/source"
 	"github.com/TingerSure/natural_language/tree"
-	"github.com/TingerSure/natural_language/word"
 )
 
 type Lexer struct {
@@ -14,7 +12,7 @@ type Lexer struct {
 
 func (l *Lexer) getVocabulariesBySources(character string, sources map[string]tree.Source, vocabularies []*tree.Vocabulary) []*tree.Vocabulary {
 	for _, source := range sources {
-		var words []*word.Word = source.GetWords(character)
+		var words []*tree.Word = source.GetWords(character)
 		for _, word := range words {
 			vocabularies = append(vocabularies, tree.NewVocabulary(word, source))
 		}
@@ -55,7 +53,7 @@ func (l *Lexer) instanceStep(sentence string, index int, now *Flow, group *FlowG
 		count++
 	}
 	if count == 0 {
-		var vocabulary *tree.Vocabulary = tree.NewVocabulary(word.NewUnknownWord(firstCharacter), nil)
+		var vocabulary *tree.Vocabulary = tree.NewVocabulary(tree.NewUnknownWord(firstCharacter), nil)
 		now.AddVocabulary(vocabulary)
 		l.instanceStep(sentence, index+vocabulary.GetWord().Len(), now, group)
 	}

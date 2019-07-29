@@ -2,12 +2,11 @@ package pronoun
 
 import (
 	"github.com/TingerSure/natural_language/tree"
-	"github.com/TingerSure/natural_language/word"
 )
 
 const (
 	targetPronounName string = "system.pronoun.target"
-	targetType        int    = word.Pronoun
+	targetType        int    = tree.Pronoun
 )
 
 const (
@@ -23,12 +22,12 @@ const (
 )
 
 var (
-	targetPronounWords []*word.Word = []*word.Word{
-		word.NewWord(He, targetType),
-		word.NewWord(She, targetType),
-		word.NewWord(It, targetType),
-		word.NewWord(You, targetType),
-		word.NewWord(I, targetType),
+	targetPronounWords []*tree.Word = []*tree.Word{
+		tree.NewWord(He, targetType),
+		tree.NewWord(She, targetType),
+		tree.NewWord(It, targetType),
+		tree.NewWord(You, targetType),
+		tree.NewWord(I, targetType),
 	}
 )
 
@@ -39,8 +38,8 @@ func (p *Target) GetName() string {
 	return targetPronounName
 }
 
-func (p *Target) GetWords(firstCharacter string) []*word.Word {
-	return word.WordsFilter(targetPronounWords, firstCharacter)
+func (p *Target) GetWords(firstCharacter string) []*tree.Word {
+	return tree.WordsFilter(targetPronounWords, firstCharacter)
 }
 
 func (p *Target) GetVocabularyRules() []*tree.VocabularyRule {

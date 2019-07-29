@@ -2,7 +2,6 @@ package verb
 
 import (
 	"github.com/TingerSure/natural_language/tree"
-	"github.com/TingerSure/natural_language/word"
 )
 
 const (
@@ -11,7 +10,7 @@ const (
 
 const (
 	setName string = "system.verb.set"
-	setType int    = word.Verb
+	setType int    = tree.Verb
 )
 
 type Set struct {
@@ -21,9 +20,9 @@ func (s *Set) GetName() string {
 	return setName
 }
 
-func (s *Set) GetWords(firstCharacter string) []*word.Word {
-	return word.WordsFilter([]*word.Word{
-		word.NewWord(Is, setType),
+func (s *Set) GetWords(firstCharacter string) []*tree.Word {
+	return tree.WordsFilter([]*tree.Word{
+		tree.NewWord(Is, setType),
 	}, firstCharacter)
 }
 func (p *Set) GetVocabularyRules() []*tree.VocabularyRule {

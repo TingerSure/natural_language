@@ -1,4 +1,4 @@
-package word
+package tree
 
 const (
 	UnknownType     = 0
