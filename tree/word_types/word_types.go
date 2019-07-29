@@ -1,7 +1,7 @@
-package tree
+package word_types
 
 const (
-	UnknownType     = 0
+	Unknown         = 0
 	Noun            = 100
 	Pronoun         = 200
 	Verb            = 300

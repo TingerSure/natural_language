@@ -36,8 +36,8 @@ func (c *Collector) PopMultiple(size int) []tree.Phrase {
 		return nil
 	}
 	c.length -= size
-	peek := c.phrases[c.length-size:]
-	c.phrases = c.phrases[:c.length-size]
+	peek := c.phrases[c.length:]
+	c.phrases = c.phrases[:c.length]
 	return peek
 }
 func (c *Collector) Peek() tree.Phrase {

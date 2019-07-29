@@ -39,6 +39,7 @@ func (g *Grammar) RemoveVocabularyRule(need func(rule *tree.VocabularyRule) bool
 }
 
 func (l *Grammar) testStruct(wait *Collector) bool {
+
 	if wait.IsEmpty() {
 		return false
 	}
@@ -48,6 +49,7 @@ func (l *Grammar) testStruct(wait *Collector) bool {
 		}
 		phrase := rule.Logic(wait.PeekMultiple(rule.Size()))
 		if phrase != nil {
+			wait.PopMultiple(rule.Size())
 			wait.Push(phrase)
 			return true
 		}

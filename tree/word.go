@@ -2,6 +2,7 @@ package tree
 
 import (
 	"github.com/TingerSure/natural_language/library/nl_string"
+	"github.com/TingerSure/natural_language/tree/word_types"
 )
 
 type Word struct {
@@ -39,7 +40,7 @@ func NewWord(context string, types int) *Word {
 }
 
 func NewUnknownWord(context string) *Word {
-	return NewWord(context, UnknownType)
+	return NewWord(context, word_types.Unknown)
 }
 
 func WordsFilter(words []*Word, firstCharacter string) []*Word {

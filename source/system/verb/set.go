@@ -2,6 +2,7 @@ package verb
 
 import (
 	"github.com/TingerSure/natural_language/tree"
+	"github.com/TingerSure/natural_language/tree/word_types"
 )
 
 const (
@@ -10,7 +11,7 @@ const (
 
 const (
 	setName string = "system.verb.set"
-	setType int    = tree.Verb
+	setType int    = word_types.Verb
 )
 
 type Set struct {

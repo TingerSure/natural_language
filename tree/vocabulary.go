@@ -24,7 +24,12 @@ func (l *Vocabulary) init(word *Word, source Source) *Vocabulary {
 }
 
 func (l *Vocabulary) ToString() string {
-	return fmt.Sprintf("%v ( %v )", l.word.GetContext(), l.source.GetName())
+	sourceName := "unknown"
+	if l.source != nil {
+		sourceName = l.source.GetName()
+
+	}
+	return fmt.Sprintf("%v ( %v )", l.word.GetContext(), sourceName)
 }
 
 func NewVocabulary(word *Word, source Source) *Vocabulary {

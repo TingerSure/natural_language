@@ -2,15 +2,13 @@ package pronoun
 
 import (
 	"github.com/TingerSure/natural_language/tree"
+	"github.com/TingerSure/natural_language/tree/phrase_types"
+	"github.com/TingerSure/natural_language/tree/word_types"
 )
 
 const (
 	targetPronounName string = "system.pronoun.target"
-	targetType        int    = tree.Pronoun
-)
-
-const (
-	targetRuleType string = "rule.target"
+	targetType        int    = word_types.Pronoun
 )
 
 const (
@@ -48,13 +46,47 @@ func (p *Target) GetVocabularyRules() []*tree.VocabularyRule {
 			if treasure.GetSource() != p {
 				return nil
 			}
-			return tree.NewPhraseVocabularyAdaptor(treasure)
-		}, targetPronounName),
+			return tree.NewPhraseVocabularyAdaptor(treasure, phrase_types.Target)
+		}, p.GetName()),
 	}
 }
 
+const (
+	targetFromTwoTargetsSize    = 2
+	targetFromTargetUnknownSize = 2
+	targetFromUnknownTargetSize = 2
+)
+
 func (p *Target) GetStructRules() []*tree.StructRule {
-	return []*tree.StructRule{}
+	return []*tree.StructRule{
+		tree.NewStructRule(func(treasures []tree.Phrase) tree.Phrase {
+			first := treasures[0]
+			second := treasures[1]
+			if first.Types() == phrase_types.Target &&
+				second.Types() == phrase_types.Target {
+				return tree.NewPhraseStructAdaptor(targetFromTwoTargetsSize, phrase_types.Target).SetChild(0, first).SetChild(1, second)
+			}
+			return nil
+		}, targetFromTwoTargetsSize, p.GetName()),
+		tree.NewStructRule(func(treasures []tree.Phrase) tree.Phrase {
+			first := treasures[0]
+			second := treasures[1]
+			if first.Types() == phrase_types.Target &&
+				second.Types() == phrase_types.Unknown {
+				return tree.NewPhraseStructAdaptor(targetFromTargetUnknownSize, phrase_types.Target).SetChild(0, first).SetChild(1, second)
+			}
+			return nil
+		}, targetFromTargetUnknownSize, p.GetName()),
+		tree.NewStructRule(func(treasures []tree.Phrase) tree.Phrase {
+			first := treasures[0]
+			second := treasures[1]
+			if first.Types() == phrase_types.Unknown &&
+				second.Types() == phrase_types.Target {
+				return tree.NewPhraseStructAdaptor(targetFromUnknownTargetSize, phrase_types.Target).SetChild(0, first).SetChild(1, second)
+			}
+			return nil
+		}, targetFromUnknownTargetSize, p.GetName()),
+	}
 }
 
 func NewTarget() *Target {

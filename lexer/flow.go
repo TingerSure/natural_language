@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"github.com/TingerSure/natural_language/tree"
+	"github.com/TingerSure/natural_language/tree/word_types"
 )
 
 type Flow struct {
@@ -17,7 +18,7 @@ func (l *Flow) Len() int {
 func (l *Flow) ValidLength() int {
 	var valid int = 0
 	for _, vocabulary := range l.vocabularies {
-		if vocabulary.GetSource() == nil {
+		if vocabulary.GetWord().GetTypes() == word_types.Unknown {
 			return valid
 		}
 		valid += vocabulary.GetWord().Len()
@@ -27,7 +28,7 @@ func (l *Flow) ValidLength() int {
 
 func (l *Flow) HasNull() bool {
 	for _, vocabulary := range l.vocabularies {
-		if vocabulary.GetSource() == nil {
+		if vocabulary.GetWord().GetTypes() == word_types.Unknown {
 			return true
 		}
 	}
