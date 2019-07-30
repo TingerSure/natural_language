@@ -29,7 +29,7 @@ func (l *Vocabulary) ToString() string {
 		sourceName = l.source.GetName()
 
 	}
-	return fmt.Sprintf("%v ( %v )", l.word.GetContext(), sourceName)
+	return fmt.Sprintf("%v (%v)", l.word.GetContext(), sourceName)
 }
 
 func NewVocabulary(word *Word, source Source) *Vocabulary {

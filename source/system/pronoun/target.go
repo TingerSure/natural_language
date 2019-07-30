@@ -52,40 +52,23 @@ func (p *Target) GetVocabularyRules() []*tree.VocabularyRule {
 }
 
 const (
-	targetFromTwoTargetsSize    = 2
-	targetFromTargetUnknownSize = 2
-	targetFromUnknownTargetSize = 2
+	targetFromTwoTargetsSize = 2
+	targetFromUnknownSize    = 1
 )
 
 func (p *Target) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
-		tree.NewStructRule(func(treasures []tree.Phrase) tree.Phrase {
-			first := treasures[0]
-			second := treasures[1]
-			if first.Types() == phrase_types.Target &&
-				second.Types() == phrase_types.Target {
-				return tree.NewPhraseStructAdaptor(targetFromTwoTargetsSize, phrase_types.Target).SetChild(0, first).SetChild(1, second)
-			}
-			return nil
-		}, targetFromTwoTargetsSize, p.GetName()),
-		tree.NewStructRule(func(treasures []tree.Phrase) tree.Phrase {
-			first := treasures[0]
-			second := treasures[1]
-			if first.Types() == phrase_types.Target &&
-				second.Types() == phrase_types.Unknown {
-				return tree.NewPhraseStructAdaptor(targetFromTargetUnknownSize, phrase_types.Target).SetChild(0, first).SetChild(1, second)
-			}
-			return nil
-		}, targetFromTargetUnknownSize, p.GetName()),
-		tree.NewStructRule(func(treasures []tree.Phrase) tree.Phrase {
-			first := treasures[0]
-			second := treasures[1]
-			if first.Types() == phrase_types.Unknown &&
-				second.Types() == phrase_types.Target {
-				return tree.NewPhraseStructAdaptor(targetFromUnknownTargetSize, phrase_types.Target).SetChild(0, first).SetChild(1, second)
-			}
-			return nil
-		}, targetFromUnknownTargetSize, p.GetName()),
+		tree.NewStructRule(func() tree.Phrase {
+			return tree.NewPhraseStructAdaptor(targetFromTwoTargetsSize, phrase_types.Target)
+		}, targetFromTwoTargetsSize, []string{
+			phrase_types.Target,
+			phrase_types.Target,
+		}, p.GetName()),
+		tree.NewStructRule(func() tree.Phrase {
+			return tree.NewPhraseStructAdaptor(targetFromUnknownSize, phrase_types.Target)
+		}, targetFromUnknownSize, []string{
+			phrase_types.Unknown,
+		}, p.GetName()),
 	}
 }
 

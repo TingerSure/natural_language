@@ -1,6 +1,8 @@
 package tree
 
-import ()
+import (
+	"fmt"
+)
 
 type PhraseStructAdaptor struct {
 	size     int
@@ -48,16 +50,15 @@ func (p *PhraseStructAdaptor) ToString() string {
 }
 
 func (p *PhraseStructAdaptor) ToStringOffset(index int) string {
-	var info = ""
-	if index > 0 {
-		for i := 0; i < index-1; i++ {
-			info += "\t"
-		}
-		info += "|---"
+	var space = ""
+	for i := 0; i < index; i++ {
+		space += "\t"
 	}
+	info := fmt.Sprintf("%v%v (\n", space, p.types)
 	for i := 0; i < len(p.children); i++ {
 		info += p.GetChild(i).ToStringOffset(index + 1)
 	}
+	info = fmt.Sprintf("%v%v)\n", info, space)
 	return info
 }
 

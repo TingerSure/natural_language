@@ -5,9 +5,9 @@ package phrase_types
    can't depend on the type behind it.
 */
 const (
-	Unknown string = "system.unknown"
-
-	Target string = "system.target"
-
+	Unknown         string = "system.unknown"
+	Event           string = "system.event"
+	Target          string = "system.target"
 	AuxiliaryBelong string = "system.auxiliary.belong"
+	Action          string = "system.action"
 )

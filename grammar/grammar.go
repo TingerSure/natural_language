@@ -67,10 +67,8 @@ func (l *Grammar) testVocabulary(wait *Collector, vocabulary *tree.Vocabulary) b
 	return false
 }
 func (l *Grammar) instanceStep(flow *lexer.Flow, wait *Collector) (bool, error) {
-	if !wait.IsSingle() {
-		for l.testStruct(wait) {
-			//Do nothing
-		}
+	for l.testStruct(wait) {
+		//Do nothing
 	}
 	if flow.IsEnd() {
 		if wait.IsEmpty() {

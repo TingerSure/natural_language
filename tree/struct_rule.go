@@ -1,9 +1,10 @@
 package tree
 
 type StructRule struct {
-	size  int
-	logic func(treasures []Phrase) Phrase
-	from  string
+	size   int
+	create func() Phrase
+	from   string
+	types  []string
 }
 
 func (r *StructRule) Size() int {
@@ -18,24 +19,41 @@ func (r *StructRule) Logic(treasures []Phrase) Phrase {
 	if len(treasures) < r.size {
 		return nil
 	}
-	mixture := r.logic(treasures[len(treasures)-r.size:])
-	if mixture == nil {
+	active := treasures[len(treasures)-r.size:]
+
+	match := true
+	for index, treasure := range active {
+		match = match && treasure.Types() == r.types[index]
+	}
+	if !match {
 		return nil
 	}
-	return mixture
+	new := r.create()
+	for index, treasure := range active {
+		new.SetChild(index, treasure)
+	}
+	return new
 }
 
 func NewStructRule(
-	logic func(treasures []Phrase) Phrase,
+	create func() Phrase,
 	size int,
+	types []string,
 	from string,
 ) *StructRule {
-	if logic == nil {
-		panic("no logic function in this struct rule!")
+	if size <= 0 {
+		panic("There must be at least one type here.")
+	}
+	if len(types) != size {
+		panic("There are too many or too few types.")
+	}
+	if create == nil {
+		panic("no create function in this struct rule!")
 	}
 	return &StructRule{
-		logic: logic,
-		size:  size,
-		from:  from,
+		types:  types,
+		create: create,
+		size:   size,
+		from:   from,
 	}
 }

@@ -37,14 +37,11 @@ func (p *PhraseVocabularyAdaptor) ToString() string {
 }
 
 func (p *PhraseVocabularyAdaptor) ToStringOffset(index int) string {
-	var info = ""
-	if index > 0 {
-		for i := 0; i < index-1; i++ {
-			info += "\t"
-		}
-		info += "|---"
+	var space = ""
+	for i := 0; i < index; i++ {
+		space += "\t"
 	}
-	return fmt.Sprintf("%v%v\n", info, p.content.ToString())
+	return fmt.Sprintf("%v%v ( %v )\n", space, p.types, p.content.ToString())
 }
 
 func NewPhraseVocabularyAdaptor(content *Vocabulary, types string) *PhraseVocabularyAdaptor {
