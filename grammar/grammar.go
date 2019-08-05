@@ -12,8 +12,13 @@ type Grammar struct {
 	vocabularies []*tree.VocabularyRule
 }
 
-func (g *Grammar) AddStructRule(rule ...*tree.StructRule) {
-	g.structs = append(g.structs, rule...)
+func (g *Grammar) AddStructRule(rules []*tree.StructRule) {
+	if rules == nil {
+		return
+	}
+	for _, rule := range rules {
+		g.structs = append(g.structs, rule)
+	}
 }
 
 func (g *Grammar) RemoveStructRule(need func(rule *tree.StructRule) bool) {
@@ -25,8 +30,13 @@ func (g *Grammar) RemoveStructRule(need func(rule *tree.StructRule) bool) {
 	}
 }
 
-func (g *Grammar) AddVocabularyRule(rule ...*tree.VocabularyRule) {
-	g.vocabularies = append(g.vocabularies, rule...)
+func (g *Grammar) AddVocabularyRule(rules []*tree.VocabularyRule) {
+	if rules == nil {
+		return
+	}
+	for _, rule := range rules {
+		g.vocabularies = append(g.vocabularies, rule)
+	}
 }
 
 func (g *Grammar) RemoveVocabularyRule(need func(rule *tree.VocabularyRule) bool) {

@@ -18,7 +18,7 @@ func (p *Unknown) GetName() string {
 }
 
 func (p *Unknown) GetWords(firstCharacter string) []*tree.Word {
-	return []*tree.Word{}
+	return nil
 }
 
 func (p *Unknown) GetVocabularyRules() []*tree.VocabularyRule {
@@ -33,7 +33,7 @@ func (p *Unknown) GetVocabularyRules() []*tree.VocabularyRule {
 }
 
 func (p *Unknown) GetStructRules() []*tree.StructRule {
-	return []*tree.StructRule{}
+	return nil
 }
 
 func NewUnknown() *Unknown {

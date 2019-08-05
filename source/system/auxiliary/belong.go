@@ -39,21 +39,8 @@ func (p *Belong) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-const (
-	targetFromTargetBelongUnknownSize = 3
-)
-
 func (p *Belong) GetStructRules() []*tree.StructRule {
-	return []*tree.StructRule{
-
-		tree.NewStructRule(func() tree.Phrase {
-			return tree.NewPhraseStructAdaptor(targetFromTargetBelongUnknownSize, phrase_types.Target)
-		}, targetFromTargetBelongUnknownSize, []string{
-			phrase_types.Target,
-			phrase_types.AuxiliaryBelong,
-			phrase_types.Target,
-		}, p.GetName()),
-	}
+	return nil
 }
 
 func NewBelong() *Belong {

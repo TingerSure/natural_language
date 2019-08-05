@@ -51,25 +51,8 @@ func (p *Target) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-const (
-	targetFromTwoTargetsSize = 2
-	targetFromUnknownSize    = 1
-)
-
 func (p *Target) GetStructRules() []*tree.StructRule {
-	return []*tree.StructRule{
-		tree.NewStructRule(func() tree.Phrase {
-			return tree.NewPhraseStructAdaptor(targetFromTwoTargetsSize, phrase_types.Target)
-		}, targetFromTwoTargetsSize, []string{
-			phrase_types.Target,
-			phrase_types.Target,
-		}, p.GetName()),
-		tree.NewStructRule(func() tree.Phrase {
-			return tree.NewPhraseStructAdaptor(targetFromUnknownSize, phrase_types.Target)
-		}, targetFromUnknownSize, []string{
-			phrase_types.Unknown,
-		}, p.GetName()),
-	}
+	return nil
 }
 
 func NewTarget() *Target {

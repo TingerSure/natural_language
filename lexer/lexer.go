@@ -13,6 +13,9 @@ type Lexer struct {
 func (l *Lexer) getVocabulariesBySources(character string, sources map[string]tree.Source, vocabularies []*tree.Vocabulary) []*tree.Vocabulary {
 	for _, source := range sources {
 		var words []*tree.Word = source.GetWords(character)
+		if words == nil {
+			continue
+		}
 		for _, word := range words {
 			vocabularies = append(vocabularies, tree.NewVocabulary(word, source))
 		}

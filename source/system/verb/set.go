@@ -38,20 +38,8 @@ func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-const (
-	sentenceFromTargetActionTarget = 3
-)
-
 func (s *Set) GetStructRules() []*tree.StructRule {
-	return []*tree.StructRule{
-		tree.NewStructRule(func() tree.Phrase {
-			return tree.NewPhraseStructAdaptor(sentenceFromTargetActionTarget, phrase_types.Event)
-		}, sentenceFromTargetActionTarget, []string{
-			phrase_types.Target,
-			phrase_types.Action,
-			phrase_types.Target,
-		}, s.GetName()),
-	}
+	return nil
 }
 func NewSet() *Set {
 	return (&Set{})

@@ -37,15 +37,12 @@ func (r *StructRule) Logic(treasures []Phrase) Phrase {
 
 func NewStructRule(
 	create func() Phrase,
-	size int,
 	types []string,
 	from string,
 ) *StructRule {
-	if size <= 0 {
+	size := len(types)
+	if size == 0 {
 		panic("There must be at least one type here.")
-	}
-	if len(types) != size {
-		panic("There are too many or too few types.")
 	}
 	if create == nil {
 		panic("no create function in this struct rule!")
