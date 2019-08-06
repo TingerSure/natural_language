@@ -12,7 +12,7 @@ type Collector struct {
 func (c *Collector) Copy() *Collector {
 	substitute := NewCollector()
 	for _, treasure := range c.phrases {
-		substitute.Push(treasure)
+		substitute.Push(treasure.Copy())
 	}
 	return substitute
 }

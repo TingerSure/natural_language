@@ -82,6 +82,7 @@ func (l *Flow) Copy() *Flow {
 	for i := 0; i < len(l.vocabularies); i++ {
 		newInstance.vocabularies = append(newInstance.vocabularies, l.vocabularies[i])
 	}
+	newInstance.index = l.index
 	return newInstance
 }
 
