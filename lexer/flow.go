@@ -68,6 +68,13 @@ func (l *Flow) Next() *tree.Vocabulary {
 	return now
 }
 
+func (l *Flow) Peek() *tree.Vocabulary {
+	if l.IsEnd() {
+		return nil
+	}
+	return l.vocabularies[l.index]
+}
+
 func (l *Flow) SetSentence(sentence string) {
 	l.sentence = sentence
 }

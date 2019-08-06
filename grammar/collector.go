@@ -46,6 +46,11 @@ func (c *Collector) Peek() tree.Phrase {
 	}
 	return c.phrases[c.length-1]
 }
+
+func (c *Collector) PeekAll() []tree.Phrase {
+	return c.phrases
+}
+
 func (c *Collector) PeekMultiple(size int) []tree.Phrase {
 	if c.length < size {
 		return nil

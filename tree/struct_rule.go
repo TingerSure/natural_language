@@ -15,21 +15,20 @@ func (r *StructRule) GetFrom() string {
 	return r.from
 }
 
-func (r *StructRule) Logic(treasures []Phrase) Phrase {
+func (r *StructRule) Match(treasures []Phrase) bool {
 	if len(treasures) < r.size {
-		return nil
+		return false
 	}
-	active := treasures[len(treasures)-r.size:]
-
 	match := true
-	for index, treasure := range active {
+	for index, treasure := range treasures[len(treasures)-r.size:] {
 		match = match && treasure.Types() == r.types[index]
 	}
-	if !match {
-		return nil
-	}
+	return match
+}
+
+func (r *StructRule) Create(treasures []Phrase) Phrase {
 	new := r.create()
-	for index, treasure := range active {
+	for index, treasure := range treasures[len(treasures)-r.size:] {
 		new.SetChild(index, treasure)
 	}
 	return new

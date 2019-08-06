@@ -29,10 +29,9 @@ func (s *Set) GetWords(firstCharacter string) []*tree.Word {
 }
 func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
-		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) tree.Phrase {
-			if treasure.GetSource() != s {
-				return nil
-			}
+		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) bool {
+			return treasure.GetSource() == s
+		}, func(treasure *tree.Vocabulary) tree.Phrase {
 			return tree.NewPhraseVocabularyAdaptor(treasure, phrase_types.Action)
 		}, s.GetName()),
 	}

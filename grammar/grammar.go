@@ -48,70 +48,43 @@ func (g *Grammar) RemoveVocabularyRule(need func(rule *tree.VocabularyRule) bool
 	}
 }
 
-func (l *Grammar) testStruct(wait *Collector) bool {
-
-	if wait.IsEmpty() {
-		return false
-	}
-	for _, rule := range l.structs {
-		if wait.Len() < rule.Size() {
-			continue
-		}
-		phrase := rule.Logic(wait.PeekMultiple(rule.Size()))
-		if phrase != nil {
-			wait.PopMultiple(rule.Size())
-			wait.Push(phrase)
-			return true
-		}
-	}
-	return false
-}
-func (l *Grammar) testVocabulary(wait *Collector, vocabulary *tree.Vocabulary) bool {
-	for _, rule := range l.vocabularies {
-		phrase := rule.Logic(vocabulary)
-		if phrase != nil {
-			wait.Push(phrase)
-			return true
-		}
-	}
-	return false
-}
-func (l *Grammar) instanceStep(flow *lexer.Flow, wait *Collector) (bool, error) {
-	for l.testStruct(wait) {
-		//Do nothing
-	}
-	if flow.IsEnd() {
-		if wait.IsEmpty() {
-			return false, errors.New("This is empty sentence!")
-		}
-		if !wait.IsSingle() {
-			return false, errors.New("There is a syntax error in this sentence!")
-		}
-		return true, nil
-	}
-
-	word := flow.Next()
-
-	if !l.testVocabulary(wait, word) {
-		return false, errors.New(fmt.Sprintf("This vocabulary has no rules to parse! ( %v )", word.ToString()))
-	}
-
-	return false, nil
-}
-
-func (l *Grammar) Instances(flow *lexer.Flow) (tree.Phrase, error) {
+func (l *Grammar) Instances(flow *lexer.Flow) ([]*River, error) {
 	flow.Reset()
 	wait := NewCollector()
-	for {
-		end, err := l.instanceStep(flow, wait)
-		if err != nil {
-			return nil, err
+	river := NewRiver(wait, flow)
+	bases, err := river.Step(l.vocabularies, l.structs)
+	if err != nil {
+		return nil, err
+	}
+	bases, err = l.riversfilter(bases)
+	if err != nil {
+		return nil, err
+	}
+	return bases, nil
+}
+
+func (l *Grammar) riversfilter(inputs []*River) ([]*River, error) {
+	if len(inputs) == 0 {
+		return nil, errors.New("This is an empty sentence!")
+	}
+	actives := []*River{}
+	var min *River = nil
+	for _, input := range inputs {
+		if input.IsActive() {
+			actives = append(actives, input)
+			continue
 		}
-		if end {
-			break
+		if min == nil {
+			min = input
+		}
+		if input.GetWait().Len() < min.GetWait().Len() {
+			min = input
 		}
 	}
-	return wait.Peek(), nil
+	if len(actives) == 0 {
+		return nil, errors.New(fmt.Sprintf("There is an unknown rule in this sentence!\n %v", min.ToString()))
+	}
+	return actives, nil
 }
 
 func (l *Grammar) init() *Grammar {

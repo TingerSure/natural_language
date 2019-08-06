@@ -1,27 +1,34 @@
 package tree
 
 type VocabularyRule struct {
-	logic func(treasure *Vocabulary) Phrase
-	from  string
+	create func(treasure *Vocabulary) Phrase
+	match  func(treasure *Vocabulary) bool
+	from   string
 }
 
 func (r *VocabularyRule) GetFrom() string {
 	return r.from
 }
 
-func (r *VocabularyRule) Logic(treasure *Vocabulary) Phrase {
-	return r.logic(treasure)
+func (r *VocabularyRule) Match(treasure *Vocabulary) bool {
+	return r.match(treasure)
+}
+
+func (r *VocabularyRule) Create(treasure *Vocabulary) Phrase {
+	return r.create(treasure)
 }
 
 func NewVocabularyRule(
-	logic func(treasure *Vocabulary) Phrase,
+	match func(treasure *Vocabulary) bool,
+	create func(treasure *Vocabulary) Phrase,
 	from string,
 ) *VocabularyRule {
-	if logic == nil {
-		panic("no logic function in this vocabulary rule!")
+	if create == nil {
+		panic("no create function in this vocabulary rule!")
 	}
 	return &VocabularyRule{
-		logic: logic,
-		from:  from,
+		create: create,
+		match:  match,
+		from:   from,
 	}
 }
