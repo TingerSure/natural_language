@@ -6,8 +6,15 @@ import (
 )
 
 const (
-	eventFromTargetActionTargetName string = "rule.target.target_belong_target"
-	eventFromTargetActionTargetSize        = 3
+	eventFromTargetActionTargetName string = "rule.event.target_belong_target"
+)
+
+var (
+	eventFromTargetActionTargetList []string = []string{
+		phrase_types.Target,
+		phrase_types.Action,
+		phrase_types.Target,
+	}
 )
 
 type EventFromTargetActionTarget struct {
@@ -17,12 +24,8 @@ func (p *EventFromTargetActionTarget) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
 		tree.NewStructRule(func() tree.Phrase {
-			return tree.NewPhraseStructAdaptor(eventFromTargetActionTargetSize, phrase_types.Target)
-		}, []string{
-			phrase_types.Target,
-			phrase_types.Action,
-			phrase_types.Target,
-		}, p.GetName()),
+			return tree.NewPhraseStructAdaptor(len(eventFromTargetActionTargetList), phrase_types.Event)
+		}, eventFromTargetActionTargetList, p.GetName()),
 	}
 }
 

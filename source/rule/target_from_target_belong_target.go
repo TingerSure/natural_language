@@ -7,7 +7,14 @@ import (
 
 const (
 	targetFromTargetBelongTargetName string = "rule.target.target_belong_target"
-	targetFromTargetBelongTargetSize        = 3
+)
+
+var (
+	targetFromTargetBelongTargetList []string = []string{
+		phrase_types.Target,
+		phrase_types.AuxiliaryBelong,
+		phrase_types.Target,
+	}
 )
 
 type TargetFromTargetBelongTarget struct {
@@ -17,12 +24,8 @@ func (p *TargetFromTargetBelongTarget) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
 		tree.NewStructRule(func() tree.Phrase {
-			return tree.NewPhraseStructAdaptor(targetFromTargetBelongTargetSize, phrase_types.Target)
-		}, []string{
-			phrase_types.Target,
-			phrase_types.AuxiliaryBelong,
-			phrase_types.Target,
-		}, p.GetName()),
+			return tree.NewPhraseStructAdaptor(len(targetFromTargetBelongTargetList), phrase_types.Target)
+		}, targetFromTargetBelongTargetList, p.GetName()),
 	}
 }
 

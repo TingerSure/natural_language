@@ -7,7 +7,12 @@ import (
 
 const (
 	targetFromUnknownName string = "rule.target.unknown"
-	targetFromUnknownSize        = 1
+)
+
+var (
+	targetFromUnknownList []string = []string{
+		phrase_types.Unknown,
+	}
 )
 
 type TargetFromUnknown struct {
@@ -17,10 +22,8 @@ func (p *TargetFromUnknown) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
 		tree.NewStructRule(func() tree.Phrase {
-			return tree.NewPhraseStructAdaptor(targetFromUnknownSize, phrase_types.Target)
-		}, []string{
-			phrase_types.Unknown,
-		}, p.GetName()),
+			return tree.NewPhraseStructAdaptor(len(targetFromUnknownList), phrase_types.Target)
+		}, targetFromUnknownList, p.GetName()),
 	}
 }
 
