@@ -8,11 +8,11 @@ type ConstIndex struct {
 	value Variable
 }
 
-func (s *ConstIndex) Get(space Closure) (Variable, error) {
+func (s *ConstIndex) Get(space *Closure) (Variable, error) {
 	return s.value, nil
 }
 
-func (s *ConstIndex) Set(space Closure, value Variable) error {
+func (s *ConstIndex) Set(space *Closure, value Variable) error {
 	return errors.New("Constants cannot be changed.")
 }
 

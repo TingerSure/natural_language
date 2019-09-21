@@ -10,7 +10,7 @@ type Addition struct {
 	result Index
 }
 
-func (a *Addition) Exec(space Closure) error {
+func (a *Addition) Exec(space *Closure) error {
 	preLeft, errLeft := a.left.Get(space)
 	preRight, errRight := a.right.Get(space)
 

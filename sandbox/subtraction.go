@@ -10,7 +10,7 @@ type Subtraction struct {
 	result Index
 }
 
-func (a *Subtraction) Exec() error {
+func (a *Subtraction) Exec(space *Closure) error {
 	preLeft, errLeft := a.left.Get(space)
 	preRight, errRight := a.right.Get(space)
 
@@ -24,7 +24,7 @@ func (a *Subtraction) Exec() error {
 	left, yesLeft := VariableFamilyInstance.IsNumber(preLeft)
 	right, yesRight := VariableFamilyInstance.IsNumber(preRight)
 	if !yesLeft || !yesRight {
-		return errors.New("Only numbers can be added.")
+		return errors.New("Only numbers can be subtracted.")
 	}
 	return a.result.Set(space, NewNumber(left.Value()-right.Value()))
 }
@@ -33,6 +33,6 @@ func NewSubtraction(left Index, right Index, result Index) *Subtraction {
 	return &Subtraction{
 		left:   left,
 		right:  right,
-		result: right,
+		result: result,
 	}
 }

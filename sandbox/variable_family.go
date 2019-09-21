@@ -1,9 +1,5 @@
 package sandbox
 
-import (
-	"unsafe"
-)
-
 type VariableFamily struct {
 }
 
@@ -12,7 +8,8 @@ func (v *VariableFamily) IsNumber(value Variable) (*Number, bool) {
 		return nil, false
 	}
 	if value.Type() == VariableNumberType {
-		return (*Number)(unsafe.Pointer(value)), true
+		number, yes := value.(*Number)
+		return number, yes
 	}
 	return nil, false
 }

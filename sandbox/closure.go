@@ -7,8 +7,12 @@ import (
 type Closure struct {
 	value  map[string]Variable
 	local  map[string]bool
-	cache  []Variable
+	cache  map[int]Variable
 	parent *Closure
+}
+
+func (c *Closure) SetParent(parent *Closure) {
+	c.parent = parent
 }
 
 func (c *Closure) InitLocal(key string) {
@@ -54,19 +58,18 @@ func (c *Closure) GetCache(index int) Variable {
 	return c.cache[index]
 }
 
-func (c *Closure) SetCache(index int, value Variable) error {
+func (c *Closure) SetCache(index int, value Variable) {
 	c.cache[index] = value
 }
 
 func (c *Closure) ClearCaches() {
-	for index := range c.cache {
-		c.cache[index] = nil
-	}
+	c.cache = make(map[int]Variable)
 }
 
-func NewClosure(cacheSize int) *Closure {
+func NewClosure() *Closure {
 	return &Closure{
-		cache: make([]Variable, cacheSize),
-		local: make(map[string]Variable),
+		cache: make(map[int]Variable),
+		value: make(map[string]Variable),
+		local: make(map[string]bool),
 	}
 }
