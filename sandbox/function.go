@@ -7,6 +7,7 @@ const (
 type Function struct {
 	flow       []Expression
 	paramNames []string
+	parent     *Closure
 }
 
 func (f *Function) AddParamName(paramName string) {
@@ -17,31 +18,37 @@ func (f *Function) AddStep(step Expression) {
 	f.flow = append(f.flow, step)
 }
 
-func (f *Function) Exec(params map[string]Variable) (*Closure, error) {
-	space := NewClosure()
+func (f *Function) Exec(params map[string]Variable) (map[string]Variable, error) {
+	space := NewClosure(f.parent)
 	for _, name := range f.paramNames {
 		space.InitLocal(name)
 	}
 	for name, value := range params {
 		err := space.SetLocal(name, value)
 		if err != nil {
-			return space, err
+			return nil, err
 		}
 	}
 	for _, step := range f.flow {
-		err := step.Exec(space)
+		keep, err := step.Exec(space)
 		if err != nil {
-			return space, err
+			return nil, err
+		}
+		if !keep {
+			break
 		}
 	}
-	space.ClearCaches()
-	return space, nil
+	returns := space.Return()
+	space.Clear()
+	return returns, nil
 }
 
 func (s *Function) Type() string {
 	return VariableFunctionType
 }
 
-func NewFunction() *Function {
-	return &Function{}
+func NewFunction(parent *Closure) *Function {
+	return &Function{
+		parent: parent,
+	}
 }

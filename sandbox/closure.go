@@ -5,14 +5,23 @@ import (
 )
 
 type Closure struct {
-	value  map[string]Variable
-	local  map[string]bool
-	cache  map[int]Variable
-	parent *Closure
+	returns map[string]Variable
+	value   map[string]Variable
+	local   map[string]bool
+	cache   map[int]Variable
+	parent  *Closure
 }
 
 func (c *Closure) SetParent(parent *Closure) {
 	c.parent = parent
+}
+
+func (c *Closure) SetReturn(key string, value Variable) {
+	c.returns[key] = value
+}
+
+func (c *Closure) Return() map[string]Variable {
+	return c.returns
 }
 
 func (c *Closure) InitLocal(key string) {
@@ -62,14 +71,17 @@ func (c *Closure) SetCache(index int, value Variable) {
 	c.cache[index] = value
 }
 
-func (c *Closure) ClearCaches() {
-	c.cache = make(map[int]Variable)
+func (c *Closure) Clear() {
+	c.cache = nil
+	c.returns = nil
 }
 
-func NewClosure() *Closure {
+func NewClosure(parent *Closure) *Closure {
 	return &Closure{
-		cache: make(map[int]Variable),
-		value: make(map[string]Variable),
-		local: make(map[string]bool),
+		parent:  parent,
+		cache:   make(map[int]Variable),
+		returns: make(map[string]Variable),
+		value:   make(map[string]Variable),
+		local:   make(map[string]bool),
 	}
 }

@@ -10,23 +10,23 @@ type Addition struct {
 	result Index
 }
 
-func (a *Addition) Exec(space *Closure) error {
+func (a *Addition) Exec(space *Closure) (bool, error) {
 	preLeft, errLeft := a.left.Get(space)
 	preRight, errRight := a.right.Get(space)
 
 	if errLeft != nil {
-		return errLeft
+		return false, errLeft
 	}
 	if errRight != nil {
-		return errRight
+		return false, errRight
 	}
 
 	left, yesLeft := VariableFamilyInstance.IsNumber(preLeft)
 	right, yesRight := VariableFamilyInstance.IsNumber(preRight)
 	if !yesLeft || !yesRight {
-		return errors.New("Only numbers can be added.")
+		return false, errors.New("Only numbers can be added.")
 	}
-	return a.result.Set(space, NewNumber(left.Value()+right.Value()))
+	return true, a.result.Set(space, NewNumber(left.Value()+right.Value()))
 }
 
 func NewAddition(left Index, right Index, result Index) *Addition {

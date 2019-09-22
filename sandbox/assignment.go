@@ -5,12 +5,12 @@ type Assignment struct {
 	to   Index
 }
 
-func (a *Assignment) Exec(space *Closure) error {
+func (a *Assignment) Exec(space *Closure) (bool, error) {
 	preFrom, errFrom := a.from.Get(space)
 	if errFrom != nil {
-		return errFrom
+		return false, errFrom
 	}
-	return a.to.Set(space, preFrom)
+	return true, a.to.Set(space, preFrom)
 }
 
 func NewAssignment(from Index, to Index) *Assignment {
