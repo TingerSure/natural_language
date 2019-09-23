@@ -79,7 +79,6 @@ func (c *Closure) SetCache(index int, value Variable) {
 
 func (c *Closure) Clear() {
 	c.cache = nil
-	c.returns = nil
 }
 
 func NewClosure(parent *Closure) *Closure {

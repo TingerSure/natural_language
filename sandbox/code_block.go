@@ -5,27 +5,31 @@ import (
 )
 
 type CodeBlock struct {
-	flow         []Expression
-	init         func(*Closure)
-	returnBubble bool
+	flow []Expression
 }
 
-func (f *CodeBlock) AddStep(step Expression) {
-	f.flow = append(f.flow, step)
+func (c *CodeBlock) AddStep(step Expression) {
+	c.flow = append(c.flow, step)
 }
 
-func (f *CodeBlock) Exec(parent *Closure, flow []Expression) (*Closure, bool, error) {
-	if parent == nil && f.returnBubble {
+func (f *CodeBlock) Exec(parent *Closure, returnBubble bool, init func(*Closure) error) (*Closure, bool, error) {
+	if parent == nil && returnBubble {
 		return nil, false, errors.New("No parent to bubble.")
 	}
 	space := NewClosure(parent)
 	defer func() {
-		if f.returnBubble {
+		if returnBubble {
 			parent.MergeReturn(space)
 		}
 		space.Clear()
 	}()
-	for _, step := range flow {
+	if init != nil {
+		err := init(space)
+		if err != nil {
+			return space, false, err
+		}
+	}
+	for _, step := range f.flow {
 		keep, err := step.Exec(space)
 		if err != nil {
 			return space, false, err
@@ -37,9 +41,6 @@ func (f *CodeBlock) Exec(parent *Closure, flow []Expression) (*Closure, bool, er
 	return space, true, nil
 }
 
-func NewCodeBlock(init func(*Closure), returnBubble bool) *CodeBlock {
-	return &CodeBlock{
-		init:         init,
-		returnBubble: returnBubble,
-	}
+func NewCodeBlock() *CodeBlock {
+	return &CodeBlock{}
 }
