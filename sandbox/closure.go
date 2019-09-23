@@ -20,6 +20,12 @@ func (c *Closure) SetReturn(key string, value Variable) {
 	c.returns[key] = value
 }
 
+func (c *Closure) MergeReturn(other *Closure) {
+	for key, value := range other.returns {
+		c.returns[key] = value
+	}
+}
+
 func (c *Closure) Return() map[string]Variable {
 	return c.returns
 }
