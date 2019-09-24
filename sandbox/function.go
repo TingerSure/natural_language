@@ -35,6 +35,8 @@ func (f *Function) Exec(params map[string]Variable) (map[string]Variable, error)
 	if err != nil {
 		return nil, err
 	}
+
+	defer space.Clear()
 	return space.Return(), nil
 }
 

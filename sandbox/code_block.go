@@ -21,7 +21,6 @@ func (f *CodeBlock) Exec(parent *Closure, returnBubble bool, init func(*Closure)
 		if returnBubble {
 			parent.MergeReturn(space)
 		}
-		space.Clear()
 	}()
 	if init != nil {
 		err := init(space)
