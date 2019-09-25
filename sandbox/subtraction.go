@@ -1,32 +1,28 @@
 package sandbox
 
-import (
-	"errors"
-)
-
 type Subtraction struct {
 	left   Index
 	right  Index
 	result Index
 }
 
-func (a *Subtraction) Exec(space *Closure) (bool, error) {
-	preLeft, errLeft := a.left.Get(space)
-	preRight, errRight := a.right.Get(space)
-
-	if errLeft != nil {
-		return false, errLeft
+func (a *Subtraction) Exec(space *Closure) Interrupt {
+	preLeft, exception := a.left.Get(space)
+	if exception != nil {
+		return exception
 	}
-	if errRight != nil {
-		return false, errRight
+	preRight, exception := a.right.Get(space)
+	if exception != nil {
+		return exception
 	}
 
 	left, yesLeft := VariableFamilyInstance.IsNumber(preLeft)
 	right, yesRight := VariableFamilyInstance.IsNumber(preRight)
 	if !yesLeft || !yesRight {
-		return false, errors.New("Only numbers can be subtracted.")
+		return NewException("type error", "Only numbers can be added.")
 	}
-	return true, a.result.Set(space, NewNumber(left.Value()-right.Value()))
+	return a.result.Set(space, NewNumber(left.Value()-right.Value()))
+
 }
 
 func NewSubtraction(left Index, right Index, result Index) *Subtraction {

@@ -1,10 +1,14 @@
 package sandbox
 
+const (
+	EndInterruptType = "end"
+)
+
 type End struct {
 }
 
-func (a *End) Exec(space *Closure) (bool, error) {
-	return false, nil
+func (e *End) InterruptType() string {
+	return EndInterruptType
 }
 
 func NewEnd() *End {

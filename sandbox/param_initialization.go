@@ -4,9 +4,9 @@ type ParamInitialization struct {
 	param string
 }
 
-func (a *ParamInitialization) Exec(space *Closure) (bool, error) {
+func (a *ParamInitialization) Exec(space *Closure) Interrupt {
 	space.InitLocal(a.param)
-	return true, nil
+	return nil
 }
 
 func NewParamInitialization(param string) *ParamInitialization {

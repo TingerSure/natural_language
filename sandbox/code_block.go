@@ -1,7 +1,8 @@
 package sandbox
 
 import (
-	"errors"
+	// "fmt"
+	// "github.com/TingerSure/natural_language/library/nl_interface"
 )
 
 type CodeBlock struct {
@@ -12,32 +13,32 @@ func (c *CodeBlock) AddStep(step Expression) {
 	c.flow = append(c.flow, step)
 }
 
-func (f *CodeBlock) Exec(parent *Closure, returnBubble bool, init func(*Closure) error) (*Closure, bool, error) {
+func (f *CodeBlock) Exec(parent *Closure, returnBubble bool, init func(*Closure) Interrupt) (*Closure, Interrupt) {
+
 	if parent == nil && returnBubble {
-		return nil, false, errors.New("No parent to bubble.")
+		returnBubble = false
 	}
+
 	space := NewClosure(parent)
 	defer func() {
 		if returnBubble {
 			parent.MergeReturn(space)
 		}
 	}()
+
 	if init != nil {
-		err := init(space)
-		if err != nil {
-			return space, false, err
+		suspend := init(space)
+		if suspend != nil {
+			return space, suspend
 		}
 	}
 	for _, step := range f.flow {
-		keep, err := step.Exec(space)
-		if err != nil {
-			return space, false, err
-		}
-		if !keep {
-			return space, false, nil
+		suspend := step.Exec(space)
+		if suspend != nil {
+			return space, suspend
 		}
 	}
-	return space, true, nil
+	return space, nil
 }
 
 func NewCodeBlock() *CodeBlock {

@@ -4,11 +4,11 @@ type LocalIndex struct {
 	key string
 }
 
-func (s *LocalIndex) Get(space *Closure) (Variable, error) {
+func (s *LocalIndex) Get(space *Closure) (Variable, *Exception) {
 	return space.GetLocal(s.key)
 }
 
-func (s *LocalIndex) Set(space *Closure, value Variable) error {
+func (s *LocalIndex) Set(space *Closure, value Variable) *Exception {
 	return space.SetLocal(s.key, value)
 }
 

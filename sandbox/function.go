@@ -1,5 +1,9 @@
 package sandbox
 
+import (
+	"fmt"
+)
+
 const (
 	VariableFunctionType = "function"
 )
@@ -18,25 +22,37 @@ func (f *Function) AddStep(step Expression) {
 	f.body.AddStep(step)
 }
 
-func (f *Function) Exec(params map[string]Variable) (map[string]Variable, error) {
+func (f *Function) Exec(params map[string]Variable) (map[string]Variable, *Exception) {
 
-	space, _, err := f.body.Exec(f.parent, false, func(space *Closure) error {
+	space, suspend := f.body.Exec(f.parent, false, func(space *Closure) Interrupt {
 		for _, name := range f.paramNames {
 			space.InitLocal(name)
 		}
 		for name, value := range params {
-			err := space.SetLocal(name, value)
-			if err != nil {
-				return err
+			suspend := space.SetLocal(name, value)
+			if suspend != nil {
+				return suspend
 			}
 		}
 		return nil
 	})
-	if err != nil {
-		return nil, err
+	defer space.Clear()
+
+	if suspend != nil {
+		switch suspend.InterruptType() {
+		case ExceptionInterruptType:
+			exception, yes := InterruptFamilyInstance.IsException(suspend)
+			if !yes {
+				return nil, NewException("system panic", fmt.Sprintf("ExceptionInterruptType does not mean an Exception anymore.\n%+v", suspend))
+			}
+			return nil, exception
+		case EndInterruptType:
+			return space.Return(), nil
+		default:
+			return nil, NewException("system error", fmt.Sprintf("Unknown Interrupt \"%v\".\n%+v", suspend.InterruptType(), suspend))
+		}
 	}
 
-	defer space.Clear()
 	return space.Return(), nil
 }
 

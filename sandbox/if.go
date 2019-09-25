@@ -1,9 +1,5 @@
 package sandbox
 
-import (
-	"errors"
-)
-
 type If struct {
 	condition Index
 	judgment  *CodeBlock
@@ -11,29 +7,26 @@ type If struct {
 	secondary *CodeBlock
 }
 
-func (f *If) Exec(parent *Closure) (bool, error) {
+func (f *If) Exec(parent *Closure) Interrupt {
 
 	if f.condition == nil {
-		return false, errors.New("No condition for judgment.")
+		return NewException("system error", "No condition for judgment.")
 	}
 
-	judgmentSpace, keep, err := f.judgment.Exec(parent, false, nil)
-	if err != nil {
-		return false, err
-	}
+	judgmentSpace, suspend := f.judgment.Exec(parent, false, nil)
 	defer judgmentSpace.Clear()
-	if !keep {
-		return false, nil
+	if suspend != nil {
+		return suspend
 	}
 
-	preCondition, err := f.condition.Get(judgmentSpace)
-	if err != nil {
-		return false, err
+	preCondition, suspend := f.condition.Get(judgmentSpace)
+	if suspend != nil {
+		return suspend
 	}
 
 	condition, yes := VariableFamilyInstance.IsBool(preCondition)
 	if !yes {
-		return false, errors.New("Only bool can be judged.")
+		return NewException("type error", "Only bool can be judged.")
 	}
 
 	var active *CodeBlock
@@ -43,13 +36,10 @@ func (f *If) Exec(parent *Closure) (bool, error) {
 		active = f.secondary
 	}
 
-	space, keep, err := active.Exec(judgmentSpace, true, nil)
-	if err != nil {
-		return false, err
-	}
+	space, suspend := active.Exec(judgmentSpace, true, nil)
 	defer space.Clear()
 	parent.MergeReturn(judgmentSpace)
-	return keep, nil
+	return suspend
 }
 
 func (f *If) SetCondition(condition Index) {

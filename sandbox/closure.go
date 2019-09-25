@@ -1,7 +1,7 @@
 package sandbox
 
 import (
-	"errors"
+	"fmt"
 )
 
 type Closure struct {
@@ -34,39 +34,39 @@ func (c *Closure) InitLocal(key string) {
 	c.local[key] = true
 }
 
-func (c *Closure) GetLocal(key string) (Variable, error) {
+func (c *Closure) GetLocal(key string) (Variable, *Exception) {
 	if !c.local[key] {
-		return nil, errors.New("Undefined variable.")
+		return nil, NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 	}
 	return c.value[key], nil
 }
 
-func (c *Closure) SetLocal(key string, value Variable) error {
+func (c *Closure) SetLocal(key string, value Variable) *Exception {
 	if !c.local[key] {
-		return errors.New("Undefined variable.")
+		return NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 	}
 	c.value[key] = value
 	return nil
 }
 
-func (c *Closure) GetBubble(key string) (Variable, error) {
+func (c *Closure) GetBubble(key string) (Variable, *Exception) {
 	if c.local[key] {
 		return c.GetLocal(key)
 	}
 	if c.parent != nil {
 		return c.parent.GetBubble(key)
 	}
-	return nil, errors.New("Undefined variable.")
+	return nil, NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 }
 
-func (c *Closure) SetBubble(key string, value Variable) error {
+func (c *Closure) SetBubble(key string, value Variable) *Exception {
 	if c.local[key] {
 		return c.SetLocal(key, value)
 	}
 	if c.parent != nil {
 		return c.parent.SetBubble(key, value)
 	}
-	return errors.New("Undefined variable.")
+	return NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 }
 
 func (c *Closure) GetCache(index int) Variable {

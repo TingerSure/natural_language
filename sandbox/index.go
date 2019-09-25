@@ -1,6 +1,6 @@
 package sandbox
 
 type Index interface {
-	Get(*Closure) (Variable, error)
-	Set(*Closure, Variable) error
+	Get(*Closure) (Variable, *Exception)
+	Set(*Closure, Variable) *Exception
 }

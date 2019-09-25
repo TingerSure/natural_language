@@ -5,14 +5,14 @@ type Return struct {
 	result Index
 }
 
-func (a *Return) Exec(space *Closure) (bool, error) {
-	result, err := a.result.Get(space)
+func (a *Return) Exec(space *Closure) Interrupt {
+	result, exception := a.result.Get(space)
 
-	if err != nil {
-		return false, err
+	if exception != nil {
+		return exception
 	}
 	space.SetReturn(a.key, result)
-	return true, nil
+	return nil
 }
 
 func NewReturn(key string, result Index) *Return {
