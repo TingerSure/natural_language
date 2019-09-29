@@ -32,12 +32,14 @@ func (f *If) ToString(prefix string) string {
 
 func (f *If) Exec(parent concept.Closure) concept.Interrupt {
 
-	if f.condition == nil {
+	if nl_interface.IsNil(f.condition) {
 		return interrupt.NewException("system error", "No condition for judgment.")
 	}
 
 	judgmentSpace, suspend := f.judgment.Exec(parent, false, nil)
 	defer judgmentSpace.Clear()
+	defer parent.MergeReturn(judgmentSpace)
+
 	if !nl_interface.IsNil(suspend) {
 		return suspend
 	}
@@ -61,7 +63,6 @@ func (f *If) Exec(parent concept.Closure) concept.Interrupt {
 
 	space, suspend := active.Exec(judgmentSpace, true, nil)
 	defer space.Clear()
-	parent.MergeReturn(judgmentSpace)
 	return suspend
 }
 

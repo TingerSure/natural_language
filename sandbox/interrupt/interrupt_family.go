@@ -18,6 +18,28 @@ func (v *InterruptFamily) IsException(value concept.Interrupt) (*Exception, bool
 	return nil, false
 }
 
+func (v *InterruptFamily) IsBreak(value concept.Interrupt) (*Break, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.InterruptType() == BreakInterruptType {
+		breaks, yes := value.(*Break)
+		return breaks, yes
+	}
+	return nil, false
+}
+
+func (v *InterruptFamily) IsContinue(value concept.Interrupt) (*Continue, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.InterruptType() == ContinueInterruptType {
+		continues, yes := value.(*Continue)
+		return continues, yes
+	}
+	return nil, false
+}
+
 func (v *InterruptFamily) IsEnd(value concept.Interrupt) (*End, bool) {
 	if value == nil {
 		return nil, false
