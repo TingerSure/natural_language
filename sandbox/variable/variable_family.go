@@ -1,9 +1,13 @@
-package sandbox
+package variable
+
+import (
+	"github.com/TingerSure/natural_language/sandbox/concept"
+)
 
 type VariableFamily struct {
 }
 
-func (v *VariableFamily) IsNumber(value Variable) (*Number, bool) {
+func (v *VariableFamily) IsNumber(value concept.Variable) (*Number, bool) {
 	if value == nil {
 		return nil, false
 	}
@@ -14,7 +18,7 @@ func (v *VariableFamily) IsNumber(value Variable) (*Number, bool) {
 	return nil, false
 }
 
-func (v *VariableFamily) IsBool(value Variable) (*Bool, bool) {
+func (v *VariableFamily) IsBool(value concept.Variable) (*Bool, bool) {
 	if value == nil {
 		return nil, false
 	}

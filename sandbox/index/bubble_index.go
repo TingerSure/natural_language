@@ -1,4 +1,8 @@
-package sandbox
+package index
+
+import (
+	"github.com/TingerSure/natural_language/sandbox/concept"
+)
 
 type BubbleIndex struct {
 	key string
@@ -8,11 +12,11 @@ func (s *BubbleIndex) ToString(prefix string) string {
 	return s.key
 }
 
-func (s *BubbleIndex) Get(space *Closure) (Variable, *Exception) {
+func (s *BubbleIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	return space.GetBubble(s.key)
 }
 
-func (s *BubbleIndex) Set(space *Closure, value Variable) *Exception {
+func (s *BubbleIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
 	return space.SetBubble(s.key, value)
 }
 

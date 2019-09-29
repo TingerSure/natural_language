@@ -1,4 +1,4 @@
-package sandbox
+package variable
 
 import (
 	"fmt"

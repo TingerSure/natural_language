@@ -1,4 +1,4 @@
-package sandbox
+package concept
 
 type Interrupt interface {
 	InterruptType() string

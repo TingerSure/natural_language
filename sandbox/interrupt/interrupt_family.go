@@ -1,9 +1,13 @@
-package sandbox
+package interrupt
+
+import (
+	"github.com/TingerSure/natural_language/sandbox/concept"
+)
 
 type InterruptFamily struct {
 }
 
-func (v *InterruptFamily) IsException(value Interrupt) (*Exception, bool) {
+func (v *InterruptFamily) IsException(value concept.Interrupt) (*Exception, bool) {
 	if value == nil {
 		return nil, false
 	}
@@ -14,7 +18,7 @@ func (v *InterruptFamily) IsException(value Interrupt) (*Exception, bool) {
 	return nil, false
 }
 
-func (v *InterruptFamily) IsEnd(value Interrupt) (*End, bool) {
+func (v *InterruptFamily) IsEnd(value concept.Interrupt) (*End, bool) {
 	if value == nil {
 		return nil, false
 	}

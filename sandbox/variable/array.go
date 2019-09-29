@@ -1,8 +1,9 @@
-package sandbox
+package variable
 
 import (
 	"errors"
 	"fmt"
+	"github.com/TingerSure/natural_language/sandbox/concept"
 	"strings"
 )
 
@@ -11,7 +12,7 @@ const (
 )
 
 type Array struct {
-	values []Variable
+	values []concept.Variable
 	length int
 }
 
@@ -24,7 +25,7 @@ func (a *Array) ToString(prefix string) string {
 	return fmt.Sprintf("[%v]", strings.Join(valuesToStrings, ", "))
 }
 
-func (a *Array) Set(index int, value Variable) error {
+func (a *Array) Set(index int, value concept.Variable) error {
 	if index < 0 || index >= a.length {
 		return errors.New("array index out of bounds error.")
 	}
@@ -32,7 +33,7 @@ func (a *Array) Set(index int, value Variable) error {
 	return nil
 }
 
-func (a *Array) Get(index int) (Variable, error) {
+func (a *Array) Get(index int) (concept.Variable, error) {
 	if index < 0 || index >= a.length {
 		return nil, errors.New("array index out of bounds error.")
 	}
@@ -49,7 +50,7 @@ func (a *Array) Type() string {
 
 func NewArray(size int) *Array {
 	return &Array{
-		values: make([]Variable, size),
+		values: make([]concept.Variable, size),
 		length: size,
 	}
 }

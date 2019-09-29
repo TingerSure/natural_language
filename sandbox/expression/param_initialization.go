@@ -1,7 +1,8 @@
-package sandbox
+package expression
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/sandbox/concept"
 )
 
 type ParamInitialization struct {
@@ -12,7 +13,7 @@ func (a *ParamInitialization) ToString(prefix string) string {
 	return fmt.Sprintf("%vvar %v", prefix, a.param)
 }
 
-func (a *ParamInitialization) Exec(space *Closure) Interrupt {
+func (a *ParamInitialization) Exec(space concept.Closure) concept.Interrupt {
 	space.InitLocal(a.param)
 	return nil
 }

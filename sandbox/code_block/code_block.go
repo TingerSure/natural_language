@@ -1,12 +1,14 @@
-package sandbox
+package code_block
 
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/library/nl_interface"
+	"github.com/TingerSure/natural_language/sandbox/closure"
+	"github.com/TingerSure/natural_language/sandbox/concept"
 )
 
 type CodeBlock struct {
-	flow []Expression
+	flow []concept.Expression
 }
 
 func (c *CodeBlock) Size() int {
@@ -21,17 +23,17 @@ func (c *CodeBlock) ToString(prefix string) string {
 	}
 	return fmt.Sprintf("{%v\n%v}", flowToStrings, prefix)
 }
-func (c *CodeBlock) AddStep(step Expression) {
+func (c *CodeBlock) AddStep(step concept.Expression) {
 	c.flow = append(c.flow, step)
 }
 
-func (f *CodeBlock) Exec(parent *Closure, returnBubble bool, init func(*Closure) Interrupt) (*Closure, Interrupt) {
+func (f *CodeBlock) Exec(parent concept.Closure, returnBubble bool, init func(concept.Closure) concept.Interrupt) (concept.Closure, concept.Interrupt) {
 
 	if parent == nil && returnBubble {
 		returnBubble = false
 	}
 
-	space := NewClosure(parent)
+	space := closure.NewClosure(parent)
 	defer func() {
 		if returnBubble {
 			parent.MergeReturn(space)

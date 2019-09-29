@@ -1,4 +1,8 @@
-package sandbox
+package index
+
+import (
+	"github.com/TingerSure/natural_language/sandbox/concept"
+)
 
 type LocalIndex struct {
 	key string
@@ -8,11 +12,11 @@ func (s *LocalIndex) ToString(prefix string) string {
 	return s.key
 }
 
-func (s *LocalIndex) Get(space *Closure) (Variable, *Exception) {
+func (s *LocalIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	return space.GetLocal(s.key)
 }
 
-func (s *LocalIndex) Set(space *Closure, value Variable) *Exception {
+func (s *LocalIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
 	return space.SetLocal(s.key, value)
 }
 

@@ -1,4 +1,4 @@
-package sandbox
+package interrupt
 
 const (
 	ExceptionInterruptType = "exception"
