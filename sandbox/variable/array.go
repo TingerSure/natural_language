@@ -18,7 +18,7 @@ type Array struct {
 
 func (a *Array) ToString(prefix string) string {
 	itemPrefix := fmt.Sprintf("%v\t", prefix)
-	valuesToStrings := make([]string, len(a.values))
+	valuesToStrings := make([]string, 0, len(a.values))
 	for _, value := range a.values {
 		valuesToStrings = append(valuesToStrings, value.ToString(itemPrefix))
 	}

@@ -31,18 +31,22 @@ func (f *Function) AddStep(step concept.Expression) {
 	f.body.AddStep(step)
 }
 
-func (f *Function) Exec(params map[string]concept.Variable) (map[string]concept.Variable, *interrupt.Exception) {
+func (f *Function) Exec(params *Param) (*Param, *interrupt.Exception) {
 
 	space, suspend := f.body.Exec(f.parent, false, func(space concept.Closure) concept.Interrupt {
 		for _, name := range f.paramNames {
 			space.InitLocal(name)
-		}
-		for name, value := range params {
-			suspend := space.SetLocal(name, value)
+			suspend := space.SetLocal(name, params.Get(name))
 			if !nl_interface.IsNil(suspend) {
 				return suspend
 			}
 		}
+		// for name, value := range f.paramNames {
+		// 	suspend := space.SetLocal(name, value)
+		// 	if !nl_interface.IsNil(suspend) {
+		// 		return suspend
+		// 	}
+		// }
 		return nil
 	})
 	defer space.Clear()
@@ -56,13 +60,13 @@ func (f *Function) Exec(params map[string]concept.Variable) (map[string]concept.
 			}
 			return nil, exception
 		case interrupt.EndInterruptType:
-			return space.Return(), nil
+			return NewParamWithInit(space.Return()), nil
 		default:
 			return nil, interrupt.NewException("system error", fmt.Sprintf("Unknown Interrupt \"%v\".\n%+v", suspend.InterruptType(), suspend))
 		}
 	}
 
-	return space.Return(), nil
+	return NewParamWithInit(space.Return()), nil
 }
 
 func (s *Function) Type() string {

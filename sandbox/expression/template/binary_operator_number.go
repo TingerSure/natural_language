@@ -35,7 +35,7 @@ func (a *BinaryOperatorNumber) Exec(space concept.Closure) concept.Interrupt {
 	if !yesLeft || !yesRight {
 		return interrupt.NewException("type error", "Only numbers can be added.")
 	}
-	value , suspend := a.exec(left, right)
+	value, suspend := a.exec(left, right)
 	if !nl_interface.IsNil(suspend) {
 		return suspend
 	}
