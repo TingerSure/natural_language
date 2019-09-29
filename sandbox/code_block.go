@@ -40,15 +40,13 @@ func (f *CodeBlock) Exec(parent *Closure, returnBubble bool, init func(*Closure)
 
 	if init != nil {
 		suspend := init(space)
-		if suspend != nil {
+		if !nl_interface.IsNil(suspend) {
 			return space, suspend
 		}
 	}
 	for _, step := range f.flow {
 		suspend := step.Exec(space)
-		fmt.Printf("%+v\n", !nl_interface.IsNil(suspend))
 		if !nl_interface.IsNil(suspend) {
-			fmt.Printf("%v\n", suspend.InterruptType())
 			return space, suspend
 		}
 	}

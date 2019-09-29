@@ -2,6 +2,7 @@ package sandbox
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/library/nl_interface"
 	"strings"
 )
 
@@ -35,7 +36,7 @@ func (f *Function) Exec(params map[string]Variable) (map[string]Variable, *Excep
 		}
 		for name, value := range params {
 			suspend := space.SetLocal(name, value)
-			if suspend != nil {
+			if !nl_interface.IsNil(suspend) {
 				return suspend
 			}
 		}
@@ -43,7 +44,7 @@ func (f *Function) Exec(params map[string]Variable) (map[string]Variable, *Excep
 	})
 	defer space.Clear()
 
-	if suspend != nil {
+	if !nl_interface.IsNil(suspend) {
 		switch suspend.InterruptType() {
 		case ExceptionInterruptType:
 			exception, yes := InterruptFamilyInstance.IsException(suspend)

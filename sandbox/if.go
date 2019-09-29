@@ -2,6 +2,7 @@ package sandbox
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/library/nl_interface"
 )
 
 type If struct {
@@ -33,12 +34,12 @@ func (f *If) Exec(parent *Closure) Interrupt {
 
 	judgmentSpace, suspend := f.judgment.Exec(parent, false, nil)
 	defer judgmentSpace.Clear()
-	if suspend != nil {
+	if !nl_interface.IsNil(suspend) {
 		return suspend
 	}
 
 	preCondition, suspend := f.condition.Get(judgmentSpace)
-	if suspend != nil {
+	if !nl_interface.IsNil(suspend) {
 		return suspend
 	}
 
