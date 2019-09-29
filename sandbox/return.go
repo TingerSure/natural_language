@@ -1,8 +1,16 @@
 package sandbox
 
+import (
+	"fmt"
+)
+
 type Return struct {
 	key    string
 	result Index
+}
+
+func (a *Return) ToString(prefix string) string {
+	return fmt.Sprintf("%vreturn[%v] %v", prefix, a.key, a.result.ToString(prefix))
 }
 
 func (a *Return) Exec(space *Closure) Interrupt {

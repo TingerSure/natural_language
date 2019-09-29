@@ -1,7 +1,15 @@
 package sandbox
 
+import (
+	"fmt"
+)
+
 type CacheIndex struct {
 	index int
+}
+
+func (s *CacheIndex) ToString(prefix string) string {
+	return fmt.Sprintf("cache[%v]", s.index)
 }
 
 func (s *CacheIndex) Get(space *Closure) (Variable, *Exception) {

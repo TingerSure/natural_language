@@ -2,6 +2,7 @@ package sandbox
 
 import (
 	"fmt"
+	"strings"
 )
 
 const (
@@ -12,6 +13,10 @@ type Function struct {
 	body       *CodeBlock
 	paramNames []string
 	parent     *Closure
+}
+
+func (f *Function) ToString(prefix string) string {
+	return fmt.Sprintf("function (%v) %v", strings.Join(f.paramNames, ", "), f.body.ToString(prefix))
 }
 
 func (f *Function) AddParamName(paramName string) {

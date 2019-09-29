@@ -4,6 +4,10 @@ type ConstIndex struct {
 	value Variable
 }
 
+func (s *ConstIndex) ToString(prefix string) string {
+	return s.value.ToString(prefix)
+}
+
 func (s *ConstIndex) Get(space *Closure) (Variable, *Exception) {
 	return s.value, nil
 }

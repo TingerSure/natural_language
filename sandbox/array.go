@@ -2,6 +2,8 @@ package sandbox
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 )
 
 const (
@@ -11,6 +13,15 @@ const (
 type Array struct {
 	values []Variable
 	length int
+}
+
+func (a *Array) ToString(prefix string) string {
+	itemPrefix := fmt.Sprintf("%v\t", prefix)
+	valuesToStrings := make([]string, len(a.values))
+	for _, value := range a.values {
+		valuesToStrings = append(valuesToStrings, value.ToString(itemPrefix))
+	}
+	return fmt.Sprintf("[%v]", strings.Join(valuesToStrings, ", "))
 }
 
 func (a *Array) Set(index int, value Variable) error {

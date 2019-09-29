@@ -1,9 +1,17 @@
 package sandbox
 
+import (
+	"fmt"
+)
+
 type Subtraction struct {
 	left   Index
 	right  Index
 	result Index
+}
+
+func (a *Subtraction) ToString(prefix string) string {
+	return fmt.Sprintf("%v%v = %v - %v", prefix, a.result.ToString(prefix), a.left.ToString(prefix), a.right.ToString(prefix))
 }
 
 func (a *Subtraction) Exec(space *Closure) Interrupt {

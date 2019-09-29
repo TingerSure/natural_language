@@ -1,10 +1,28 @@
 package sandbox
 
+import (
+	"fmt"
+)
+
 type If struct {
 	condition Index
 	judgment  *CodeBlock
 	primary   *CodeBlock
 	secondary *CodeBlock
+}
+
+func (f *If) ToString(prefix string) string {
+	judgmentToString := ""
+
+	if f.judgment.Size() != 0 {
+		judgmentToString = fmt.Sprintf(" %v", f.judgment.ToString(prefix))
+	}
+
+	primaryToString := fmt.Sprintf("%vif (%v%v) %v", prefix, f.condition.ToString(prefix), judgmentToString, f.primary.ToString(prefix))
+	if f.secondary.Size() == 0 {
+		return primaryToString
+	}
+	return fmt.Sprintf("%v else %v", primaryToString, f.secondary.ToString(prefix))
 }
 
 func (f *If) Exec(parent *Closure) Interrupt {

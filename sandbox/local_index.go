@@ -4,6 +4,10 @@ type LocalIndex struct {
 	key string
 }
 
+func (s *LocalIndex) ToString(prefix string) string {
+	return s.key
+}
+
 func (s *LocalIndex) Get(space *Closure) (Variable, *Exception) {
 	return space.GetLocal(s.key)
 }

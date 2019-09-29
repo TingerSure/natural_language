@@ -4,6 +4,10 @@ type BubbleIndex struct {
 	key string
 }
 
+func (s *BubbleIndex) ToString(prefix string) string {
+	return s.key
+}
+
 func (s *BubbleIndex) Get(space *Closure) (Variable, *Exception) {
 	return space.GetBubble(s.key)
 }
