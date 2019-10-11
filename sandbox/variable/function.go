@@ -41,12 +41,6 @@ func (f *Function) Exec(params *Param) (*Param, *interrupt.Exception) {
 				return suspend
 			}
 		}
-		// for name, value := range f.paramNames {
-		// 	suspend := space.SetLocal(name, value)
-		// 	if !nl_interface.IsNil(suspend) {
-		// 		return suspend
-		// 	}
-		// }
 		return nil
 	})
 	defer space.Clear()

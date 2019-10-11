@@ -11,43 +11,37 @@ import (
 type BinaryOperatorNumber struct {
 	left   concept.Index
 	right  concept.Index
-	result concept.Index
 	sign   string
 	exec   func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt)
 }
 
 func (a *BinaryOperatorNumber) ToString(prefix string) string {
-	return fmt.Sprintf("%v%v = %v %v %v", prefix, a.result.ToString(prefix), a.left.ToString(prefix), a.sign, a.right.ToString(prefix))
+	return fmt.Sprintf("%v %v %v", a.left.ToString(prefix), a.sign, a.right.ToString(prefix))
 }
 
-func (a *BinaryOperatorNumber) Exec(space concept.Closure) concept.Interrupt {
+func (a *BinaryOperatorNumber) Exec(space concept.Closure) (concept.Variable,concept.Interrupt) {
 	preLeft, suspend := a.left.Get(space)
 	if !nl_interface.IsNil(suspend) {
-		return suspend
+		return nil, suspend
 	}
 	preRight, suspend := a.right.Get(space)
 	if !nl_interface.IsNil(suspend) {
-		return suspend
+		return nil, suspend
 	}
 
 	left, yesLeft := variable.VariableFamilyInstance.IsNumber(preLeft)
 	right, yesRight := variable.VariableFamilyInstance.IsNumber(preRight)
 	if !yesLeft || !yesRight {
-		return interrupt.NewException("type error", "Only numbers can be added.")
+		return nil, interrupt.NewException("type error", "Only numbers can be added.")
 	}
-	value, suspend := a.exec(left, right)
-	if !nl_interface.IsNil(suspend) {
-		return suspend
-	}
-	return a.result.Set(space, value)
+	return a.exec(left, right)
 }
 
-func NewBinaryOperatorNumber(sign string, left concept.Index, right concept.Index, result concept.Index, exec func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt)) *BinaryOperatorNumber {
+func NewBinaryOperatorNumber(sign string, left concept.Index, right concept.Index, exec func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt)) *BinaryOperatorNumber {
 	return &BinaryOperatorNumber{
 		sign:   sign,
 		left:   left,
 		right:  right,
-		result: result,
 		exec:   exec,
 	}
 }

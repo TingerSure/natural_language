@@ -10,9 +10,9 @@ type Addition struct {
 	*template.BinaryOperatorNumber
 }
 
-func NewAddition(left concept.Index, right concept.Index, result concept.Index) *Addition {
+func NewAddition(left concept.Index, right concept.Index) *Addition {
 	return &Addition{
-		template.NewBinaryOperatorNumber("+", left, right, result, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {
+		template.NewBinaryOperatorNumber("+", left, right, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {
 			return variable.NewNumber(left.Value() + right.Value()), nil
 		}),
 	}

@@ -10,11 +10,11 @@ type FunctionEnd struct {
 }
 
 func (a *FunctionEnd) ToString(prefix string) string {
-	return fmt.Sprintf("%vend", prefix)
+	return fmt.Sprintf("end")
 }
 
-func (a *FunctionEnd) Exec(space concept.Closure) concept.Interrupt {
-	return interrupt.NewEnd()
+func (a *FunctionEnd) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+	return nil, interrupt.NewEnd()
 }
 
 func NewFunctionEnd() *FunctionEnd {

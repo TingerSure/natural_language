@@ -1,6 +1,6 @@
 package concept
 
 type Expression interface {
-	Exec(Closure) Interrupt
+	Exec(Closure) (Variable, Interrupt)
 	ToString(string) string
 }

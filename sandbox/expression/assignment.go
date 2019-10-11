@@ -12,15 +12,15 @@ type Assignment struct {
 }
 
 func (a *Assignment) ToString(prefix string) string {
-	return fmt.Sprintf("%v%v = %v", prefix, a.to.ToString(prefix), a.from.ToString(prefix))
+	return fmt.Sprintf("%v = %v", a.to.ToString(prefix), a.from.ToString(prefix))
 }
 
-func (a *Assignment) Exec(space concept.Closure) concept.Interrupt {
+func (a *Assignment) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	preFrom, suspend := a.from.Get(space)
 	if !nl_interface.IsNil(suspend) {
-		return suspend
+		return nil, suspend
 	}
-	return a.to.Set(space, preFrom)
+	return preFrom, a.to.Set(space, preFrom)
 }
 
 func NewAssignment(from concept.Index, to concept.Index) *Assignment {

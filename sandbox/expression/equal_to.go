@@ -10,9 +10,9 @@ type EqualTo struct {
 	*template.BinaryOperatorNumber
 }
 
-func NewEqualTo(left concept.Index, right concept.Index, result concept.Index) *EqualTo {
+func NewEqualTo(left concept.Index, right concept.Index) *EqualTo {
 	return &EqualTo{
-		template.NewBinaryOperatorNumber("==", left, right, result, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {
+		template.NewBinaryOperatorNumber("==", left, right, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {
 			return variable.NewBool(left.Value() == right.Value()), nil
 		}),
 	}

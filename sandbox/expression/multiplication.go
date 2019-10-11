@@ -10,9 +10,9 @@ type Multiplication struct {
 	*template.BinaryOperatorNumber
 }
 
-func NewMultiplication(left concept.Index, right concept.Index, result concept.Index) *Multiplication {
+func NewMultiplication(left concept.Index, right concept.Index) *Multiplication {
 	return &Multiplication{
-		template.NewBinaryOperatorNumber("*", left, right, result, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {
+		template.NewBinaryOperatorNumber("*", left, right, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {
 			return variable.NewNumber(left.Value() * right.Value()), nil
 		}),
 	}

@@ -3,6 +3,7 @@ package expression
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/library/nl_interface"
+	"github.com/TingerSure/natural_language/sandbox/closure"
 	"github.com/TingerSure/natural_language/sandbox/code_block"
 	"github.com/TingerSure/natural_language/sandbox/concept"
 	"github.com/TingerSure/natural_language/sandbox/interrupt"
@@ -11,47 +12,35 @@ import (
 
 type If struct {
 	condition concept.Index
-	judgment  *code_block.CodeBlock
 	primary   *code_block.CodeBlock
 	secondary *code_block.CodeBlock
 }
 
 func (f *If) ToString(prefix string) string {
-	judgmentToString := ""
-
-	if f.judgment.Size() != 0 {
-		judgmentToString = fmt.Sprintf(" %v", f.judgment.ToString(prefix))
-	}
-
-	primaryToString := fmt.Sprintf("%vif (%v%v) %v", prefix, f.condition.ToString(prefix), judgmentToString, f.primary.ToString(prefix))
+	primaryToString := fmt.Sprintf("if (%v) %v", f.condition.ToString(prefix), f.primary.ToString(prefix))
 	if f.secondary.Size() == 0 {
 		return primaryToString
 	}
 	return fmt.Sprintf("%v else %v", primaryToString, f.secondary.ToString(prefix))
 }
 
-func (f *If) Exec(parent concept.Closure) concept.Interrupt {
+func (f *If) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) {
 
 	if nl_interface.IsNil(f.condition) {
-		return interrupt.NewException("system error", "No condition for judgment.")
+		return nil, interrupt.NewException("system error", "No condition for judgment.")
 	}
+	initSpace := closure.NewClosure(parent)
+	defer initSpace.Clear()
+	defer parent.MergeReturn(initSpace)
 
-	judgmentSpace, suspend := f.judgment.Exec(parent, false, nil)
-	defer judgmentSpace.Clear()
-	defer parent.MergeReturn(judgmentSpace)
-
+	preCondition, suspend := f.condition.Get(initSpace)
 	if !nl_interface.IsNil(suspend) {
-		return suspend
-	}
-
-	preCondition, suspend := f.condition.Get(judgmentSpace)
-	if !nl_interface.IsNil(suspend) {
-		return suspend
+		return nil, suspend
 	}
 
 	condition, yes := variable.VariableFamilyInstance.IsBool(preCondition)
 	if !yes {
-		return interrupt.NewException("type error", "Only bool can be judged.")
+		return nil, interrupt.NewException("type error", "Only bool can be judged.")
 	}
 
 	var active *code_block.CodeBlock
@@ -61,17 +50,13 @@ func (f *If) Exec(parent concept.Closure) concept.Interrupt {
 		active = f.secondary
 	}
 
-	space, suspend := active.Exec(judgmentSpace, true, nil)
+	space, suspend := active.Exec(initSpace, true, nil)
 	defer space.Clear()
-	return suspend
+	return nil, suspend
 }
 
 func (f *If) SetCondition(condition concept.Index) {
 	f.condition = condition
-}
-
-func (f *If) AddJudgmentStep(step concept.Expression) {
-	f.judgment.AddStep(step)
 }
 
 func (f *If) AddPrimaryStep(step concept.Expression) {
@@ -84,7 +69,6 @@ func (f *If) AddSecondaryStep(step concept.Expression) {
 
 func NewIf() *If {
 	return &If{
-		judgment:  code_block.NewCodeBlock(),
 		primary:   code_block.NewCodeBlock(),
 		secondary: code_block.NewCodeBlock(),
 	}

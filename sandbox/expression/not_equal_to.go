@@ -10,9 +10,9 @@ type NotEqualTo struct {
 	*template.BinaryOperatorNumber
 }
 
-func NewNotEqualTo(left concept.Index, right concept.Index, result concept.Index) *NotEqualTo {
+func NewNotEqualTo(left concept.Index, right concept.Index) *NotEqualTo {
 	return &NotEqualTo{
-		template.NewBinaryOperatorNumber("!=", left, right, result, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {
+		template.NewBinaryOperatorNumber("!=", left, right, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {
 			return variable.NewBool(left.Value() != right.Value()), nil
 		}),
 	}

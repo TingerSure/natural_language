@@ -11,9 +11,9 @@ type Division struct {
 	*template.BinaryOperatorNumber
 }
 
-func NewDivision(left concept.Index, right concept.Index, result concept.Index) *Division {
+func NewDivision(left concept.Index, right concept.Index) *Division {
 	return &Division{
-		template.NewBinaryOperatorNumber("/", left, right, result, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {
+		template.NewBinaryOperatorNumber("/", left, right, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {
 			if right.Value() == 0 {
 				return variable.NewNumber(0), interrupt.NewException("param error", "Division right cannot be 0")
 			}

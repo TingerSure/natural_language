@@ -10,9 +10,9 @@ type GreaterThan struct {
 	*template.BinaryOperatorNumber
 }
 
-func NewGreaterThan(left concept.Index, right concept.Index, result concept.Index) *GreaterThan {
+func NewGreaterThan(left concept.Index, right concept.Index) *GreaterThan {
 	return &GreaterThan{
-		template.NewBinaryOperatorNumber(">", left, right, result, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {
+		template.NewBinaryOperatorNumber(">", left, right, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {
 			return variable.NewBool(left.Value() > right.Value()), nil
 		}),
 	}
