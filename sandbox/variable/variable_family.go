@@ -29,6 +29,28 @@ func (v *VariableFamily) IsBool(value concept.Variable) (*Bool, bool) {
 	return nil, false
 }
 
+func (v *VariableFamily) IsFunction(value concept.Variable) (*Function, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == VariableFunctionType {
+		funcs, yes := value.(*Function)
+		return funcs, yes
+	}
+	return nil, false
+}
+
+func (v *VariableFamily) IsParam(value concept.Variable) (*Param, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == VariableParamType {
+		param, yes := value.(*Param)
+		return param, yes
+	}
+	return nil, false
+}
+
 func newVariableFamily() *VariableFamily {
 	return &VariableFamily{}
 }

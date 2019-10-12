@@ -8,6 +8,7 @@ import (
 
 const (
 	VariableParamType = "param"
+	ParamDefaultKey   = "default"
 )
 
 type Param struct {

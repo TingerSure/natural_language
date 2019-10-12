@@ -59,12 +59,12 @@ func (f *If) SetCondition(condition concept.Index) {
 	f.condition = condition
 }
 
-func (f *If) AddPrimaryStep(step concept.Expression) {
-	f.primary.AddStep(step)
+func (f *If) Primary() *code_block.CodeBlock {
+	return f.primary
 }
 
-func (f *If) AddSecondaryStep(step concept.Expression) {
-	f.secondary.AddStep(step)
+func (f *If) Secondary() *code_block.CodeBlock {
+	return f.secondary
 }
 
 func NewIf() *If {

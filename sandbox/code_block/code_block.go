@@ -40,8 +40,12 @@ func (c *CodeBlock) ToString(prefix string) string {
 	}
 	return fmt.Sprintf("{\n%v\n%v}", strings.Join(flowToStrings, "\n"), prefix)
 }
-func (c *CodeBlock) AddStep(step concept.Expression) {
-	c.flow = append(c.flow, step)
+func (c *CodeBlock) AddStep(step ...concept.Expression) {
+	c.flow = append(c.flow, step...)
+}
+
+func (c *CodeBlock) AddSteps(steps []concept.Expression) {
+	c.flow = append(c.flow, steps...)
 }
 
 func (f *CodeBlock) Exec(parent concept.Closure, returnBubble bool, init func(concept.Closure) concept.Interrupt) (concept.Closure, concept.Interrupt) {

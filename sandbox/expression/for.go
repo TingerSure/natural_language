@@ -106,17 +106,14 @@ func (f *For) IsMyTag(tag string) bool {
 func (f *For) SetCondition(condition concept.Index) {
 	f.condition = condition
 }
-
-func (f *For) AddBodyStep(step concept.Expression) {
-	f.body.AddStep(step)
+func (f *For) Body() *code_block.CodeBlock {
+	return f.body
 }
-
-func (f *For) AddInitStep(step concept.Expression) {
-	f.init.AddStep(step)
+func (f *For) Init() *code_block.CodeBlock {
+	return f.init
 }
-
-func (f *For) AddEndStep(step concept.Expression) {
-	f.end.AddStep(step)
+func (f *For) End() *code_block.CodeBlock {
+	return f.end
 }
 
 func NewFor() *For {

@@ -11,6 +11,8 @@ import (
 
 const (
 	VariableFunctionType = "function"
+
+	FunctionAutoParamSelf = "self"
 )
 
 type Function struct {
@@ -27,13 +29,16 @@ func (f *Function) AddParamName(paramName string) {
 	f.paramNames = append(f.paramNames, paramName)
 }
 
-func (f *Function) AddStep(step concept.Expression) {
-	f.body.AddStep(step)
+func (f *Function) Body() *code_block.CodeBlock {
+	return f.body
 }
 
-func (f *Function) Exec(params *Param) (*Param, *interrupt.Exception) {
+func (f *Function) Exec(params *Param) (concept.Param, concept.Exception) {
 
 	space, suspend := f.body.Exec(f.parent, false, func(space concept.Closure) concept.Interrupt {
+		space.InitLocal(FunctionAutoParamSelf)
+		space.SetLocal(FunctionAutoParamSelf, f)
+
 		for _, name := range f.paramNames {
 			space.InitLocal(name)
 			suspend := space.SetLocal(name, params.Get(name))
