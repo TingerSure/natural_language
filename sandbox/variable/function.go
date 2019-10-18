@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	VariableFunctionType = "function"
-
+	VariableFunctionType  = "function"
+	FunctionFunctionType  = "general"
 	FunctionAutoParamSelf = "self"
 )
 
@@ -19,6 +19,10 @@ type Function struct {
 	body       *code_block.CodeBlock
 	paramNames []string
 	parent     concept.Closure
+}
+
+func (s *Function) FunctionType() string {
+	return FunctionFunctionType
 }
 
 func (f *Function) ToString(prefix string) string {
@@ -33,7 +37,7 @@ func (f *Function) Body() *code_block.CodeBlock {
 	return f.body
 }
 
-func (f *Function) Exec(params *Param) (concept.Param, concept.Exception) {
+func (f *Function) Exec(params concept.Param) (concept.Param, concept.Exception) {
 
 	space, suspend := f.body.Exec(f.parent, false, func(space concept.Closure) concept.Interrupt {
 		space.InitLocal(FunctionAutoParamSelf)

@@ -29,13 +29,20 @@ func (v *VariableFamily) IsBool(value concept.Variable) (*Bool, bool) {
 	return nil, false
 }
 
-func (v *VariableFamily) IsFunction(value concept.Variable) (*Function, bool) {
+func (v *VariableFamily) IsFunction(value concept.Variable) (concept.Function, bool) {
 	if value == nil {
 		return nil, false
 	}
 	if value.Type() == VariableFunctionType {
 		funcs, yes := value.(*Function)
-		return funcs, yes
+		if(yes){
+			return funcs, true
+		}
+		sysfuncs, yes := value.(*SystemFunction)
+		if(yes){
+			return sysfuncs, true
+		}
+		return nil, false
 	}
 	return nil, false
 }
