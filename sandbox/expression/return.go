@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/library/nl_interface"
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/sandbox/expression/adaptor"
 )
 
 type Return struct {
+	*adaptor.ExpressionIndex
 	key    string
 	result concept.Index
 }
@@ -26,8 +28,10 @@ func (a *Return) Exec(space concept.Closure) (concept.Variable, concept.Interrup
 }
 
 func NewReturn(key string, result concept.Index) *Return {
-	return &Return{
+	back := &Return{
 		key:    key,
 		result: result,
 	}
+	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	return back
 }

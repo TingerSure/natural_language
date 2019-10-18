@@ -6,11 +6,13 @@ import (
 	"github.com/TingerSure/natural_language/sandbox/closure"
 	"github.com/TingerSure/natural_language/sandbox/code_block"
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/sandbox/expression/adaptor"
 	"github.com/TingerSure/natural_language/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/sandbox/variable"
 )
 
 type If struct {
+	*adaptor.ExpressionIndex
 	condition concept.Index
 	primary   *code_block.CodeBlock
 	secondary *code_block.CodeBlock
@@ -68,8 +70,10 @@ func (f *If) Secondary() *code_block.CodeBlock {
 }
 
 func NewIf() *If {
-	return &If{
+	back := &If{
 		primary:   code_block.NewCodeBlock(),
 		secondary: code_block.NewCodeBlock(),
 	}
+	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	return back
 }

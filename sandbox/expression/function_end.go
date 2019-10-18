@@ -3,10 +3,12 @@ package expression
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/sandbox/expression/adaptor"
 	"github.com/TingerSure/natural_language/sandbox/interrupt"
 )
 
 type FunctionEnd struct {
+	*adaptor.ExpressionIndex
 }
 
 func (a *FunctionEnd) ToString(prefix string) string {
@@ -18,5 +20,7 @@ func (a *FunctionEnd) Exec(space concept.Closure) (concept.Variable, concept.Int
 }
 
 func NewFunctionEnd() *FunctionEnd {
-	return &FunctionEnd{}
+	back := &FunctionEnd{}
+	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	return back
 }

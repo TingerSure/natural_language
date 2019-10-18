@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/library/nl_interface"
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/sandbox/expression/adaptor"
 	"github.com/TingerSure/natural_language/sandbox/variable"
 	"strings"
 )
 
 type NewParam struct {
+	*adaptor.ExpressionIndex
 	values map[string]concept.Index
 }
 
@@ -42,11 +44,15 @@ func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interr
 }
 
 func NewNewParamWithInit(values map[string]concept.Index) *NewParam {
-	return &NewParam{
+	back := &NewParam{
 		values: values,
 	}
+	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	return back
 }
 
 func NewNewParam() *NewParam {
-	return &NewParam{}
+	back := &NewParam{}
+	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	return back
 }

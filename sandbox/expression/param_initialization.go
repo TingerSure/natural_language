@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/library/nl_interface"
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/sandbox/expression/adaptor"
 )
 
 type ParamInitialization struct {
+	*adaptor.ExpressionIndex
 	param       string
 	defaltValue concept.Index
 }
@@ -26,8 +28,10 @@ func (a *ParamInitialization) Exec(space concept.Closure) (concept.Variable, con
 }
 
 func NewParamInitialization(param string, defaltValue concept.Index) *ParamInitialization {
-	return &ParamInitialization{
+	back := &ParamInitialization{
 		param:       param,
 		defaltValue: defaltValue,
 	}
+	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	return back
 }

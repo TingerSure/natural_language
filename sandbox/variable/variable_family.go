@@ -35,11 +35,11 @@ func (v *VariableFamily) IsFunction(value concept.Variable) (concept.Function, b
 	}
 	if value.Type() == VariableFunctionType {
 		funcs, yes := value.(*Function)
-		if(yes){
+		if yes {
 			return funcs, true
 		}
 		sysfuncs, yes := value.(*SystemFunction)
-		if(yes){
+		if yes {
 			return sysfuncs, true
 		}
 		return nil, false

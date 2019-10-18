@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/library/nl_interface"
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/sandbox/expression/adaptor"
 )
 
 type Assignment struct {
+	*adaptor.ExpressionIndex
 	from concept.Index
 	to   concept.Index
 }
@@ -24,8 +26,10 @@ func (a *Assignment) Exec(space concept.Closure) (concept.Variable, concept.Inte
 }
 
 func NewAssignment(from concept.Index, to concept.Index) *Assignment {
-	return &Assignment{
+	back := &Assignment{
 		from: from,
 		to:   to,
 	}
+	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	return back
 }

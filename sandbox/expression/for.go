@@ -5,6 +5,7 @@ import (
 	"github.com/TingerSure/natural_language/library/nl_interface"
 	"github.com/TingerSure/natural_language/sandbox/code_block"
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/sandbox/expression/adaptor"
 	"github.com/TingerSure/natural_language/sandbox/index"
 	"github.com/TingerSure/natural_language/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/sandbox/variable"
@@ -15,6 +16,7 @@ var (
 )
 
 type For struct {
+	*adaptor.ExpressionIndex
 	tag       string
 	condition concept.Index
 	init      *code_block.CodeBlock
@@ -117,10 +119,12 @@ func (f *For) End() *code_block.CodeBlock {
 }
 
 func NewFor() *For {
-	return &For{
+	back := &For{
 		tag:  "",
 		init: code_block.NewCodeBlock(),
 		end:  code_block.NewCodeBlock(),
 		body: code_block.NewCodeBlock(),
 	}
+	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	return back
 }

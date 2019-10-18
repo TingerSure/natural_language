@@ -4,22 +4,24 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/library/nl_interface"
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/sandbox/expression/adaptor"
 	"github.com/TingerSure/natural_language/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/sandbox/variable"
 )
 
 type BinaryOperatorNumber struct {
-	left   concept.Index
-	right  concept.Index
-	sign   string
-	exec   func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt)
+	*adaptor.ExpressionIndex
+	left  concept.Index
+	right concept.Index
+	sign  string
+	exec  func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt)
 }
 
 func (a *BinaryOperatorNumber) ToString(prefix string) string {
 	return fmt.Sprintf("%v %v %v", a.left.ToString(prefix), a.sign, a.right.ToString(prefix))
 }
 
-func (a *BinaryOperatorNumber) Exec(space concept.Closure) (concept.Variable,concept.Interrupt) {
+func (a *BinaryOperatorNumber) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	preLeft, suspend := a.left.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
@@ -38,10 +40,12 @@ func (a *BinaryOperatorNumber) Exec(space concept.Closure) (concept.Variable,con
 }
 
 func NewBinaryOperatorNumber(sign string, left concept.Index, right concept.Index, exec func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt)) *BinaryOperatorNumber {
-	return &BinaryOperatorNumber{
-		sign:   sign,
-		left:   left,
-		right:  right,
-		exec:   exec,
+	back := &BinaryOperatorNumber{
+		sign:  sign,
+		left:  left,
+		right: right,
+		exec:  exec,
 	}
+	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	return back
 }

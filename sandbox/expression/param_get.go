@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/library/nl_interface"
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/sandbox/expression/adaptor"
 	"github.com/TingerSure/natural_language/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/sandbox/variable"
 )
 
 type ParamGet struct {
+	*adaptor.ExpressionIndex
 	key   string
 	param concept.Index
 }
@@ -32,10 +34,12 @@ func (a *ParamGet) Exec(space concept.Closure) (concept.Variable, concept.Interr
 }
 
 func NewParamGet(param concept.Index, key string) *ParamGet {
-	return &ParamGet{
+	back := &ParamGet{
 		key:   key,
 		param: param,
 	}
+	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	return back
 }
 
 func NewParamGetWithoutKey(param concept.Index) *ParamGet {
