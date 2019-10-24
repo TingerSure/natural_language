@@ -13,6 +13,7 @@ const (
 	VariableFunctionType  = "function"
 	FunctionFunctionType  = "general"
 	FunctionAutoParamSelf = "self"
+	FunctionAutoParamThis = "this"
 )
 
 type Function struct {
@@ -37,11 +38,14 @@ func (f *Function) Body() *code_block.CodeBlock {
 	return f.body
 }
 
-func (f *Function) Exec(params concept.Param) (concept.Param, concept.Exception) {
+func (f *Function) Exec(params concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 
 	space, suspend := f.body.Exec(f.parent, false, func(space concept.Closure) concept.Interrupt {
 		space.InitLocal(FunctionAutoParamSelf)
 		space.SetLocal(FunctionAutoParamSelf, f)
+
+		space.InitLocal(FunctionAutoParamThis)
+		space.SetLocal(FunctionAutoParamThis, object)
 
 		for _, name := range f.paramNames {
 			space.InitLocal(name)

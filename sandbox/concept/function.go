@@ -2,6 +2,6 @@ package concept
 
 type Function interface {
 	Variable
-	Exec(Param) (Param, Exception)
+	Exec(Param, Object) (Param, Exception)
 	FunctionType() string
 }

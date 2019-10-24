@@ -14,26 +14,75 @@ const (
 
 type Object struct {
 	fields      map[string]concept.Variable
+	methods     map[string]concept.Function
 	reflections []*component.ClassReflection
 }
 
-func (o *Object) GetReflection(class concept.Class) []*component.ClassReflection {
-	reflections := []*component.ClassReflection{}
+func (o *Object) GetClasses() []string {
+	classes := []string{}
 	for _, reflection := range o.reflections {
-		if reflection.GetClass().GetName() == class.GetName() {
-			reflections = append(reflections, reflection)
-		}
+		classes = append(classes, reflection.GetClass().GetName())
 	}
-	return reflections
+	return classes
 }
 
-func (o *Object) AddReflection(reflection *component.ClassReflection) concept.Exception {
+func (o *Object) GetClass(className string) concept.Class {
+
+	for _, reflection := range o.reflections {
+		if reflection.GetClass().GetName() == className {
+			return reflection.GetClass()
+		}
+	}
+	return nil
+}
+
+func (o *Object) GetAliases(class string) []string {
+	aliases := []string{}
+	for _, reflection := range o.reflections {
+		if reflection.GetClass().GetName() == class {
+			aliases = append(aliases, reflection.GetAlias())
+		}
+	}
+	return aliases
+}
+
+func (o *Object) UpdateAlias(class string, old, new string) bool {
+	for _, reflection := range o.reflections {
+		if reflection.GetClass().GetName() == class && reflection.GetAlias() == old {
+			reflection.SetAlias(new)
+			return true
+		}
+	}
+	return false
+}
+
+func (o *Object) GetMapping(class string, alias string) (map[string]string, concept.Exception) {
+	for _, reflection := range o.reflections {
+		if reflection.GetClass().GetName() == class && reflection.GetAlias() == alias {
+			return reflection.GetMapping(), nil
+		}
+	}
+	return nil, interrupt.NewException("system error", fmt.Sprintf("No mapping who's class is \"%v\" and alias is \"%v\"", class, alias))
+}
+
+func (o *Object) RemoveClass(class string, alias string) concept.Exception {
+	for index, reflection := range o.reflections {
+		if reflection.GetClass().GetName() == class && reflection.GetAlias() == alias {
+			o.reflections = append(o.reflections[:index], o.reflections[index+1:]...)
+			return nil
+		}
+	}
+	return interrupt.NewException("system error", fmt.Sprintf("No class who's name is \"%v\" and alias is \"%v\"", class, alias))
+
+}
+
+func (o *Object) AddClass(class concept.Class, alias string, mapping map[string]string) concept.Exception {
 	for _, old := range o.reflections {
-		if old.GetClass().GetName() == reflection.GetClass().GetName() && old.GetAlias() == reflection.GetAlias() {
+		if old.GetClass().GetName() == class.GetName() && old.GetAlias() == alias {
 			return interrupt.NewException("system error", "Duplicate class reflections are added.")
 		}
 	}
-	o.reflections = append(o.reflections, reflection)
+	o.reflections = append(o.reflections, component.NewClassReflectionWithMapping(class, mapping, alias))
 	return nil
 }
 
@@ -41,10 +90,11 @@ func (o *Object) HasField(key string) bool {
 	return o.fields[key] != nil
 }
 
-func (o *Object) InitField(key string, defaultValue concept.Variable) {
+func (o *Object) InitField(key string, defaultValue concept.Variable) concept.Exception {
 	if o.fields[key] == nil {
 		o.fields[key] = defaultValue
 	}
+	return nil
 }
 
 func (o *Object) SetField(key string, value concept.Variable) concept.Exception {
@@ -62,6 +112,23 @@ func (o *Object) GetField(key string) (concept.Variable, concept.Exception) {
 	return o.fields[key], nil
 }
 
+func (o *Object) HasMethod(key string) bool {
+	return o.methods[key] == nil
+}
+
+func (o *Object) SetMethod(key string, value concept.Function) concept.Exception {
+	o.methods[key] = value
+	return nil
+}
+
+func (o *Object) GetMethod(key string) (concept.Function, concept.Exception) {
+	value := o.methods[key]
+	if value == nil {
+		return nil, interrupt.NewException("system error", fmt.Sprintf("no method called %v", key))
+	}
+	return o.methods[key], nil
+}
+
 func (a *Object) ToString(prefix string) string {
 	if 0 == len(a.fields) && 0 == len(a.reflections) {
 		return "object <> {}"
@@ -71,6 +138,9 @@ func (a *Object) ToString(prefix string) string {
 
 	paramsToString := make([]string, 0, len(a.fields))
 	for key, value := range a.fields {
+		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key, value.ToString(subPrefix)))
+	}
+	for key, value := range a.methods {
 		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key, value.ToString(subPrefix)))
 	}
 
@@ -84,7 +154,6 @@ func (a *Object) ToString(prefix string) string {
 	}
 
 	return fmt.Sprintf("object <%v> {\n%v\n%v}", strings.Join(reflectionToString, ", "), strings.Join(paramsToString, ",\n"), prefix)
-
 }
 
 func (o *Object) Type() string {
@@ -94,6 +163,7 @@ func (o *Object) Type() string {
 func NewObject() *Object {
 	return &Object{
 		fields:      make(map[string]concept.Variable),
+		methods:     make(map[string]concept.Function),
 		reflections: make([]*component.ClassReflection, 0),
 	}
 }

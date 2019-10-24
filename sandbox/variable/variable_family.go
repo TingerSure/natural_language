@@ -29,20 +29,24 @@ func (v *VariableFamily) IsBool(value concept.Variable) (*Bool, bool) {
 	return nil, false
 }
 
-func (v *VariableFamily) IsFunction(value concept.Variable) (concept.Function, bool) {
+func (v *VariableFamily) IsFunction(value concept.Variable) (*Function, bool) {
 	if value == nil {
 		return nil, false
 	}
 	if value.Type() == VariableFunctionType {
-		funcs, yes := value.(*Function)
-		if yes {
-			return funcs, true
-		}
-		sysfuncs, yes := value.(*SystemFunction)
-		if yes {
-			return sysfuncs, true
-		}
+		bool, yes := value.(*Function)
+		return bool, yes
+	}
+	return nil, false
+}
+
+func (v *VariableFamily) IsSystemFunction(value concept.Variable) (*SystemFunction, bool) {
+	if value == nil {
 		return nil, false
+	}
+	if value.Type() == VariableSystemFunctionType {
+		bool, yes := value.(*SystemFunction)
+		return bool, yes
 	}
 	return nil, false
 }
@@ -76,6 +80,41 @@ func (v *VariableFamily) IsObject(value concept.Variable) (*Object, bool) {
 	if value.Type() == VariableObjectType {
 		object, yes := value.(*Object)
 		return object, yes
+	}
+	return nil, false
+}
+
+func (v *VariableFamily) IsMappingObject(value concept.Variable) (*MappingObject, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == VariableMappingObjectType {
+		object, yes := value.(*MappingObject)
+		return object, yes
+	}
+	return nil, false
+}
+
+func (v *VariableFamily) IsFunctionHome(value concept.Variable) (concept.Function, bool) {
+	function, yes := v.IsFunction(value)
+	if yes {
+		return function, yes
+	}
+	systemFunction, yes := v.IsSystemFunction(value)
+	if yes {
+		return systemFunction, yes
+	}
+	return nil, false
+}
+
+func (v *VariableFamily) IsObjectHome(value concept.Variable) (concept.Object, bool) {
+	object, yes := v.IsObject(value)
+	if yes {
+		return object, yes
+	}
+	mappingObject, yes := v.IsMappingObject(value)
+	if yes {
+		return mappingObject, yes
 	}
 	return nil, false
 }

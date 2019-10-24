@@ -7,7 +7,6 @@ import (
 	"github.com/TingerSure/natural_language/sandbox/expression/adaptor"
 	"github.com/TingerSure/natural_language/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/sandbox/variable"
-	"github.com/TingerSure/natural_language/sandbox/variable/component"
 	"strings"
 )
 
@@ -63,8 +62,7 @@ func (a *ClassRegister) Exec(space concept.Closure) (concept.Variable, concept.I
 		}
 	}
 
-	reflection := component.NewClassReflectionWithMapping(class, a.mapping, a.alias)
-	return object, object.AddReflection(reflection)
+	return object, object.AddClass(class, a.alias, a.mapping)
 }
 
 func NewClassRegister(object concept.Index, class concept.Index, mapping map[string]string, alias string) *ClassRegister {

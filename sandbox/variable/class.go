@@ -19,16 +19,6 @@ type Class struct {
 	staticFields  map[string]concept.Variable
 }
 
-func NewClass(name string) *Class {
-	return &Class{
-		name:          name,
-		methods:       make(map[string]concept.Function),
-		fields:        make(map[string]concept.Variable),
-		staticMethods: make(map[string]concept.Function),
-		staticFields:  make(map[string]concept.Variable),
-	}
-}
-
 func (c *Class) ToString(prefix string) string {
 	subprefix := fmt.Sprintf("%v\t", prefix)
 
@@ -120,4 +110,14 @@ func (c *Class) HasStaticField(key string) bool {
 
 func (c *Class) AllStaticFields() map[string]concept.Variable {
 	return c.staticFields
+}
+
+func NewClass(name string) *Class {
+	return &Class{
+		name:          name,
+		methods:       make(map[string]concept.Function),
+		fields:        make(map[string]concept.Variable),
+		staticMethods: make(map[string]concept.Function),
+		staticFields:  make(map[string]concept.Variable),
+	}
 }

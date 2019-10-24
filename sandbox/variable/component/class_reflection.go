@@ -5,29 +5,29 @@ import (
 )
 
 type ClassReflection struct {
-	class       concept.Class
-	alias       string
-	reflections map[string]string
+	class   concept.Class
+	alias   string
+	mapping map[string]string
 }
 
-func (c *ClassReflection) CheckReflections() bool {
-	if len(c.reflections) != len(c.class.AllFields()) {
+func (c *ClassReflection) CheckMapping() bool {
+	if len(c.mapping) != len(c.class.AllFields()) {
 		return false
 	}
 	for field, _ := range c.class.AllFields() {
-		if c.reflections[field] == "" {
+		if c.mapping[field] == "" {
 			return false
 		}
 	}
 	return true
 }
 
-func (c *ClassReflection) SetReflection(classField string, objectField string) {
-	c.reflections[classField] = objectField
+func (c *ClassReflection) SetMapping(mapping map[string]string) {
+	c.mapping = mapping
 }
 
-func (c *ClassReflection) GetReflection(classField string) string {
-	return c.reflections[classField]
+func (c *ClassReflection) GetMapping() map[string]string {
+	return c.mapping
 }
 
 func (c *ClassReflection) GetClass() concept.Class {
@@ -50,8 +50,8 @@ func NewClassReflection(class concept.Class) *ClassReflection {
 
 func NewClassReflectionWithMapping(class concept.Class, mapping map[string]string, alias string) *ClassReflection {
 	return &ClassReflection{
-		class:       class,
-		reflections: mapping,
-		alias:       alias,
+		class:   class,
+		mapping: mapping,
+		alias:   alias,
 	}
 }

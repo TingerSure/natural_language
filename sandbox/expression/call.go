@@ -5,12 +5,13 @@ import (
 	"github.com/TingerSure/natural_language/library/nl_interface"
 	"github.com/TingerSure/natural_language/sandbox/concept"
 	"github.com/TingerSure/natural_language/sandbox/expression/adaptor"
+	"github.com/TingerSure/natural_language/sandbox/index"
 	"github.com/TingerSure/natural_language/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/sandbox/variable"
 )
 
 var (
-	callDefaultParam = variable.NewParam()
+	callDefaultParam = index.NewConstIndex(variable.NewParam())
 )
 
 type Call struct {
@@ -28,28 +29,28 @@ func (a *Call) Exec(space concept.Closure) (concept.Variable, concept.Interrupt)
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
 	}
-	funcs, yesFuncs := variable.VariableFamilyInstance.IsFunction(preFuncs)
+	funcs, yesFuncs := variable.VariableFamilyInstance.IsFunctionHome(preFuncs)
 	if !yesFuncs {
 		return nil, interrupt.NewException("type error", "Only Function can be Called.")
 	}
 
-	param := callDefaultParam
-	if !nl_interface.IsNil(a.param) {
-		preParam, suspend := a.param.Get(space)
-		if !nl_interface.IsNil(suspend) {
-			return nil, suspend
-		}
-		yesParam := false
-		param, yesParam = variable.VariableFamilyInstance.IsParam(preParam)
-		if !yesParam {
-			return nil, interrupt.NewException("type error", "Only Param can are passed to a Function")
-		}
+	preParam, suspend := a.param.Get(space)
+	if !nl_interface.IsNil(suspend) {
+		return nil, suspend
+	}
+	yesParam := false
+	param, yesParam := variable.VariableFamilyInstance.IsParam(preParam)
+	if !yesParam {
+		return nil, interrupt.NewException("type error", "Only Param can are passed to a Function")
 	}
 
-	return funcs.Exec(param)
+	return funcs.Exec(param, nil)
 }
 
 func NewCall(funcs concept.Index, param concept.Index) *Call {
+	if nl_interface.IsNil(param) {
+		param = callDefaultParam
+	}
 	back := &Call{
 		funcs: funcs,
 		param: param,
