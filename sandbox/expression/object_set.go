@@ -9,17 +9,18 @@ import (
 	"github.com/TingerSure/natural_language/sandbox/variable"
 )
 
-type ObjectGet struct {
+type ObjectSet struct {
 	*adaptor.ExpressionIndex
 	key    string
 	object concept.Index
+	value  concept.Index
 }
 
-func (a *ObjectGet) ToString(prefix string) string {
-	return fmt.Sprintf("%v.%v", a.object.ToString(prefix), a.key)
+func (a *ObjectSet) ToString(prefix string) string {
+	return fmt.Sprintf("%v.%v = %v", a.object.ToString(prefix), a.key, a.value.ToString(prefix))
 }
 
-func (a *ObjectGet) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *ObjectSet) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
 
 	preObject, suspend := a.object.Get(space)
 	if !nl_interface.IsNil(suspend) {
@@ -27,23 +28,26 @@ func (a *ObjectGet) Exec(space concept.Closure) (concept.Variable, concept.Inter
 	}
 	object, yesObject := variable.VariableFamilyInstance.IsObject(preObject)
 	if !yesObject {
-		return nil, interrupt.NewException("type error", "Only Object can be get in ObjectGet")
+		return nil, interrupt.NewException("type error", "Only Object can be get in ObjectSet")
 	}
 
-	value, suspend := object.GetField(a.key)
+	preValue, suspend := a.value.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
 	}
-	if nl_interface.IsNil(value) {
-		return nil, interrupt.NewException("type error", fmt.Sprintf("%v is empty.", a.ToString("")))
+
+	suspend = object.SetField(a.key, preValue)
+	if !nl_interface.IsNil(suspend) {
+		return nil, suspend
 	}
-	return value, nil
+	return preObject, nil
 }
 
-func NewObjectGet(object concept.Index, key string) *ObjectGet {
-	back := &ObjectGet{
+func NewObjectSet(object concept.Index, key string, value concept.Index) *ObjectSet {
+	back := &ObjectSet{
 		key:    key,
 		object: object,
+		value:  value,
 	}
 	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
 	return back
