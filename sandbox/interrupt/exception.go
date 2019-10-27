@@ -1,5 +1,9 @@
 package interrupt
 
+import (
+	"fmt"
+)
+
 const (
 	ExceptionInterruptType = "exception"
 )
@@ -20,6 +24,11 @@ func (e *Exception) Name() string {
 func (e *Exception) Message() string {
 	return e.message
 }
+
+func (e *Exception) ToString(prefix string) string {
+	return fmt.Sprintf("[%v] %v", e.name, e.message)
+}
+
 func NewException(name string, message string) *Exception {
 	return &Exception{
 		name:    name,
