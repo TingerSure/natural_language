@@ -10,7 +10,8 @@ type Closure interface {
 	SetLocal(string, Variable) Interrupt
 	GetBubble(string) (Variable, Interrupt)
 	SetBubble(string, Variable) Interrupt
-	GetCache(int) Variable
-	SetCache(int, Variable)
+	IterateHistory(func(string, Variable) bool) bool
+	IterateLocal(func(string, Variable) bool) bool
+	IterateBubble(func(string, Variable) bool) bool
 	Clear()
 }

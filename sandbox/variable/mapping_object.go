@@ -16,10 +16,10 @@ type MappingObject struct {
 	alias     string
 	class     concept.Class
 	className string
-	object    *Object
+	object    concept.Object
 }
 
-func NewMappingObject(object *Object, className string, alias string) (*MappingObject, concept.Exception) {
+func NewMappingObject(object concept.Object, className string, alias string) (*MappingObject, concept.Exception) {
 
 	class := object.GetClass(className)
 	if nl_interface.IsNil(class) {
@@ -39,6 +39,46 @@ func NewMappingObject(object *Object, className string, alias string) (*MappingO
 		object:    object,
 	}, nil
 }
+func (m *MappingObject) GetSource() concept.Object {
+	return m.object
+}
+
+func (m *MappingObject) GetClasses() []string {
+	return []string{
+		m.className,
+	}
+}
+
+func (m *MappingObject) GetClass(className string) concept.Class {
+	if className == m.className {
+		return m.class
+	}
+	return nil
+}
+
+func (m *MappingObject) GetAliases(className string) []string {
+	if className == m.className {
+		return []string{
+			m.alias,
+		}
+	}
+	return []string{}
+}
+
+func (m *MappingObject) IsClassAlias(className string, alias string) bool {
+	return className == m.className && alias == m.alias
+}
+
+func (m *MappingObject) GetMapping(className string, alias string) (map[string]string, concept.Exception) {
+	if className != m.className || alias != m.alias {
+		return nil, interrupt.NewException("system error", fmt.Sprintf("No mapping who's class is \"%v\" and alias is \"%v\"", className, alias))
+	}
+	var mapping map[string]string
+	for key, _ := range m.mapping {
+		mapping[key] = key
+	}
+	return mapping, nil
+}
 
 func (a *MappingObject) ToString(prefix string) string {
 	if a.alias == "" {
@@ -47,7 +87,7 @@ func (a *MappingObject) ToString(prefix string) string {
 	return fmt.Sprintf("%v<%v(%v)>", a.object.ToString(prefix), a.className, a.alias)
 }
 
-func (o *MappingObject) Type() string {
+func (m *MappingObject) Type() string {
 	return VariableMappingObjectType
 }
 

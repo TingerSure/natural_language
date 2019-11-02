@@ -46,6 +46,15 @@ func (o *Object) GetAliases(class string) []string {
 	return aliases
 }
 
+func (o *Object) IsClassAlias(class string, alias string) bool {
+	for _, reflection := range o.reflections {
+		if reflection.GetClass().GetName() == class && reflection.GetAlias() == alias {
+			return true
+		}
+	}
+	return false
+}
+
 func (o *Object) UpdateAlias(class string, old, new string) bool {
 	for _, reflection := range o.reflections {
 		if reflection.GetClass().GetName() == class && reflection.GetAlias() == old {

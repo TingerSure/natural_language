@@ -4,6 +4,10 @@ import (
 	"github.com/TingerSure/natural_language/sandbox/concept"
 )
 
+var (
+	VariableFamilyInstance *VariableFamily = newVariableFamily()
+)
+
 type VariableFamily struct {
 }
 
@@ -122,7 +126,3 @@ func (v *VariableFamily) IsObjectHome(value concept.Variable) (concept.Object, b
 func newVariableFamily() *VariableFamily {
 	return &VariableFamily{}
 }
-
-var (
-	VariableFamilyInstance *VariableFamily = newVariableFamily()
-)
