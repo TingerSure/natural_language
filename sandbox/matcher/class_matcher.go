@@ -27,5 +27,8 @@ func (c *ClassMatcher) Match(value concept.Variable) bool {
 }
 
 func NewClassMatcher(className string, alias string) *ClassMatcher {
-
+	return &ClassMatcher{
+		className: className,
+		alias:     alias,
+	}
 }
