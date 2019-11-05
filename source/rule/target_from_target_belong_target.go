@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"github.com/TingerSure/natural_language/sandbox/concept"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
 )
@@ -24,7 +25,10 @@ func (p *TargetFromTargetBelongTarget) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
 		tree.NewStructRule(func() tree.Phrase {
-			return tree.NewPhraseStructAdaptor(len(targetFromTargetBelongTargetList), phrase_types.Target)
+			return tree.NewPhraseStructAdaptor(func([]tree.Phrase) concept.Index {
+				return nil
+				//TODO
+			}, len(targetFromTargetBelongTargetList), phrase_types.Target)
 		}, targetFromTargetBelongTargetList, p.GetName()),
 	}
 }

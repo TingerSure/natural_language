@@ -9,4 +9,6 @@ const (
 	Adverb          = 500
 	Auxiliary       = 600
 	AuxiliaryBelong = 610
+	Number          = 700
+	Operator        = 800
 )

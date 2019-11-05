@@ -9,7 +9,7 @@ import (
 )
 
 type CodeBlock struct {
-	flow []concept.Expression
+	flow []concept.Index
 }
 
 func (c *CodeBlock) Size() int {
@@ -40,11 +40,11 @@ func (c *CodeBlock) ToString(prefix string) string {
 	}
 	return fmt.Sprintf("{\n%v\n%v}", strings.Join(flowToStrings, "\n"), prefix)
 }
-func (c *CodeBlock) AddStep(step ...concept.Expression) {
+func (c *CodeBlock) AddStep(step ...concept.Index) {
 	c.flow = append(c.flow, step...)
 }
 
-func (c *CodeBlock) AddSteps(steps []concept.Expression) {
+func (c *CodeBlock) AddSteps(steps []concept.Index) {
 	c.flow = append(c.flow, steps...)
 }
 
@@ -68,7 +68,7 @@ func (f *CodeBlock) Exec(parent concept.Closure, returnBubble bool, init func(co
 		}
 	}
 	for _, step := range f.flow {
-		_, suspend := step.Exec(space)
+		_, suspend := step.Get(space)
 		if !nl_interface.IsNil(suspend) {
 			return space, suspend
 		}

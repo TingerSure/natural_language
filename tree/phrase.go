@@ -1,5 +1,9 @@
 package tree
 
+import (
+	"github.com/TingerSure/natural_language/sandbox/concept"
+)
+
 type Phrase interface {
 	Copy() Phrase
 	Size() int
@@ -9,4 +13,5 @@ type Phrase interface {
 	SetChild(index int, child Phrase) Phrase
 	ToString() string
 	ToStringOffset(index int) string
+	Index() concept.Index
 }

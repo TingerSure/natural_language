@@ -1,6 +1,7 @@
 package pronoun
 
 import (
+	"github.com/TingerSure/natural_language/sandbox/concept"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
 	"github.com/TingerSure/natural_language/tree/word_types"
@@ -45,7 +46,10 @@ func (p *Target) GetVocabularyRules() []*tree.VocabularyRule {
 		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) bool {
 			return treasure.GetSource() == p
 		}, func(treasure *tree.Vocabulary) tree.Phrase {
-			return tree.NewPhraseVocabularyAdaptor(treasure, phrase_types.Target)
+			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
+				return nil
+				//TODO
+			}, treasure, phrase_types.Target)
 		}, p.GetName()),
 	}
 }

@@ -2,11 +2,17 @@ package tree
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/sandbox/concept"
 )
 
 type PhraseVocabularyAdaptor struct {
 	types   string
 	content *Vocabulary
+	index   func() concept.Index
+}
+
+func (p *PhraseVocabularyAdaptor) Index() concept.Index {
+	return p.index()
 }
 
 func (p *PhraseVocabularyAdaptor) Types() string {
@@ -14,7 +20,7 @@ func (p *PhraseVocabularyAdaptor) Types() string {
 }
 
 func (p *PhraseVocabularyAdaptor) Copy() Phrase {
-	return NewPhraseVocabularyAdaptor(p.content, p.types)
+	return NewPhraseVocabularyAdaptor(p.index, p.content, p.types)
 }
 func (p *PhraseVocabularyAdaptor) Size() int {
 	return 0
@@ -44,9 +50,10 @@ func (p *PhraseVocabularyAdaptor) ToStringOffset(index int) string {
 	return fmt.Sprintf("%v%v ( %v )\n", space, p.types, p.content.ToString())
 }
 
-func NewPhraseVocabularyAdaptor(content *Vocabulary, types string) *PhraseVocabularyAdaptor {
+func NewPhraseVocabularyAdaptor(index func() concept.Index, content *Vocabulary, types string) *PhraseVocabularyAdaptor {
 	return &PhraseVocabularyAdaptor{
 		content: content,
+		index:   index,
 		types:   types,
 	}
 }

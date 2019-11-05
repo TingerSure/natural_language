@@ -11,21 +11,26 @@ var (
 )
 
 type Event struct {
-	param concept.Param
-	exec  concept.Function
+	param           concept.Param
+	exec            concept.Function
+	resaultListener func(value concept.Variable)
 }
 
 func (e *Event) Exec() concept.Exception {
-	_, exception := e.exec.Exec(e.param, nil)
+	resault, exception := e.exec.Exec(e.param, nil)
+	if e.resaultListener != nil {
+		e.resaultListener(resault)
+	}
 	return exception
 }
 
-func NewEvent(exec concept.Function, param concept.Param) *Event {
+func NewEvent(exec concept.Function, param concept.Param, resaultListener func(value concept.Variable)) *Event {
 	if nl_interface.IsNil(param) {
 		param = eventDefaultParam
 	}
 	return &Event{
-		param: param,
-		exec:  exec,
+		param:           param,
+		exec:            exec,
+		resaultListener: resaultListener,
 	}
 }

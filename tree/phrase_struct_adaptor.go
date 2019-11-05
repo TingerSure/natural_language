@@ -2,12 +2,18 @@ package tree
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/sandbox/concept"
 )
 
 type PhraseStructAdaptor struct {
 	size     int
 	children []Phrase
 	types    string
+	index    func(children []Phrase) concept.Index
+}
+
+func (p *PhraseStructAdaptor) Index() concept.Index {
+	return p.index(p.children)
 }
 
 func (p *PhraseStructAdaptor) Types() string {
@@ -19,7 +25,7 @@ func (p *PhraseStructAdaptor) Size() int {
 }
 
 func (p *PhraseStructAdaptor) Copy() Phrase {
-	substitute := NewPhraseStructAdaptor(p.size, p.types)
+	substitute := NewPhraseStructAdaptor(p.index, p.size, p.types)
 	for index, child := range p.children {
 		substitute.SetChild(index, child.Copy())
 	}
@@ -62,9 +68,10 @@ func (p *PhraseStructAdaptor) ToStringOffset(index int) string {
 	return info
 }
 
-func NewPhraseStructAdaptor(size int, types string) *PhraseStructAdaptor {
+func NewPhraseStructAdaptor(index func([]Phrase) concept.Index, size int, types string) *PhraseStructAdaptor {
 	return &PhraseStructAdaptor{
 		size:     size,
+		index:    index,
 		types:    types,
 		children: make([]Phrase, size),
 	}

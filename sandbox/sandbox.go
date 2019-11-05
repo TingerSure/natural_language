@@ -9,6 +9,7 @@ import (
 type SandboxParam struct {
 	OnError   func(error)
 	OnClose   func()
+	OnResault func(value concept.Variable)
 	EventSize int
 }
 
@@ -22,7 +23,7 @@ func (s *Sandbox) GetEventLoop() *loop.Loop {
 }
 
 func (s *Sandbox) Exec(funcs concept.Function, param concept.Param) {
-	s.eventLoop.Append(loop.NewEvent(funcs, param))
+	s.eventLoop.Append(loop.NewEvent(funcs, param, s.param.OnResault))
 }
 
 func (s *Sandbox) Start() error {
