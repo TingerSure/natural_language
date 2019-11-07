@@ -40,9 +40,6 @@ func (l *Lexer) instanceStep(sentence string, index int, now *Flow, group *FlowG
 	var base *Flow = now.Copy()
 
 	for _, vocabulary := range vocabularies {
-		if !vocabulary.GetWord().StartFor(indexSentence) {
-			continue
-		}
 		if count == 0 {
 			now.AddVocabulary(vocabulary)
 			l.instanceStep(sentence, index+vocabulary.GetWord().Len(), now, group)

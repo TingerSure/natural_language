@@ -25,8 +25,8 @@ func (p *Addition) GetName() string {
 	return additionName
 }
 
-func (p *Addition) GetWords(firstCharacter string) []*tree.Word {
-	return tree.WordsFilter(additionWords, firstCharacter)
+func (p *Addition) GetWords(sentence string) []*tree.Word {
+	return tree.WordsFilter(additionWords, sentence)
 }
 
 func (p *Addition) GetVocabularyRules() []*tree.VocabularyRule {

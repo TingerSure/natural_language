@@ -37,8 +37,8 @@ func (p *Target) GetName() string {
 	return targetPronounName
 }
 
-func (p *Target) GetWords(firstCharacter string) []*tree.Word {
-	return tree.WordsFilter(targetPronounWords, firstCharacter)
+func (p *Target) GetWords(sentence string) []*tree.Word {
+	return tree.WordsFilter(targetPronounWords, sentence)
 }
 
 func (p *Target) GetVocabularyRules() []*tree.VocabularyRule {

@@ -7,6 +7,7 @@ import (
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
 	"github.com/TingerSure/natural_language/tree/word_types"
+	"regexp"
 	"strconv"
 )
 
@@ -16,15 +17,7 @@ const (
 )
 
 var (
-	NumberCharactors = []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
-
-	numberWords []*tree.Word = func() []*tree.Word {
-		words := []*tree.Word{}
-		for _, character := range NumberCharactors {
-			words = append(words, tree.NewWord(character, numberType))
-		}
-		return words
-	}()
+	numberTemplate *regexp.Regexp = regexp.MustCompile("^(-?\\d+)(\\.\\d+)?")
 )
 
 type Number struct {
@@ -34,8 +27,12 @@ func (p *Number) GetName() string {
 	return numberName
 }
 
-func (p *Number) GetWords(firstCharacter string) []*tree.Word {
-	return tree.WordsFilter(numberWords, firstCharacter)
+func (p *Number) GetWords(sentence string) []*tree.Word {
+	value := numberTemplate.FindString(sentence)
+	if value != "" {
+		return []*tree.Word{tree.NewWord(value, numberType)}
+	}
+	return nil
 }
 
 func (p *Number) GetVocabularyRules() []*tree.VocabularyRule {

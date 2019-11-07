@@ -23,10 +23,10 @@ func (p *Belong) GetName() string {
 	return belongAuxiliaryName
 }
 
-func (p *Belong) GetWords(firstCharacter string) []*tree.Word {
+func (p *Belong) GetWords(sentence string) []*tree.Word {
 	return tree.WordsFilter([]*tree.Word{
 		tree.NewWord(BelongTo, belongType),
-	}, firstCharacter)
+	}, sentence)
 }
 
 func (p *Belong) GetVocabularyRules() []*tree.VocabularyRule {

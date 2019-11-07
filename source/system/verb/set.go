@@ -23,10 +23,10 @@ func (s *Set) GetName() string {
 	return setName
 }
 
-func (s *Set) GetWords(firstCharacter string) []*tree.Word {
+func (s *Set) GetWords(sentence string) []*tree.Word {
 	return tree.WordsFilter([]*tree.Word{
 		tree.NewWord(Is, setType),
-	}, firstCharacter)
+	}, sentence)
 }
 func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{

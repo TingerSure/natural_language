@@ -18,7 +18,7 @@ func (p *Unknown) GetName() string {
 	return unknownName
 }
 
-func (p *Unknown) GetWords(firstCharacter string) []*tree.Word {
+func (p *Unknown) GetWords(sentence string) []*tree.Word {
 	return nil
 }
 
