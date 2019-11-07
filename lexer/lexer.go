@@ -10,9 +10,9 @@ type Lexer struct {
 	naturalSources map[string]tree.Source
 }
 
-func (l *Lexer) getVocabulariesBySources(character string, sources map[string]tree.Source, vocabularies []*tree.Vocabulary) []*tree.Vocabulary {
+func (l *Lexer) getVocabulariesBySources(sentence string, sources map[string]tree.Source, vocabularies []*tree.Vocabulary) []*tree.Vocabulary {
 	for _, source := range sources {
-		var words []*tree.Word = source.GetWords(character)
+		var words []*tree.Word = source.GetWords(sentence)
 		if words == nil {
 			continue
 		}
@@ -23,10 +23,10 @@ func (l *Lexer) getVocabulariesBySources(character string, sources map[string]tr
 	return vocabularies
 }
 
-func (l *Lexer) getVocabulary(character string) []*tree.Vocabulary {
+func (l *Lexer) getVocabulary(sentence string) []*tree.Vocabulary {
 	var vocabularies []*tree.Vocabulary
-	vocabularies = l.getVocabulariesBySources(character, l.sources, vocabularies)
-	vocabularies = l.getVocabulariesBySources(character, l.naturalSources, vocabularies)
+	vocabularies = l.getVocabulariesBySources(sentence, l.sources, vocabularies)
+	vocabularies = l.getVocabulariesBySources(sentence, l.naturalSources, vocabularies)
 	return vocabularies
 }
 
@@ -35,8 +35,7 @@ func (l *Lexer) instanceStep(sentence string, index int, now *Flow, group *FlowG
 		return
 	}
 	var indexSentence string = nl_string.SubStringFrom(sentence, index)
-	var firstCharacter string = nl_string.SubString(indexSentence, 0, 1)
-	var vocabularies []*tree.Vocabulary = l.getVocabulary(firstCharacter)
+	var vocabularies []*tree.Vocabulary = l.getVocabulary(indexSentence)
 	var count int = 0
 	var base *Flow = now.Copy()
 
@@ -56,7 +55,7 @@ func (l *Lexer) instanceStep(sentence string, index int, now *Flow, group *FlowG
 		count++
 	}
 	if count == 0 {
-		var vocabulary *tree.Vocabulary = tree.NewVocabulary(tree.NewUnknownWord(firstCharacter), nil)
+		var vocabulary *tree.Vocabulary = tree.NewVocabulary(tree.NewUnknownWord(nl_string.SubString(indexSentence, 0, 1)), nil)
 		now.AddVocabulary(vocabulary)
 		l.instanceStep(sentence, index+vocabulary.GetWord().Len(), now, group)
 	}

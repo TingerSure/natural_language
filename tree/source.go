@@ -2,7 +2,7 @@ package tree
 
 type Source interface {
 	GetName() string
-	GetWords(firstCharacter string) []*Word
+	GetWords(string) []*Word
 	GetVocabularyRules() []*VocabularyRule
 	GetStructRules() []*StructRule
 }

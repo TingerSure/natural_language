@@ -43,11 +43,11 @@ func NewUnknownWord(context string) *Word {
 	return NewWord(context, word_types.Unknown)
 }
 
-func WordsFilter(words []*Word, firstCharacter string) []*Word {
+func WordsFilter(words []*Word, sentence string) []*Word {
 	var targets []*Word
 
 	for _, word := range words {
-		if word.StartWith(firstCharacter) {
+		if word.StartFor(sentence) {
 			targets = append(targets, word)
 		}
 	}
