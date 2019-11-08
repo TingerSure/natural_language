@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	numberFromNumberOperatorNumberName string = "rule.number.number_number"
+	numberFromNumberOperatorNumberName string = "rule.number.number_operator_number"
 )
 
 var (

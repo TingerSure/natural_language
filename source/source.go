@@ -19,6 +19,7 @@ func AllRules() []tree.Source {
 		unknown.NewUnknown(),
 		number.NewNumber(),
 		operator.NewAddition(),
+		operator.NewSubtraction(),
 
 		rule.NewTargetFromTargetTarget(),
 		rule.NewTargetFromUnknown(),
