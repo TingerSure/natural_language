@@ -27,9 +27,16 @@ func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
 
 		tree.NewStructRule(func() tree.Phrase {
 			return tree.NewPhraseStructAdaptor(func(phrase []tree.Phrase) concept.Index {
-
-				return expression.NewAddition(phrase[0].Index(), phrase[2].Index())
-
+				return expression.NewParamGet(
+					expression.NewCall(
+						phrase[1].Index(),
+						expression.NewNewParamWithInit(map[string]concept.Index{
+							phrase_types.Operator_Left:  phrase[0].Index(),
+							phrase_types.Operator_Right: phrase[2].Index(),
+						}),
+					),
+					phrase_types.Operator_Result,
+				)
 			}, len(numberFromNumberOperatorNumberList), phrase_types.Number)
 		}, numberFromNumberOperatorNumberList, p.GetName()),
 	}

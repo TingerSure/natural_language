@@ -82,7 +82,7 @@ func (l *Grammar) riversfilter(inputs []*River) ([]*River, error) {
 		}
 	}
 	if len(actives) == 0 {
-		return nil, errors.New(fmt.Sprintf("There is an unknown rule in this sentence!\n %v", min.ToString()))
+		return nil, errors.New(fmt.Sprintf("There is an unknown rule in this sentence!\n%v", min.ToString()))
 	}
 	return actives, nil
 }
