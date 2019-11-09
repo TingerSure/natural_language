@@ -2,7 +2,7 @@ package loop
 
 import (
 	"errors"
-	"github.com/TingerSure/natural_language/library/nl_interface"
+	"github.com/TingerSure/natural_language/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/sandbox/concept"
 )
 

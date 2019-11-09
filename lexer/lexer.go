@@ -1,7 +1,7 @@
 package lexer
 
 import (
-	"github.com/TingerSure/natural_language/library/nl_string"
+	"github.com/TingerSure/natural_language/adaptor/nl_string"
 	"github.com/TingerSure/natural_language/tree"
 )
 
