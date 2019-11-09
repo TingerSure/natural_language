@@ -2,6 +2,7 @@ package unknown
 
 import (
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/source/adaptor"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
 	"github.com/TingerSure/natural_language/tree/word_types"
@@ -12,14 +13,11 @@ const (
 )
 
 type Unknown struct {
+	adaptor.Adaptor
 }
 
 func (p *Unknown) GetName() string {
 	return unknownName
-}
-
-func (p *Unknown) GetWords(sentence string) []*tree.Word {
-	return nil
 }
 
 func (p *Unknown) GetVocabularyRules() []*tree.VocabularyRule {
@@ -33,10 +31,6 @@ func (p *Unknown) GetVocabularyRules() []*tree.VocabularyRule {
 			}, treasure, phrase_types.Unknown)
 		}, p.GetName()),
 	}
-}
-
-func (p *Unknown) GetStructRules() []*tree.StructRule {
-	return nil
 }
 
 func NewUnknown() *Unknown {

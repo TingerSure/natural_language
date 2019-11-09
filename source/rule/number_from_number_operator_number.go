@@ -3,6 +3,7 @@ package rule
 import (
 	"github.com/TingerSure/natural_language/sandbox/concept"
 	"github.com/TingerSure/natural_language/sandbox/expression"
+	"github.com/TingerSure/natural_language/source/adaptor"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
 )
@@ -20,6 +21,7 @@ var (
 )
 
 type NumberFromNumberOperatorNumber struct {
+	adaptor.Adaptor
 }
 
 func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
@@ -44,14 +46,6 @@ func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
 
 func (p *NumberFromNumberOperatorNumber) GetName() string {
 	return numberFromNumberOperatorNumberName
-}
-
-func (p *NumberFromNumberOperatorNumber) GetWords(firstCharacter string) []*tree.Word {
-	return nil
-}
-
-func (p *NumberFromNumberOperatorNumber) GetVocabularyRules() []*tree.VocabularyRule {
-	return nil
 }
 
 func NewNumberFromNumberOperatorNumber() *NumberFromNumberOperatorNumber {

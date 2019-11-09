@@ -4,6 +4,7 @@ import (
 	"github.com/TingerSure/natural_language/sandbox/concept"
 	"github.com/TingerSure/natural_language/sandbox/index"
 	"github.com/TingerSure/natural_language/sandbox/variable"
+	"github.com/TingerSure/natural_language/source/adaptor"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
 	"github.com/TingerSure/natural_language/tree/word_types"
@@ -21,6 +22,7 @@ var (
 )
 
 type Number struct {
+	adaptor.Adaptor
 }
 
 func (p *Number) GetName() string {
@@ -49,10 +51,6 @@ func (p *Number) GetVocabularyRules() []*tree.VocabularyRule {
 			}, treasure, phrase_types.Number)
 		}, p.GetName()),
 	}
-}
-
-func (p *Number) GetStructRules() []*tree.StructRule {
-	return nil
 }
 
 func NewNumber() *Number {

@@ -2,6 +2,7 @@ package auxiliary
 
 import (
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/source/adaptor"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
 	"github.com/TingerSure/natural_language/tree/word_types"
@@ -17,6 +18,7 @@ const (
 )
 
 type Belong struct {
+	adaptor.Adaptor
 }
 
 func (p *Belong) GetName() string {
@@ -40,10 +42,6 @@ func (p *Belong) GetVocabularyRules() []*tree.VocabularyRule {
 			}, treasure, phrase_types.AuxiliaryBelong)
 		}, p.GetName()),
 	}
-}
-
-func (p *Belong) GetStructRules() []*tree.StructRule {
-	return nil
 }
 
 func NewBelong() *Belong {

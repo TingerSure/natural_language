@@ -2,6 +2,7 @@ package rule
 
 import (
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/source/adaptor"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
 )
@@ -19,6 +20,7 @@ var (
 )
 
 type TargetFromTargetBelongTarget struct {
+	adaptor.Adaptor
 }
 
 func (p *TargetFromTargetBelongTarget) GetStructRules() []*tree.StructRule {
@@ -35,14 +37,6 @@ func (p *TargetFromTargetBelongTarget) GetStructRules() []*tree.StructRule {
 
 func (p *TargetFromTargetBelongTarget) GetName() string {
 	return targetFromTargetBelongTargetName
-}
-
-func (p *TargetFromTargetBelongTarget) GetWords(firstCharacter string) []*tree.Word {
-	return nil
-}
-
-func (p *TargetFromTargetBelongTarget) GetVocabularyRules() []*tree.VocabularyRule {
-	return nil
 }
 
 func NewTargetFromTargetBelongTarget() *TargetFromTargetBelongTarget {

@@ -2,6 +2,7 @@ package verb
 
 import (
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/source/adaptor"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
 	"github.com/TingerSure/natural_language/tree/word_types"
@@ -17,6 +18,7 @@ const (
 )
 
 type Set struct {
+	adaptor.Adaptor
 }
 
 func (s *Set) GetName() string {
@@ -41,9 +43,6 @@ func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func (s *Set) GetStructRules() []*tree.StructRule {
-	return nil
-}
 func NewSet() *Set {
 	return (&Set{})
 }

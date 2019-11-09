@@ -2,6 +2,7 @@ package pronoun
 
 import (
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/source/adaptor"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
 	"github.com/TingerSure/natural_language/tree/word_types"
@@ -31,6 +32,7 @@ var (
 )
 
 type Target struct {
+	adaptor.Adaptor
 }
 
 func (p *Target) GetName() string {
@@ -52,10 +54,6 @@ func (p *Target) GetVocabularyRules() []*tree.VocabularyRule {
 			}, treasure, phrase_types.Target)
 		}, p.GetName()),
 	}
-}
-
-func (p *Target) GetStructRules() []*tree.StructRule {
-	return nil
 }
 
 func NewTarget() *Target {

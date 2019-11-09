@@ -5,6 +5,7 @@ import (
 	"github.com/TingerSure/natural_language/sandbox/expression"
 	"github.com/TingerSure/natural_language/sandbox/index"
 	"github.com/TingerSure/natural_language/sandbox/variable"
+	"github.com/TingerSure/natural_language/source/adaptor"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
 	"github.com/TingerSure/natural_language/tree/word_types"
@@ -39,6 +40,7 @@ func init() {
 }
 
 type Subtraction struct {
+	adaptor.Adaptor
 }
 
 func (p *Subtraction) GetName() string {
@@ -59,10 +61,6 @@ func (p *Subtraction) GetVocabularyRules() []*tree.VocabularyRule {
 			}, treasure, phrase_types.Operator)
 		}, p.GetName()),
 	}
-}
-
-func (p *Subtraction) GetStructRules() []*tree.StructRule {
-	return nil
 }
 
 func NewSubtraction() *Subtraction {
