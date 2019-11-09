@@ -13,7 +13,7 @@ const (
 )
 
 type Unknown struct {
-	adaptor.Adaptor
+	adaptor.SourceAdaptor
 }
 
 func (p *Unknown) GetName() string {

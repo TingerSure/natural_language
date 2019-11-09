@@ -22,7 +22,7 @@ var (
 )
 
 type Number struct {
-	adaptor.Adaptor
+	adaptor.SourceAdaptor
 }
 
 func (p *Number) GetName() string {

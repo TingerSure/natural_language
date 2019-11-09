@@ -21,7 +21,7 @@ var (
 )
 
 type NumberFromNumberOperatorNumber struct {
-	adaptor.Adaptor
+	adaptor.SourceAdaptor
 }
 
 func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {

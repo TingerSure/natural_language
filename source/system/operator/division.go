@@ -40,7 +40,7 @@ func init() {
 }
 
 type Division struct {
-	adaptor.Adaptor
+	adaptor.SourceAdaptor
 }
 
 func (p *Division) GetName() string {

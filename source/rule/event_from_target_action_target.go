@@ -20,7 +20,7 @@ var (
 )
 
 type EventFromTargetActionTarget struct {
-	adaptor.Adaptor
+	adaptor.SourceAdaptor
 }
 
 func (p *EventFromTargetActionTarget) GetStructRules() []*tree.StructRule {

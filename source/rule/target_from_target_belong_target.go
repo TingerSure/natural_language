@@ -20,7 +20,7 @@ var (
 )
 
 type TargetFromTargetBelongTarget struct {
-	adaptor.Adaptor
+	adaptor.SourceAdaptor
 }
 
 func (p *TargetFromTargetBelongTarget) GetStructRules() []*tree.StructRule {

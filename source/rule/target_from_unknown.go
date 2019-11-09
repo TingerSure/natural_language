@@ -18,7 +18,7 @@ var (
 )
 
 type TargetFromUnknown struct {
-	adaptor.Adaptor
+	adaptor.SourceAdaptor
 }
 
 func (p *TargetFromUnknown) GetStructRules() []*tree.StructRule {

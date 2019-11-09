@@ -18,7 +18,7 @@ const (
 )
 
 type Belong struct {
-	adaptor.Adaptor
+	adaptor.SourceAdaptor
 }
 
 func (p *Belong) GetName() string {

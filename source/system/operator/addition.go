@@ -40,7 +40,7 @@ func init() {
 }
 
 type Addition struct {
-	adaptor.Adaptor
+	adaptor.SourceAdaptor
 }
 
 func (p *Addition) GetName() string {

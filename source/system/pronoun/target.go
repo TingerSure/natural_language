@@ -32,7 +32,7 @@ var (
 )
 
 type Target struct {
-	adaptor.Adaptor
+	adaptor.SourceAdaptor
 }
 
 func (p *Target) GetName() string {

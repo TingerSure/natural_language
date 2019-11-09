@@ -18,7 +18,7 @@ const (
 )
 
 type Set struct {
-	adaptor.Adaptor
+	adaptor.SourceAdaptor
 }
 
 func (s *Set) GetName() string {

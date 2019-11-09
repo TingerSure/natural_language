@@ -4,16 +4,16 @@ import (
 	"github.com/TingerSure/natural_language/tree"
 )
 
-type Adaptor struct{}
+type SourceAdaptor struct{}
 
-func (*Adaptor) GetWords(string) []*tree.Word {
+func (*SourceAdaptor) GetWords(string) []*tree.Word {
 	return nil
 }
 
-func (*Adaptor) GetVocabularyRules() []*tree.VocabularyRule {
+func (*SourceAdaptor) GetVocabularyRules() []*tree.VocabularyRule {
 	return nil
 }
 
-func (*Adaptor) GetStructRules() []*tree.StructRule {
+func (*SourceAdaptor) GetStructRules() []*tree.StructRule {
 	return nil
 }

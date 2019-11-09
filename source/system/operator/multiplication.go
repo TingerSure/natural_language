@@ -40,7 +40,7 @@ func init() {
 }
 
 type Multiplication struct {
-	adaptor.Adaptor
+	adaptor.SourceAdaptor
 }
 
 func (p *Multiplication) GetName() string {
