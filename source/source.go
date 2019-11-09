@@ -20,6 +20,8 @@ func AllRules() []tree.Source {
 		number.NewNumber(),
 		operator.NewAddition(),
 		operator.NewSubtraction(),
+		operator.NewDivision(),
+		operator.NewMultiplication(),
 
 		rule.NewTargetFromTargetTarget(),
 		rule.NewTargetFromUnknown(),
