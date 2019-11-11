@@ -16,4 +16,6 @@ const (
 	Target          string = "system.target"
 	AuxiliaryBelong string = "system.auxiliary.belong"
 	Action          string = "system.action"
+	BracketsLeft    string = "system.brackets.left"
+	BracketsRight   string = "system.brackets.right"
 )

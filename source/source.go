@@ -4,6 +4,7 @@ import (
 	"github.com/TingerSure/natural_language/source/priority"
 	"github.com/TingerSure/natural_language/source/structs"
 	"github.com/TingerSure/natural_language/source/word/auxiliary"
+	"github.com/TingerSure/natural_language/source/word/brackets"
 	"github.com/TingerSure/natural_language/source/word/number"
 	"github.com/TingerSure/natural_language/source/word/operator"
 	"github.com/TingerSure/natural_language/source/word/pronoun"
@@ -23,12 +24,15 @@ func AllRules() []tree.Source {
 		operator.NewSubtraction(),
 		operator.NewDivision(),
 		operator.NewMultiplication(),
+		brackets.NewBracketsLeft(),
+		brackets.NewBracketsRight(),
 
 		structs.NewTargetFromTargetTarget(),
 		structs.NewTargetFromUnknown(),
 		structs.NewTargetFromTargetBelongTarget(),
 		structs.NewEventFromTargetActionTarget(),
 		structs.NewNumberFromNumberOperatorNumber(),
+		structs.NewNumberFromBracketNumberBracket(),
 
 		priority.NewOperatorLevel(),
 	}
