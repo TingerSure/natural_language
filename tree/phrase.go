@@ -14,4 +14,5 @@ type Phrase interface {
 	ToString() string
 	ToStringOffset(index int) string
 	Index() concept.Index
+	From() string
 }

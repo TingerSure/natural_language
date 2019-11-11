@@ -8,6 +8,7 @@ import (
 type PhraseStructAdaptor struct {
 	size     int
 	children []Phrase
+	from     string
 	types    string
 	index    func(children []Phrase) concept.Index
 }
@@ -25,7 +26,7 @@ func (p *PhraseStructAdaptor) Size() int {
 }
 
 func (p *PhraseStructAdaptor) Copy() Phrase {
-	substitute := NewPhraseStructAdaptor(p.index, p.size, p.types)
+	substitute := NewPhraseStructAdaptor(p.index, p.size, p.types, p.from)
 	for index, child := range p.children {
 		substitute.SetChild(index, child.Copy())
 	}
@@ -68,10 +69,15 @@ func (p *PhraseStructAdaptor) ToStringOffset(index int) string {
 	return info
 }
 
-func NewPhraseStructAdaptor(index func([]Phrase) concept.Index, size int, types string) *PhraseStructAdaptor {
+func (p *PhraseStructAdaptor) From() string {
+	return p.from
+}
+
+func NewPhraseStructAdaptor(index func([]Phrase) concept.Index, size int, types string, from string) *PhraseStructAdaptor {
 	return &PhraseStructAdaptor{
 		size:     size,
 		index:    index,
+		from:     from,
 		types:    types,
 		children: make([]Phrase, size),
 	}

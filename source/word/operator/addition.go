@@ -12,26 +12,26 @@ import (
 )
 
 const (
-	multiplicationName string = "system.operator.multiplication"
-	multiplicationType int    = word_types.Operator
+	AdditionName string = "word.operator.addition"
+	additionType int    = word_types.Operator
 )
 
 var (
-	multiplicationCharactor = "*"
+	additionCharactor = "+"
 
-	multiplicationWords []*tree.Word = []*tree.Word{tree.NewWord(multiplicationCharactor, multiplicationType)}
+	additionWords []*tree.Word = []*tree.Word{tree.NewWord(additionCharactor, additionType)}
 
-	multiplicationFuncs *variable.Function = nil
+	additionFuncs *variable.Function = nil
 )
 
 func init() {
-	multiplicationFuncs = variable.NewFunction(nil)
-	multiplicationFuncs.AddParamName(phrase_types.Operator_Left)
-	multiplicationFuncs.AddParamName(phrase_types.Operator_Right)
-	multiplicationFuncs.Body().AddStep(
+	additionFuncs = variable.NewFunction(nil)
+	additionFuncs.AddParamName(phrase_types.Operator_Left)
+	additionFuncs.AddParamName(phrase_types.Operator_Right)
+	additionFuncs.Body().AddStep(
 		expression.NewReturn(
 			phrase_types.Operator_Result,
-			expression.NewMultiplication(
+			expression.NewAddition(
 				index.NewLocalIndex(phrase_types.Operator_Left),
 				index.NewLocalIndex(phrase_types.Operator_Right),
 			),
@@ -39,30 +39,30 @@ func init() {
 	)
 }
 
-type Multiplication struct {
+type Addition struct {
 	adaptor.SourceAdaptor
 }
 
-func (p *Multiplication) GetName() string {
-	return multiplicationName
+func (p *Addition) GetName() string {
+	return AdditionName
 }
 
-func (p *Multiplication) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(multiplicationWords, sentence)
+func (p *Addition) GetWords(sentence string) []*tree.Word {
+	return tree.WordsFilter(additionWords, sentence)
 }
 
-func (p *Multiplication) GetVocabularyRules() []*tree.VocabularyRule {
+func (p *Addition) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
 		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) bool {
 			return treasure.GetSource() == p
 		}, func(treasure *tree.Vocabulary) tree.Phrase {
 			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
-				return index.NewConstIndex(multiplicationFuncs)
-			}, treasure, phrase_types.Operator)
+				return index.NewConstIndex(additionFuncs)
+			}, treasure, phrase_types.Operator, p.GetName())
 		}, p.GetName()),
 	}
 }
 
-func NewMultiplication() *Multiplication {
-	return (&Multiplication{})
+func NewAddition() *Addition {
+	return (&Addition{})
 }

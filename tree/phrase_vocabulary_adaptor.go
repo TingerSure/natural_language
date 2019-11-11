@@ -7,6 +7,7 @@ import (
 
 type PhraseVocabularyAdaptor struct {
 	types   string
+	from    string
 	content *Vocabulary
 	index   func() concept.Index
 }
@@ -20,7 +21,7 @@ func (p *PhraseVocabularyAdaptor) Types() string {
 }
 
 func (p *PhraseVocabularyAdaptor) Copy() Phrase {
-	return NewPhraseVocabularyAdaptor(p.index, p.content, p.types)
+	return NewPhraseVocabularyAdaptor(p.index, p.content, p.types, p.from)
 }
 func (p *PhraseVocabularyAdaptor) Size() int {
 	return 0
@@ -50,10 +51,15 @@ func (p *PhraseVocabularyAdaptor) ToStringOffset(index int) string {
 	return fmt.Sprintf("%v%v ( %v )\n", space, p.types, p.content.ToString())
 }
 
-func NewPhraseVocabularyAdaptor(index func() concept.Index, content *Vocabulary, types string) *PhraseVocabularyAdaptor {
+func (p *PhraseVocabularyAdaptor) From() string {
+	return p.from
+}
+
+func NewPhraseVocabularyAdaptor(index func() concept.Index, content *Vocabulary, types string, from string) *PhraseVocabularyAdaptor {
 	return &PhraseVocabularyAdaptor{
 		content: content,
 		index:   index,
 		types:   types,
+		from:    from,
 	}
 }

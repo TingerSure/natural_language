@@ -12,26 +12,26 @@ import (
 )
 
 const (
-	divisionName string = "system.operator.division"
-	divisionType int    = word_types.Operator
+	SubtractionName string = "word.operator.subtraction"
+	subtractionType int    = word_types.Operator
 )
 
 var (
-	divisionCharactor = "/"
+	subtractionCharactor = "-"
 
-	divisionWords []*tree.Word = []*tree.Word{tree.NewWord(divisionCharactor, divisionType)}
+	subtractionWords []*tree.Word = []*tree.Word{tree.NewWord(subtractionCharactor, subtractionType)}
 
-	divisionFuncs *variable.Function = nil
+	subtractionFuncs *variable.Function = nil
 )
 
 func init() {
-	divisionFuncs = variable.NewFunction(nil)
-	divisionFuncs.AddParamName(phrase_types.Operator_Left)
-	divisionFuncs.AddParamName(phrase_types.Operator_Right)
-	divisionFuncs.Body().AddStep(
+	subtractionFuncs = variable.NewFunction(nil)
+	subtractionFuncs.AddParamName(phrase_types.Operator_Left)
+	subtractionFuncs.AddParamName(phrase_types.Operator_Right)
+	subtractionFuncs.Body().AddStep(
 		expression.NewReturn(
 			phrase_types.Operator_Result,
-			expression.NewDivision(
+			expression.NewSubtraction(
 				index.NewLocalIndex(phrase_types.Operator_Left),
 				index.NewLocalIndex(phrase_types.Operator_Right),
 			),
@@ -39,30 +39,30 @@ func init() {
 	)
 }
 
-type Division struct {
+type Subtraction struct {
 	adaptor.SourceAdaptor
 }
 
-func (p *Division) GetName() string {
-	return divisionName
+func (p *Subtraction) GetName() string {
+	return SubtractionName
 }
 
-func (p *Division) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(divisionWords, sentence)
+func (p *Subtraction) GetWords(sentence string) []*tree.Word {
+	return tree.WordsFilter(subtractionWords, sentence)
 }
 
-func (p *Division) GetVocabularyRules() []*tree.VocabularyRule {
+func (p *Subtraction) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
 		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) bool {
 			return treasure.GetSource() == p
 		}, func(treasure *tree.Vocabulary) tree.Phrase {
 			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
-				return index.NewConstIndex(divisionFuncs)
-			}, treasure, phrase_types.Operator)
+				return index.NewConstIndex(subtractionFuncs)
+			}, treasure, phrase_types.Operator, p.GetName())
 		}, p.GetName()),
 	}
 }
 
-func NewDivision() *Division {
-	return (&Division{})
+func NewSubtraction() *Subtraction {
+	return (&Subtraction{})
 }

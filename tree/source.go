@@ -5,4 +5,5 @@ type Source interface {
 	GetWords(string) []*Word
 	GetVocabularyRules() []*VocabularyRule
 	GetStructRules() []*StructRule
+	GetPriorityRules() []*PriorityRule
 }

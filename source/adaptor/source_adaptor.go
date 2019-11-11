@@ -17,3 +17,7 @@ func (*SourceAdaptor) GetVocabularyRules() []*tree.VocabularyRule {
 func (*SourceAdaptor) GetStructRules() []*tree.StructRule {
 	return nil
 }
+
+func (*SourceAdaptor) GetPriorityRules() []*tree.PriorityRule {
+	return nil
+}

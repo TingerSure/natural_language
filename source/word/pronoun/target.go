@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	targetPronounName string = "system.pronoun.target"
+	targetPronounName string = "word.pronoun.target"
 	targetType        int    = word_types.Pronoun
 )
 
@@ -51,7 +51,7 @@ func (p *Target) GetVocabularyRules() []*tree.VocabularyRule {
 			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
 				return nil
 				//TODO
-			}, treasure, phrase_types.Target)
+			}, treasure, phrase_types.Target, p.GetName())
 		}, p.GetName()),
 	}
 }

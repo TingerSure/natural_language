@@ -1,4 +1,4 @@
-package rule
+package structs
 
 import (
 	"github.com/TingerSure/natural_language/sandbox/concept"
@@ -9,11 +9,11 @@ import (
 )
 
 const (
-	numberFromNumberOperatorNumberName string = "rule.number.number_operator_number"
+	NumberFromNumberOperatorNumberName string = "structs.number.number_operator_number"
 )
 
 var (
-	numberFromNumberOperatorNumberList []string = []string{
+	NumberFromNumberOperatorNumberList []string = []string{
 		phrase_types.Number,
 		phrase_types.Operator,
 		phrase_types.Number,
@@ -39,13 +39,13 @@ func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
 					),
 					phrase_types.Operator_Result,
 				)
-			}, len(numberFromNumberOperatorNumberList), phrase_types.Number)
-		}, numberFromNumberOperatorNumberList, p.GetName()),
+			}, len(NumberFromNumberOperatorNumberList), phrase_types.Number, p.GetName())
+		}, NumberFromNumberOperatorNumberList, p.GetName()),
 	}
 }
 
 func (p *NumberFromNumberOperatorNumber) GetName() string {
-	return numberFromNumberOperatorNumberName
+	return NumberFromNumberOperatorNumberName
 }
 
 func NewNumberFromNumberOperatorNumber() *NumberFromNumberOperatorNumber {

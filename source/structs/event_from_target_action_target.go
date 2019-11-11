@@ -1,4 +1,4 @@
-package rule
+package structs
 
 import (
 	"github.com/TingerSure/natural_language/sandbox/concept"
@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	eventFromTargetActionTargetName string = "rule.event.target_belong_target"
+	EventFromTargetActionTargetName string = "structs.event.target_belong_target"
 )
 
 var (
@@ -30,13 +30,13 @@ func (p *EventFromTargetActionTarget) GetStructRules() []*tree.StructRule {
 			return tree.NewPhraseStructAdaptor(func([]tree.Phrase) concept.Index {
 				return nil
 				//TODO
-			}, len(eventFromTargetActionTargetList), phrase_types.Event)
+			}, len(eventFromTargetActionTargetList), phrase_types.Event, p.GetName())
 		}, eventFromTargetActionTargetList, p.GetName()),
 	}
 }
 
 func (p *EventFromTargetActionTarget) GetName() string {
-	return eventFromTargetActionTargetName
+	return EventFromTargetActionTargetName
 }
 
 func NewEventFromTargetActionTarget() *EventFromTargetActionTarget {

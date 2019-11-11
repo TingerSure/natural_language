@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	belongAuxiliaryName string = "system.auxiliary.belong"
+	belongAuxiliaryName string = "word.auxiliary.belong"
 	belongType          int    = word_types.AuxiliaryBelong
 )
 
@@ -39,7 +39,7 @@ func (p *Belong) GetVocabularyRules() []*tree.VocabularyRule {
 			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
 				return nil
 				//TODO
-			}, treasure, phrase_types.AuxiliaryBelong)
+			}, treasure, phrase_types.AuxiliaryBelong, p.GetName())
 		}, p.GetName()),
 	}
 }

@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	numberName string = "system.number"
+	NumberName string = "word.number"
 	numberType int    = word_types.Number
 )
 
@@ -26,7 +26,7 @@ type Number struct {
 }
 
 func (p *Number) GetName() string {
-	return numberName
+	return NumberName
 }
 
 func (p *Number) GetWords(sentence string) []*tree.Word {
@@ -48,7 +48,7 @@ func (p *Number) GetVocabularyRules() []*tree.VocabularyRule {
 					panic(err)
 				}
 				return index.NewConstIndex(variable.NewNumber(value))
-			}, treasure, phrase_types.Number)
+			}, treasure, phrase_types.Number, p.GetName())
 		}, p.GetName()),
 	}
 }

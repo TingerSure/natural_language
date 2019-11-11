@@ -12,26 +12,26 @@ import (
 )
 
 const (
-	additionName string = "system.operator.addition"
-	additionType int    = word_types.Operator
+	DivisionName string = "word.operator.division"
+	divisionType int    = word_types.Operator
 )
 
 var (
-	additionCharactor = "+"
+	divisionCharactor = "/"
 
-	additionWords []*tree.Word = []*tree.Word{tree.NewWord(additionCharactor, additionType)}
+	divisionWords []*tree.Word = []*tree.Word{tree.NewWord(divisionCharactor, divisionType)}
 
-	additionFuncs *variable.Function = nil
+	divisionFuncs *variable.Function = nil
 )
 
 func init() {
-	additionFuncs = variable.NewFunction(nil)
-	additionFuncs.AddParamName(phrase_types.Operator_Left)
-	additionFuncs.AddParamName(phrase_types.Operator_Right)
-	additionFuncs.Body().AddStep(
+	divisionFuncs = variable.NewFunction(nil)
+	divisionFuncs.AddParamName(phrase_types.Operator_Left)
+	divisionFuncs.AddParamName(phrase_types.Operator_Right)
+	divisionFuncs.Body().AddStep(
 		expression.NewReturn(
 			phrase_types.Operator_Result,
-			expression.NewAddition(
+			expression.NewDivision(
 				index.NewLocalIndex(phrase_types.Operator_Left),
 				index.NewLocalIndex(phrase_types.Operator_Right),
 			),
@@ -39,30 +39,30 @@ func init() {
 	)
 }
 
-type Addition struct {
+type Division struct {
 	adaptor.SourceAdaptor
 }
 
-func (p *Addition) GetName() string {
-	return additionName
+func (p *Division) GetName() string {
+	return DivisionName
 }
 
-func (p *Addition) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(additionWords, sentence)
+func (p *Division) GetWords(sentence string) []*tree.Word {
+	return tree.WordsFilter(divisionWords, sentence)
 }
 
-func (p *Addition) GetVocabularyRules() []*tree.VocabularyRule {
+func (p *Division) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
 		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) bool {
 			return treasure.GetSource() == p
 		}, func(treasure *tree.Vocabulary) tree.Phrase {
 			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
-				return index.NewConstIndex(additionFuncs)
-			}, treasure, phrase_types.Operator)
+				return index.NewConstIndex(divisionFuncs)
+			}, treasure, phrase_types.Operator, p.GetName())
 		}, p.GetName()),
 	}
 }
 
-func NewAddition() *Addition {
-	return (&Addition{})
+func NewDivision() *Division {
+	return (&Division{})
 }

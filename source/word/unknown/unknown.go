@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	unknownName string = "system.unknown"
+	unknownName string = "word.unknown"
 )
 
 type Unknown struct {
@@ -28,7 +28,7 @@ func (p *Unknown) GetVocabularyRules() []*tree.VocabularyRule {
 			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
 				return nil
 				//TODO
-			}, treasure, phrase_types.Unknown)
+			}, treasure, phrase_types.Unknown, p.GetName())
 		}, p.GetName()),
 	}
 }

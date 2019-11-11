@@ -16,9 +16,7 @@ func (g *Grammar) AddStructRule(rules []*tree.StructRule) {
 	if rules == nil {
 		return
 	}
-	for _, rule := range rules {
-		g.structs = append(g.structs, rule)
-	}
+	g.structs = append(g.structs, rules...)
 }
 
 func (g *Grammar) RemoveStructRule(need func(rule *tree.StructRule) bool) {
@@ -34,9 +32,7 @@ func (g *Grammar) AddVocabularyRule(rules []*tree.VocabularyRule) {
 	if rules == nil {
 		return
 	}
-	for _, rule := range rules {
-		g.vocabularies = append(g.vocabularies, rule)
-	}
+	g.vocabularies = append(g.vocabularies, rules...)
 }
 
 func (g *Grammar) RemoveVocabularyRule(need func(rule *tree.VocabularyRule) bool) {

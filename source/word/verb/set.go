@@ -13,7 +13,7 @@ const (
 )
 
 const (
-	setName string = "system.verb.set"
+	setName string = "word.verb.set"
 	setType int    = word_types.Verb
 )
 
@@ -38,7 +38,7 @@ func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
 				return nil
 				//TODO
-			}, treasure, phrase_types.Action)
+			}, treasure, phrase_types.Action, s.GetName())
 		}, s.GetName()),
 	}
 }
