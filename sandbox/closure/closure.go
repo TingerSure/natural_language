@@ -13,11 +13,12 @@ const (
 )
 
 type Closure struct {
-	returns map[string]concept.Variable
-	value   map[string]concept.Variable
-	local   map[string]bool
-	parent  concept.Closure
-	history *History
+	returns   map[string]concept.Variable
+	value     map[string]concept.Variable
+	local     map[string]bool
+	parent    concept.Closure
+	history   *History
+	extempore *Extempore
 }
 
 func (c *Closure) IterateHistory(match func(string, concept.Variable) bool) bool {
@@ -46,6 +47,10 @@ func (c *Closure) IterateHistory(match func(string, concept.Variable) bool) bool
 		c.history.Set(selectedKey, selectedTypes)
 	}
 	return ok
+}
+
+func (c *Closure) IterateExtempore(match func(concept.Index, concept.Variable) bool) bool {
+	return c.extempore.Iterate(match)
 }
 
 func (c *Closure) IterateLocal(match func(string, concept.Variable) bool) bool {
@@ -78,6 +83,10 @@ func (c *Closure) IterateBubble(match func(string, concept.Variable) bool) bool 
 
 func (c *Closure) SetParent(parent concept.Closure) {
 	c.parent = parent
+}
+
+func (c *Closure) AddExtempore(index concept.Index, value concept.Variable) {
+	c.extempore.Add(index, value)
 }
 
 func (c *Closure) SetReturn(key string, value concept.Variable) {
@@ -148,10 +157,11 @@ func (c *Closure) Clear() {
 
 func NewClosure(parent concept.Closure) *Closure {
 	return &Closure{
-		parent:  parent,
-		returns: make(map[string]concept.Variable),
-		value:   make(map[string]concept.Variable),
-		local:   make(map[string]bool),
-		history: NewHistory(),
+		parent:    parent,
+		returns:   make(map[string]concept.Variable),
+		value:     make(map[string]concept.Variable),
+		local:     make(map[string]bool),
+		history:   NewHistory(),
+		extempore: NewExtempore(),
 	}
 }

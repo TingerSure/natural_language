@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/TingerSure/natural_language/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/sandbox/interrupt"
 )
 
 const (
@@ -13,10 +14,10 @@ const (
 )
 
 type Loop struct {
-	events             chan *Event
-	state              int
-	excepetionListener func(concept.Exception)
-	closeListener      func()
+	events            chan *Event
+	state             int
+	interruptListener func(concept.Interrupt)
+	closeListener     func()
 }
 
 func (l *Loop) Append(event *Event) {
@@ -28,8 +29,8 @@ func (l *Loop) Append(event *Event) {
 func (l *Loop) OnClose(listener func()) {
 	l.closeListener = listener
 }
-func (l *Loop) OnException(listener func(concept.Exception)) {
-	l.excepetionListener = listener
+func (l *Loop) OnInterrupt(listener func(concept.Interrupt)) {
+	l.interruptListener = listener
 }
 
 func (l *Loop) Start() error {
@@ -43,9 +44,14 @@ func (l *Loop) Start() error {
 			if !ok {
 				break
 			}
-			exception := event.Exec()
-			if !nl_interface.IsNil(exception) && l.excepetionListener != nil {
-				l.excepetionListener(exception)
+			suspend := event.Exec()
+			if !nl_interface.IsNil(suspend) {
+				if suspend.InterruptType() == interrupt.EndInterruptType {
+					break
+				}
+				if l.interruptListener != nil {
+					l.interruptListener(suspend)
+				}
 			}
 		}
 		if l.closeListener != nil {

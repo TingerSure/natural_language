@@ -2,14 +2,17 @@ package sandbox
 
 import (
 	"errors"
+	"fmt"
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/sandbox/loop"
 )
 
 type SandboxParam struct {
 	OnError   func(error)
 	OnClose   func()
-	OnResault func(value concept.Variable)
+	OnPrint   func(concept.Variable)
+	Root      concept.Closure
 	EventSize int
 }
 
@@ -22,8 +25,8 @@ func (s *Sandbox) GetEventLoop() *loop.Loop {
 	return s.eventLoop
 }
 
-func (s *Sandbox) Exec(funcs concept.Function, param concept.Param) {
-	s.eventLoop.Append(loop.NewEvent(funcs, param, s.param.OnResault))
+func (s *Sandbox) Exec(index concept.Index) {
+	s.eventLoop.Append(loop.NewEvent(index, s.param.Root))
 }
 
 func (s *Sandbox) Start() error {
@@ -41,8 +44,13 @@ func NewSandbox(param *SandboxParam) *Sandbox {
 	})
 
 	box.eventLoop.OnClose(param.OnClose)
-	box.eventLoop.OnException(func(exception concept.Exception) {
-		param.OnError(errors.New(exception.ToString("")))
+	box.eventLoop.OnInterrupt(func(suspend concept.Interrupt) {
+		switch suspend.InterruptType() {
+		case interrupt.ExceptionInterruptType:
+			param.OnError(errors.New(suspend.(concept.Exception).ToString("")))
+		default:
+			param.OnError(errors.New(fmt.Sprintf("Illegel interrupt in the root loop: %v.", suspend.InterruptType())))
+		}
 	})
 
 	return box

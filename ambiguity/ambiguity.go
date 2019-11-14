@@ -2,7 +2,6 @@ package ambiguity
 
 import (
 	"github.com/TingerSure/natural_language/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/lexer"
 	"github.com/TingerSure/natural_language/tree"
 	"sort"
 )
@@ -89,7 +88,7 @@ func (a *Ambiguity) Check(left, right tree.Phrase) int {
 	return 0
 }
 
-func (a *Ambiguity) Filter(flow *lexer.Flow, phrases []tree.Phrase) tree.Phrase {
+func (a *Ambiguity) Filter(phrases []tree.Phrase) tree.Phrase {
 	a.Sort(phrases)
 	var base tree.Phrase = nil
 	for _, now := range phrases {

@@ -3,34 +3,25 @@ package loop
 import (
 	"github.com/TingerSure/natural_language/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/sandbox/concept"
-	"github.com/TingerSure/natural_language/sandbox/variable"
-)
-
-var (
-	eventDefaultParam = variable.NewParam()
 )
 
 type Event struct {
-	param           concept.Param
-	exec            concept.Function
-	resaultListener func(value concept.Variable)
+	index concept.Index
+	space concept.Closure
 }
 
-func (e *Event) Exec() concept.Exception {
-	resault, exception := e.exec.Exec(e.param, nil)
-	if e.resaultListener != nil {
-		e.resaultListener(resault)
+func (e *Event) Exec() concept.Interrupt {
+	resault, suspend := e.index.Get(e.space)
+	if nl_interface.IsNil(suspend) {
+		e.space.AddExtempore(e.index, resault)
 	}
-	return exception
+	return suspend
 }
 
-func NewEvent(exec concept.Function, param concept.Param, resaultListener func(value concept.Variable)) *Event {
-	if nl_interface.IsNil(param) {
-		param = eventDefaultParam
-	}
+func NewEvent(index concept.Index, space concept.Closure) *Event {
+
 	return &Event{
-		param:           param,
-		exec:            exec,
-		resaultListener: resaultListener,
+		index: index,
+		space: space,
 	}
 }

@@ -48,7 +48,11 @@ func (c *CodeBlock) AddSteps(steps []concept.Index) {
 	c.flow = append(c.flow, steps...)
 }
 
-func (f *CodeBlock) Exec(parent concept.Closure, returnBubble bool, init func(concept.Closure) concept.Interrupt) (concept.Closure, concept.Interrupt) {
+func (f *CodeBlock) Exec(
+	parent concept.Closure,
+	returnBubble bool,
+	init func(concept.Closure) concept.Interrupt,
+) (concept.Closure, concept.Interrupt) {
 
 	if parent == nil && returnBubble {
 		returnBubble = false
@@ -68,10 +72,11 @@ func (f *CodeBlock) Exec(parent concept.Closure, returnBubble bool, init func(co
 		}
 	}
 	for _, step := range f.flow {
-		_, suspend := step.Get(space)
+		value, suspend := step.Get(space)
 		if !nl_interface.IsNil(suspend) {
 			return space, suspend
 		}
+		space.AddExtempore(step, value)
 	}
 	return space, nil
 }
