@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	Left  = "left"
-	Right = "right"
+	Left   = "left"
+	Right  = "right"
 	Result = "result"
 )
 

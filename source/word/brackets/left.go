@@ -37,9 +37,14 @@ func (s *BracketsLeft) GetVocabularyRules() []*tree.VocabularyRule {
 		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) bool {
 			return treasure.GetSource() == s
 		}, func(treasure *tree.Vocabulary) tree.Phrase {
-			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
-				return LeftIndex
-			}, treasure, phrase_types.BracketsLeft, s.GetName())
+			return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
+				Index: func() concept.Index {
+					return LeftIndex
+				},
+				Content: treasure,
+				Types:   phrase_types.BracketsLeft,
+				From:    s.GetName(),
+			})
 		}, s.GetName()),
 	}
 }

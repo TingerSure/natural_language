@@ -42,13 +42,18 @@ func (p *Number) GetVocabularyRules() []*tree.VocabularyRule {
 		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) bool {
 			return treasure.GetSource() == p
 		}, func(treasure *tree.Vocabulary) tree.Phrase {
-			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
-				value, err := strconv.ParseFloat(treasure.GetWord().GetContext(), 64)
-				if err != nil {
-					panic(err)
-				}
-				return index.NewConstIndex(variable.NewNumber(value))
-			}, treasure, phrase_types.Number, p.GetName())
+			return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
+				Index: func() concept.Index {
+					value, err := strconv.ParseFloat(treasure.GetWord().GetContext(), 64)
+					if err != nil {
+						panic(err)
+					}
+					return index.NewConstIndex(variable.NewNumber(value))
+				},
+				Content: treasure,
+				Types:   phrase_types.Number,
+				From:    p.GetName(),
+			})
 		}, p.GetName()),
 	}
 }

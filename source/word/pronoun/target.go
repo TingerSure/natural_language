@@ -48,10 +48,15 @@ func (p *Target) GetVocabularyRules() []*tree.VocabularyRule {
 		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) bool {
 			return treasure.GetSource() == p
 		}, func(treasure *tree.Vocabulary) tree.Phrase {
-			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
-				return nil
-				//TODO
-			}, treasure, phrase_types.Target, p.GetName())
+			return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
+				Index: func() concept.Index {
+					return nil
+					//TODO
+				},
+				Content: treasure,
+				Types:   phrase_types.Target,
+				From:    p.GetName(),
+			})
 		}, p.GetName()),
 	}
 }

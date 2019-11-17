@@ -5,29 +5,33 @@ import (
 	"github.com/TingerSure/natural_language/sandbox/concept"
 )
 
+type PhraseVocabularyAdaptorParam struct {
+	Index   func() concept.Index
+	Content *Vocabulary
+	Types   string
+	From    string
+}
+
 type PhraseVocabularyAdaptor struct {
-	types   string
-	from    string
-	content *Vocabulary
-	index   func() concept.Index
+	param *PhraseVocabularyAdaptorParam
 }
 
 func (p *PhraseVocabularyAdaptor) Index() concept.Index {
-	return p.index()
+	return p.param.Index()
 }
 
 func (p *PhraseVocabularyAdaptor) Types() string {
-	return p.types
+	return p.param.Types
 }
 
 func (p *PhraseVocabularyAdaptor) Copy() Phrase {
-	return NewPhraseVocabularyAdaptor(p.index, p.content, p.types, p.from)
+	return NewPhraseVocabularyAdaptor(p.param)
 }
 func (p *PhraseVocabularyAdaptor) Size() int {
 	return 0
 }
 func (p *PhraseVocabularyAdaptor) GetContent() *Vocabulary {
-	return p.content
+	return p.param.Content
 }
 
 func (p *PhraseVocabularyAdaptor) GetChild(index int) Phrase {
@@ -48,23 +52,15 @@ func (p *PhraseVocabularyAdaptor) ToStringOffset(index int) string {
 	for i := 0; i < index; i++ {
 		space += "\t"
 	}
-	return fmt.Sprintf("%v%v ( %v )\n", space, p.types, p.content.ToString())
+	return fmt.Sprintf("%v%v ( %v )\n", space, p.param.Types, p.param.Content.ToString())
 }
 
 func (p *PhraseVocabularyAdaptor) From() string {
-	return p.from
+	return p.param.From
 }
 
-func NewPhraseVocabularyAdaptor(
-	index func() concept.Index,
-	content *Vocabulary,
-	types string,
-	from string,
-) *PhraseVocabularyAdaptor {
+func NewPhraseVocabularyAdaptor(param *PhraseVocabularyAdaptorParam) *PhraseVocabularyAdaptor {
 	return &PhraseVocabularyAdaptor{
-		content: content,
-		index:   index,
-		types:   types,
-		from:    from,
+		param: param,
 	}
 }

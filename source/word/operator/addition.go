@@ -37,9 +37,14 @@ func (p *Addition) GetVocabularyRules() []*tree.VocabularyRule {
 		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) bool {
 			return treasure.GetSource() == p
 		}, func(treasure *tree.Vocabulary) tree.Phrase {
-			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
-				return index.NewConstIndex(operator.AdditionFunc)
-			}, treasure, phrase_types.Operator, p.GetName())
+			return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
+				Index: func() concept.Index {
+					return index.NewConstIndex(operator.AdditionFunc)
+				},
+				Content: treasure,
+				Types:   phrase_types.Operator,
+				From:    p.GetName(),
+			})
 		}, p.GetName()),
 	}
 }
