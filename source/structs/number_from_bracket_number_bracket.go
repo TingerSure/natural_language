@@ -28,9 +28,14 @@ func (p *NumberFromBracketNumberBracket) GetStructRules() []*tree.StructRule {
 
 		tree.NewStructRule(&tree.StructRuleParam{
 			Create: func() tree.Phrase {
-				return tree.NewPhraseStructAdaptor(func(phrase []tree.Phrase) concept.Index {
-					return phrase[1].Index()
-				}, len(NumberFromBracketNumberBracketList), phrase_types.Number, p.GetName())
+				return tree.NewPhraseStructAdaptor(&tree.PhraseStructAdaptorParam{
+					Index: func(phrase []tree.Phrase) concept.Index {
+						return phrase[1].Index()
+					},
+					Size:  len(NumberFromBracketNumberBracketList),
+					Types: phrase_types.Number,
+					From:  p.GetName(),
+				})
 			},
 			Types: NumberFromBracketNumberBracketList,
 			From:  p.GetName(),

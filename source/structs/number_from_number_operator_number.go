@@ -30,18 +30,23 @@ func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
 
 		tree.NewStructRule(&tree.StructRuleParam{
 			Create: func() tree.Phrase {
-				return tree.NewPhraseStructAdaptor(func(phrase []tree.Phrase) concept.Index {
-					return expression.NewParamGet(
-						expression.NewCall(
-							phrase[1].Index(),
-							expression.NewNewParamWithInit(map[string]concept.Index{
-								operator.Left:  phrase[0].Index(),
-								operator.Right: phrase[2].Index(),
-							}),
-						),
-						operator.Result,
-					)
-				}, len(NumberFromNumberOperatorNumberList), phrase_types.Number, p.GetName())
+				return tree.NewPhraseStructAdaptor(&tree.PhraseStructAdaptorParam{
+					Index: func(phrase []tree.Phrase) concept.Index {
+						return expression.NewParamGet(
+							expression.NewCall(
+								phrase[1].Index(),
+								expression.NewNewParamWithInit(map[string]concept.Index{
+									operator.Left:  phrase[0].Index(),
+									operator.Right: phrase[2].Index(),
+								}),
+							),
+							operator.Result,
+						)
+					},
+					Size:  len(NumberFromNumberOperatorNumberList),
+					Types: phrase_types.Number,
+					From:  p.GetName(),
+				})
 			},
 			Types: NumberFromNumberOperatorNumberList,
 			From:  p.GetName(),

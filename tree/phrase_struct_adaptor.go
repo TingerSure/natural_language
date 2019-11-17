@@ -5,28 +5,32 @@ import (
 	"github.com/TingerSure/natural_language/sandbox/concept"
 )
 
+type PhraseStructAdaptorParam struct {
+	Index func([]Phrase) concept.Index
+	Size  int
+	Types string
+	From  string
+}
+
 type PhraseStructAdaptor struct {
-	size     int
 	children []Phrase
-	from     string
-	types    string
-	index    func(children []Phrase) concept.Index
+	param    *PhraseStructAdaptorParam
 }
 
 func (p *PhraseStructAdaptor) Index() concept.Index {
-	return p.index(p.children)
+	return p.param.Index(p.children)
 }
 
 func (p *PhraseStructAdaptor) Types() string {
-	return p.types
+	return p.param.Types
 }
 
 func (p *PhraseStructAdaptor) Size() int {
-	return p.size
+	return p.param.Size
 }
 
 func (p *PhraseStructAdaptor) Copy() Phrase {
-	substitute := NewPhraseStructAdaptor(p.index, p.size, p.types, p.from)
+	substitute := NewPhraseStructAdaptor(p.param)
 	for index, child := range p.children {
 		substitute.SetChild(index, child.Copy())
 	}
@@ -38,14 +42,14 @@ func (p *PhraseStructAdaptor) GetContent() *Vocabulary {
 }
 
 func (p *PhraseStructAdaptor) GetChild(index int) Phrase {
-	if index < 0 || index >= p.size {
+	if index < 0 || index >= p.param.Size {
 		return nil
 	}
 	return p.children[index]
 }
 
 func (p *PhraseStructAdaptor) SetChild(index int, child Phrase) Phrase {
-	if index < 0 || index >= p.size {
+	if index < 0 || index >= p.param.Size {
 		panic("error index when set child")
 	}
 	p.children[index] = child
@@ -61,7 +65,7 @@ func (p *PhraseStructAdaptor) ToStringOffset(index int) string {
 	for i := 0; i < index; i++ {
 		space += "\t"
 	}
-	info := fmt.Sprintf("%v%v (\n", space, p.types)
+	info := fmt.Sprintf("%v%v (\n", space, p.param.Types)
 	for i := 0; i < len(p.children); i++ {
 		info += p.GetChild(i).ToStringOffset(index + 1)
 	}
@@ -70,20 +74,12 @@ func (p *PhraseStructAdaptor) ToStringOffset(index int) string {
 }
 
 func (p *PhraseStructAdaptor) From() string {
-	return p.from
+	return p.param.From
 }
 
-func NewPhraseStructAdaptor(
-	index func([]Phrase) concept.Index,
-	size int,
-	types string,
-	from string,
-) *PhraseStructAdaptor {
+func NewPhraseStructAdaptor(param *PhraseStructAdaptorParam) *PhraseStructAdaptor {
 	return &PhraseStructAdaptor{
-		size:     size,
-		index:    index,
-		from:     from,
-		types:    types,
-		children: make([]Phrase, size),
+		param:    param,
+		children: make([]Phrase, param.Size),
 	}
 }

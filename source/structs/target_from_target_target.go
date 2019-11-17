@@ -27,10 +27,15 @@ func (p *TargetFromTargetTarget) GetStructRules() []*tree.StructRule {
 
 		tree.NewStructRule(&tree.StructRuleParam{
 			Create: func() tree.Phrase {
-				return tree.NewPhraseStructAdaptor(func([]tree.Phrase) concept.Index {
-					return nil
-					//TODO
-				}, len(targetFromTargetTargetList), phrase_types.Target, p.GetName())
+				return tree.NewPhraseStructAdaptor(&tree.PhraseStructAdaptorParam{
+					Index: func([]tree.Phrase) concept.Index {
+						return nil
+						//TODO
+					},
+					Size:  len(targetFromTargetTargetList),
+					Types: phrase_types.Target,
+					From:  p.GetName(),
+				})
 			},
 			Types: targetFromTargetTargetList,
 			From:  p.GetName(),
