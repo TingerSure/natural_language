@@ -26,12 +26,16 @@ type TargetFromTargetBelongTarget struct {
 func (p *TargetFromTargetBelongTarget) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
-		tree.NewStructRule(func() tree.Phrase {
-			return tree.NewPhraseStructAdaptor(func([]tree.Phrase) concept.Index {
-				return nil
-				//TODO
-			}, len(targetFromTargetBelongTargetList), phrase_types.Target, p.GetName())
-		}, targetFromTargetBelongTargetList, p.GetName()),
+		tree.NewStructRule(&tree.StructRuleParam{
+			Create: func() tree.Phrase {
+				return tree.NewPhraseStructAdaptor(func([]tree.Phrase) concept.Index {
+					return nil
+					//TODO
+				}, len(targetFromTargetBelongTargetList), phrase_types.Target, p.GetName())
+			},
+			Types: targetFromTargetBelongTargetList,
+			From:  p.GetName(),
+		}),
 	}
 }
 

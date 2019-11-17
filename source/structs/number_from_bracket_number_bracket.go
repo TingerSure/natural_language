@@ -26,11 +26,15 @@ type NumberFromBracketNumberBracket struct {
 func (p *NumberFromBracketNumberBracket) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
-		tree.NewStructRule(func() tree.Phrase {
-			return tree.NewPhraseStructAdaptor(func(phrase []tree.Phrase) concept.Index {
-				return phrase[1].Index()
-			}, len(NumberFromBracketNumberBracketList), phrase_types.Number, p.GetName())
-		}, NumberFromBracketNumberBracketList, p.GetName()),
+		tree.NewStructRule(&tree.StructRuleParam{
+			Create: func() tree.Phrase {
+				return tree.NewPhraseStructAdaptor(func(phrase []tree.Phrase) concept.Index {
+					return phrase[1].Index()
+				}, len(NumberFromBracketNumberBracketList), phrase_types.Number, p.GetName())
+			},
+			Types: NumberFromBracketNumberBracketList,
+			From:  p.GetName(),
+		}),
 	}
 }
 

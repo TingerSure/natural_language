@@ -26,12 +26,16 @@ type EventFromTargetActionTarget struct {
 func (p *EventFromTargetActionTarget) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
-		tree.NewStructRule(func() tree.Phrase {
-			return tree.NewPhraseStructAdaptor(func([]tree.Phrase) concept.Index {
-				return nil
-				//TODO
-			}, len(eventFromTargetActionTargetList), phrase_types.Event, p.GetName())
-		}, eventFromTargetActionTargetList, p.GetName()),
+		tree.NewStructRule(&tree.StructRuleParam{
+			Create: func() tree.Phrase {
+				return tree.NewPhraseStructAdaptor(func([]tree.Phrase) concept.Index {
+					return nil
+					//TODO
+				}, len(eventFromTargetActionTargetList), phrase_types.Event, p.GetName())
+			},
+			Types: eventFromTargetActionTargetList,
+			From:  p.GetName(),
+		}),
 	}
 }
 

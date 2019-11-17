@@ -28,19 +28,23 @@ type AnyFromQuestionSetAny struct {
 func (p *AnyFromQuestionSetAny) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
-		tree.NewStructRule(func() tree.Phrase {
-			return tree.NewPhraseStructAdaptor(func(phrase []tree.Phrase) concept.Index {
-				return expression.NewParamGet(
-					expression.NewCall(
-						phrase[0].Index(),
-						expression.NewNewParamWithInit(map[string]concept.Index{
-							std.PrintfContent: phrase[2].Index(),
-						}),
-					),
-					std.PrintfContent,
-				)
-			}, len(anyFromQuestionSetAnyList), phrase_types.Any, p.GetName())
-		}, anyFromQuestionSetAnyList, p.GetName()),
+		tree.NewStructRule(&tree.StructRuleParam{
+			Create: func() tree.Phrase {
+				return tree.NewPhraseStructAdaptor(func(phrase []tree.Phrase) concept.Index {
+					return expression.NewParamGet(
+						expression.NewCall(
+							phrase[0].Index(),
+							expression.NewNewParamWithInit(map[string]concept.Index{
+								std.PrintfContent: phrase[2].Index(),
+							}),
+						),
+						std.PrintfContent,
+					)
+				}, len(anyFromQuestionSetAnyList), phrase_types.Any, p.GetName())
+			},
+			Types: anyFromQuestionSetAnyList,
+			From:  p.GetName(),
+		}),
 	}
 }
 

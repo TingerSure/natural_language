@@ -24,12 +24,16 @@ type TargetFromUnknown struct {
 func (p *TargetFromUnknown) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
-		tree.NewStructRule(func() tree.Phrase {
-			return tree.NewPhraseStructAdaptor(func([]tree.Phrase) concept.Index {
-				return nil
-				//TODO
-			}, len(targetFromUnknownList), phrase_types.Target, p.GetName())
-		}, targetFromUnknownList, p.GetName()),
+		tree.NewStructRule(&tree.StructRuleParam{
+			Create: func() tree.Phrase {
+				return tree.NewPhraseStructAdaptor(func([]tree.Phrase) concept.Index {
+					return nil
+					//TODO
+				}, len(targetFromUnknownList), phrase_types.Target, p.GetName())
+			},
+			Types: targetFromUnknownList,
+			From:  p.GetName(),
+		}),
 	}
 }
 

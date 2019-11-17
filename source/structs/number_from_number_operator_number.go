@@ -28,20 +28,24 @@ type NumberFromNumberOperatorNumber struct {
 func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
-		tree.NewStructRule(func() tree.Phrase {
-			return tree.NewPhraseStructAdaptor(func(phrase []tree.Phrase) concept.Index {
-				return expression.NewParamGet(
-					expression.NewCall(
-						phrase[1].Index(),
-						expression.NewNewParamWithInit(map[string]concept.Index{
-							operator.Left:  phrase[0].Index(),
-							operator.Right: phrase[2].Index(),
-						}),
-					),
-					operator.Result,
-				)
-			}, len(NumberFromNumberOperatorNumberList), phrase_types.Number, p.GetName())
-		}, NumberFromNumberOperatorNumberList, p.GetName()),
+		tree.NewStructRule(&tree.StructRuleParam{
+			Create: func() tree.Phrase {
+				return tree.NewPhraseStructAdaptor(func(phrase []tree.Phrase) concept.Index {
+					return expression.NewParamGet(
+						expression.NewCall(
+							phrase[1].Index(),
+							expression.NewNewParamWithInit(map[string]concept.Index{
+								operator.Left:  phrase[0].Index(),
+								operator.Right: phrase[2].Index(),
+							}),
+						),
+						operator.Result,
+					)
+				}, len(NumberFromNumberOperatorNumberList), phrase_types.Number, p.GetName())
+			},
+			Types: NumberFromNumberOperatorNumberList,
+			From:  p.GetName(),
+		}),
 	}
 }
 
