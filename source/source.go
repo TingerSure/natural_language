@@ -36,6 +36,7 @@ func AllRules() []tree.Source {
 		structs.NewNumberFromNumberOperatorNumber(),
 		structs.NewNumberFromBracketNumberBracket(),
 		structs.NewAnyFromQuestionSetAny(),
+		structs.NewAnyFromAnySetQuestion(),
 
 		priority.NewOperatorLevel(),
 	}
