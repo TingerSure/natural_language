@@ -3,6 +3,7 @@ package sandbox
 import (
 	"errors"
 	"fmt"
+	"github.com/TingerSure/natural_language/library/std"
 	"github.com/TingerSure/natural_language/sandbox/concept"
 	"github.com/TingerSure/natural_language/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/sandbox/loop"
@@ -37,6 +38,10 @@ func (s *Sandbox) Stop() error {
 	return s.eventLoop.Start()
 }
 
+func (s *Sandbox) Print(value concept.Variable) {
+	s.param.OnPrint(value)
+}
+
 func NewSandbox(param *SandboxParam) *Sandbox {
 	box := (&Sandbox{
 		eventLoop: loop.NewLoop(param.EventSize),
@@ -52,6 +57,8 @@ func NewSandbox(param *SandboxParam) *Sandbox {
 			param.OnError(errors.New(fmt.Sprintf("Illegel interrupt in the root loop: %v.", suspend.InterruptType())))
 		}
 	})
+
+	std.Std = box
 
 	return box
 }

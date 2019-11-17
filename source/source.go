@@ -8,15 +8,17 @@ import (
 	"github.com/TingerSure/natural_language/source/word/number"
 	"github.com/TingerSure/natural_language/source/word/operator"
 	"github.com/TingerSure/natural_language/source/word/pronoun"
+	"github.com/TingerSure/natural_language/source/word/question"
 	"github.com/TingerSure/natural_language/source/word/unknown"
-	"github.com/TingerSure/natural_language/source/word/verb"
+	"github.com/TingerSure/natural_language/source/word/verb/set"
 	"github.com/TingerSure/natural_language/tree"
 )
 
 func AllRules() []tree.Source {
 	return []tree.Source{
 		pronoun.NewTarget(),
-		verb.NewSet(),
+		set.NewSet(),
+		question.NewQuestion(),
 		auxiliary.NewBelong(),
 		unknown.NewUnknown(),
 		number.NewNumber(),
@@ -33,6 +35,7 @@ func AllRules() []tree.Source {
 		structs.NewEventFromTargetActionTarget(),
 		structs.NewNumberFromNumberOperatorNumber(),
 		structs.NewNumberFromBracketNumberBracket(),
+		structs.NewAnyFromQuestionSetAny(),
 
 		priority.NewOperatorLevel(),
 	}

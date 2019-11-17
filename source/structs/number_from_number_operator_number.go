@@ -1,6 +1,7 @@
 package structs
 
 import (
+	"github.com/TingerSure/natural_language/library/operator"
 	"github.com/TingerSure/natural_language/sandbox/concept"
 	"github.com/TingerSure/natural_language/sandbox/expression"
 	"github.com/TingerSure/natural_language/source/adaptor"
@@ -33,11 +34,11 @@ func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
 					expression.NewCall(
 						phrase[1].Index(),
 						expression.NewNewParamWithInit(map[string]concept.Index{
-							phrase_types.Operator_Left:  phrase[0].Index(),
-							phrase_types.Operator_Right: phrase[2].Index(),
+							operator.Left:  phrase[0].Index(),
+							operator.Right: phrase[2].Index(),
 						}),
 					),
-					phrase_types.Operator_Result,
+					operator.Result,
 				)
 			}, len(NumberFromNumberOperatorNumberList), phrase_types.Number, p.GetName())
 		}, NumberFromNumberOperatorNumberList, p.GetName()),

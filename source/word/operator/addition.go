@@ -1,10 +1,9 @@
 package operator
 
 import (
+	"github.com/TingerSure/natural_language/library/operator"
 	"github.com/TingerSure/natural_language/sandbox/concept"
-	"github.com/TingerSure/natural_language/sandbox/expression"
 	"github.com/TingerSure/natural_language/sandbox/index"
-	"github.com/TingerSure/natural_language/sandbox/variable"
 	"github.com/TingerSure/natural_language/source/adaptor"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
@@ -12,32 +11,14 @@ import (
 )
 
 const (
-	AdditionName string = "word.operator.addition"
-	additionType int    = word_types.Operator
+	AdditionName      string = "word.operator.addition"
+	additionType      int    = word_types.Operator
+	additionCharactor        = "+"
 )
 
 var (
-	additionCharactor = "+"
-
 	additionWords []*tree.Word = []*tree.Word{tree.NewWord(additionCharactor, additionType)}
-
-	additionFuncs *variable.Function = nil
 )
-
-func init() {
-	additionFuncs = variable.NewFunction(nil)
-	additionFuncs.AddParamName(phrase_types.Operator_Left)
-	additionFuncs.AddParamName(phrase_types.Operator_Right)
-	additionFuncs.Body().AddStep(
-		expression.NewReturn(
-			phrase_types.Operator_Result,
-			expression.NewAddition(
-				index.NewLocalIndex(phrase_types.Operator_Left),
-				index.NewLocalIndex(phrase_types.Operator_Right),
-			),
-		),
-	)
-}
 
 type Addition struct {
 	adaptor.SourceAdaptor
@@ -57,7 +38,7 @@ func (p *Addition) GetVocabularyRules() []*tree.VocabularyRule {
 			return treasure.GetSource() == p
 		}, func(treasure *tree.Vocabulary) tree.Phrase {
 			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
-				return index.NewConstIndex(additionFuncs)
+				return index.NewConstIndex(operator.AdditionFunc)
 			}, treasure, phrase_types.Operator, p.GetName())
 		}, p.GetName()),
 	}

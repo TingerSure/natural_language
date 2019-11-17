@@ -1,4 +1,4 @@
-package verb
+package set
 
 import (
 	"github.com/TingerSure/natural_language/sandbox/concept"
@@ -37,8 +37,7 @@ func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 		}, func(treasure *tree.Vocabulary) tree.Phrase {
 			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
 				return nil
-				//TODO
-			}, treasure, phrase_types.Action, s.GetName())
+			}, treasure, phrase_types.Set, s.GetName())
 		}, s.GetName()),
 	}
 }

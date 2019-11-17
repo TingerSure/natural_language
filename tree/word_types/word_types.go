@@ -5,6 +5,7 @@ const (
 	Noun              = 100
 	Pronoun           = 200
 	Verb              = 300
+	VerbSet           = 310
 	Adjective         = 400
 	Adverb            = 500
 	Auxiliary         = 600
@@ -12,4 +13,5 @@ const (
 	AuxiliaryBrackets = 620
 	Number            = 700
 	Operator          = 800
+	Question          = 900
 )

@@ -55,7 +55,12 @@ func (p *PhraseVocabularyAdaptor) From() string {
 	return p.from
 }
 
-func NewPhraseVocabularyAdaptor(index func() concept.Index, content *Vocabulary, types string, from string) *PhraseVocabularyAdaptor {
+func NewPhraseVocabularyAdaptor(
+	index func() concept.Index,
+	content *Vocabulary,
+	types string,
+	from string,
+) *PhraseVocabularyAdaptor {
 	return &PhraseVocabularyAdaptor{
 		content: content,
 		index:   index,

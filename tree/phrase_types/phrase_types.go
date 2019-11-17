@@ -1,21 +1,18 @@
 package phrase_types
 
 const (
-	Unknown string = "system.unknown"
-	Number  string = "system.number"
-
-	/*
-		Operator_Result = Operator_Left Operator Operator_Right
-	*/
+	Any             string = "system.any"
+	Unknown         string = "system.unknown"
+	Number          string = "system.number"
 	Operator        string = "system.operator"
-	Operator_Left   string = "left"
-	Operator_Right  string = "right"
-	Operator_Result string = "result"
-
 	Event           string = "system.event"
 	Target          string = "system.target"
 	AuxiliaryBelong string = "system.auxiliary.belong"
 	Action          string = "system.action"
-	BracketsLeft    string = "system.brackets.left"
-	BracketsRight   string = "system.brackets.right"
+	Set             string = "system.set"
+
+	BracketsLeft  string = "system.brackets.left"
+	BracketsRight string = "system.brackets.right"
+
+	Question string = "system.question"
 )

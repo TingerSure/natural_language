@@ -73,7 +73,12 @@ func (p *PhraseStructAdaptor) From() string {
 	return p.from
 }
 
-func NewPhraseStructAdaptor(index func([]Phrase) concept.Index, size int, types string, from string) *PhraseStructAdaptor {
+func NewPhraseStructAdaptor(
+	index func([]Phrase) concept.Index,
+	size int,
+	types string,
+	from string,
+) *PhraseStructAdaptor {
 	return &PhraseStructAdaptor{
 		size:     size,
 		index:    index,

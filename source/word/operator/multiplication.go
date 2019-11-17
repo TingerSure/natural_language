@@ -1,10 +1,9 @@
 package operator
 
 import (
+	"github.com/TingerSure/natural_language/library/operator"
 	"github.com/TingerSure/natural_language/sandbox/concept"
-	"github.com/TingerSure/natural_language/sandbox/expression"
 	"github.com/TingerSure/natural_language/sandbox/index"
-	"github.com/TingerSure/natural_language/sandbox/variable"
 	"github.com/TingerSure/natural_language/source/adaptor"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
@@ -12,32 +11,14 @@ import (
 )
 
 const (
-	MultiplicationName string = "word.operator.multiplication"
-	multiplicationType int    = word_types.Operator
+	MultiplicationName      string = "word.operator.multiplication"
+	multiplicationType      int    = word_types.Operator
+	multiplicationCharactor        = "*"
 )
 
 var (
-	multiplicationCharactor = "*"
-
 	multiplicationWords []*tree.Word = []*tree.Word{tree.NewWord(multiplicationCharactor, multiplicationType)}
-
-	multiplicationFuncs *variable.Function = nil
 )
-
-func init() {
-	multiplicationFuncs = variable.NewFunction(nil)
-	multiplicationFuncs.AddParamName(phrase_types.Operator_Left)
-	multiplicationFuncs.AddParamName(phrase_types.Operator_Right)
-	multiplicationFuncs.Body().AddStep(
-		expression.NewReturn(
-			phrase_types.Operator_Result,
-			expression.NewMultiplication(
-				index.NewLocalIndex(phrase_types.Operator_Left),
-				index.NewLocalIndex(phrase_types.Operator_Right),
-			),
-		),
-	)
-}
 
 type Multiplication struct {
 	adaptor.SourceAdaptor
@@ -57,7 +38,7 @@ func (p *Multiplication) GetVocabularyRules() []*tree.VocabularyRule {
 			return treasure.GetSource() == p
 		}, func(treasure *tree.Vocabulary) tree.Phrase {
 			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
-				return index.NewConstIndex(multiplicationFuncs)
+				return index.NewConstIndex(operator.MultiplicationFunc)
 			}, treasure, phrase_types.Operator, p.GetName())
 		}, p.GetName()),
 	}

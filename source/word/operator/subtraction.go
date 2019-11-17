@@ -1,10 +1,9 @@
 package operator
 
 import (
+	"github.com/TingerSure/natural_language/library/operator"
 	"github.com/TingerSure/natural_language/sandbox/concept"
-	"github.com/TingerSure/natural_language/sandbox/expression"
 	"github.com/TingerSure/natural_language/sandbox/index"
-	"github.com/TingerSure/natural_language/sandbox/variable"
 	"github.com/TingerSure/natural_language/source/adaptor"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
@@ -12,31 +11,17 @@ import (
 )
 
 const (
-	SubtractionName string = "word.operator.subtraction"
-	subtractionType int    = word_types.Operator
+	SubtractionName      string = "word.operator.subtraction"
+	subtractionType      int    = word_types.Operator
+	subtractionCharactor        = "-"
 )
 
 var (
-	subtractionCharactor = "-"
-
 	subtractionWords []*tree.Word = []*tree.Word{tree.NewWord(subtractionCharactor, subtractionType)}
-
-	subtractionFuncs *variable.Function = nil
 )
 
 func init() {
-	subtractionFuncs = variable.NewFunction(nil)
-	subtractionFuncs.AddParamName(phrase_types.Operator_Left)
-	subtractionFuncs.AddParamName(phrase_types.Operator_Right)
-	subtractionFuncs.Body().AddStep(
-		expression.NewReturn(
-			phrase_types.Operator_Result,
-			expression.NewSubtraction(
-				index.NewLocalIndex(phrase_types.Operator_Left),
-				index.NewLocalIndex(phrase_types.Operator_Right),
-			),
-		),
-	)
+
 }
 
 type Subtraction struct {
@@ -57,7 +42,7 @@ func (p *Subtraction) GetVocabularyRules() []*tree.VocabularyRule {
 			return treasure.GetSource() == p
 		}, func(treasure *tree.Vocabulary) tree.Phrase {
 			return tree.NewPhraseVocabularyAdaptor(func() concept.Index {
-				return index.NewConstIndex(subtractionFuncs)
+				return index.NewConstIndex(operator.SubtractionFunc)
 			}, treasure, phrase_types.Operator, p.GetName())
 		}, p.GetName()),
 	}
