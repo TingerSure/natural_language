@@ -22,19 +22,22 @@ func (p *Unknown) GetName() string {
 
 func (p *Unknown) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
-		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) bool {
-			return treasure.GetWord().GetTypes() == word_types.Unknown
-		}, func(treasure *tree.Vocabulary) tree.Phrase {
-			return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
-				Index: func() concept.Index {
-					return nil
-					//TODO
-				},
-				Content: treasure,
-				Types:   phrase_types.Unknown,
-				From:    p.GetName(),
-			})
-		}, p.GetName()),
+		tree.NewVocabularyRule(&tree.VocabularyRuleParam{
+			Match: func(treasure *tree.Vocabulary) bool {
+				return treasure.GetWord().GetTypes() == word_types.Unknown
+			},
+			Create: func(treasure *tree.Vocabulary) tree.Phrase {
+				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
+					Index: func() concept.Index {
+						return nil
+						//TODO
+					},
+					Content: treasure,
+					Types:   phrase_types.Unknown,
+					From:    p.GetName(),
+				})
+			}, From: p.GetName(),
+		}),
 	}
 }
 

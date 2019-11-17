@@ -32,18 +32,21 @@ func (p *Question) GetWords(sentence string) []*tree.Word {
 
 func (p *Question) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
-		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) bool {
-			return treasure.GetSource() == p
-		}, func(treasure *tree.Vocabulary) tree.Phrase {
-			return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
-				Index: func() concept.Index {
-					return index.NewConstIndex(std.Print)
-				},
-				Content: treasure,
-				Types:   phrase_types.Question,
-				From:    p.GetName(),
-			})
-		}, p.GetName()),
+		tree.NewVocabularyRule(&tree.VocabularyRuleParam{
+			Match: func(treasure *tree.Vocabulary) bool {
+				return treasure.GetSource() == p
+			},
+			Create: func(treasure *tree.Vocabulary) tree.Phrase {
+				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
+					Index: func() concept.Index {
+						return index.NewConstIndex(std.Print)
+					},
+					Content: treasure,
+					Types:   phrase_types.Question,
+					From:    p.GetName(),
+				})
+			}, From: p.GetName(),
+		}),
 	}
 }
 

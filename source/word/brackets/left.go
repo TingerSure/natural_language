@@ -34,18 +34,21 @@ func (s *BracketsLeft) GetWords(sentence string) []*tree.Word {
 }
 func (s *BracketsLeft) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
-		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) bool {
-			return treasure.GetSource() == s
-		}, func(treasure *tree.Vocabulary) tree.Phrase {
-			return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
-				Index: func() concept.Index {
-					return LeftIndex
-				},
-				Content: treasure,
-				Types:   phrase_types.BracketsLeft,
-				From:    s.GetName(),
-			})
-		}, s.GetName()),
+		tree.NewVocabularyRule(&tree.VocabularyRuleParam{
+			Match: func(treasure *tree.Vocabulary) bool {
+				return treasure.GetSource() == s
+			},
+			Create: func(treasure *tree.Vocabulary) tree.Phrase {
+				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
+					Index: func() concept.Index {
+						return LeftIndex
+					},
+					Content: treasure,
+					Types:   phrase_types.BracketsLeft,
+					From:    s.GetName(),
+				})
+			}, From: s.GetName(),
+		}),
 	}
 }
 

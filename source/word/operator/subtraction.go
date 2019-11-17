@@ -38,18 +38,21 @@ func (p *Subtraction) GetWords(sentence string) []*tree.Word {
 
 func (p *Subtraction) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
-		tree.NewVocabularyRule(func(treasure *tree.Vocabulary) bool {
-			return treasure.GetSource() == p
-		}, func(treasure *tree.Vocabulary) tree.Phrase {
-			return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
-				Index: func() concept.Index {
-					return index.NewConstIndex(operator.SubtractionFunc)
-				},
-				Content: treasure,
-				Types:   phrase_types.Operator,
-				From:    p.GetName(),
-			})
-		}, p.GetName()),
+		tree.NewVocabularyRule(&tree.VocabularyRuleParam{
+			Match: func(treasure *tree.Vocabulary) bool {
+				return treasure.GetSource() == p
+			},
+			Create: func(treasure *tree.Vocabulary) tree.Phrase {
+				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
+					Index: func() concept.Index {
+						return index.NewConstIndex(operator.SubtractionFunc)
+					},
+					Content: treasure,
+					Types:   phrase_types.Operator,
+					From:    p.GetName(),
+				})
+			}, From: p.GetName(),
+		}),
 	}
 }
 

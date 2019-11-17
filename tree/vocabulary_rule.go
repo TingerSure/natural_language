@@ -1,34 +1,32 @@
 package tree
 
+type VocabularyRuleParam struct {
+	Create func(treasure *Vocabulary) Phrase
+	Match  func(treasure *Vocabulary) bool
+	From   string
+}
+
 type VocabularyRule struct {
-	create func(treasure *Vocabulary) Phrase
-	match  func(treasure *Vocabulary) bool
-	from   string
+	param *VocabularyRuleParam
 }
 
 func (r *VocabularyRule) GetFrom() string {
-	return r.from
+	return r.param.From
 }
 
 func (r *VocabularyRule) Match(treasure *Vocabulary) bool {
-	return r.match(treasure)
+	return r.param.Match(treasure)
 }
 
 func (r *VocabularyRule) Create(treasure *Vocabulary) Phrase {
-	return r.create(treasure)
+	return r.param.Create(treasure)
 }
 
-func NewVocabularyRule(
-	match func(treasure *Vocabulary) bool,
-	create func(treasure *Vocabulary) Phrase,
-	from string,
-) *VocabularyRule {
-	if create == nil {
+func NewVocabularyRule(param *VocabularyRuleParam) *VocabularyRule {
+	if param.Create == nil {
 		panic("no create function in this vocabulary rule!")
 	}
 	return &VocabularyRule{
-		create: create,
-		match:  match,
-		from:   from,
+		param: param,
 	}
 }
