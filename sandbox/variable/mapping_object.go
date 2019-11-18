@@ -104,7 +104,7 @@ func (m *MappingObject) InitField(string, concept.Variable) concept.Exception {
 }
 
 func (m *MappingObject) HasField(key string) bool {
-	return m.mapping[key] == ""
+	return m.mapping[key] != ""
 }
 
 func (m *MappingObject) HasMethod(key string) bool {
