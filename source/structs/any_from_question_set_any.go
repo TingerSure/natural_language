@@ -42,9 +42,11 @@ func (p *AnyFromQuestionSetAny) GetStructRules() []*tree.StructRule {
 							std.PrintfContent,
 						)
 					},
-					Size:  len(anyFromQuestionSetAnyList),
-					Types: phrase_types.Any,
-					From:  p.GetName(),
+					Size: len(anyFromQuestionSetAnyList),
+					DynamicTypes: func(phrase []tree.Phrase) string {
+						return phrase[2].Types()
+					},
+					From: p.GetName(),
 				})
 			},
 			Types: anyFromQuestionSetAnyList,
