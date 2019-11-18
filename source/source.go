@@ -34,7 +34,7 @@ func AllRules() []tree.Source {
 		structs.NewTargetFromTargetBelongTarget(),
 		structs.NewEventFromTargetActionTarget(),
 		structs.NewNumberFromNumberOperatorNumber(),
-		structs.NewNumberFromBracketNumberBracket(),
+		structs.NewAnyFromBracketAnyBracket(),
 		structs.NewAnyFromQuestionSetAny(),
 		structs.NewAnyFromAnySetQuestion(),
 

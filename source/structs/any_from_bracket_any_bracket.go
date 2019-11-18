@@ -8,22 +8,22 @@ import (
 )
 
 const (
-	NumberFromBracketNumberBracketName string = "structs.number.bracket_number_bracket"
+	AnyFromBracketAnyBracketName string = "structs.any.bracket_any_bracket"
 )
 
 var (
-	NumberFromBracketNumberBracketList []string = []string{
+	AnyFromBracketAnyBracketList []string = []string{
 		phrase_types.BracketsLeft,
-		phrase_types.Number,
+		phrase_types.Any,
 		phrase_types.BracketsRight,
 	}
 )
 
-type NumberFromBracketNumberBracket struct {
+type AnyFromBracketAnyBracket struct {
 	adaptor.SourceAdaptor
 }
 
-func (p *NumberFromBracketNumberBracket) GetStructRules() []*tree.StructRule {
+func (p *AnyFromBracketAnyBracket) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
 		tree.NewStructRule(&tree.StructRuleParam{
@@ -32,21 +32,23 @@ func (p *NumberFromBracketNumberBracket) GetStructRules() []*tree.StructRule {
 					Index: func(phrase []tree.Phrase) concept.Index {
 						return phrase[1].Index()
 					},
-					Size:  len(NumberFromBracketNumberBracketList),
-					Types: phrase_types.Number,
-					From:  p.GetName(),
+					Size: len(AnyFromBracketAnyBracketList),
+					DynamicTypes: func(phrase []tree.Phrase) string {
+						return phrase[1].Types()
+					},
+					From: p.GetName(),
 				})
 			},
-			Types: NumberFromBracketNumberBracketList,
+			Types: AnyFromBracketAnyBracketList,
 			From:  p.GetName(),
 		}),
 	}
 }
 
-func (p *NumberFromBracketNumberBracket) GetName() string {
-	return NumberFromBracketNumberBracketName
+func (p *AnyFromBracketAnyBracket) GetName() string {
+	return AnyFromBracketAnyBracketName
 }
 
-func NewNumberFromBracketNumberBracket() *NumberFromBracketNumberBracket {
-	return (&NumberFromBracketNumberBracket{})
+func NewAnyFromBracketAnyBracket() *AnyFromBracketAnyBracket {
+	return (&AnyFromBracketAnyBracket{})
 }

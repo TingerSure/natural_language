@@ -6,10 +6,11 @@ import (
 )
 
 type PhraseStructAdaptorParam struct {
-	Index func([]Phrase) concept.Index
-	Size  int
-	Types string
-	From  string
+	Index        func([]Phrase) concept.Index
+	Size         int
+	Types        string
+	DynamicTypes func([]Phrase) string
+	From         string
 }
 
 type PhraseStructAdaptor struct {
@@ -22,6 +23,9 @@ func (p *PhraseStructAdaptor) Index() concept.Index {
 }
 
 func (p *PhraseStructAdaptor) Types() string {
+	if p.param.DynamicTypes != nil {
+		return p.param.DynamicTypes(p.children)
+	}
 	return p.param.Types
 }
 
@@ -65,7 +69,7 @@ func (p *PhraseStructAdaptor) ToStringOffset(index int) string {
 	for i := 0; i < index; i++ {
 		space += "\t"
 	}
-	info := fmt.Sprintf("%v%v (\n", space, p.param.Types)
+	info := fmt.Sprintf("%v%v (\n", space, p.Types())
 	for i := 0; i < len(p.children); i++ {
 		info += p.GetChild(i).ToStringOffset(index + 1)
 	}
