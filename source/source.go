@@ -18,7 +18,8 @@ func AllRules() []tree.Source {
 	return []tree.Source{
 		pronoun.NewTarget(),
 		set.NewSet(),
-		question.NewQuestion(),
+		question.NewWhat(),
+		question.NewHowMany(),
 		auxiliary.NewBelong(),
 		unknown.NewUnknown(),
 		number.NewNumber(),
@@ -30,7 +31,6 @@ func AllRules() []tree.Source {
 		brackets.NewBracketsRight(),
 
 		structs.NewTargetFromTargetTarget(),
-		structs.NewTargetFromUnknown(),
 		structs.NewTargetFromTargetBelongTarget(),
 		structs.NewEventFromTargetActionTarget(),
 		structs.NewNumberFromNumberOperatorNumber(),

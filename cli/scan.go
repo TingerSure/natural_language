@@ -29,6 +29,9 @@ func (s *Scan) Run() {
 			}
 		}
 		input = strings.TrimSpace(input)
+		if input == "" {
+			continue
+		}
 		s.listener(input)
 	}
 }

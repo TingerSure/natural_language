@@ -36,10 +36,10 @@ func (p *AnyFromAnySetQuestion) GetStructRules() []*tree.StructRule {
 							expression.NewCall(
 								phrase[2].Index(),
 								expression.NewNewParamWithInit(map[string]concept.Index{
-									std.PrintfContent: phrase[0].Index(),
+									std.PrintContent: phrase[0].Index(),
 								}),
 							),
-							std.PrintfContent,
+							std.PrintContent,
 						)
 					},
 					Size: len(anyFromAnySetQuestionList),

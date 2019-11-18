@@ -1,7 +1,7 @@
 package question
 
 import (
-	"github.com/TingerSure/natural_language/library/std"
+	"github.com/TingerSure/natural_language/library/question"
 	"github.com/TingerSure/natural_language/sandbox/concept"
 	"github.com/TingerSure/natural_language/sandbox/index"
 	"github.com/TingerSure/natural_language/source/adaptor"
@@ -11,26 +11,26 @@ import (
 )
 
 const (
-	WhatCharactor        = "什么"
-	QuestionType  int    = word_types.Question
-	QuestionName  string = "word.question"
+	HowManyCharactor        = "多少"
+	HowManyType      int    = word_types.Question
+	HowManyName      string = "word.how_many"
 )
 
-type Question struct {
+type HowMany struct {
 	adaptor.SourceAdaptor
 }
 
-func (p *Question) GetName() string {
-	return QuestionName
+func (p *HowMany) GetName() string {
+	return HowManyName
 }
 
-func (p *Question) GetWords(sentence string) []*tree.Word {
+func (p *HowMany) GetWords(sentence string) []*tree.Word {
 	return tree.WordsFilter([]*tree.Word{
-		tree.NewWord(WhatCharactor, QuestionType),
+		tree.NewWord(HowManyCharactor, HowManyType),
 	}, sentence)
 }
 
-func (p *Question) GetVocabularyRules() []*tree.VocabularyRule {
+func (p *HowMany) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
 		tree.NewVocabularyRule(&tree.VocabularyRuleParam{
 			Match: func(treasure *tree.Vocabulary) bool {
@@ -39,7 +39,7 @@ func (p *Question) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(std.Print)
+						return index.NewConstIndex(question.HowManyFunc)
 					},
 					Content: treasure,
 					Types:   phrase_types.Question,
@@ -50,6 +50,6 @@ func (p *Question) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewQuestion() *Question {
-	return (&Question{})
+func NewHowMany() *HowMany {
+	return (&HowMany{})
 }

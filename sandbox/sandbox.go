@@ -9,6 +9,24 @@ import (
 	"github.com/TingerSure/natural_language/sandbox/loop"
 )
 
+type sandboxStd struct {
+	param *SandboxParam
+}
+
+func (s *sandboxStd) Print(value concept.Variable) {
+	s.param.OnPrint(value)
+}
+
+func (s *sandboxStd) Error(value concept.Variable) {
+	s.param.OnError(errors.New(value.ToString("")))
+}
+
+func newSandboxStd(param *SandboxParam) *sandboxStd {
+	return &sandboxStd{
+		param: param,
+	}
+}
+
 type SandboxParam struct {
 	OnError   func(error)
 	OnClose   func()
@@ -38,10 +56,6 @@ func (s *Sandbox) Stop() error {
 	return s.eventLoop.Start()
 }
 
-func (s *Sandbox) Print(value concept.Variable) {
-	s.param.OnPrint(value)
-}
-
 func NewSandbox(param *SandboxParam) *Sandbox {
 	box := (&Sandbox{
 		eventLoop: loop.NewLoop(param.EventSize),
@@ -58,7 +72,7 @@ func NewSandbox(param *SandboxParam) *Sandbox {
 		}
 	})
 
-	std.Std = box
+	std.Std = newSandboxStd(param)
 
 	return box
 }

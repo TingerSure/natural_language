@@ -9,12 +9,18 @@ import (
 )
 
 const (
-	Is = "是"
+	Is    = "是"
+	Equal = "等于"
+
+	SetName string = "word.verb.set"
+	SetType int    = word_types.Verb
 )
 
-const (
-	setName string = "word.verb.set"
-	setType int    = word_types.Verb
+var (
+	SetCharactors = []*tree.Word{
+		tree.NewWord(Is, SetType),
+		tree.NewWord(Equal, SetType),
+	}
 )
 
 type Set struct {
@@ -22,13 +28,11 @@ type Set struct {
 }
 
 func (s *Set) GetName() string {
-	return setName
+	return SetName
 }
 
 func (s *Set) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter([]*tree.Word{
-		tree.NewWord(Is, setType),
-	}, sentence)
+	return tree.WordsFilter(SetCharactors, sentence)
 }
 func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{

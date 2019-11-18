@@ -44,10 +44,8 @@ func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interr
 }
 
 func NewNewParamWithInit(values map[string]concept.Index) *NewParam {
-	back := &NewParam{
-		values: values,
-	}
-	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	back := NewNewParam()
+	back.values = values
 	return back
 }
 

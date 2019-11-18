@@ -8,10 +8,12 @@ import (
 
 type StdObject interface {
 	Print(concept.Variable)
+	Error(concept.Variable)
 }
 
 const (
-	PrintfContent = "content"
+	PrintContent = "content"
+	ErrorContent = PrintContent
 )
 
 var (
@@ -20,7 +22,16 @@ var (
 	Print = variable.NewSystemFunction(
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 			if Std != nil || !nl_interface.IsNil(input) {
-				Std.Print(input.Get(PrintfContent))
+				Std.Print(input.Get(PrintContent))
+			}
+			return input, nil
+		},
+	)
+
+	Error = variable.NewSystemFunction(
+		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+			if Std != nil || !nl_interface.IsNil(input) {
+				Std.Error(input.Get(ErrorContent))
 			}
 			return input, nil
 		},
