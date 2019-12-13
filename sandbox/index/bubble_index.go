@@ -8,6 +8,10 @@ type BubbleIndex struct {
 	key string
 }
 
+func (s *BubbleIndex) SubIterate(func(concept.Index) bool) bool {
+	return false
+}
+
 func (s *BubbleIndex) ToString(prefix string) string {
 	return s.key
 }

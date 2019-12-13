@@ -18,6 +18,10 @@ type If struct {
 	secondary *code_block.CodeBlock
 }
 
+func (f *If) SubIterate(onIndex func(concept.Index) bool) bool {
+	return f.primary.Iterate(onIndex) || f.secondary.Iterate(onIndex)
+}
+
 func (f *If) ToString(prefix string) string {
 	primaryToString := fmt.Sprintf("if (%v) %v", f.condition.ToString(prefix), f.primary.ToString(prefix))
 	if f.secondary.Size() == 0 {

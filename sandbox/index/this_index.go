@@ -12,6 +12,10 @@ const (
 type ThisIndex struct {
 }
 
+func (s *ThisIndex) SubIterate(func(concept.Index) bool) bool {
+	return false
+}
+
 func (s *ThisIndex) ToString(prefix string) string {
 	return thisIndexKey
 }

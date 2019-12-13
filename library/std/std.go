@@ -26,6 +26,12 @@ var (
 			}
 			return input, nil
 		},
+		[]string{
+			PrintContent,
+		},
+		[]string{
+			PrintContent,
+		},
 	)
 
 	Error = variable.NewSystemFunction(
@@ -34,6 +40,12 @@ var (
 				Std.Error(input.Get(ErrorContent))
 			}
 			return input, nil
+		},
+		[]string{
+			ErrorContent,
+		},
+		[]string{
+			ErrorContent,
 		},
 	)
 )

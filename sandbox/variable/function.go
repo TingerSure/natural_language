@@ -22,6 +22,22 @@ type Function struct {
 	parent     concept.Closure
 }
 
+func (s *Function) ParamNames() []string {
+	return s.paramNames
+}
+
+func (s *Function) ReturnNames() []string {
+	names := []string{}
+	s.body.Iterate(func(index concept.Index) bool {
+		end, ok := index.(concept.Return)
+		if ok {
+			names = append(names, end.Key())
+		}
+		return false
+	})
+	return names
+}
+
 func (s *Function) FunctionType() string {
 	return FunctionFunctionType
 }

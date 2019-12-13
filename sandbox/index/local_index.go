@@ -8,6 +8,10 @@ type LocalIndex struct {
 	key string
 }
 
+func (s *LocalIndex) SubIterate(func(concept.Index) bool) bool {
+	return false
+}
+
 func (s *LocalIndex) ToString(prefix string) string {
 	return s.key
 }

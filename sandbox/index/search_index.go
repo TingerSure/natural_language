@@ -11,6 +11,10 @@ type SearchIndex struct {
 	items []concept.Matcher
 }
 
+func (s *SearchIndex) SubIterate(func(concept.Index) bool) bool {
+	return false
+}
+
 func (s *SearchIndex) ToString(prefix string) string {
 	var subprefix = fmt.Sprintf("%v\t", prefix)
 	subs := []string{}

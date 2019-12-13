@@ -24,6 +24,10 @@ type For struct {
 	body      *code_block.CodeBlock
 }
 
+func (f *For) SubIterate(onIndex func(concept.Index) bool) bool {
+	return f.init.Iterate(onIndex) || f.end.Iterate(onIndex) || f.body.Iterate(onIndex)
+}
+
 func (f *For) ToString(prefix string) string {
 	return fmt.Sprintf("for (%v; %v; %v) %v", f.init.ToStringSimplify(prefix), f.condition.ToString(prefix), f.end.ToStringSimplify(prefix), f.body.ToString(prefix))
 }

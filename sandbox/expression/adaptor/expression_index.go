@@ -9,6 +9,10 @@ type ExpressionIndex struct {
 	exec func(concept.Closure) (concept.Variable, concept.Interrupt)
 }
 
+func (e *ExpressionIndex) SubIterate(func(concept.Index) bool) bool {
+	return false
+}
+
 func (e *ExpressionIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	return e.exec(space)
 }

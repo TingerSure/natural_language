@@ -13,6 +13,10 @@ type Return struct {
 	result concept.Index
 }
 
+func (a *Return) Key() string {
+	return a.key
+}
+
 func (a *Return) ToString(prefix string) string {
 	return fmt.Sprintf("return[%v] %v", a.key, a.result.ToString(prefix))
 }

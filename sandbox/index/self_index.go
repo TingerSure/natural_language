@@ -12,6 +12,10 @@ const (
 type SelfIndex struct {
 }
 
+func (s *SelfIndex) SubIterate(func(concept.Index) bool) bool {
+	return false
+}
+
 func (s *SelfIndex) ToString(prefix string) string {
 	return selfIndexKey
 }

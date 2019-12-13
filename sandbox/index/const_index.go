@@ -9,6 +9,10 @@ type ConstIndex struct {
 	value concept.Variable
 }
 
+func (s *ConstIndex) SubIterate(func(concept.Index) bool) bool {
+	return false
+}
+
 func (s *ConstIndex) ToString(prefix string) string {
 	return s.value.ToString(prefix)
 }
