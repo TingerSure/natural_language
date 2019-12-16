@@ -5,4 +5,7 @@ type Exception interface {
 	ToString
 	Name() string
 	Message() string
+	Copy() Exception
+	IterateStacks(func(ExceptionStack) bool) bool
+	AddStack(ExceptionStack)
 }
