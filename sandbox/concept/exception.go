@@ -7,5 +7,5 @@ type Exception interface {
 	Message() string
 	Copy() Exception
 	IterateStacks(func(ExceptionStack) bool) bool
-	AddStack(ExceptionStack)
+	AddStack(ExceptionStack) Exception
 }

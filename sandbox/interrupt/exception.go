@@ -24,8 +24,9 @@ func (e *Exception) IterateStacks(listener func(concept.ExceptionStack) bool) bo
 	return false
 }
 
-func (e *Exception) AddStack(stack concept.ExceptionStack) {
+func (e *Exception) AddStack(stack concept.ExceptionStack) concept.Exception {
 	e.stacks = append(e.stacks, stack)
+	return e
 }
 
 func (e *Exception) Copy() concept.Exception {
