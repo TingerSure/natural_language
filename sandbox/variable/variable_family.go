@@ -11,6 +11,17 @@ var (
 type VariableFamily struct {
 }
 
+func (v *VariableFamily) IsString(value concept.Variable) (*String, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == VariableStringType {
+		str, yes := value.(*String)
+		return str, yes
+	}
+	return nil, false
+}
+
 func (v *VariableFamily) IsNumber(value concept.Variable) (*Number, bool) {
 	if value == nil {
 		return nil, false
