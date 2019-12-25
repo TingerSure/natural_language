@@ -13,8 +13,8 @@ const (
 )
 
 var (
-	HasFieldObjectErrorException = interrupt.NewException("type error", "TODO")
-	HasFieldKeyErrorException    = interrupt.NewException("type error", "TODO")
+	HasFieldObjectErrorException = interrupt.NewException("type error", "HasFieldObjectErrorException")
+	HasFieldKeyErrorException    = interrupt.NewException("type error", "HasFieldKeyErrorException")
 )
 
 var (

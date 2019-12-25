@@ -14,9 +14,9 @@ const (
 )
 
 var (
-	GetFieldObjectErrorException = interrupt.NewException("type error", "TODO")
-	GetFieldKeyErrorException    = interrupt.NewException("type error", "TODO")
-	GetFieldKeyNotExistException = interrupt.NewException("type error", "TODO")
+	GetFieldObjectErrorException = interrupt.NewException("type error", "GetFieldObjectErrorException")
+	GetFieldKeyErrorException    = interrupt.NewException("type error", "GetFieldKeyErrorException")
+	GetFieldKeyNotExistException = interrupt.NewException("type error", "GetFieldKeyNotExistException")
 )
 
 var (
