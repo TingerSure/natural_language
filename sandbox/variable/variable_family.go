@@ -49,8 +49,8 @@ func (v *VariableFamily) IsFunction(value concept.Variable) (*Function, bool) {
 		return nil, false
 	}
 	if value.Type() == VariableFunctionType {
-		bool, yes := value.(*Function)
-		return bool, yes
+		function, yes := value.(*Function)
+		return function, yes
 	}
 	return nil, false
 }
@@ -60,8 +60,19 @@ func (v *VariableFamily) IsSystemFunction(value concept.Variable) (*SystemFuncti
 		return nil, false
 	}
 	if value.Type() == VariableSystemFunctionType {
-		bool, yes := value.(*SystemFunction)
-		return bool, yes
+		function, yes := value.(*SystemFunction)
+		return function, yes
+	}
+	return nil, false
+}
+
+func (v *VariableFamily) IsPreObjectFunction(value concept.Variable) (*PreObjectFunction, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == VariablePreObjectFunctionType {
+		function, yes := value.(*PreObjectFunction)
+		return function, yes
 	}
 	return nil, false
 }
@@ -115,6 +126,12 @@ func (v *VariableFamily) IsFunctionHome(value concept.Variable) (concept.Functio
 	if yes {
 		return function, yes
 	}
+
+	preObjectFunction, yes := v.IsPreObjectFunction(value)
+	if yes {
+		return preObjectFunction, yes
+	}
+
 	systemFunction, yes := v.IsSystemFunction(value)
 	if yes {
 		return systemFunction, yes

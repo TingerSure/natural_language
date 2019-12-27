@@ -26,11 +26,21 @@ func (s *ObjectMethodIndex) Get(space concept.Closure) (concept.Variable, concep
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
 	}
+
 	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
 	if !ok {
 		return nil, interrupt.NewException("type error", "There is not an effective object When system call the ObjectMethodIndex.Get")
 	}
-	return object.GetMethod(s.key)
+
+	function, suspend := object.GetMethod(s.key)
+	if !nl_interface.IsNil(suspend) {
+		return nil, suspend
+	}
+	if nl_interface.IsNil(function) {
+		return nil, interrupt.NewException("runtime error", fmt.Sprintf("Object don't have a method named %s.", s.key))
+	}
+
+	return variable.NewPreObjectFunction(function, object), nil
 }
 
 func (s *ObjectMethodIndex) Set(space concept.Closure, preFunction concept.Variable) concept.Interrupt {
