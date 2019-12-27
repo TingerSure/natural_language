@@ -9,7 +9,7 @@ type ExpressionIndex struct {
 	exec func(concept.Closure) (concept.Variable, concept.Interrupt)
 }
 
-func (e *ExpressionIndex) SubIterate(func(concept.Index) bool) bool {
+func (e *ExpressionIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }
 

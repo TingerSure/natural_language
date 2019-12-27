@@ -8,7 +8,7 @@ type BubbleIndex struct {
 	key string
 }
 
-func (s *BubbleIndex) SubIterate(func(concept.Index) bool) bool {
+func (s *BubbleIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }
 

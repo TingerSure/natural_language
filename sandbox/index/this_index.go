@@ -12,7 +12,7 @@ const (
 type ThisIndex struct {
 }
 
-func (s *ThisIndex) SubIterate(func(concept.Index) bool) bool {
+func (s *ThisIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }
 

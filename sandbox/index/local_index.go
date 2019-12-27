@@ -8,7 +8,7 @@ type LocalIndex struct {
 	key string
 }
 
-func (s *LocalIndex) SubIterate(func(concept.Index) bool) bool {
+func (s *LocalIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }
 

@@ -24,7 +24,7 @@ type For struct {
 	body      *code_block.CodeBlock
 }
 
-func (f *For) SubIterate(onIndex func(concept.Index) bool) bool {
+func (f *For) SubCodeBlockIterate(onIndex func(concept.Index) bool) bool {
 	return f.init.Iterate(onIndex) || f.end.Iterate(onIndex) || f.body.Iterate(onIndex)
 }
 

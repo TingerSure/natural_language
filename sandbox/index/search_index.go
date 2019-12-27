@@ -11,7 +11,7 @@ type SearchIndex struct {
 	items []concept.Matcher
 }
 
-func (s *SearchIndex) SubIterate(func(concept.Index) bool) bool {
+func (s *SearchIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }
 

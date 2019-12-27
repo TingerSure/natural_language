@@ -24,7 +24,7 @@ const (
 
 func (c *CodeBlock) Iterate(onIndex func(concept.Index) bool) bool {
 	for _, index := range c.flow {
-		if onIndex(index) || index.SubIterate(onIndex) {
+		if onIndex(index) || index.SubCodeBlockIterate(onIndex) {
 			return true
 		}
 	}

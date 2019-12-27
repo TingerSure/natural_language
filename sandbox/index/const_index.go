@@ -9,7 +9,7 @@ type ConstIndex struct {
 	value concept.Variable
 }
 
-func (s *ConstIndex) SubIterate(func(concept.Index) bool) bool {
+func (s *ConstIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }
 

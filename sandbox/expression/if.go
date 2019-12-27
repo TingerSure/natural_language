@@ -18,7 +18,7 @@ type If struct {
 	secondary *code_block.CodeBlock
 }
 
-func (f *If) SubIterate(onIndex func(concept.Index) bool) bool {
+func (f *If) SubCodeBlockIterate(onIndex func(concept.Index) bool) bool {
 	return f.primary.Iterate(onIndex) || f.secondary.Iterate(onIndex)
 }
 
