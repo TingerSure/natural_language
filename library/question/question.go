@@ -20,11 +20,14 @@ func init() {
 	howManyFunc.Body().AddStep(
 		expression.NewReturn(
 			std.PrintContent,
-			expression.NewCall(
-				index.NewConstIndex(std.Print),
-				expression.NewNewParamWithInit(map[string]concept.Index{
-					std.PrintContent: index.NewLocalIndex(std.PrintContent),
-				}),
+			expression.NewParamGet(
+				expression.NewCall(
+					index.NewConstIndex(std.Print),
+					expression.NewNewParamWithInit(map[string]concept.Index{
+						std.PrintContent: index.NewLocalIndex(std.PrintContent),
+					}),
+				),
+				std.PrintContent,
 			),
 		),
 	)
