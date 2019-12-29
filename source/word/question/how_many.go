@@ -39,7 +39,7 @@ func (p *HowMany) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(question.HowManyFunc)
+						return index.NewConstIndex(question.HowMany)
 					},
 					Content: treasure,
 					Types:   phrase_types.Question,
