@@ -14,6 +14,7 @@ func (e *Event) Exec() concept.Interrupt {
 	resault, suspend := e.index.Get(e.space)
 	if nl_interface.IsNil(suspend) {
 		e.space.AddExtempore(e.index, resault)
+		return nil
 	}
 	return suspend
 }

@@ -6,7 +6,7 @@ import (
 
 type extemporeNode struct {
 	value concept.Variable
-	index concept.Index
+	line  concept.Index
 	next  *extemporeNode
 }
 
@@ -20,17 +20,17 @@ func (c *Extempore) Clear() {
 
 func (c *Extempore) Iterate(match func(concept.Index, concept.Variable) bool) bool {
 	for cursor := c.root; cursor != nil; cursor = cursor.next {
-		if match(cursor.index, cursor.value) {
+		if match(cursor.line, cursor.value) {
 			return true
 		}
 	}
 	return false
 }
 
-func (c *Extempore) Add(index concept.Index, value concept.Variable) {
+func (c *Extempore) Add(line concept.Index, value concept.Variable) {
 	c.root = &extemporeNode{
 		value: value,
-		index: index,
+		line:  line,
 		next:  c.root,
 	}
 }
