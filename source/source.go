@@ -7,17 +7,18 @@ import (
 	"github.com/TingerSure/natural_language/source/word/brackets"
 	"github.com/TingerSure/natural_language/source/word/number"
 	"github.com/TingerSure/natural_language/source/word/operator"
-	_ "github.com/TingerSure/natural_language/source/word/pronoun"
+	"github.com/TingerSure/natural_language/source/word/pronoun"
 	"github.com/TingerSure/natural_language/source/word/question"
 	"github.com/TingerSure/natural_language/source/word/unknown"
-	_ "github.com/TingerSure/natural_language/source/word/verb/set"
+	"github.com/TingerSure/natural_language/source/word/verb/set"
 	"github.com/TingerSure/natural_language/tree"
 )
 
 func AllRules() []tree.Source {
 	return []tree.Source{
-		// pronoun.NewTarget(),
-		// set.NewSet(),
+		pronoun.NewIt(),
+		pronoun.NewResult(),
+		set.NewSet(),
 		question.NewWhat(),
 		question.NewHowMany(),
 		// auxiliary.NewBelong(),

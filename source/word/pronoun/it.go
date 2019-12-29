@@ -2,6 +2,8 @@ package pronoun
 
 import (
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/sandbox/index"
+	"github.com/TingerSure/natural_language/sandbox/matcher"
 	"github.com/TingerSure/natural_language/source/adaptor"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
@@ -9,41 +11,30 @@ import (
 )
 
 const (
-	targetPronounName string = "word.pronoun.target"
-	targetType        int    = word_types.Pronoun
-)
-
-const (
-	He  string = "他"
-	She string = "她"
-	It  string = "它"
-	You string = "你"
-	I   string = "我"
+	ItName      string = "word.pronoun.target.it"
+	ItType      int    = word_types.Pronoun
+	ItCharactor string = "它"
 )
 
 var (
-	targetPronounWords []*tree.Word = []*tree.Word{
-		tree.NewWord(He, targetType),
-		tree.NewWord(She, targetType),
-		tree.NewWord(It, targetType),
-		tree.NewWord(You, targetType),
-		tree.NewWord(I, targetType),
+	itPronounWords []*tree.Word = []*tree.Word{
+		tree.NewWord(ItCharactor, ItType),
 	}
 )
 
-type Target struct {
+type It struct {
 	adaptor.SourceAdaptor
 }
 
-func (p *Target) GetName() string {
-	return targetPronounName
+func (p *It) GetName() string {
+	return ItName
 }
 
-func (p *Target) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(targetPronounWords, sentence)
+func (p *It) GetWords(sentence string) []*tree.Word {
+	return tree.WordsFilter(itPronounWords, sentence)
 }
 
-func (p *Target) GetVocabularyRules() []*tree.VocabularyRule {
+func (p *It) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
 		tree.NewVocabularyRule(&tree.VocabularyRuleParam{
 			Match: func(treasure *tree.Vocabulary) bool {
@@ -52,11 +43,14 @@ func (p *Target) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return nil
-						//TODO
+						return index.NewSearchIndex([]concept.Matcher{
+							matcher.NewSystemMatcher(func(concept.Variable) bool {
+								return true
+							}),
+						})
 					},
 					Content: treasure,
-					Types:   phrase_types.Target,
+					Types:   phrase_types.Any,
 					From:    p.GetName(),
 				})
 			}, From: p.GetName(),
@@ -64,6 +58,6 @@ func (p *Target) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewTarget() *Target {
-	return (&Target{})
+func NewIt() *It {
+	return (&It{})
 }
