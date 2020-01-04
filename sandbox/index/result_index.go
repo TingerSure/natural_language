@@ -2,8 +2,10 @@ package index
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/sandbox/concept"
 	"github.com/TingerSure/natural_language/sandbox/interrupt"
+	"github.com/TingerSure/natural_language/sandbox/variable"
 	"strings"
 )
 
@@ -35,6 +37,9 @@ func (s *ResaultIndex) Get(space concept.Closure) (concept.Variable, concept.Int
 		selected = value
 		return true
 	})
+	if nl_interface.IsNil(selected) {
+		selected = variable.NewNull()
+	}
 	return selected, nil
 }
 
