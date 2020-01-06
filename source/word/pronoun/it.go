@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	ItName      string = "word.pronoun.target.it"
+	ItName      string = "word.pronoun.it"
 	ItType      int    = word_types.Pronoun
 	ItCharactor string = "它"
 )

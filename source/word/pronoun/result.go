@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	ResultName      string = "word.pronoun.target.result"
+	ResultName      string = "word.pronoun.result"
 	ResultType      int    = word_types.Pronoun
 	ResultCharactor string = "结果"
 )
