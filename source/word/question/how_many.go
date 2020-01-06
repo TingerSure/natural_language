@@ -3,7 +3,9 @@ package question
 import (
 	"github.com/TingerSure/natural_language/library/question"
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/sandbox/expression"
 	"github.com/TingerSure/natural_language/sandbox/index"
+	"github.com/TingerSure/natural_language/sandbox/variable"
 	"github.com/TingerSure/natural_language/source/adaptor"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
@@ -15,6 +17,30 @@ const (
 	HowManyType      int    = word_types.Question
 	HowManyName      string = "word.how_many"
 )
+
+var (
+	HowManyFunc *variable.Function = nil
+)
+
+func init() {
+	HowManyFunc = variable.NewFunction(nil)
+	HowManyFunc.AddParamName(QuestionParam)
+	HowManyFunc.Body().AddStep(
+		expression.NewReturn(
+			QuestionResult,
+			expression.NewParamGet(
+				expression.NewCall(
+					index.NewConstIndex(question.HowMany),
+					expression.NewNewParamWithInit(map[string]concept.Index{
+						question.HowManyContent: index.NewBubbleIndex(QuestionParam),
+					}),
+				),
+				question.HowManyContent,
+			),
+		),
+	)
+
+}
 
 type HowMany struct {
 	adaptor.SourceAdaptor
@@ -39,7 +65,7 @@ func (p *HowMany) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(question.HowMany)
+						return index.NewConstIndex(HowManyFunc)
 					},
 					Content: treasure,
 					Types:   phrase_types.Question,

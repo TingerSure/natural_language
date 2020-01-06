@@ -3,7 +3,9 @@ package question
 import (
 	"github.com/TingerSure/natural_language/library/question"
 	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/sandbox/expression"
 	"github.com/TingerSure/natural_language/sandbox/index"
+	"github.com/TingerSure/natural_language/sandbox/variable"
 	"github.com/TingerSure/natural_language/source/adaptor"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
@@ -15,6 +17,30 @@ const (
 	WhatType      int    = word_types.Question
 	WhatName      string = "word.what"
 )
+
+var (
+	WhatFunc *variable.Function = nil
+)
+
+func init() {
+	WhatFunc = variable.NewFunction(nil)
+	WhatFunc.AddParamName(QuestionParam)
+	WhatFunc.Body().AddStep(
+		expression.NewReturn(
+			QuestionResult,
+			expression.NewParamGet(
+				expression.NewCall(
+					index.NewConstIndex(question.What),
+					expression.NewNewParamWithInit(map[string]concept.Index{
+						question.WhatContent: index.NewBubbleIndex(QuestionParam),
+					}),
+				),
+				question.WhatContent,
+			),
+		),
+	)
+
+}
 
 type What struct {
 	adaptor.SourceAdaptor
@@ -39,7 +65,7 @@ func (p *What) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(question.What)
+						return index.NewConstIndex(WhatFunc)
 					},
 					Content: treasure,
 					Types:   phrase_types.Question,

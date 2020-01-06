@@ -1,10 +1,10 @@
 package structs
 
 import (
-	"github.com/TingerSure/natural_language/library/std"
 	"github.com/TingerSure/natural_language/sandbox/concept"
 	"github.com/TingerSure/natural_language/sandbox/expression"
 	"github.com/TingerSure/natural_language/source/adaptor"
+	"github.com/TingerSure/natural_language/source/word/question"
 	"github.com/TingerSure/natural_language/tree"
 	"github.com/TingerSure/natural_language/tree/phrase_types"
 )
@@ -36,10 +36,10 @@ func (p *AnyFromAnySetQuestion) GetStructRules() []*tree.StructRule {
 							expression.NewCall(
 								phrase[2].Index(),
 								expression.NewNewParamWithInit(map[string]concept.Index{
-									std.PrintContent: phrase[0].Index(),
+									question.QuestionParam: phrase[0].Index(),
 								}),
 							),
-							std.PrintContent,
+							question.QuestionResult,
 						)
 					},
 					Size: len(anyFromAnySetQuestionList),
