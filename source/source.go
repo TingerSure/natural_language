@@ -3,7 +3,7 @@ package source
 import (
 	"github.com/TingerSure/natural_language/source/priority"
 	"github.com/TingerSure/natural_language/source/structs"
-	_ "github.com/TingerSure/natural_language/source/word/auxiliary"
+	"github.com/TingerSure/natural_language/source/word/auxiliary"
 	"github.com/TingerSure/natural_language/source/word/brackets"
 	"github.com/TingerSure/natural_language/source/word/number"
 	"github.com/TingerSure/natural_language/source/word/operator"
@@ -21,7 +21,7 @@ func AllRules() []tree.Source {
 		set.NewSet(),
 		question.NewWhat(),
 		question.NewHowMany(),
-		// auxiliary.NewBelong(),
+		auxiliary.NewBelong(),
 		unknown.NewUnknown(),
 		number.NewNumber(),
 		operator.NewAddition(),
@@ -32,7 +32,7 @@ func AllRules() []tree.Source {
 		brackets.NewBracketsRight(),
 
 		// structs.NewTargetFromTargetTarget(),
-		// structs.NewTargetFromTargetBelongTarget(),
+		structs.NewAnyFromAnyBelongAny(),
 		// structs.NewEventFromTargetActionTarget(),
 		structs.NewNumberFromNumberOperatorNumber(),
 		structs.NewAnyFromBracketAnyBracket(),
