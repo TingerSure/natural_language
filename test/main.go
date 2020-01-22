@@ -15,6 +15,7 @@ import (
 	"github.com/TingerSure/natural_language/tree"
 	"os"
 
+	_ "github.com/TingerSure/natural_language/library/auto_number"
 	_ "github.com/TingerSure/natural_language/library/object"
 )
 
