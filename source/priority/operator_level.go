@@ -38,12 +38,12 @@ func (o *OperatorLevel) getIndex(phrase tree.Phrase) int {
 
 func (o *OperatorLevel) GetPriorityRules() []*tree.PriorityRule {
 	return []*tree.PriorityRule{
-		tree.NewPriorityRule(
-			func(left tree.Phrase, right tree.Phrase) bool {
+		tree.NewPriorityRule(&tree.PriorityRuleParam{
+			Match: func(left tree.Phrase, right tree.Phrase) bool {
 				return left.From() == structs.NumberFromNumberOperatorNumberName &&
 					right.From() == structs.NumberFromNumberOperatorNumberName
 			},
-			func(left tree.Phrase, right tree.Phrase) int {
+			Chooser: func(left tree.Phrase, right tree.Phrase) int {
 
 				operatorLeft := o.getLevel(left.GetChild(1).From())
 				operatorRight := o.getLevel(right.GetChild(1).From())
@@ -65,7 +65,7 @@ func (o *OperatorLevel) GetPriorityRules() []*tree.PriorityRule {
 
 				return 0
 			},
-		),
+		}),
 	}
 }
 
