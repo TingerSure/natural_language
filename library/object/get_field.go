@@ -2,6 +2,7 @@ package object
 
 import (
 	"github.com/TingerSure/natural_language/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/library/auto_number"
 	"github.com/TingerSure/natural_language/sandbox/concept"
 	"github.com/TingerSure/natural_language/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/sandbox/variable"
@@ -26,8 +27,13 @@ var (
 func init() {
 	GetField = variable.NewSystemFunction(
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
-			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(GetFieldContent))
-			if !ok {
+			content := input.Get(GetFieldContent)
+			var object concept.Object
+			if objectHome, ok := variable.VariableFamilyInstance.IsObjectHome(content); ok {
+				object = objectHome
+			} else if number, ok := variable.VariableFamilyInstance.IsNumber(content); ok {
+				object = auto_number.NewAutoNumber(number)
+			} else {
 				return nil, GetFieldObjectErrorException.Copy().AddStack(GetField)
 			}
 

@@ -1,13 +1,18 @@
 package auto_number
 
 import (
+	"github.com/TingerSure/natural_language/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/sandbox/concept"
 	"github.com/TingerSure/natural_language/sandbox/variable"
 )
 
 var (
-	AutoNumberClassValue = "value"
-	AutoNumberClass      = variable.NewClass("system.auto.number")
+	AutoNumberClassValue   = "value"
+	AutoNumberClassName    = "system.auto.number"
+	AutoNumberClass        = variable.NewClass(AutoNumberClassName)
+	AutoNumberClassMapping = map[string]string{
+		AutoNumberClassValue: AutoNumberClassValue,
+	}
 )
 
 func init() {
@@ -16,9 +21,11 @@ func init() {
 
 func NewAutoNumber(value *variable.Number) concept.Object {
 	auto := variable.NewObject()
-	auto.SetField(AutoNumberClassValue, value)
-	auto.AddClass(AutoNumberClass, "", map[string]string{
-		AutoNumberClassValue: AutoNumberClassValue,
-	})
-	return auto
+	auto.InitField(AutoNumberClassValue, value)
+	auto.AddClass(AutoNumberClass, "", AutoNumberClassMapping)
+	object, suspend := variable.NewMappingObject(auto, AutoNumberClassName, "")
+	if !nl_interface.IsNil(suspend) {
+		panic(suspend)
+	}
+	return object
 }
