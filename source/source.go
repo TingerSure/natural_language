@@ -40,5 +40,6 @@ func AllRules() []tree.Source {
 		structs.NewAnyFromAnySetQuestion(),
 
 		priority.NewOperatorLevel(),
+		priority.NewBelong(),
 	}
 }
