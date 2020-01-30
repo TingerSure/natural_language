@@ -1,9 +1,9 @@
 package operator
 
 import (
-	"github.com/TingerSure/natural_language/sandbox/expression"
-	"github.com/TingerSure/natural_language/sandbox/index"
-	"github.com/TingerSure/natural_language/sandbox/variable"
+	"github.com/TingerSure/natural_language/core/sandbox/expression"
+	"github.com/TingerSure/natural_language/core/sandbox/index"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 const (

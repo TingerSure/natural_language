@@ -1,9 +1,9 @@
 package std
 
 import (
-	"github.com/TingerSure/natural_language/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/sandbox/concept"
-	"github.com/TingerSure/natural_language/sandbox/variable"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type StdObject interface {

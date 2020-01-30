@@ -1,8 +1,8 @@
 package question
 
 import (
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/library/std"
-	"github.com/TingerSure/natural_language/sandbox/concept"
 )
 
 var (

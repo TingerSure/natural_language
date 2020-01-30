@@ -1,11 +1,11 @@
 package object
 
 import (
-	"github.com/TingerSure/natural_language/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/library/auto_number"
-	"github.com/TingerSure/natural_language/sandbox/concept"
-	"github.com/TingerSure/natural_language/sandbox/interrupt"
-	"github.com/TingerSure/natural_language/sandbox/variable"
 )
 
 const (

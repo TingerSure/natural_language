@@ -2,7 +2,7 @@ package tree
 
 import (
 	"fmt"
-	"github.com/TingerSure/natural_language/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
 )
 
 type PhraseVocabularyAdaptorParam struct {
