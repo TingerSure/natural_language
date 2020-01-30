@@ -4,10 +4,10 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/matcher"
+	"github.com/TingerSure/natural_language/core/tree"
+	"github.com/TingerSure/natural_language/core/tree/phrase_types"
+	"github.com/TingerSure/natural_language/core/tree/word_types"
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
-	"github.com/TingerSure/natural_language/tree"
-	"github.com/TingerSure/natural_language/tree/phrase_types"
-	"github.com/TingerSure/natural_language/tree/word_types"
 )
 
 const (

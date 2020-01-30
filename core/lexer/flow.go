@@ -1,8 +1,8 @@
 package lexer
 
 import (
-	"github.com/TingerSure/natural_language/tree"
-	"github.com/TingerSure/natural_language/tree/word_types"
+	"github.com/TingerSure/natural_language/core/tree"
+	"github.com/TingerSure/natural_language/core/tree/word_types"
 )
 
 type Flow struct {

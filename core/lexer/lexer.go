@@ -2,7 +2,7 @@ package lexer
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_string"
-	"github.com/TingerSure/natural_language/tree"
+	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type Lexer struct {

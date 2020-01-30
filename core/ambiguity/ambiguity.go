@@ -2,7 +2,7 @@ package ambiguity
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/tree"
+	"github.com/TingerSure/natural_language/core/tree"
 	"sort"
 )
 

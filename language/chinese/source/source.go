@@ -1,6 +1,7 @@
 package source
 
 import (
+	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/source/priority"
 	"github.com/TingerSure/natural_language/language/chinese/source/structs"
 	"github.com/TingerSure/natural_language/language/chinese/source/word/auxiliary"
@@ -11,7 +12,6 @@ import (
 	"github.com/TingerSure/natural_language/language/chinese/source/word/question"
 	"github.com/TingerSure/natural_language/language/chinese/source/word/unknown"
 	"github.com/TingerSure/natural_language/language/chinese/source/word/verb/set"
-	"github.com/TingerSure/natural_language/tree"
 )
 
 func AllRules() []tree.Source {

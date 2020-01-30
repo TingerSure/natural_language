@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/lexer"
-	"github.com/TingerSure/natural_language/tree"
+	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type River struct {

@@ -2,7 +2,7 @@ package tree
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_string"
-	"github.com/TingerSure/natural_language/tree/word_types"
+	"github.com/TingerSure/natural_language/core/tree/word_types"
 )
 
 type Word struct {

@@ -1,7 +1,7 @@
 package adaptor
 
 import (
-	"github.com/TingerSure/natural_language/tree"
+	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type SourceAdaptor struct{}

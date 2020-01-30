@@ -1,10 +1,10 @@
 package priority
 
 import (
+	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/source/structs"
 	"github.com/TingerSure/natural_language/language/chinese/source/word/operator"
-	"github.com/TingerSure/natural_language/tree"
 )
 
 const (

@@ -1,7 +1,7 @@
 package tree
 
 import (
-	"github.com/TingerSure/natural_language/tree/phrase_types"
+	"github.com/TingerSure/natural_language/core/tree/phrase_types"
 )
 
 type StructRuleParam struct {

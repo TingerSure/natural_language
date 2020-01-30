@@ -1,7 +1,7 @@
 package grammar
 
 import (
-	"github.com/TingerSure/natural_language/tree"
+	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type Collector struct {

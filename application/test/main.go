@@ -11,8 +11,8 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
+	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/source"
-	"github.com/TingerSure/natural_language/tree"
 	"os"
 
 	_ "github.com/TingerSure/natural_language/library/auto_number"
