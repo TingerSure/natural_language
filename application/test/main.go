@@ -14,9 +14,6 @@ import (
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/source"
 	"os"
-
-	_ "github.com/TingerSure/natural_language/library/auto_number"
-	_ "github.com/TingerSure/natural_language/library/object"
 )
 
 func bind(l *lexer.Lexer, g *grammar.Grammar, a *ambiguity.Ambiguity, sources []tree.Source) {
