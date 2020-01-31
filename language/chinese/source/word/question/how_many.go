@@ -7,15 +7,15 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/core/tree/phrase_types"
-	"github.com/TingerSure/natural_language/core/tree/word_types"
+
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
 	"github.com/TingerSure/natural_language/library/question"
 )
 
 const (
-	HowManyCharactor        = "多少"
-	HowManyType      int    = word_types.Question
-	HowManyName      string = "word.how_many"
+	HowManyCharactor = "多少"
+
+	HowManyName string = "word.how_many"
 )
 
 var (
@@ -52,7 +52,7 @@ func (p *HowMany) GetName() string {
 
 func (p *HowMany) GetWords(sentence string) []*tree.Word {
 	return tree.WordsFilter([]*tree.Word{
-		tree.NewWord(HowManyCharactor, HowManyType),
+		tree.NewWord(HowManyCharactor),
 	}, sentence)
 }
 

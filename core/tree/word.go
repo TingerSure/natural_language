@@ -2,20 +2,14 @@ package tree
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_string"
-	"github.com/TingerSure/natural_language/core/tree/word_types"
 )
 
 type Word struct {
 	context string
-	types   int
 }
 
 func (w *Word) GetContext() string {
 	return w.context
-}
-
-func (w *Word) GetTypes() int {
-	return w.types
 }
 
 func (w *Word) StartFor(sentence string) bool {
@@ -31,16 +25,15 @@ func (w *Word) Len() int {
 	return nl_string.Len(w.context)
 }
 
-func NewWord(context string, types int) *Word {
+func NewWord(context string) *Word {
 	return (&Word{
 		context: context,
-		types:   types,
 	})
 
 }
 
 func NewUnknownWord(context string) *Word {
-	return NewWord(context, word_types.Unknown)
+	return NewWord(context)
 }
 
 func WordsFilter(words []*Word, sentence string) []*Word {

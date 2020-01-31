@@ -6,7 +6,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/core/tree/phrase_types"
-	"github.com/TingerSure/natural_language/core/tree/word_types"
+
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
 )
 
@@ -15,13 +15,12 @@ const (
 	Equal = "等于"
 
 	SetName string = "word.verb.set"
-	SetType int    = word_types.Verb
 )
 
 var (
 	SetCharactors = []*tree.Word{
-		tree.NewWord(Is, SetType),
-		tree.NewWord(Equal, SetType),
+		tree.NewWord(Is),
+		tree.NewWord(Equal),
 	}
 )
 

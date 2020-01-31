@@ -6,18 +6,17 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/core/tree/phrase_types"
-	"github.com/TingerSure/natural_language/core/tree/word_types"
+
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
 )
 
 const (
 	RightCharactor        = ")"
 	RightName      string = "word.brackets.right"
-	RightType      int    = word_types.AuxiliaryBrackets
 )
 
 var (
-	RightWord  []*tree.Word = []*tree.Word{tree.NewWord(RightCharactor, RightType)}
+	RightWord  []*tree.Word = []*tree.Word{tree.NewWord(RightCharactor)}
 	RightIndex              = index.NewConstIndex(variable.NewString(RightCharactor))
 )
 

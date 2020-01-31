@@ -5,19 +5,19 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/core/tree/phrase_types"
-	"github.com/TingerSure/natural_language/core/tree/word_types"
+
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
 	"github.com/TingerSure/natural_language/library/operator"
 )
 
 const (
-	MultiplicationName      string = "word.operator.multiplication"
-	multiplicationType      int    = word_types.Operator
-	multiplicationCharactor        = "*"
+	MultiplicationName string = "word.operator.multiplication"
+
+	multiplicationCharactor = "*"
 )
 
 var (
-	multiplicationWords []*tree.Word = []*tree.Word{tree.NewWord(multiplicationCharactor, multiplicationType)}
+	multiplicationWords []*tree.Word = []*tree.Word{tree.NewWord(multiplicationCharactor)}
 )
 
 type Multiplication struct {

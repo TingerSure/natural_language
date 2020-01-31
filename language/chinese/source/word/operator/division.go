@@ -5,19 +5,19 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/core/tree/phrase_types"
-	"github.com/TingerSure/natural_language/core/tree/word_types"
+
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
 	"github.com/TingerSure/natural_language/library/operator"
 )
 
 const (
-	DivisionName      string = "word.operator.division"
-	divisionType      int    = word_types.Operator
-	divisionCharactor        = "/"
+	DivisionName string = "word.operator.division"
+
+	divisionCharactor = "/"
 )
 
 var (
-	divisionWords []*tree.Word = []*tree.Word{tree.NewWord(divisionCharactor, divisionType)}
+	divisionWords []*tree.Word = []*tree.Word{tree.NewWord(divisionCharactor)}
 )
 
 type Division struct {

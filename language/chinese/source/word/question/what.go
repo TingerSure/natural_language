@@ -7,15 +7,15 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/core/tree/phrase_types"
-	"github.com/TingerSure/natural_language/core/tree/word_types"
+
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
 	"github.com/TingerSure/natural_language/library/question"
 )
 
 const (
-	WhatCharactor        = "什么"
-	WhatType      int    = word_types.Question
-	WhatName      string = "word.what"
+	WhatCharactor = "什么"
+
+	WhatName string = "word.what"
 )
 
 var (
@@ -52,7 +52,7 @@ func (p *What) GetName() string {
 
 func (p *What) GetWords(sentence string) []*tree.Word {
 	return tree.WordsFilter([]*tree.Word{
-		tree.NewWord(WhatCharactor, WhatType),
+		tree.NewWord(WhatCharactor),
 	}, sentence)
 }
 

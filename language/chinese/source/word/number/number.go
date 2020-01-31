@@ -6,7 +6,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/core/tree/phrase_types"
-	"github.com/TingerSure/natural_language/core/tree/word_types"
+
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
 	"regexp"
 	"strconv"
@@ -14,7 +14,6 @@ import (
 
 const (
 	NumberName string = "word.number"
-	numberType int    = word_types.Number
 )
 
 var (
@@ -32,7 +31,7 @@ func (p *Number) GetName() string {
 func (p *Number) GetWords(sentence string) []*tree.Word {
 	value := numberTemplate.FindString(sentence)
 	if value != "" {
-		return []*tree.Word{tree.NewWord(value, numberType)}
+		return []*tree.Word{tree.NewWord(value)}
 	}
 	return nil
 }

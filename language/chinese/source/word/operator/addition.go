@@ -5,19 +5,19 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/core/tree/phrase_types"
-	"github.com/TingerSure/natural_language/core/tree/word_types"
+
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
 	"github.com/TingerSure/natural_language/library/operator"
 )
 
 const (
-	AdditionName      string = "word.operator.addition"
-	additionType      int    = word_types.Operator
-	additionCharactor        = "+"
+	AdditionName string = "word.operator.addition"
+
+	additionCharactor = "+"
 )
 
 var (
-	additionWords []*tree.Word = []*tree.Word{tree.NewWord(additionCharactor, additionType)}
+	additionWords []*tree.Word = []*tree.Word{tree.NewWord(additionCharactor)}
 )
 
 type Addition struct {

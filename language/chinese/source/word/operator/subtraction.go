@@ -5,19 +5,19 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/core/tree/phrase_types"
-	"github.com/TingerSure/natural_language/core/tree/word_types"
+
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
 	"github.com/TingerSure/natural_language/library/operator"
 )
 
 const (
-	SubtractionName      string = "word.operator.subtraction"
-	subtractionType      int    = word_types.Operator
-	subtractionCharactor        = "-"
+	SubtractionName string = "word.operator.subtraction"
+
+	subtractionCharactor = "-"
 )
 
 var (
-	subtractionWords []*tree.Word = []*tree.Word{tree.NewWord(subtractionCharactor, subtractionType)}
+	subtractionWords []*tree.Word = []*tree.Word{tree.NewWord(subtractionCharactor)}
 )
 
 func init() {

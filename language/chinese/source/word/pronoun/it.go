@@ -6,19 +6,19 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/matcher"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/core/tree/phrase_types"
-	"github.com/TingerSure/natural_language/core/tree/word_types"
+
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
 )
 
 const (
-	ItName      string = "word.pronoun.it"
-	ItType      int    = word_types.Pronoun
+	ItName string = "word.pronoun.it"
+
 	ItCharactor string = "它"
 )
 
 var (
 	itPronounWords []*tree.Word = []*tree.Word{
-		tree.NewWord(ItCharactor, ItType),
+		tree.NewWord(ItCharactor),
 	}
 )
 

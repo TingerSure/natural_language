@@ -6,13 +6,12 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/core/tree/phrase_types"
-	"github.com/TingerSure/natural_language/core/tree/word_types"
+
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
 )
 
 const (
 	belongAuxiliaryName string = "word.auxiliary.belong"
-	belongType          int    = word_types.AuxiliaryBelong
 )
 
 const (
@@ -29,7 +28,7 @@ func (p *Belong) GetName() string {
 
 func (p *Belong) GetWords(sentence string) []*tree.Word {
 	return tree.WordsFilter([]*tree.Word{
-		tree.NewWord(BelongTo, belongType),
+		tree.NewWord(BelongTo),
 	}, sentence)
 }
 
