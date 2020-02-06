@@ -7,7 +7,7 @@ import (
 type Phrase interface {
 	Copy() Phrase
 	Size() int
-	Types() string
+	Types() *PhraseType
 	GetContent() *Vocabulary
 	GetChild(index int) Phrase
 	SetChild(index int, child Phrase) Phrase

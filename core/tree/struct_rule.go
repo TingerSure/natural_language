@@ -1,14 +1,10 @@
 package tree
 
-import (
-	"github.com/TingerSure/natural_language/core/tree/phrase_types"
-)
-
 type StructRuleParam struct {
 	Size   int
 	Create func() Phrase
 	From   string
-	Types  []string
+	Types  []*PhraseType
 }
 type StructRule struct {
 	param *StructRuleParam
@@ -28,7 +24,7 @@ func (r *StructRule) Match(treasures []Phrase) bool {
 	}
 	match := true
 	for index, treasure := range treasures[len(treasures)-r.param.Size:] {
-		match = match && phrase_types.Match(r.param.Types[index], treasure.Types())
+		match = match && r.param.Types[index].Match(treasure.Types())
 	}
 	return match
 }

@@ -4,8 +4,8 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/expression"
 	"github.com/TingerSure/natural_language/core/tree"
-	"github.com/TingerSure/natural_language/core/tree/phrase_types"
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
+	"github.com/TingerSure/natural_language/language/chinese/source/phrase_type"
 	"github.com/TingerSure/natural_language/language/chinese/source/word/question"
 )
 
@@ -14,10 +14,10 @@ const (
 )
 
 var (
-	anyFromAnySetQuestionList []string = []string{
-		phrase_types.Any,
-		phrase_types.Set,
-		phrase_types.Question,
+	anyFromAnySetQuestionList []*tree.PhraseType = []*tree.PhraseType{
+		phrase_type.Any,
+		phrase_type.Set,
+		phrase_type.Question,
 	}
 )
 
@@ -43,7 +43,7 @@ func (p *AnyFromAnySetQuestion) GetStructRules() []*tree.StructRule {
 						)
 					},
 					Size: len(anyFromAnySetQuestionList),
-					DynamicTypes: func(phrase []tree.Phrase) string {
+					DynamicTypes: func(phrase []tree.Phrase) *tree.PhraseType {
 						return phrase[0].Types()
 					},
 					From: p.GetName(),

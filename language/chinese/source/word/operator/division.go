@@ -4,7 +4,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/tree"
-	"github.com/TingerSure/natural_language/core/tree/phrase_types"
+	"github.com/TingerSure/natural_language/language/chinese/source/phrase_type"
 
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
 	"github.com/TingerSure/natural_language/library/operator"
@@ -44,7 +44,7 @@ func (p *Division) GetVocabularyRules() []*tree.VocabularyRule {
 						return index.NewConstIndex(operator.DivisionFunc)
 					},
 					Content: treasure,
-					Types:   phrase_types.Operator,
+					Types:   phrase_type.Operator,
 					From:    p.GetName(),
 				})
 			}, From: p.GetName(),

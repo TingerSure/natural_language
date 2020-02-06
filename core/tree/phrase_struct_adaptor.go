@@ -8,8 +8,8 @@ import (
 type PhraseStructAdaptorParam struct {
 	Index        func([]Phrase) concept.Index
 	Size         int
-	Types        string
-	DynamicTypes func([]Phrase) string
+	Types        *PhraseType
+	DynamicTypes func([]Phrase) *PhraseType
 	From         string
 }
 
@@ -22,7 +22,7 @@ func (p *PhraseStructAdaptor) Index() concept.Index {
 	return p.param.Index(p.children)
 }
 
-func (p *PhraseStructAdaptor) Types() string {
+func (p *PhraseStructAdaptor) Types() *PhraseType {
 	if p.param.DynamicTypes != nil {
 		return p.param.DynamicTypes(p.children)
 	}
@@ -69,7 +69,7 @@ func (p *PhraseStructAdaptor) ToStringOffset(index int) string {
 	for i := 0; i < index; i++ {
 		space += "\t"
 	}
-	info := fmt.Sprintf("%v%v (\n", space, p.Types())
+	info := fmt.Sprintf("%v%v (\n", space, p.Types().Name())
 	for i := 0; i < len(p.children); i++ {
 		info += p.GetChild(i).ToStringOffset(index + 1)
 	}

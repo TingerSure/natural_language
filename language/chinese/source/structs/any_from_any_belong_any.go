@@ -5,8 +5,8 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/expression"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/tree"
-	"github.com/TingerSure/natural_language/core/tree/phrase_types"
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
+	"github.com/TingerSure/natural_language/language/chinese/source/phrase_type"
 	"github.com/TingerSure/natural_language/library/object"
 )
 
@@ -15,10 +15,10 @@ const (
 )
 
 var (
-	anyFromAnyBelongAnyList []string = []string{
-		phrase_types.Any,
-		phrase_types.AuxiliaryBelong,
-		phrase_types.Any,
+	anyFromAnyBelongAnyList []*tree.PhraseType = []*tree.PhraseType{
+		phrase_type.Any,
+		phrase_type.AuxiliaryBelong,
+		phrase_type.Any,
 	}
 )
 
@@ -44,7 +44,7 @@ func (p *AnyFromAnyBelongAny) GetStructRules() []*tree.StructRule {
 						)
 					},
 					Size:  len(anyFromAnyBelongAnyList),
-					Types: phrase_types.Any,
+					Types: phrase_type.Any,
 					From:  p.GetName(),
 				})
 			},

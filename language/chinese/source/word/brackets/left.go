@@ -5,7 +5,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
-	"github.com/TingerSure/natural_language/core/tree/phrase_types"
+	"github.com/TingerSure/natural_language/language/chinese/source/phrase_type"
 
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
 )
@@ -43,7 +43,7 @@ func (s *BracketsLeft) GetVocabularyRules() []*tree.VocabularyRule {
 						return LeftIndex
 					},
 					Content: treasure,
-					Types:   phrase_types.BracketsLeft,
+					Types:   phrase_type.BracketsLeft,
 					From:    s.GetName(),
 				})
 			}, From: s.GetName(),

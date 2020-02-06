@@ -8,7 +8,7 @@ import (
 type PhraseVocabularyAdaptorParam struct {
 	Index   func() concept.Index
 	Content *Vocabulary
-	Types   string
+	Types   *PhraseType
 	From    string
 }
 
@@ -20,7 +20,7 @@ func (p *PhraseVocabularyAdaptor) Index() concept.Index {
 	return p.param.Index()
 }
 
-func (p *PhraseVocabularyAdaptor) Types() string {
+func (p *PhraseVocabularyAdaptor) Types() *PhraseType {
 	return p.param.Types
 }
 
@@ -52,7 +52,7 @@ func (p *PhraseVocabularyAdaptor) ToStringOffset(index int) string {
 	for i := 0; i < index; i++ {
 		space += "\t"
 	}
-	return fmt.Sprintf("%v%v ( %v )\n", space, p.param.Types, p.param.Content.ToString())
+	return fmt.Sprintf("%v%v ( %v )\n", space, p.param.Types.Name(), p.param.Content.ToString())
 }
 
 func (p *PhraseVocabularyAdaptor) From() string {

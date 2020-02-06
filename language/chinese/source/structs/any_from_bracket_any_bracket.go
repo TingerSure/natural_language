@@ -3,8 +3,8 @@ package structs
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
-	"github.com/TingerSure/natural_language/core/tree/phrase_types"
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
+	"github.com/TingerSure/natural_language/language/chinese/source/phrase_type"
 )
 
 const (
@@ -12,10 +12,10 @@ const (
 )
 
 var (
-	AnyFromBracketAnyBracketList []string = []string{
-		phrase_types.BracketsLeft,
-		phrase_types.Any,
-		phrase_types.BracketsRight,
+	AnyFromBracketAnyBracketList []*tree.PhraseType = []*tree.PhraseType{
+		phrase_type.BracketsLeft,
+		phrase_type.Any,
+		phrase_type.BracketsRight,
 	}
 )
 
@@ -33,7 +33,7 @@ func (p *AnyFromBracketAnyBracket) GetStructRules() []*tree.StructRule {
 						return phrase[1].Index()
 					},
 					Size: len(AnyFromBracketAnyBracketList),
-					DynamicTypes: func(phrase []tree.Phrase) string {
+					DynamicTypes: func(phrase []tree.Phrase) *tree.PhraseType {
 						return phrase[1].Types()
 					},
 					From: p.GetName(),

@@ -4,8 +4,8 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/expression"
 	"github.com/TingerSure/natural_language/core/tree"
-	"github.com/TingerSure/natural_language/core/tree/phrase_types"
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
+	"github.com/TingerSure/natural_language/language/chinese/source/phrase_type"
 	"github.com/TingerSure/natural_language/library/operator"
 )
 
@@ -14,10 +14,10 @@ const (
 )
 
 var (
-	NumberFromNumberOperatorNumberList []string = []string{
-		phrase_types.Number,
-		phrase_types.Operator,
-		phrase_types.Number,
+	NumberFromNumberOperatorNumberList []*tree.PhraseType = []*tree.PhraseType{
+		phrase_type.Number,
+		phrase_type.Operator,
+		phrase_type.Number,
 	}
 )
 
@@ -44,7 +44,7 @@ func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
 						)
 					},
 					Size:  len(NumberFromNumberOperatorNumberList),
-					Types: phrase_types.Number,
+					Types: phrase_type.Number,
 					From:  p.GetName(),
 				})
 			},
