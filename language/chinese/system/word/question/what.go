@@ -9,54 +9,54 @@ import (
 	"github.com/TingerSure/natural_language/language/chinese/source/phrase_type"
 
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
-	"github.com/TingerSure/natural_language/library/question"
+	"github.com/TingerSure/natural_language/library/system/question"
 )
 
 const (
-	HowManyCharactor = "多少"
+	WhatCharactor = "什么"
 
-	HowManyName string = "word.how_many"
+	WhatName string = "word.what"
 )
 
 var (
-	HowManyFunc *variable.Function = nil
+	WhatFunc *variable.Function = nil
 )
 
 func init() {
-	HowManyFunc = variable.NewFunction(nil)
-	HowManyFunc.AddParamName(QuestionParam)
-	HowManyFunc.Body().AddStep(
+	WhatFunc = variable.NewFunction(nil)
+	WhatFunc.AddParamName(QuestionParam)
+	WhatFunc.Body().AddStep(
 		expression.NewReturn(
 			QuestionResult,
 			expression.NewParamGet(
 				expression.NewCall(
-					index.NewConstIndex(question.HowMany),
+					index.NewConstIndex(question.What),
 					expression.NewNewParamWithInit(map[string]concept.Index{
-						question.HowManyContent: index.NewBubbleIndex(QuestionParam),
+						question.WhatContent: index.NewBubbleIndex(QuestionParam),
 					}),
 				),
-				question.HowManyContent,
+				question.WhatContent,
 			),
 		),
 	)
 
 }
 
-type HowMany struct {
+type What struct {
 	adaptor.SourceAdaptor
 }
 
-func (p *HowMany) GetName() string {
-	return HowManyName
+func (p *What) GetName() string {
+	return WhatName
 }
 
-func (p *HowMany) GetWords(sentence string) []*tree.Word {
+func (p *What) GetWords(sentence string) []*tree.Word {
 	return tree.WordsFilter([]*tree.Word{
-		tree.NewWord(HowManyCharactor),
+		tree.NewWord(WhatCharactor),
 	}, sentence)
 }
 
-func (p *HowMany) GetVocabularyRules() []*tree.VocabularyRule {
+func (p *What) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
 		tree.NewVocabularyRule(&tree.VocabularyRuleParam{
 			Match: func(treasure *tree.Vocabulary) bool {
@@ -65,7 +65,7 @@ func (p *HowMany) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(HowManyFunc)
+						return index.NewConstIndex(WhatFunc)
 					},
 					Content: treasure,
 					Types:   phrase_type.Question,
@@ -76,6 +76,6 @@ func (p *HowMany) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewHowMany() *HowMany {
-	return (&HowMany{})
+func NewWhat() *What {
+	return (&What{})
 }

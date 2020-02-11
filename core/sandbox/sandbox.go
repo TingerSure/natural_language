@@ -6,7 +6,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/loop"
-	"github.com/TingerSure/natural_language/library/std"
+	"github.com/TingerSure/natural_language/library/system/std"
 )
 
 type sandboxStd struct {

@@ -7,32 +7,36 @@ import (
 	"github.com/TingerSure/natural_language/language/chinese/source/phrase_type"
 
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
-	"github.com/TingerSure/natural_language/library/operator"
+	"github.com/TingerSure/natural_language/library/system/operator"
 )
 
 const (
-	AdditionName string = "word.operator.addition"
+	SubtractionName string = "word.operator.subtraction"
 
-	additionCharactor = "+"
+	subtractionCharactor = "-"
 )
 
 var (
-	additionWords []*tree.Word = []*tree.Word{tree.NewWord(additionCharactor)}
+	subtractionWords []*tree.Word = []*tree.Word{tree.NewWord(subtractionCharactor)}
 )
 
-type Addition struct {
+func init() {
+
+}
+
+type Subtraction struct {
 	adaptor.SourceAdaptor
 }
 
-func (p *Addition) GetName() string {
-	return AdditionName
+func (p *Subtraction) GetName() string {
+	return SubtractionName
 }
 
-func (p *Addition) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(additionWords, sentence)
+func (p *Subtraction) GetWords(sentence string) []*tree.Word {
+	return tree.WordsFilter(subtractionWords, sentence)
 }
 
-func (p *Addition) GetVocabularyRules() []*tree.VocabularyRule {
+func (p *Subtraction) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
 		tree.NewVocabularyRule(&tree.VocabularyRuleParam{
 			Match: func(treasure *tree.Vocabulary) bool {
@@ -41,7 +45,7 @@ func (p *Addition) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(operator.AdditionFunc)
+						return index.NewConstIndex(operator.SubtractionFunc)
 					},
 					Content: treasure,
 					Types:   phrase_type.Operator,
@@ -52,6 +56,6 @@ func (p *Addition) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewAddition() *Addition {
-	return (&Addition{})
+func NewSubtraction() *Subtraction {
+	return (&Subtraction{})
 }

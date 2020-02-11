@@ -7,32 +7,32 @@ import (
 	"github.com/TingerSure/natural_language/language/chinese/source/phrase_type"
 
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
-	"github.com/TingerSure/natural_language/library/operator"
+	"github.com/TingerSure/natural_language/library/system/operator"
 )
 
 const (
-	MultiplicationName string = "word.operator.multiplication"
+	AdditionName string = "word.operator.addition"
 
-	multiplicationCharactor = "*"
+	additionCharactor = "+"
 )
 
 var (
-	multiplicationWords []*tree.Word = []*tree.Word{tree.NewWord(multiplicationCharactor)}
+	additionWords []*tree.Word = []*tree.Word{tree.NewWord(additionCharactor)}
 )
 
-type Multiplication struct {
+type Addition struct {
 	adaptor.SourceAdaptor
 }
 
-func (p *Multiplication) GetName() string {
-	return MultiplicationName
+func (p *Addition) GetName() string {
+	return AdditionName
 }
 
-func (p *Multiplication) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(multiplicationWords, sentence)
+func (p *Addition) GetWords(sentence string) []*tree.Word {
+	return tree.WordsFilter(additionWords, sentence)
 }
 
-func (p *Multiplication) GetVocabularyRules() []*tree.VocabularyRule {
+func (p *Addition) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
 		tree.NewVocabularyRule(&tree.VocabularyRuleParam{
 			Match: func(treasure *tree.Vocabulary) bool {
@@ -41,7 +41,7 @@ func (p *Multiplication) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(operator.MultiplicationFunc)
+						return index.NewConstIndex(operator.AdditionFunc)
 					},
 					Content: treasure,
 					Types:   phrase_type.Operator,
@@ -52,6 +52,6 @@ func (p *Multiplication) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewMultiplication() *Multiplication {
-	return (&Multiplication{})
+func NewAddition() *Addition {
+	return (&Addition{})
 }

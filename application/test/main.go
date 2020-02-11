@@ -6,13 +6,16 @@ import (
 	"github.com/TingerSure/natural_language/core/ambiguity"
 	"github.com/TingerSure/natural_language/core/grammar"
 	"github.com/TingerSure/natural_language/core/lexer"
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox"
 	"github.com/TingerSure/natural_language/core/sandbox/closure"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
+	"github.com/TingerSure/natural_language/language/chinese"
 	"github.com/TingerSure/natural_language/language/chinese/source"
+	"github.com/TingerSure/natural_language/library/system"
 	"os"
 )
 
@@ -26,9 +29,12 @@ func bind(l *lexer.Lexer, g *grammar.Grammar, a *ambiguity.Ambiguity, sources []
 }
 
 func getLexerGrammarSandboxAmbiguity(space concept.Closure) (*lexer.Lexer, *grammar.Grammar, *ambiguity.Ambiguity, *sandbox.Sandbox) {
-	var l *lexer.Lexer = lexer.NewLexer()
-	var g *grammar.Grammar = grammar.NewGrammar()
-	var a *ambiguity.Ambiguity = ambiguity.NewAmbiguity()
+
+	VM := runtime.NewRuntime()
+	VM.GetLibraryManager().AddLibrary("system", system.NewSystemLibrary())
+
+	VM.GetLanguageManager().AddLanguage("chinese", chinese.NewChinese(VM.GetLibraryManager()))
+
 	bind(l, g, a, source.AllRules())
 	box := sandbox.NewSandbox(&sandbox.SandboxParam{
 		Root: space,
@@ -76,9 +82,6 @@ func deal(l *lexer.Lexer, g *grammar.Grammar, a *ambiguity.Ambiguity, sentence s
 
 func test4() {
 	rootSpace := closure.NewClosure(nil)
-	// rootObject := variable.NewObject()
-	// rootSpace.InitLocal("root")
-	// rootSpace.SetLocal("root", rootObject)
 	l, g, a, box := getLexerGrammarSandboxAmbiguity(rootSpace)
 
 	err := box.Start()

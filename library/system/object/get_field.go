@@ -5,7 +5,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
-	"github.com/TingerSure/natural_language/library/auto_number"
+	"github.com/TingerSure/natural_language/library/system/auto_number"
 )
 
 const (

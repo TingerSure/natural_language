@@ -7,36 +7,32 @@ import (
 	"github.com/TingerSure/natural_language/language/chinese/source/phrase_type"
 
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
-	"github.com/TingerSure/natural_language/library/operator"
+	"github.com/TingerSure/natural_language/library/system/operator"
 )
 
 const (
-	SubtractionName string = "word.operator.subtraction"
+	MultiplicationName string = "word.operator.multiplication"
 
-	subtractionCharactor = "-"
+	multiplicationCharactor = "*"
 )
 
 var (
-	subtractionWords []*tree.Word = []*tree.Word{tree.NewWord(subtractionCharactor)}
+	multiplicationWords []*tree.Word = []*tree.Word{tree.NewWord(multiplicationCharactor)}
 )
 
-func init() {
-
-}
-
-type Subtraction struct {
+type Multiplication struct {
 	adaptor.SourceAdaptor
 }
 
-func (p *Subtraction) GetName() string {
-	return SubtractionName
+func (p *Multiplication) GetName() string {
+	return MultiplicationName
 }
 
-func (p *Subtraction) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(subtractionWords, sentence)
+func (p *Multiplication) GetWords(sentence string) []*tree.Word {
+	return tree.WordsFilter(multiplicationWords, sentence)
 }
 
-func (p *Subtraction) GetVocabularyRules() []*tree.VocabularyRule {
+func (p *Multiplication) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
 		tree.NewVocabularyRule(&tree.VocabularyRuleParam{
 			Match: func(treasure *tree.Vocabulary) bool {
@@ -45,7 +41,7 @@ func (p *Subtraction) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(operator.SubtractionFunc)
+						return index.NewConstIndex(operator.MultiplicationFunc)
 					},
 					Content: treasure,
 					Types:   phrase_type.Operator,
@@ -56,6 +52,6 @@ func (p *Subtraction) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewSubtraction() *Subtraction {
-	return (&Subtraction{})
+func NewMultiplication() *Multiplication {
+	return (&Multiplication{})
 }

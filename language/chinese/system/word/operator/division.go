@@ -7,7 +7,7 @@ import (
 	"github.com/TingerSure/natural_language/language/chinese/source/phrase_type"
 
 	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
-	"github.com/TingerSure/natural_language/library/operator"
+	"github.com/TingerSure/natural_language/library/system/operator"
 )
 
 const (
