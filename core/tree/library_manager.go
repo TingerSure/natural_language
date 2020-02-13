@@ -32,3 +32,7 @@ func (l *LibraryManager) AddLibrary(name string, lib Library) {
 func (l *LibraryManager) GetLibrary(name string) Library {
 	return l.librarys[name]
 }
+
+func NewLibraryManager() *LibraryManager {
+	return &LibraryManager{}
+}

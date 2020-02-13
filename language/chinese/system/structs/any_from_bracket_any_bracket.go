@@ -3,8 +3,8 @@ package structs
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
-	"github.com/TingerSure/natural_language/language/chinese/source/adaptor"
-	"github.com/TingerSure/natural_language/language/chinese/source/phrase_type"
+	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
+	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
 )
 
 const (

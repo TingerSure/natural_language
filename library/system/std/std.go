@@ -7,9 +7,9 @@ import (
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
-type StdObject interface {
-	Print(concept.Variable)
-	Error(concept.Variable)
+type StdParam struct {
+	Print func(concept.Variable)
+	Error func(concept.Variable)
 }
 
 const (
@@ -18,46 +18,47 @@ const (
 )
 
 type Std struct {
-	implementer StdObject
 	*tree.PageAdaptor
+	param *StdParam
 }
 
-func NewStd(implementer StdObject) *Std {
-	instance := &Std{
-		implementer: implementer,
+func (s *Std) Print(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+	if s.param != nil || !nl_interface.IsNil(input) {
+		s.param.Print(input.Get(PrintContent))
 	}
-	instance.SetFunction("Print", func() concept.Function {
-		return variable.NewSystemFunction(
-			func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
-				if implementer != nil || !nl_interface.IsNil(input) {
-					implementer.Print(input.Get(PrintContent))
-				}
-				return input, nil
-			},
-			[]string{
-				PrintContent,
-			},
-			[]string{
-				PrintContent,
-			},
-		)
-	}())
-	instance.SetFunction("Error", func() concept.Function {
-		return variable.NewSystemFunction(
-			func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
-				if implementer != nil || !nl_interface.IsNil(input) {
-					implementer.Error(input.Get(ErrorContent))
-				}
-				return input, nil
-			},
-			[]string{
-				ErrorContent,
-			},
-			[]string{
-				ErrorContent,
-			},
-		)
-	}())
+	return input, nil
+}
+
+func (s *Std) Error(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+	if s.param != nil || !nl_interface.IsNil(input) {
+		s.param.Error(input.Get(ErrorContent))
+	}
+	return input, nil
+}
+
+func NewStd(param *StdParam) *Std {
+	instance := &Std{
+		tree.NewPageAdaptor(),
+	}
+	instance.param = param
+	instance.SetFunction("Print", variable.NewSystemFunction(
+		instance.Print,
+		[]string{
+			PrintContent,
+		},
+		[]string{
+			PrintContent,
+		},
+	))
+	instance.SetFunction("Error", variable.NewSystemFunction(
+		instance.Error,
+		[]string{
+			ErrorContent,
+		},
+		[]string{
+			ErrorContent,
+		},
+	))
 	instance.SetConst("PrintContent", PrintContent)
 	instance.SetConst("ErrorContent", ErrorContent)
 	return instance

@@ -6,7 +6,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/loop"
-	"github.com/TingerSure/natural_language/library/system/std"
+	// "github.com/TingerSure/natural_language/library/system/std"
 )
 
 type sandboxStd struct {
@@ -53,7 +53,7 @@ func (s *Sandbox) Start() error {
 }
 
 func (s *Sandbox) Stop() error {
-	return s.eventLoop.Start()
+	return s.eventLoop.Stop()
 }
 
 func NewSandbox(param *SandboxParam) *Sandbox {
@@ -72,7 +72,7 @@ func NewSandbox(param *SandboxParam) *Sandbox {
 		}
 	})
 
-	std.Std = newSandboxStd(param)
+	// std.Std = newSandboxStd(param)
 
 	return box
 }
