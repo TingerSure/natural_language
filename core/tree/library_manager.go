@@ -8,7 +8,7 @@ type LibraryManager struct {
 	librarys map[string]Library
 }
 
-func (l *LibraryManager) GetLibraryPage(pageName string, libraryName string) Page {
+func (l *LibraryManager) GetLibraryPage(libraryName string, pageName string) Page {
 	if libraryName == "" {
 		return l.GetPage(pageName)
 	}
@@ -27,6 +27,10 @@ func (l *LibraryManager) GetPage(pageName string) Page {
 
 func (l *LibraryManager) AddLibrary(name string, lib Library) {
 	l.librarys[name] = lib
+}
+
+func (l *LibraryManager) AddSystemLibrary(lib Library) {
+	l.AddLibrary("system", lib)
 }
 
 func (l *LibraryManager) GetLibrary(name string) Library {

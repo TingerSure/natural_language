@@ -6,44 +6,40 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
-	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
-
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
-	"github.com/TingerSure/natural_language/library/system/question"
+	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
 )
 
 const (
-	HowManyCharactor = "多少"
-
-	HowManyName string = "word.how_many"
+	HowManyCharactor        = "多少"
+	HowManyName      string = "word.how_many"
 )
 
-var (
-	HowManyFunc *variable.Function = nil
-)
+type HowMany struct {
+	adaptor.SourceAdaptor
+	libs              *tree.LibraryManager
+	libHowManyContent string
+	libHowManyFunc    concept.Function
+	HowManyFunc       *variable.Function
+}
 
-func init() {
-	HowManyFunc = variable.NewFunction(nil)
-	HowManyFunc.AddParamName(QuestionParam)
-	HowManyFunc.Body().AddStep(
+func (p *HowMany) init() {
+	p.HowManyFunc = variable.NewFunction(nil)
+	p.HowManyFunc.AddParamName(QuestionParam)
+	p.HowManyFunc.Body().AddStep(
 		expression.NewReturn(
 			QuestionResult,
 			expression.NewParamGet(
 				expression.NewCall(
-					index.NewConstIndex(question.HowMany),
+					index.NewConstIndex(p.libHowManyFunc),
 					expression.NewNewParamWithInit(map[string]concept.Index{
-						question.HowManyContent: index.NewBubbleIndex(QuestionParam),
+						p.libHowManyContent: index.NewBubbleIndex(QuestionParam),
 					}),
 				),
-				question.HowManyContent,
+				p.libHowManyContent,
 			),
 		),
 	)
-
-}
-
-type HowMany struct {
-	adaptor.SourceAdaptor
 }
 
 func (p *HowMany) GetName() string {
@@ -65,7 +61,7 @@ func (p *HowMany) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(HowManyFunc)
+						return index.NewConstIndex(p.HowManyFunc)
 					},
 					Content: treasure,
 					Types:   phrase_type.Question,
@@ -76,6 +72,11 @@ func (p *HowMany) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewHowMany() *HowMany {
-	return (&HowMany{})
+func NewHowMany(libs *tree.LibraryManager) *HowMany {
+	page := libs.GetLibraryPage("system", "question")
+	return (&HowMany{
+		libs:              libs,
+		libHowManyContent: page.GetConst("HowManyContent"),
+		libHowManyFunc:    page.GetFunction("HowManyFunc"),
+	})
 }

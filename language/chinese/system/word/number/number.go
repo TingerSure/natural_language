@@ -60,6 +60,6 @@ func (p *Number) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewNumber() *Number {
+func NewNumber(libs *tree.LibraryManager) *Number {
 	return (&Number{})
 }

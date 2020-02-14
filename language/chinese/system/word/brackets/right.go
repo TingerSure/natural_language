@@ -51,6 +51,6 @@ func (s *BracketsRight) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewBracketsRight() *BracketsRight {
+func NewBracketsRight(libs *tree.LibraryManager) *BracketsRight {
 	return (&BracketsRight{})
 }

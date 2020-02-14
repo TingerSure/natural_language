@@ -55,6 +55,6 @@ func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewSet() *Set {
+func NewSet(libs *tree.LibraryManager) *Set {
 	return (&Set{})
 }

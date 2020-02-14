@@ -58,6 +58,6 @@ func (p *It) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewIt() *It {
+func NewIt(libs *tree.LibraryManager) *It {
 	return (&It{})
 }

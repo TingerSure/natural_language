@@ -6,44 +6,40 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
-	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
-
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
-	"github.com/TingerSure/natural_language/library/system/question"
+	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
 )
 
 const (
-	WhatCharactor = "什么"
-
-	WhatName string = "word.what"
+	WhatCharactor        = "什么"
+	WhatName      string = "word.what"
 )
 
-var (
-	WhatFunc *variable.Function = nil
-)
+type What struct {
+	adaptor.SourceAdaptor
+	libs           *tree.LibraryManager
+	libWhatContent string
+	libWhatFunc    concept.Function
+	WhatFunc       *variable.Function
+}
 
-func init() {
-	WhatFunc = variable.NewFunction(nil)
-	WhatFunc.AddParamName(QuestionParam)
-	WhatFunc.Body().AddStep(
+func (p *What) init() {
+	p.WhatFunc = variable.NewFunction(nil)
+	p.WhatFunc.AddParamName(QuestionParam)
+	p.WhatFunc.Body().AddStep(
 		expression.NewReturn(
 			QuestionResult,
 			expression.NewParamGet(
 				expression.NewCall(
-					index.NewConstIndex(question.What),
+					index.NewConstIndex(p.libWhatFunc),
 					expression.NewNewParamWithInit(map[string]concept.Index{
-						question.WhatContent: index.NewBubbleIndex(QuestionParam),
+						p.libWhatContent: index.NewBubbleIndex(QuestionParam),
 					}),
 				),
-				question.WhatContent,
+				p.libWhatContent,
 			),
 		),
 	)
-
-}
-
-type What struct {
-	adaptor.SourceAdaptor
 }
 
 func (p *What) GetName() string {
@@ -65,7 +61,7 @@ func (p *What) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(WhatFunc)
+						return index.NewConstIndex(p.WhatFunc)
 					},
 					Content: treasure,
 					Types:   phrase_type.Question,
@@ -76,6 +72,11 @@ func (p *What) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewWhat() *What {
-	return (&What{})
+func NewWhat(libs *tree.LibraryManager) *What {
+	page := libs.GetLibraryPage("system", "question")
+	return (&What{
+		libs:           libs,
+		libWhatContent: page.GetConst("WhatContent"),
+		libWhatFunc:    page.GetFunction("WhatFunc"),
+	})
 }

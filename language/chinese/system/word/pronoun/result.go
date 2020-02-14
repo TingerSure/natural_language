@@ -58,6 +58,6 @@ func (p *Result) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewResult() *Result {
+func NewResult(libs *tree.LibraryManager) *Result {
 	return (&Result{})
 }

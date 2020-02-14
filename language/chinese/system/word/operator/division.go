@@ -4,10 +4,8 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/tree"
-	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
-
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
-	"github.com/TingerSure/natural_language/library/system/operator"
+	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
 )
 
 const (
@@ -22,6 +20,8 @@ var (
 
 type Division struct {
 	adaptor.SourceAdaptor
+	libs     *tree.LibraryManager
+	operator concept.Function
 }
 
 func (p *Division) GetName() string {
@@ -41,7 +41,7 @@ func (p *Division) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(operator.DivisionFunc)
+						return index.NewConstIndex(p.operator)
 					},
 					Content: treasure,
 					Types:   phrase_type.Operator,
@@ -52,6 +52,9 @@ func (p *Division) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewDivision() *Division {
-	return (&Division{})
+func NewDivision(libs *tree.LibraryManager) *Division {
+	return (&Division{
+		libs:     libs,
+		operator: libs.GetLibraryPage("system", "operator").GetFunction("DivisionFunc"),
+	})
 }

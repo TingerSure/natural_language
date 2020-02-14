@@ -4,10 +4,8 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/tree"
-	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
-
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
-	"github.com/TingerSure/natural_language/library/system/operator"
+	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
 )
 
 const (
@@ -26,6 +24,8 @@ func init() {
 
 type Subtraction struct {
 	adaptor.SourceAdaptor
+	libs     *tree.LibraryManager
+	operator concept.Function
 }
 
 func (p *Subtraction) GetName() string {
@@ -45,7 +45,7 @@ func (p *Subtraction) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(operator.SubtractionFunc)
+						return index.NewConstIndex(p.operator)
 					},
 					Content: treasure,
 					Types:   phrase_type.Operator,
@@ -56,6 +56,9 @@ func (p *Subtraction) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewSubtraction() *Subtraction {
-	return (&Subtraction{})
+func NewSubtraction(libs *tree.LibraryManager) *Subtraction {
+	return (&Subtraction{
+		libs:     libs,
+		operator: libs.GetLibraryPage("system", "operator").GetFunction("MultiplicationFunc"),
+	})
 }

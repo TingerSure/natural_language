@@ -52,6 +52,6 @@ func (p *Belong) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewBelong() *Belong {
+func NewBelong(libs *tree.LibraryManager) *Belong {
 	return (&Belong{})
 }

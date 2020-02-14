@@ -42,6 +42,6 @@ func (p *Unknown) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewUnknown() *Unknown {
+func NewUnknown(libs *tree.LibraryManager) *Unknown {
 	return (&Unknown{})
 }

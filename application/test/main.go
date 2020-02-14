@@ -3,16 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/application/cli"
-	// "github.com/TingerSure/natural_language/core/ambiguity"
-	// "github.com/TingerSure/natural_language/core/grammar"
-	// "github.com/TingerSure/natural_language/core/lexer"
 	"github.com/TingerSure/natural_language/core/runtime"
-	// "github.com/TingerSure/natural_language/core/sandbox"
-	// "github.com/TingerSure/natural_language/core/sandbox/closure"
-	// "github.com/TingerSure/natural_language/core/sandbox/concept"
-	// "github.com/TingerSure/natural_language/core/sandbox/index"
-	// "github.com/TingerSure/natural_language/core/sandbox/variable"
-	// "github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese"
 	"github.com/TingerSure/natural_language/library/system"
 	"github.com/TingerSure/natural_language/library/system/std"
@@ -29,7 +20,7 @@ func getVM() *runtime.Runtime {
 		},
 		EventSize: 1024,
 	})
-	VM.GetLibraryManager().AddLibrary("system", system.NewSystemLibrary(&SystemLibraryParam{
+	VM.GetLibraryManager().AddSystemLibrary(system.NewSystemLibrary(&SystemLibraryParam{
 		Std: &std.StdParam{
 			OnError: func(value concept.Variable) {
 				os.Stdout.WriteString(fmt.Sprintf("\033[1;35m[NL]: \033[00m%v\n", value.ToString("")))
@@ -67,6 +58,7 @@ func test4() {
 	)
 	scan.Run()
 }
+
 func main() {
 	test4()
 }
