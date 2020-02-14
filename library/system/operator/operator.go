@@ -4,6 +4,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/expression"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
+	"github.com/TingerSure/natural_language/core/tree"
 )
 
 const (
@@ -12,18 +13,44 @@ const (
 	Result = "result"
 )
 
+type Operator struct {
+	*tree.PageAdaptor
+	AdditionFunc       *variable.Function
+	DivisionFunc       *variable.Function
+	MultiplicationFunc *variable.Function
+	SubtractionFunc    *variable.Function
+}
+
+func NewOperator() *Operator {
+	instance := &Operator{
+		PageAdaptor:        tree.NewPageAdaptor(),
+		AdditionFunc:       additionFunc,
+		DivisionFunc:       divisionFunc,
+		MultiplicationFunc: multiplicationFunc,
+		SubtractionFunc:    subtractionFunc,
+	}
+	instance.SetFunction("AdditionFunc       ", instance.AdditionFunc)
+	instance.SetFunction("DivisionFunc       ", instance.DivisionFunc)
+	instance.SetFunction("MultiplicationFunc ", instance.MultiplicationFunc)
+	instance.SetFunction("SubtractionFunc    ", instance.SubtractionFunc)
+	instance.SetConst("Left", Left)
+	instance.SetConst("Right", Right)
+	instance.SetConst("Result", Result)
+	return instance
+}
+
 var (
-	AdditionFunc       *variable.Function = nil
-	DivisionFunc       *variable.Function = nil
-	MultiplicationFunc *variable.Function = nil
-	SubtractionFunc    *variable.Function = nil
+	additionFunc       *variable.Function = nil
+	divisionFunc       *variable.Function = nil
+	multiplicationFunc *variable.Function = nil
+	subtractionFunc    *variable.Function = nil
 )
 
 func init() {
-	AdditionFunc = variable.NewFunction(nil)
-	AdditionFunc.AddParamName(Left)
-	AdditionFunc.AddParamName(Right)
-	AdditionFunc.Body().AddStep(
+	additionFunc = variable.NewFunction(nil)
+	additionFunc.AddParamName(Left)
+	additionFunc.AddParamName(Right)
+	additionFunc.Body().AddStep(
 		expression.NewReturn(
 			Result,
 			expression.NewAddition(
@@ -33,10 +60,10 @@ func init() {
 		),
 	)
 
-	DivisionFunc = variable.NewFunction(nil)
-	DivisionFunc.AddParamName(Left)
-	DivisionFunc.AddParamName(Right)
-	DivisionFunc.Body().AddStep(
+	divisionFunc = variable.NewFunction(nil)
+	divisionFunc.AddParamName(Left)
+	divisionFunc.AddParamName(Right)
+	divisionFunc.Body().AddStep(
 		expression.NewReturn(
 			Result,
 			expression.NewDivision(
@@ -46,10 +73,10 @@ func init() {
 		),
 	)
 
-	MultiplicationFunc = variable.NewFunction(nil)
-	MultiplicationFunc.AddParamName(Left)
-	MultiplicationFunc.AddParamName(Right)
-	MultiplicationFunc.Body().AddStep(
+	multiplicationFunc = variable.NewFunction(nil)
+	multiplicationFunc.AddParamName(Left)
+	multiplicationFunc.AddParamName(Right)
+	multiplicationFunc.Body().AddStep(
 		expression.NewReturn(
 			Result,
 			expression.NewMultiplication(
@@ -59,10 +86,10 @@ func init() {
 		),
 	)
 
-	SubtractionFunc = variable.NewFunction(nil)
-	SubtractionFunc.AddParamName(Left)
-	SubtractionFunc.AddParamName(Right)
-	SubtractionFunc.Body().AddStep(
+	subtractionFunc = variable.NewFunction(nil)
+	subtractionFunc.AddParamName(Left)
+	subtractionFunc.AddParamName(Right)
+	subtractionFunc.Body().AddStep(
 		expression.NewReturn(
 			Result,
 			expression.NewSubtraction(

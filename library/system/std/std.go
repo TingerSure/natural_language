@@ -38,9 +38,9 @@ func (s *Std) Error(input concept.Param, object concept.Object) (concept.Param, 
 
 func NewStd(param *StdParam) *Std {
 	instance := &Std{
-		tree.NewPageAdaptor(),
+		param:       param,
+		PageAdaptor: tree.NewPageAdaptor(),
 	}
-	instance.param = param
 	instance.SetFunction("Print", variable.NewSystemFunction(
 		instance.Print,
 		[]string{

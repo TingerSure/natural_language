@@ -8,6 +8,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/closure"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
@@ -29,7 +30,7 @@ func (r *Runtime) GetLanguageManager() *tree.LanguageManager {
 }
 
 func (r *Runtime) Bind(languageName string) {
-	r.languages.GetLanguage(languageName).PackagesIterate(func(_ string, instance *tree.Package) bool {
+	r.languages.GetLanguage(languageName).PackagesIterate(func(_ string, instance tree.Package) bool {
 		for _, source := range instance.GetSources() {
 			r.lexer.AddNaturalSource(source)
 			r.grammar.AddStructRule(source.GetStructRules())
@@ -77,7 +78,7 @@ func (r *Runtime) Stop() error {
 }
 
 func (r *Runtime) Exec(hand concept.Index) {
-	return r.box.Exec(hand)
+	r.box.Exec(hand)
 }
 
 type RuntimeParam struct {
@@ -86,7 +87,7 @@ type RuntimeParam struct {
 	EventSize int
 }
 
-func NewRuntime(param *RuntimeParam) Runtime {
+func NewRuntime(param *RuntimeParam) *Runtime {
 
 	runtime := &Runtime{
 		lexer:     lexer.NewLexer(),

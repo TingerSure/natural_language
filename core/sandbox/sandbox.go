@@ -6,7 +6,6 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/loop"
-	// "github.com/TingerSure/natural_language/library/system/std"
 )
 
 type sandboxStd struct {
@@ -71,8 +70,6 @@ func NewSandbox(param *SandboxParam) *Sandbox {
 			param.OnError(errors.New(fmt.Sprintf("Illegel interrupt in the root loop: %v.", suspend.InterruptType())))
 		}
 	})
-
-	// std.Std = newSandboxStd(param)
 
 	return box
 }

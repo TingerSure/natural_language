@@ -32,7 +32,7 @@ func init() {
 			if objectHome, ok := variable.VariableFamilyInstance.IsObjectHome(content); ok {
 				object = objectHome
 			} else if number, ok := variable.VariableFamilyInstance.IsNumber(content); ok {
-				object = auto_number.NewAutoNumber(number)
+				object = auto_number.NewAutoNumberObject(number)
 			} else {
 				return nil, GetFieldObjectErrorException.Copy().AddStack(GetField)
 			}

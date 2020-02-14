@@ -2,6 +2,7 @@ package library
 
 import (
 	"github.com/TingerSure/natural_language/core/tree"
+	"github.com/TingerSure/natural_language/library/system/auto_number"
 	"github.com/TingerSure/natural_language/library/system/object"
 	"github.com/TingerSure/natural_language/library/system/operator"
 	"github.com/TingerSure/natural_language/library/system/question"
@@ -20,14 +21,15 @@ type SystemLibraryParam struct {
 	Std *std.StdParam
 }
 
-func NewSystemLibrary(param *SystemLibraryParam) SystemLibrary {
+func NewSystemLibrary(param *SystemLibraryParam) *SystemLibrary {
 	stdObject := std.NewStd(param.Std)
 	system := &SystemLibrary{
 		functions: map[string]tree.Page{
-			"std":      stdObject,
-			"question": question.NewQuestion(stdObject),
-			"operator": operator.NewOperator(),
-			"object":   object.NewObject(),
+			"std":         stdObject,
+			"question":    question.NewQuestion(stdObject),
+			"operator":    operator.NewOperator(),
+			"object":      object.NewObject(),
+			"auto_number": auto_number.NewAutoNumber(),
 		},
 	}
 

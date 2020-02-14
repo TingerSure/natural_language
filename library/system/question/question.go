@@ -1,24 +1,56 @@
 package question
 
 import (
-	// "github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/library/system/std"
 )
 
-// var (
-// 	HowManyContent                  = std.PrintContent
-// 	HowMany        concept.Function = std.Print
-//
-// 	WhatContent                  = std.PrintContent
-// 	What        concept.Function = std.Print
-// )
+type Question struct {
+	*tree.PageAdaptor
+	output *std.Std
+}
 
-func NewQuestion(instance *std.Std) tree.Page {
-	page := tree.NewPageAdaptor()
-	page.SetFunction("HowMany", instance.GetFunction("Print"))
-	page.SetConst("HowManyContent", instance.GetConst("PrintContent"))
-	page.SetFunction("What", instance.GetFunction("Print"))
-	page.SetConst("WhatContent", instance.GetConst("PrintContent"))
-	return page
+var (
+	HowManyContent = std.PrintContent
+	WhatContent    = std.PrintContent
+)
+
+func (q *Question) HowMany(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+	return q.output.Print(input, object)
+}
+
+func (q *Question) What(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+	return q.output.Print(input, object)
+}
+
+func NewQuestion(output *std.Std) tree.Page {
+
+	instance := &Question{
+		PageAdaptor: tree.NewPageAdaptor(),
+		output:      output,
+	}
+	instance.SetFunction("HowMany", variable.NewSystemFunction(
+		instance.HowMany,
+		[]string{
+			HowManyContent,
+		},
+		[]string{
+			HowManyContent,
+		},
+	))
+
+	instance.SetFunction("What", variable.NewSystemFunction(
+		instance.What,
+		[]string{
+			WhatContent,
+		},
+		[]string{
+			WhatContent,
+		},
+	))
+	instance.SetConst("HowManyContent", HowManyContent)
+	instance.SetConst("WhatContent", WhatContent)
+	return instance
 }
