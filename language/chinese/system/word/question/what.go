@@ -17,6 +17,7 @@ const (
 
 type What struct {
 	adaptor.SourceAdaptor
+	parent         *Question
 	libs           *tree.LibraryManager
 	libWhatContent string
 	libWhatFunc    concept.Function
@@ -25,15 +26,15 @@ type What struct {
 
 func (p *What) init() {
 	p.WhatFunc = variable.NewFunction(nil)
-	p.WhatFunc.AddParamName(QuestionParam)
+	p.WhatFunc.AddParamName(p.parent.QuestionParam)
 	p.WhatFunc.Body().AddStep(
 		expression.NewReturn(
-			QuestionResult,
+			p.parent.QuestionResult,
 			expression.NewParamGet(
 				expression.NewCall(
 					index.NewConstIndex(p.libWhatFunc),
 					expression.NewNewParamWithInit(map[string]concept.Index{
-						p.libWhatContent: index.NewBubbleIndex(QuestionParam),
+						p.libWhatContent: index.NewBubbleIndex(p.parent.QuestionParam),
 					}),
 				),
 				p.libWhatContent,
@@ -72,10 +73,11 @@ func (p *What) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewWhat(libs *tree.LibraryManager) *What {
+func NewWhat(libs *tree.LibraryManager, parent *Question) *What {
 	page := libs.GetLibraryPage("system", "question")
 	return (&What{
 		libs:           libs,
+		parent:         parent,
 		libWhatContent: page.GetConst("WhatContent"),
 		libWhatFunc:    page.GetFunction("WhatFunc"),
 	})

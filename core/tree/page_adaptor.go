@@ -38,5 +38,9 @@ func (p *PageAdaptor) SetConst(key string, value string) Page {
 }
 
 func NewPageAdaptor() *PageAdaptor {
-	return &PageAdaptor{}
+	return &PageAdaptor{
+		functions: map[string]concept.Function{},
+		classes:   map[string]concept.Class{},
+		consts:    map[string]string{},
+	}
 }

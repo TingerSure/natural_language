@@ -49,6 +49,6 @@ func (p *AnyFromBracketAnyBracket) GetName() string {
 	return AnyFromBracketAnyBracketName
 }
 
-func NewAnyFromBracketAnyBracket() *AnyFromBracketAnyBracket {
+func NewAnyFromBracketAnyBracket(libs *tree.LibraryManager) *AnyFromBracketAnyBracket {
 	return (&AnyFromBracketAnyBracket{})
 }

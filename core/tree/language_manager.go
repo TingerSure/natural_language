@@ -34,5 +34,7 @@ func (l *LanguageManager) LanguagesIterate(onLanguage func(string, *Language) bo
 }
 
 func NewLanguageManager() *LanguageManager {
-	return &LanguageManager{}
+	return &LanguageManager{
+		languages: map[string]*Language{},
+	}
 }

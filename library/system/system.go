@@ -1,4 +1,4 @@
-package library
+package system
 
 import (
 	"github.com/TingerSure/natural_language/core/tree"
@@ -10,11 +10,16 @@ import (
 )
 
 type SystemLibrary struct {
-	functions map[string]tree.Page
+	pages map[string]tree.Page
 }
 
 func (s *SystemLibrary) GetPage(name string) tree.Page {
-	return s.functions[name]
+	return s.pages[name]
+}
+
+func (s *SystemLibrary) SetPage(name string, value tree.Page) tree.Library {
+	s.pages[name] = value
+	return s
 }
 
 type SystemLibraryParam struct {
@@ -24,7 +29,7 @@ type SystemLibraryParam struct {
 func NewSystemLibrary(param *SystemLibraryParam) *SystemLibrary {
 	stdObject := std.NewStd(param.Std)
 	system := &SystemLibrary{
-		functions: map[string]tree.Page{
+		pages: map[string]tree.Page{
 			"std":         stdObject,
 			"question":    question.NewQuestion(stdObject),
 			"operator":    operator.NewOperator(),

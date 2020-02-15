@@ -38,5 +38,7 @@ func (l *LibraryManager) GetLibrary(name string) Library {
 }
 
 func NewLibraryManager() *LibraryManager {
-	return &LibraryManager{}
+	return &LibraryManager{
+		librarys: map[string]Library{},
+	}
 }

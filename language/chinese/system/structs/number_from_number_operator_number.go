@@ -58,6 +58,6 @@ func (p *NumberFromNumberOperatorNumber) GetName() string {
 	return NumberFromNumberOperatorNumberName
 }
 
-func NewNumberFromNumberOperatorNumber() *NumberFromNumberOperatorNumber {
+func NewNumberFromNumberOperatorNumber(libs *tree.LibraryManager) *NumberFromNumberOperatorNumber {
 	return (&NumberFromNumberOperatorNumber{})
 }

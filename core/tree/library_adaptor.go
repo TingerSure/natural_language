@@ -14,5 +14,7 @@ func (p *LibraryAdaptor) SetPage(key string, value Page) Library {
 }
 
 func NewLibraryAdaptor() *LibraryAdaptor {
-	return &LibraryAdaptor{}
+	return &LibraryAdaptor{
+		pages: map[string]Page{},
+	}
 }

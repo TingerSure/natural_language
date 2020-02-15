@@ -32,5 +32,7 @@ func (l *Language) AllPackages() []string {
 }
 
 func NewLanguage() *Language {
-	return &Language{}
+	return &Language{
+		packages: map[string]Package{},
+	}
 }

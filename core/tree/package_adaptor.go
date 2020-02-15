@@ -15,5 +15,7 @@ func (p *PackageAdaptor) AddSource(source Source) {
 }
 
 func NewPackageAdaptor() *PackageAdaptor {
-	return &PackageAdaptor{}
+	return &PackageAdaptor{
+		sources: []Source{},
+	}
 }

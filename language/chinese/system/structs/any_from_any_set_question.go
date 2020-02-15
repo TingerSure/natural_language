@@ -23,6 +23,7 @@ var (
 
 type AnyFromAnySetQuestion struct {
 	adaptor.SourceAdaptor
+	questionPackage *question.Question
 }
 
 func (p *AnyFromAnySetQuestion) GetStructRules() []*tree.StructRule {
@@ -36,10 +37,10 @@ func (p *AnyFromAnySetQuestion) GetStructRules() []*tree.StructRule {
 							expression.NewCall(
 								phrase[2].Index(),
 								expression.NewNewParamWithInit(map[string]concept.Index{
-									question.QuestionParam: phrase[0].Index(),
+									p.questionPackage.QuestionParam: phrase[0].Index(),
 								}),
 							),
-							question.QuestionResult,
+							p.questionPackage.QuestionResult,
 						)
 					},
 					Size: len(anyFromAnySetQuestionList),
@@ -59,6 +60,8 @@ func (p *AnyFromAnySetQuestion) GetName() string {
 	return AnyFromAnySetQuestionName
 }
 
-func NewAnyFromAnySetQuestion() *AnyFromAnySetQuestion {
-	return (&AnyFromAnySetQuestion{})
+func NewAnyFromAnySetQuestion(libs *tree.LibraryManager, questionPackage *question.Question) *AnyFromAnySetQuestion {
+	return (&AnyFromAnySetQuestion{
+		questionPackage: questionPackage,
+	})
 }

@@ -41,6 +41,6 @@ func (p *Belong) GetName() string {
 	return belongName
 }
 
-func NewBelong() *Belong {
+func NewBelong(libs *tree.LibraryManager) *Belong {
 	return (&Belong{})
 }

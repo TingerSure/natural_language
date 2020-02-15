@@ -73,6 +73,6 @@ func (p *OperatorLevel) GetName() string {
 	return operatorLevelName
 }
 
-func NewOperatorLevel() *OperatorLevel {
+func NewOperatorLevel(libs *tree.LibraryManager) *OperatorLevel {
 	return (&OperatorLevel{})
 }
