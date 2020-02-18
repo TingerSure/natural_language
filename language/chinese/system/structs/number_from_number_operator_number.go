@@ -6,7 +6,6 @@ import (
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
-	"github.com/TingerSure/natural_language/library/system/operator"
 )
 
 const (
@@ -23,6 +22,9 @@ var (
 
 type NumberFromNumberOperatorNumber struct {
 	adaptor.SourceAdaptor
+	operatorLeft   string
+	operatorRight  string
+	operatorResult string
 }
 
 func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
@@ -36,11 +38,11 @@ func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
 							expression.NewCall(
 								phrase[1].Index(),
 								expression.NewNewParamWithInit(map[string]concept.Index{
-									operator.Left:  phrase[0].Index(),
-									operator.Right: phrase[2].Index(),
+									p.operatorLeft:  phrase[0].Index(),
+									p.operatorRight: phrase[2].Index(),
 								}),
 							),
-							operator.Result,
+							p.operatorResult,
 						)
 					},
 					Size:  len(NumberFromNumberOperatorNumberList),
@@ -59,5 +61,10 @@ func (p *NumberFromNumberOperatorNumber) GetName() string {
 }
 
 func NewNumberFromNumberOperatorNumber(libs *tree.LibraryManager) *NumberFromNumberOperatorNumber {
-	return (&NumberFromNumberOperatorNumber{})
+	page := libs.GetLibraryPage("system", "operator")
+	return (&NumberFromNumberOperatorNumber{
+		operatorLeft:   page.GetConst("Left"),
+		operatorRight:  page.GetConst("Right"),
+		operatorResult: page.GetConst("Result"),
+	})
 }

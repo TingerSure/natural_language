@@ -52,29 +52,3 @@ func NewSystem(libs *tree.LibraryManager) *tree.PackageAdaptor {
 	system.AddSource(priority.NewBelong(libs))
 	return system
 }
-
-// func AllRules() []tree.Source {
-// 	return []tree.Source{
-// 		pronoun.NewIt(),
-// 		pronoun.NewResult(),
-// 		set.NewSet(),
-// 		question.NewWhat(),
-// 		question.NewHowMany(),
-// 		auxiliary.NewBelong(),
-// 		unknown.NewUnknown(),
-// 		number.NewNumber(),
-// 		operator.NewAddition(),
-// 		operator.NewSubtraction(),
-// 		operator.NewDivision(),
-// 		operator.NewMultiplication(),
-// 		brackets.NewBracketsLeft(),
-// 		brackets.NewBracketsRight(),
-// 		structs.NewAnyFromAnyBelongAny(),
-// 		structs.NewNumberFromNumberOperatorNumber(),
-// 		structs.NewAnyFromBracketAnyBracket(),
-// 		structs.NewAnyFromQuestionSetAny(),
-// 		structs.NewAnyFromAnySetQuestion(),
-// 		priority.NewOperatorLevel(),
-// 		priority.NewBelong(),
-// 	}
-// }

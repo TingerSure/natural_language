@@ -29,10 +29,10 @@ func NewOperator() *Operator {
 		MultiplicationFunc: multiplicationFunc,
 		SubtractionFunc:    subtractionFunc,
 	}
-	instance.SetFunction("AdditionFunc       ", instance.AdditionFunc)
-	instance.SetFunction("DivisionFunc       ", instance.DivisionFunc)
-	instance.SetFunction("MultiplicationFunc ", instance.MultiplicationFunc)
-	instance.SetFunction("SubtractionFunc    ", instance.SubtractionFunc)
+	instance.SetFunction("AdditionFunc", instance.AdditionFunc)
+	instance.SetFunction("DivisionFunc", instance.DivisionFunc)
+	instance.SetFunction("MultiplicationFunc", instance.MultiplicationFunc)
+	instance.SetFunction("SubtractionFunc", instance.SubtractionFunc)
 	instance.SetConst("Left", Left)
 	instance.SetConst("Right", Right)
 	instance.SetConst("Result", Result)
