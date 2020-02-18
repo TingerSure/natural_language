@@ -24,7 +24,7 @@ type HowMany struct {
 	HowManyFunc       *variable.Function
 }
 
-func (p *HowMany) init() {
+func (p *HowMany) init() *HowMany {
 	p.HowManyFunc = variable.NewFunction(nil)
 	p.HowManyFunc.AddParamName(p.parent.QuestionParam)
 	p.HowManyFunc.Body().AddStep(
@@ -41,6 +41,7 @@ func (p *HowMany) init() {
 			),
 		),
 	)
+	return p
 }
 
 func (p *HowMany) GetName() string {
@@ -79,6 +80,6 @@ func NewHowMany(libs *tree.LibraryManager, parent *Question) *HowMany {
 		libs:              libs,
 		parent:            parent,
 		libHowManyContent: page.GetConst("HowManyContent"),
-		libHowManyFunc:    page.GetFunction("HowManyFunc"),
-	})
+		libHowManyFunc:    page.GetFunction("HowMany"),
+	}).init()
 }

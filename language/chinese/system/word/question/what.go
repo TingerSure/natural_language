@@ -24,7 +24,7 @@ type What struct {
 	WhatFunc       *variable.Function
 }
 
-func (p *What) init() {
+func (p *What) init() *What {
 	p.WhatFunc = variable.NewFunction(nil)
 	p.WhatFunc.AddParamName(p.parent.QuestionParam)
 	p.WhatFunc.Body().AddStep(
@@ -41,6 +41,7 @@ func (p *What) init() {
 			),
 		),
 	)
+	return p
 }
 
 func (p *What) GetName() string {
@@ -79,6 +80,6 @@ func NewWhat(libs *tree.LibraryManager, parent *Question) *What {
 		libs:           libs,
 		parent:         parent,
 		libWhatContent: page.GetConst("WhatContent"),
-		libWhatFunc:    page.GetFunction("WhatFunc"),
-	})
+		libWhatFunc:    page.GetFunction("What"),
+	}).init()
 }
