@@ -1,4 +1,4 @@
-package cli
+package runtime
 
 import (
 	"bufio"
@@ -36,7 +36,16 @@ func (s *Scan) Run() {
 	}
 }
 
+var (
+	defaultPrompt = func() {
+		// Do nothing
+	}
+)
+
 func NewScan(reader *os.File, listener func(string), prompt func()) *Scan {
+	if prompt == nil {
+		prompt = defaultPrompt
+	}
 	return &Scan{
 		reader:   reader,
 		listener: listener,

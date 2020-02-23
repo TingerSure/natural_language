@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/TingerSure/natural_language/application/cli"
 	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/language/chinese"
@@ -44,7 +43,7 @@ func test4() {
 		os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[System]: \033[00m%v\n", err.Error()))
 		return
 	}
-	scan := cli.NewScan(
+	cli := runtime.NewScan(
 		os.Stdin,
 		func(input string) {
 			indexes := VM.Deal(input)
@@ -57,7 +56,7 @@ func test4() {
 			os.Stderr.WriteString("\033[1;36m[TS]: \033[00m")
 		},
 	)
-	scan.Run()
+	cli.Run()
 }
 
 func main() {
