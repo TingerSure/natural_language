@@ -9,16 +9,16 @@ import (
 )
 
 type Scan struct {
-	listener func(string)
-	prompt   func()
-	reader   *os.File
+	onReader     func(string)
+	beforeReader func()
+	stream       *os.File
 }
 
 func (s *Scan) Run() {
-	bufferReader := bufio.NewReader(s.reader)
+	bufferReader := bufio.NewReader(s.stream)
 
 	for {
-		s.prompt()
+		s.beforeReader()
 		input, err := bufferReader.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
@@ -32,23 +32,20 @@ func (s *Scan) Run() {
 		if input == "" {
 			continue
 		}
-		s.listener(input)
+		s.onReader(input)
 	}
 }
 
-var (
-	defaultPrompt = func() {
-		// Do nothing
-	}
-)
+type ScanParam struct {
+	OnReader     func(string)
+	BeforeReader func()
+	Stream       *os.File
+}
 
-func NewScan(reader *os.File, listener func(string), prompt func()) *Scan {
-	if prompt == nil {
-		prompt = defaultPrompt
-	}
+func NewScan(param *ScanParam) *Scan {
 	return &Scan{
-		reader:   reader,
-		listener: listener,
-		prompt:   prompt,
+		stream:       param.Stream,
+		onReader:     param.OnReader,
+		beforeReader: param.BeforeReader,
 	}
 }

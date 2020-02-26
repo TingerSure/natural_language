@@ -43,19 +43,19 @@ func test4() {
 		os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[System]: \033[00m%v\n", err.Error()))
 		return
 	}
-	cli := runtime.NewScan(
-		os.Stdin,
-		func(input string) {
+	cli := runtime.NewScan(&runtime.ScanParam{
+		Stream: os.Stdin,
+		OnReader: func(input string) {
 			indexes := VM.Deal(input)
 			for _, index := range indexes {
 				fmt.Printf("\033[1;32m[LOG]: \033[00m%v\n", index.ToString(""))
 				VM.Exec(index)
 			}
 		},
-		func() {
+		BeforeReader: func() {
 			os.Stderr.WriteString("\033[1;36m[TS]: \033[00m")
 		},
-	)
+	})
 	cli.Run()
 }
 
