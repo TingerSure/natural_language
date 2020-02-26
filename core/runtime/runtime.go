@@ -47,16 +47,13 @@ func (r *Runtime) Deal(sentence string) []concept.Index {
 	back := []concept.Index{}
 	selecteds := []tree.Phrase{}
 	for _, flow := range group.GetInstances() {
-		// back = append(back, index.NewConstIndex(variable.NewString(flow.ToString())))
 		rivers, err := r.grammar.Instances(flow)
 
 		if err != nil {
-			// back = append(back, index.NewConstIndex(variable.NewString(err.Error())))
 			continue
 		}
 		candidates := []tree.Phrase{}
 		for _, river := range rivers {
-			// back = append(back, index.NewConstIndex(variable.NewString(river.ToString())))
 			candidates = append(candidates, river.GetWait().Peek())
 		}
 		selecteds = append(selecteds, r.ambiguity.Filter(candidates))
@@ -101,12 +98,9 @@ func NewRuntime(param *RuntimeParam) *Runtime {
 		Root: runtime.rootSpace,
 		OnError: func(err error) {
 			param.OnError(err)
-			// os.Stdout.WriteString(fmt.Sprintf("\033[1;35m[NL]: \033[00m%v\n", err.Error()))
 		},
 		OnPrint: func(value concept.Variable) {
 			param.OnPrint(value)
-
-			// os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[NL]:\033[00m %v\n", value.ToString("")))
 		},
 		EventSize: param.EventSize,
 	})
