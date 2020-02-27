@@ -8,24 +8,6 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/loop"
 )
 
-type sandboxStd struct {
-	param *SandboxParam
-}
-
-func (s *sandboxStd) Print(value concept.Variable) {
-	s.param.OnPrint(value)
-}
-
-func (s *sandboxStd) Error(value concept.Variable) {
-	s.param.OnError(errors.New(value.ToString("")))
-}
-
-func newSandboxStd(param *SandboxParam) *sandboxStd {
-	return &sandboxStd{
-		param: param,
-	}
-}
-
 type SandboxParam struct {
 	OnError   func(error)
 	OnClose   func()
