@@ -1,14 +1,13 @@
 package runtime
 
 import (
+	"errors"
 	"github.com/TingerSure/natural_language/core/ambiguity"
 	"github.com/TingerSure/natural_language/core/grammar"
 	"github.com/TingerSure/natural_language/core/lexer"
 	"github.com/TingerSure/natural_language/core/sandbox"
 	"github.com/TingerSure/natural_language/core/sandbox/closure"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/index"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
@@ -42,7 +41,7 @@ func (r *Runtime) Bind(languageName string) {
 
 }
 
-func (r *Runtime) Deal(sentence string) []concept.Index {
+func (r *Runtime) Deal(sentence string) ([]concept.Index, error) {
 	var group *lexer.FlowGroup = r.lexer.Instances(sentence)
 	back := []concept.Index{}
 	selecteds := []tree.Phrase{}
@@ -59,11 +58,11 @@ func (r *Runtime) Deal(sentence string) []concept.Index {
 		selecteds = append(selecteds, r.ambiguity.Filter(candidates))
 	}
 	if 0 == len(selecteds) {
-		return append(back, index.NewConstIndex(variable.NewString("No rules available to match this sentence.")))
+		return nil, errors.New("No rules available to match this sentence.")
 	}
 	selected := r.ambiguity.Filter(selecteds)
 	back = append(back, selected.Index())
-	return back
+	return back, nil
 }
 
 func (r *Runtime) Start() error {
