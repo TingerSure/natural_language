@@ -9,6 +9,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/closure"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
+	"os"
 )
 
 type Runtime struct {
@@ -41,9 +42,8 @@ func (r *Runtime) Bind(languageName string) {
 
 }
 
-func (r *Runtime) Deal(sentence string) ([]concept.Index, error) {
+func (r *Runtime) Deal(sentence string) (concept.Index, error) {
 	var group *lexer.FlowGroup = r.lexer.Instances(sentence)
-	back := []concept.Index{}
 	selecteds := []tree.Phrase{}
 	for _, flow := range group.GetInstances() {
 		rivers, err := r.grammar.Instances(flow)
@@ -60,9 +60,27 @@ func (r *Runtime) Deal(sentence string) ([]concept.Index, error) {
 	if 0 == len(selecteds) {
 		return nil, errors.New("No rules available to match this sentence.")
 	}
-	selected := r.ambiguity.Filter(selecteds)
-	back = append(back, selected.Index())
-	return back, nil
+	return r.ambiguity.Filter(selecteds).Index(), nil
+}
+
+func (r *Runtime) Read(stream *os.File) error {
+	var scanErr error = nil
+	traffic := NewScan(&ScanParam{
+		Stream: stream,
+		OnReader: func(input string) bool {
+			index, err := r.Deal(input)
+			if err != nil {
+				scanErr = err
+				return false
+			}
+			r.Exec(index)
+			return true
+		},
+		BeforeReader: func() {},
+	})
+	traffic.Run()
+
+	return scanErr
 }
 
 func (r *Runtime) Start() error {

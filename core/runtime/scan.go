@@ -9,7 +9,7 @@ import (
 )
 
 type Scan struct {
-	onReader     func(string)
+	onReader     func(string) bool
 	beforeReader func()
 	stream       *os.File
 }
@@ -32,12 +32,14 @@ func (s *Scan) Run() {
 		if input == "" {
 			continue
 		}
-		s.onReader(input)
+		if !s.onReader(input) {
+			break
+		}
 	}
 }
 
 type ScanParam struct {
-	OnReader     func(string)
+	OnReader     func(string) bool
 	BeforeReader func()
 	Stream       *os.File
 }
