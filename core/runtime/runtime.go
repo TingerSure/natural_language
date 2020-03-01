@@ -65,7 +65,7 @@ func (r *Runtime) Deal(sentence string) (concept.Index, error) {
 
 func (r *Runtime) Read(stream *os.File) error {
 	var scanErr error = nil
-	traffic := NewScan(&ScanParam{
+	NewScan(&ScanParam{
 		Stream: stream,
 		OnReader: func(input string) bool {
 			index, err := r.Deal(input)
@@ -77,8 +77,7 @@ func (r *Runtime) Read(stream *os.File) error {
 			return true
 		},
 		BeforeReader: func() {},
-	})
-	traffic.Run()
+	}).Run()
 
 	return scanErr
 }
