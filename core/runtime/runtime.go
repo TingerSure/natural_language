@@ -13,13 +13,22 @@ import (
 )
 
 type Runtime struct {
-	lexer     *lexer.Lexer
-	grammar   *grammar.Grammar
-	ambiguity *ambiguity.Ambiguity
-	libs      *tree.LibraryManager
-	languages *tree.LanguageManager
-	box       *sandbox.Sandbox
-	rootSpace *closure.Closure
+	lexer           *lexer.Lexer
+	grammar         *grammar.Grammar
+	ambiguity       *ambiguity.Ambiguity
+	libs            *tree.LibraryManager
+	languages       *tree.LanguageManager
+	box             *sandbox.Sandbox
+	rootSpace       *closure.Closure
+	defaultLanguage string
+}
+
+func (r *Runtime) SetDefaultLanguage(name string) {
+	r.defaultLanguage = name
+
+}
+func (r *Runtime) GetDefaultLanguage() string {
+	return r.defaultLanguage
 }
 
 func (r *Runtime) GetLibraryManager() *tree.LibraryManager {

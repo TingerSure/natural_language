@@ -4,6 +4,15 @@ import ()
 
 type Language struct {
 	packages map[string]Package
+	name     string
+}
+
+func (l *Language) SetName(name string) {
+	l.name = name
+}
+
+func (l *Language) GetName() string {
+	return l.name
 }
 
 func (l *Language) SetPackage(name string, instance Package) {
