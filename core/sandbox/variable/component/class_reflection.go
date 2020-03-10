@@ -7,26 +7,14 @@ import (
 type ClassReflection struct {
 	class   concept.Class
 	alias   string
-	mapping map[string]string
+	mapping map[concept.KeySpecimen]concept.KeySpecimen
 }
 
-func (c *ClassReflection) CheckMapping() bool {
-	if len(c.mapping) != len(c.class.AllFields()) {
-		return false
-	}
-	for field, _ := range c.class.AllFields() {
-		if c.mapping[field] == "" {
-			return false
-		}
-	}
-	return true
-}
-
-func (c *ClassReflection) SetMapping(mapping map[string]string) {
+func (c *ClassReflection) SetMapping(mapping map[concept.KeySpecimen]concept.KeySpecimen) {
 	c.mapping = mapping
 }
 
-func (c *ClassReflection) GetMapping() map[string]string {
+func (c *ClassReflection) GetMapping() map[concept.KeySpecimen]concept.KeySpecimen {
 	return c.mapping
 }
 
@@ -48,7 +36,11 @@ func NewClassReflection(class concept.Class) *ClassReflection {
 	}
 }
 
-func NewClassReflectionWithMapping(class concept.Class, mapping map[string]string, alias string) *ClassReflection {
+func NewClassReflectionWithMapping(
+	class concept.Class,
+	mapping map[concept.KeySpecimen]concept.KeySpecimen,
+	alias string,
+) *ClassReflection {
 	return &ClassReflection{
 		class:   class,
 		mapping: mapping,

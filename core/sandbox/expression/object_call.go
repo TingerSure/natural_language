@@ -11,7 +11,7 @@ import (
 
 type ObjectCall struct {
 	*adaptor.ExpressionIndex
-	key    string
+	key    concept.KeySpecimen
 	object concept.Index
 	param  concept.Index
 }
@@ -21,7 +21,7 @@ var (
 )
 
 func (a *ObjectCall) ToString(prefix string) string {
-	return fmt.Sprintf("%v.%v(%v)", a.object.ToString(prefix), a.key, a.param.ToString(prefix))
+	return fmt.Sprintf("%v.%v(%v)", a.object.ToString(prefix), a.key.ToString(prefix), a.param.ToString(prefix))
 }
 
 func (a *ObjectCall) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
@@ -54,7 +54,7 @@ func (a *ObjectCall) Exec(space concept.Closure) (concept.Variable, concept.Inte
 	return method.Exec(param, object)
 }
 
-func NewObjectCall(object concept.Index, key string, param concept.Index) *ObjectCall {
+func NewObjectCall(object concept.Index, key concept.KeySpecimen, param concept.Index) *ObjectCall {
 	if nl_interface.IsNil(param) {
 		param = objectCallDefaultParam
 	}

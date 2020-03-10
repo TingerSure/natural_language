@@ -7,11 +7,11 @@ import (
 )
 
 type MethodMatcher struct {
-	methodName string
+	methodName concept.KeySpecimen
 }
 
-func (c *MethodMatcher) ToString(string) string {
-	return fmt.Sprintf("method=%v", c.methodName)
+func (c *MethodMatcher) ToString(prefix string) string {
+	return fmt.Sprintf("method=%v", c.methodName.ToString(prefix))
 }
 
 func (c *MethodMatcher) Match(value concept.Variable) bool {
@@ -22,7 +22,7 @@ func (c *MethodMatcher) Match(value concept.Variable) bool {
 	return object.HasMethod(c.methodName)
 }
 
-func NewMethodMatcher(methodName string) *MethodMatcher {
+func NewMethodMatcher(methodName concept.KeySpecimen) *MethodMatcher {
 	return &MethodMatcher{
 		methodName: methodName,
 	}

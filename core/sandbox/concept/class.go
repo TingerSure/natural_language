@@ -5,23 +5,27 @@ type Class interface {
 
 	GetName() string
 
-	SetMethod(key string, action Function)
-	GetMethod(key string) Function
-	HasMethod(key string) bool
-	AllMethods() map[string]Function
+	SetMethod(key KeySpecimen, action Function)
+	GetMethod(key KeySpecimen) Function
+	HasMethod(key KeySpecimen) bool
+	SizeMethod() int
+	IterateMethods(func(key Key, value Function) bool) bool
 
-	SetField(key string, defaultField Variable)
-	GetField(key string) Variable
-	HasField(key string) bool
-	AllFields() map[string]Variable
+	SetField(key KeySpecimen, defaultField Variable)
+	GetField(key KeySpecimen) Variable
+	HasField(key KeySpecimen) bool
+	SizeField() int
+	IterateFields(func(key Key, value Variable) bool) bool
 
-	SetStaticMethod(key string, action Function)
-	GetStaticMethod(key string) Function
-	HasStaticMethod(key string) bool
-	AllStaticMethods() map[string]Function
+	SetStaticMethod(key KeySpecimen, action Function)
+	GetStaticMethod(key KeySpecimen) Function
+	HasStaticMethod(key KeySpecimen) bool
+	SizeStaticMethod() int
+	IterateStaticMethods(func(key Key, value Function) bool) bool
 
-	SetStaticField(key string, action Variable)
-	GetStaticField(key string) Variable
-	HasStaticField(key string) bool
-	AllStaticFields() map[string]Variable
+	SetStaticField(key KeySpecimen, action Variable)
+	GetStaticField(key KeySpecimen) Variable
+	HasStaticField(key KeySpecimen) bool
+	SizeStaticField() int
+	IterateStaticFields(func(key Key, value Variable) bool) bool
 }

@@ -2,6 +2,7 @@ package variable
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable/component"
@@ -13,8 +14,8 @@ const (
 )
 
 type Object struct {
-	fields      map[string]concept.Variable
-	methods     map[string]concept.Function
+	fields      *component.Mapping
+	methods     *component.Mapping
 	reflections []*component.ClassReflection
 }
 
@@ -64,8 +65,30 @@ func (o *Object) UpdateAlias(class string, old, new string) bool {
 	}
 	return false
 }
+func (o *Object) CheckMapping(class concept.Class, mapping map[concept.KeySpecimen]concept.KeySpecimen) bool {
+	if len(mapping) != class.SizeField() {
+		return false
+	}
 
-func (o *Object) GetMapping(class string, alias string) (map[string]string, concept.Exception) {
+	if class.IterateFields(func(key concept.Key, _ concept.Variable) bool {
+		for specimen, _ := range mapping {
+			if key.Is(specimen) {
+				return false
+			}
+		}
+		return true
+	}) {
+		return false
+	}
+
+	for _, specimen := range mapping {
+		if !o.HasField(specimen) {
+			return false
+		}
+	}
+	return true
+}
+func (o *Object) GetMapping(class string, alias string) (map[concept.KeySpecimen]concept.KeySpecimen, concept.Exception) {
 	for _, reflection := range o.reflections {
 		if reflection.GetClass().GetName() == class && reflection.GetAlias() == alias {
 			return reflection.GetMapping(), nil
@@ -85,7 +108,7 @@ func (o *Object) RemoveClass(class string, alias string) concept.Exception {
 
 }
 
-func (o *Object) AddClass(class concept.Class, alias string, mapping map[string]string) concept.Exception {
+func (o *Object) AddClass(class concept.Class, alias string, mapping map[concept.KeySpecimen]concept.KeySpecimen) concept.Exception {
 	for _, old := range o.reflections {
 		if old.GetClass().GetName() == class.GetName() && old.GetAlias() == alias {
 			return interrupt.NewException("system error", "Duplicate class reflections are added.")
@@ -95,63 +118,68 @@ func (o *Object) AddClass(class concept.Class, alias string, mapping map[string]
 	return nil
 }
 
-func (o *Object) HasField(key string) bool {
-	return o.fields[key] != nil
+func (o *Object) HasField(specimen concept.KeySpecimen) bool {
+	return o.fields.Has(specimen)
 }
 
-func (o *Object) InitField(key string, defaultValue concept.Variable) concept.Exception {
-	if o.fields[key] == nil {
-		o.fields[key] = defaultValue
+func (o *Object) InitField(specimen concept.KeySpecimen, defaultValue concept.Variable) concept.Exception {
+	if !o.fields.Has(specimen) {
+		o.fields.Set(specimen, defaultValue)
 	}
 	return nil
 }
 
-func (o *Object) SetField(key string, value concept.Variable) concept.Exception {
-	if o.fields[key] == nil {
-		return interrupt.NewException("system error", fmt.Sprintf("There is no field called \"%v\" to be set here.", key))
+func (o *Object) SetField(specimen concept.KeySpecimen, value concept.Variable) concept.Exception {
+	if !o.fields.Has(specimen) {
+		return interrupt.NewException("system error", fmt.Sprintf("There is no field called \"%v\" to be set here.", specimen.ToString("")))
 	}
-	o.fields[key] = value
+	o.fields.Set(specimen, value)
 	return nil
 }
 
-func (o *Object) GetField(key string) (concept.Variable, concept.Exception) {
-	if o.fields[key] == nil {
-		return nil, interrupt.NewException("system error", fmt.Sprintf("There is no field called \"%v\" to be got here.", key))
+func (o *Object) GetField(specimen concept.KeySpecimen) (concept.Variable, concept.Exception) {
+	value := o.fields.Get(specimen)
+	if nl_interface.IsNil(value) {
+		return nil, interrupt.NewException("system error", fmt.Sprintf("There is no field called \"%v\" to be got here.", specimen.ToString("")))
 	}
-	return o.fields[key], nil
+	return value.(concept.Variable), nil
 }
 
-func (o *Object) HasMethod(key string) bool {
-	return o.methods[key] == nil
+func (o *Object) HasMethod(specimen concept.KeySpecimen) bool {
+	return o.methods.Has(specimen)
 }
 
-func (o *Object) SetMethod(key string, value concept.Function) concept.Exception {
-	o.methods[key] = value
+func (o *Object) SetMethod(specimen concept.KeySpecimen, value concept.Function) concept.Exception {
+	o.methods.Set(specimen, value)
 	return nil
 }
 
-func (o *Object) GetMethod(key string) (concept.Function, concept.Exception) {
-	value := o.methods[key]
-	if value == nil {
-		return nil, interrupt.NewException("system error", fmt.Sprintf("no method called %v", key))
+func (o *Object) GetMethod(specimen concept.KeySpecimen) (concept.Function, concept.Exception) {
+	value := o.methods.Get(specimen)
+	if nl_interface.IsNil(value) {
+		return nil, interrupt.NewException("system error", fmt.Sprintf("no method called %v", specimen.ToString("")))
 	}
-	return o.methods[key], nil
+	return value.(concept.Function), nil
 }
 
 func (a *Object) ToString(prefix string) string {
-	if 0 == len(a.fields) && 0 == len(a.reflections) {
+	if 0 == a.fields.Size() && 0 == len(a.reflections) {
 		return "object <> {}"
 	}
 
 	subPrefix := fmt.Sprintf("%v\t", prefix)
 
-	paramsToString := make([]string, 0, len(a.fields))
-	for key, value := range a.fields {
-		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key, value.ToString(subPrefix)))
-	}
-	for key, value := range a.methods {
-		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key, value.ToString(subPrefix)))
-	}
+	paramsToString := make([]string, 0, a.fields.Size())
+
+	a.fields.Iterate(func(key concept.Key, value interface{}) bool {
+		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.ToString(subPrefix), value.(concept.ToString).ToString(subPrefix)))
+		return false
+	})
+
+	a.methods.Iterate(func(key concept.Key, value interface{}) bool {
+		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.ToString(subPrefix), value.(concept.ToString).ToString(subPrefix)))
+		return false
+	})
 
 	reflectionToString := make([]string, 0, len(a.reflections))
 	for _, reflection := range a.reflections {
@@ -170,9 +198,24 @@ func (o *Object) Type() string {
 }
 
 func NewObject() *Object {
+	keySpecimenCreator := func() concept.KeySpecimen {
+		return NewKeySpecimen()
+	}
+
+	keyCreator := func() concept.Key {
+		return NewKey()
+	}
 	return &Object{
-		fields:      make(map[string]concept.Variable),
-		methods:     make(map[string]concept.Function),
+		fields: component.NewMapping(&component.MappingParam{
+			KeySpecimenCreator: keySpecimenCreator,
+			KeyCreator:         keyCreator,
+			AutoInit:           false,
+		}),
+		methods: component.NewMapping(&component.MappingParam{
+			KeySpecimenCreator: keySpecimenCreator,
+			KeyCreator:         keyCreator,
+			AutoInit:           true,
+		}),
 		reflections: make([]*component.ClassReflection, 0),
 	}
 }

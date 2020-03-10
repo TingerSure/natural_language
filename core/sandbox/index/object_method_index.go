@@ -9,7 +9,7 @@ import (
 )
 
 type ObjectMethodIndex struct {
-	key    string
+	key    concept.KeySpecimen
 	object concept.Index
 }
 
@@ -18,7 +18,7 @@ func (s *ObjectMethodIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 }
 
 func (s *ObjectMethodIndex) ToString(prefix string) string {
-	return fmt.Sprintf("%s.%s", s.object.ToString(prefix), s.key)
+	return fmt.Sprintf("%s.%s", s.object.ToString(prefix), s.key.ToString(""))
 }
 
 func (s *ObjectMethodIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
@@ -61,7 +61,7 @@ func (s *ObjectMethodIndex) Set(space concept.Closure, preFunction concept.Varia
 	return object.SetMethod(s.key, function)
 }
 
-func NewObjectMethodIndex(object concept.Index, key string) *ObjectMethodIndex {
+func NewObjectMethodIndex(object concept.Index, key concept.KeySpecimen) *ObjectMethodIndex {
 	return &ObjectMethodIndex{
 		key:    key,
 		object: object,

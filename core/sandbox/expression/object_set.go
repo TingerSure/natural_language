@@ -11,13 +11,13 @@ import (
 
 type ObjectSet struct {
 	*adaptor.ExpressionIndex
-	key    string
+	key    concept.KeySpecimen
 	object concept.Index
 	value  concept.Index
 }
 
 func (a *ObjectSet) ToString(prefix string) string {
-	return fmt.Sprintf("%v.%v = %v", a.object.ToString(prefix), a.key, a.value.ToString(prefix))
+	return fmt.Sprintf("%v.%v = %v", a.object.ToString(prefix), a.key.ToString(prefix), a.value.ToString(prefix))
 }
 
 func (a *ObjectSet) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
@@ -43,7 +43,7 @@ func (a *ObjectSet) Exec(space concept.Closure) (concept.Variable, concept.Inter
 	return preObject, nil
 }
 
-func NewObjectSet(object concept.Index, key string, value concept.Index) *ObjectSet {
+func NewObjectSet(object concept.Index, key concept.KeySpecimen, value concept.Index) *ObjectSet {
 	back := &ObjectSet{
 		key:    key,
 		object: object,

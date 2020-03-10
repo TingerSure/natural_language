@@ -14,7 +14,7 @@ type ClassRegister struct {
 	*adaptor.ExpressionIndex
 	object  concept.Index
 	class   concept.Index
-	mapping map[string]string
+	mapping map[concept.KeySpecimen]concept.KeySpecimen
 	alias   string
 }
 
@@ -22,7 +22,7 @@ func (a *ClassRegister) ToString(prefix string) string {
 	subprefix := fmt.Sprintf("%v\t", prefix)
 	items := []string{}
 	for key, value := range a.mapping {
-		items = append(items, fmt.Sprintf("%v%v : %v", subprefix, key, value))
+		items = append(items, fmt.Sprintf("%v%v : %v", subprefix, key.ToString(subprefix), value.ToString(subprefix)))
 	}
 	return fmt.Sprintf("%v <- %v <%v> {\n%v\n%v}",
 		a.object.ToString(prefix),
@@ -52,20 +52,14 @@ func (a *ClassRegister) Exec(space concept.Closure) (concept.Variable, concept.I
 		return nil, interrupt.NewException("type error", "Only Class can be use in ClassRegister")
 	}
 
-	for classKey, _ := range class.AllFields() {
-		objectKey := a.mapping[classKey]
-		if objectKey == "" {
-			return nil, interrupt.NewException("type error", fmt.Sprintf("ClassKey \"%v\" is not found in mapping.", classKey))
-		}
-		if !object.HasField(objectKey) {
-			return nil, interrupt.NewException("type error", fmt.Sprintf("ObjectKey \"%v\" is not found in object.", objectKey))
-		}
+	if object.CheckMapping(class, a.mapping) {
+		return nil, interrupt.NewException("type error", fmt.Sprintf("Class \"%v\" cannot register to Object \"%v\".", a.class.ToString(""), a.object.ToString("")))
 	}
 
 	return object, object.AddClass(class, a.alias, a.mapping)
 }
 
-func NewClassRegister(object concept.Index, class concept.Index, mapping map[string]string, alias string) *ClassRegister {
+func NewClassRegister(object concept.Index, class concept.Index, mapping map[concept.KeySpecimen]concept.KeySpecimen, alias string) *ClassRegister {
 	back := &ClassRegister{
 		object:  object,
 		class:   class,

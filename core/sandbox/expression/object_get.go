@@ -11,12 +11,12 @@ import (
 
 type ObjectGet struct {
 	*adaptor.ExpressionIndex
-	key    string
+	key    concept.KeySpecimen
 	object concept.Index
 }
 
 func (a *ObjectGet) ToString(prefix string) string {
-	return fmt.Sprintf("%v.%v", a.object.ToString(prefix), a.key)
+	return fmt.Sprintf("%v.%v", a.object.ToString(prefix), a.key.ToString(prefix))
 }
 
 func (a *ObjectGet) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
@@ -40,7 +40,7 @@ func (a *ObjectGet) Exec(space concept.Closure) (concept.Variable, concept.Inter
 	return value, nil
 }
 
-func NewObjectGet(object concept.Index, key string) *ObjectGet {
+func NewObjectGet(object concept.Index, key concept.KeySpecimen) *ObjectGet {
 	back := &ObjectGet{
 		key:    key,
 		object: object,
