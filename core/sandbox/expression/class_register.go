@@ -14,7 +14,7 @@ type ClassRegister struct {
 	*adaptor.ExpressionIndex
 	object  concept.Index
 	class   concept.Index
-	mapping map[concept.KeySpecimen]concept.KeySpecimen
+	mapping map[concept.String]concept.String
 	alias   string
 }
 
@@ -59,7 +59,7 @@ func (a *ClassRegister) Exec(space concept.Closure) (concept.Variable, concept.I
 	return object, object.AddClass(class, a.alias, a.mapping)
 }
 
-func NewClassRegister(object concept.Index, class concept.Index, mapping map[concept.KeySpecimen]concept.KeySpecimen, alias string) *ClassRegister {
+func NewClassRegister(object concept.Index, class concept.Index, mapping map[concept.String]concept.String, alias string) *ClassRegister {
 	back := &ClassRegister{
 		object:  object,
 		class:   class,

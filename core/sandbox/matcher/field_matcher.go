@@ -7,7 +7,7 @@ import (
 )
 
 type FieldMatcher struct {
-	fieldName concept.KeySpecimen
+	fieldName concept.String
 }
 
 func (c *FieldMatcher) ToString(prefix string) string {
@@ -22,7 +22,7 @@ func (c *FieldMatcher) Match(value concept.Variable) bool {
 	return object.HasField(c.fieldName)
 }
 
-func NewFieldMatcher(fieldName concept.KeySpecimen) *FieldMatcher {
+func NewFieldMatcher(fieldName concept.String) *FieldMatcher {
 	return &FieldMatcher{
 		fieldName: fieldName,
 	}

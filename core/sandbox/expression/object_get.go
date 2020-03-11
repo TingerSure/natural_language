@@ -11,7 +11,7 @@ import (
 
 type ObjectGet struct {
 	*adaptor.ExpressionIndex
-	key    concept.KeySpecimen
+	key    concept.String
 	object concept.Index
 }
 
@@ -40,7 +40,7 @@ func (a *ObjectGet) Exec(space concept.Closure) (concept.Variable, concept.Inter
 	return value, nil
 }
 
-func NewObjectGet(object concept.Index, key concept.KeySpecimen) *ObjectGet {
+func NewObjectGet(object concept.Index, key concept.String) *ObjectGet {
 	back := &ObjectGet{
 		key:    key,
 		object: object,

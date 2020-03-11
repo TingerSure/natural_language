@@ -11,7 +11,7 @@ import (
 
 type ObjectSet struct {
 	*adaptor.ExpressionIndex
-	key    concept.KeySpecimen
+	key    concept.String
 	object concept.Index
 	value  concept.Index
 }
@@ -43,7 +43,7 @@ func (a *ObjectSet) Exec(space concept.Closure) (concept.Variable, concept.Inter
 	return preObject, nil
 }
 
-func NewObjectSet(object concept.Index, key concept.KeySpecimen, value concept.Index) *ObjectSet {
+func NewObjectSet(object concept.Index, key concept.String, value concept.Index) *ObjectSet {
 	back := &ObjectSet{
 		key:    key,
 		object: object,

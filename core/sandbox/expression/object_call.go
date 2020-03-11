@@ -11,7 +11,7 @@ import (
 
 type ObjectCall struct {
 	*adaptor.ExpressionIndex
-	key    concept.KeySpecimen
+	key    concept.String
 	object concept.Index
 	param  concept.Index
 }
@@ -54,7 +54,7 @@ func (a *ObjectCall) Exec(space concept.Closure) (concept.Variable, concept.Inte
 	return method.Exec(param, object)
 }
 
-func NewObjectCall(object concept.Index, key concept.KeySpecimen, param concept.Index) *ObjectCall {
+func NewObjectCall(object concept.Index, key concept.String, param concept.Index) *ObjectCall {
 	if nl_interface.IsNil(param) {
 		param = objectCallDefaultParam
 	}

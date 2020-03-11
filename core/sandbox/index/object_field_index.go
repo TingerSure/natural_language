@@ -9,7 +9,7 @@ import (
 )
 
 type ObjectFieldIndex struct {
-	key    concept.KeySpecimen
+	key    concept.String
 	object concept.Index
 }
 
@@ -18,7 +18,7 @@ func (s *ObjectFieldIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 }
 
 func (s *ObjectFieldIndex) ToString(prefix string) string {
-	return fmt.Sprintf("%s.%s", s.object.ToString(prefix), s.key.ToString(""))
+	return fmt.Sprintf("%s.%s", s.object.ToString(prefix), s.key.ToString(prefix))
 }
 
 func (s *ObjectFieldIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
@@ -45,7 +45,7 @@ func (s *ObjectFieldIndex) Set(space concept.Closure, value concept.Variable) co
 	return object.SetField(s.key, value)
 }
 
-func NewObjectFieldIndex(object concept.Index, key concept.KeySpecimen) *ObjectFieldIndex {
+func NewObjectFieldIndex(object concept.Index, key concept.String) *ObjectFieldIndex {
 	return &ObjectFieldIndex{
 		key:    key,
 		object: object,

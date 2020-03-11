@@ -2,7 +2,7 @@ package concept
 
 type String interface {
 	Variable
-	Value()string
+	Value() string
 	GetSystem() string
 	SetSystem(string)
 	GetLanguage(string) string

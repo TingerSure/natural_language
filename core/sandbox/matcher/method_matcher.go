@@ -7,7 +7,7 @@ import (
 )
 
 type MethodMatcher struct {
-	methodName concept.KeySpecimen
+	methodName concept.String
 }
 
 func (c *MethodMatcher) ToString(prefix string) string {
@@ -22,7 +22,7 @@ func (c *MethodMatcher) Match(value concept.Variable) bool {
 	return object.HasMethod(c.methodName)
 }
 
-func NewMethodMatcher(methodName concept.KeySpecimen) *MethodMatcher {
+func NewMethodMatcher(methodName concept.String) *MethodMatcher {
 	return &MethodMatcher{
 		methodName: methodName,
 	}
