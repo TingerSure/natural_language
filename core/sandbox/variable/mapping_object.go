@@ -12,7 +12,7 @@ const (
 )
 
 type MappingObject struct {
-	mapping   map[concept.KeySpecimen]concept.KeySpecimen
+	mapping   map[concept.String]concept.String
 	alias     string
 	class     concept.Class
 	className string
@@ -69,18 +69,18 @@ func (m *MappingObject) IsClassAlias(className string, alias string) bool {
 	return className == m.className && alias == m.alias
 }
 
-func (m *MappingObject) GetMapping(className string, alias string) (map[concept.KeySpecimen]concept.KeySpecimen, concept.Exception) {
+func (m *MappingObject) GetMapping(className string, alias string) (map[concept.String]concept.String, concept.Exception) {
 	if className != m.className || alias != m.alias {
 		return nil, interrupt.NewException("system error", fmt.Sprintf("No mapping who's class is \"%v\" and alias is \"%v\"", className, alias))
 	}
-	var mapping map[concept.KeySpecimen]concept.KeySpecimen
+	var mapping map[concept.String]concept.String
 	for key, _ := range m.mapping {
 		mapping[key] = key
 	}
 	return mapping, nil
 }
 
-func (m *MappingObject) CheckMapping(concept.Class, map[concept.KeySpecimen]concept.KeySpecimen) bool {
+func (m *MappingObject) CheckMapping(concept.Class, map[concept.String]concept.String) bool {
 	return false
 	// TODO
 }
@@ -96,12 +96,12 @@ func (m *MappingObject) Type() string {
 	return VariableMappingObjectType
 }
 
-func (m *MappingObject) specimenClassToObject(specimen concept.KeySpecimen) concept.KeySpecimen {
-	var objectSpecimen concept.KeySpecimen = nil
-	m.class.IterateFields(func(key concept.Key, _ concept.Variable) bool {
-		if key.Is(specimen) {
+func (m *MappingObject) specimenClassToObject(specimen concept.String) concept.String {
+	var objectSpecimen concept.String = nil
+	m.class.IterateFields(func(key concept.String, _ concept.Variable) bool {
+		if key.EqualLanguage(specimen) {
 			for target, source := range m.mapping {
-				if key.Is(target) {
+				if key.EqualLanguage(target) {
 					objectSpecimen = source
 					break
 				}
@@ -113,31 +113,31 @@ func (m *MappingObject) specimenClassToObject(specimen concept.KeySpecimen) conc
 	return objectSpecimen
 }
 
-func (m *MappingObject) SetField(specimen concept.KeySpecimen, value concept.Variable) concept.Exception {
+func (m *MappingObject) SetField(specimen concept.String, value concept.Variable) concept.Exception {
 	return m.object.SetField(m.specimenClassToObject(specimen), value)
 }
 
-func (m *MappingObject) GetField(specimen concept.KeySpecimen) (concept.Variable, concept.Exception) {
+func (m *MappingObject) GetField(specimen concept.String) (concept.Variable, concept.Exception) {
 	return m.object.GetField(m.specimenClassToObject(specimen))
 }
 
-func (m *MappingObject) InitField(concept.KeySpecimen, concept.Variable) concept.Exception {
+func (m *MappingObject) InitField(concept.String, concept.Variable) concept.Exception {
 	return interrupt.NewException("system error", "Mapping object cannot init.")
 }
 
-func (m *MappingObject) HasField(specimen concept.KeySpecimen) bool {
+func (m *MappingObject) HasField(specimen concept.String) bool {
 	return !nl_interface.IsNil(m.specimenClassToObject(specimen))
 }
 
-func (m *MappingObject) HasMethod(specimen concept.KeySpecimen) bool {
+func (m *MappingObject) HasMethod(specimen concept.String) bool {
 	return m.class.HasMethod(specimen)
 }
 
-func (m *MappingObject) SetMethod(specimen concept.KeySpecimen, value concept.Function) concept.Exception {
+func (m *MappingObject) SetMethod(specimen concept.String, value concept.Function) concept.Exception {
 	return interrupt.NewException("system error", "Mapping object cannot set method.")
 }
 
-func (m *MappingObject) GetMethod(specimen concept.KeySpecimen) (concept.Function, concept.Exception) {
+func (m *MappingObject) GetMethod(specimen concept.String) (concept.Function, concept.Exception) {
 	value := m.class.GetMethod(specimen)
 	if nl_interface.IsNil(value) {
 		return nil, interrupt.NewException("system error", fmt.Sprintf("no method called %v", specimen.ToString("")))

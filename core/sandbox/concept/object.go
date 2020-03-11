@@ -7,15 +7,15 @@ type Object interface {
 	GetClass(string) Class
 	GetAliases(string) []string
 	IsClassAlias(string, string) bool
-	GetMapping(string, string) (map[KeySpecimen]KeySpecimen, Exception)
-	CheckMapping(Class, map[KeySpecimen]KeySpecimen) bool
+	GetMapping(string, string) (map[String]String, Exception)
+	CheckMapping(Class, map[String]String) bool
 
-	InitField(KeySpecimen, Variable) Exception
-	HasField(KeySpecimen) bool
-	SetField(KeySpecimen, Variable) Exception
-	GetField(KeySpecimen) (Variable, Exception)
+	InitField(String, Variable) Exception
+	HasField(String) bool
+	SetField(String, Variable) Exception
+	GetField(String) (Variable, Exception)
 
-	HasMethod(KeySpecimen) bool
-	SetMethod(KeySpecimen, Function) Exception
-	GetMethod(KeySpecimen) (Function, Exception)
+	HasMethod(String) bool
+	SetMethod(String, Function) Exception
+	GetMethod(String) (Function, Exception)
 }

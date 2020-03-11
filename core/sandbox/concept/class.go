@@ -5,27 +5,27 @@ type Class interface {
 
 	GetName() string
 
-	SetMethod(key KeySpecimen, action Function)
-	GetMethod(key KeySpecimen) Function
-	HasMethod(key KeySpecimen) bool
+	SetMethod(key String, action Function)
+	GetMethod(key String) Function
+	HasMethod(key String) bool
 	SizeMethod() int
-	IterateMethods(func(key Key, value Function) bool) bool
+	IterateMethods(func(key String, value Function) bool) bool
 
-	SetField(key KeySpecimen, defaultField Variable)
-	GetField(key KeySpecimen) Variable
-	HasField(key KeySpecimen) bool
+	SetField(key String, defaultField Variable)
+	GetField(key String) Variable
+	HasField(key String) bool
 	SizeField() int
-	IterateFields(func(key Key, value Variable) bool) bool
+	IterateFields(func(key String, value Variable) bool) bool
 
-	SetStaticMethod(key KeySpecimen, action Function)
-	GetStaticMethod(key KeySpecimen) Function
-	HasStaticMethod(key KeySpecimen) bool
+	SetStaticMethod(key String, action Function)
+	GetStaticMethod(key String) Function
+	HasStaticMethod(key String) bool
 	SizeStaticMethod() int
-	IterateStaticMethods(func(key Key, value Function) bool) bool
+	IterateStaticMethods(func(key String, value Function) bool) bool
 
-	SetStaticField(key KeySpecimen, action Variable)
-	GetStaticField(key KeySpecimen) Variable
-	HasStaticField(key KeySpecimen) bool
+	SetStaticField(key String, action Variable)
+	GetStaticField(key String) Variable
+	HasStaticField(key String) bool
 	SizeStaticField() int
-	IterateStaticFields(func(key Key, value Variable) bool) bool
+	IterateStaticFields(func(key String, value Variable) bool) bool
 }

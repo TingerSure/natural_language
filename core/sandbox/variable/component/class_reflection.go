@@ -7,14 +7,14 @@ import (
 type ClassReflection struct {
 	class   concept.Class
 	alias   string
-	mapping map[concept.KeySpecimen]concept.KeySpecimen
+	mapping map[concept.String]concept.String
 }
 
-func (c *ClassReflection) SetMapping(mapping map[concept.KeySpecimen]concept.KeySpecimen) {
+func (c *ClassReflection) SetMapping(mapping map[concept.String]concept.String) {
 	c.mapping = mapping
 }
 
-func (c *ClassReflection) GetMapping() map[concept.KeySpecimen]concept.KeySpecimen {
+func (c *ClassReflection) GetMapping() map[concept.String]concept.String {
 	return c.mapping
 }
 
@@ -38,7 +38,7 @@ func NewClassReflection(class concept.Class) *ClassReflection {
 
 func NewClassReflectionWithMapping(
 	class concept.Class,
-	mapping map[concept.KeySpecimen]concept.KeySpecimen,
+	mapping map[concept.String]concept.String,
 	alias string,
 ) *ClassReflection {
 	return &ClassReflection{
