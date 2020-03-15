@@ -18,48 +18,52 @@ const (
 )
 
 type Std struct {
-	*tree.PageAdaptor
-	param *StdParam
+	*tree.Page
+	param        *StdParam
+	PrintContent concept.String
+	ErrorContent concept.String
 }
 
 func (s *Std) Print(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 	if s.param != nil || !nl_interface.IsNil(input) {
-		s.param.Print(input.Get(PrintContent))
+		s.param.Print(input.Get(s.PrintContent))
 	}
 	return input, nil
 }
 
 func (s *Std) Error(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 	if s.param != nil || !nl_interface.IsNil(input) {
-		s.param.Error(input.Get(ErrorContent))
+		s.param.Error(input.Get(s.ErrorContent))
 	}
 	return input, nil
 }
 
 func NewStd(param *StdParam) *Std {
 	instance := &Std{
-		param:       param,
-		PageAdaptor: tree.NewPageAdaptor(),
+		param:        param,
+		Page:         tree.NewPage(),
+		PrintContent: variable.NewString(PrintContent),
+		ErrorContent: variable.NewString(ErrorContent),
 	}
-	instance.SetFunction("Print", variable.NewSystemFunction(
+	instance.SetFunction(variable.NewString("Print"), variable.NewSystemFunction(
 		instance.Print,
-		[]string{
-			PrintContent,
+		[]concept.String{
+			instance.PrintContent,
 		},
-		[]string{
-			PrintContent,
+		[]concept.String{
+			instance.PrintContent,
 		},
 	))
-	instance.SetFunction("Error", variable.NewSystemFunction(
+	instance.SetFunction(variable.NewString("Error"), variable.NewSystemFunction(
 		instance.Error,
-		[]string{
-			ErrorContent,
+		[]concept.String{
+			instance.ErrorContent,
 		},
-		[]string{
-			ErrorContent,
+		[]concept.String{
+			instance.ErrorContent,
 		},
 	))
-	instance.SetConst("PrintContent", PrintContent)
-	instance.SetConst("ErrorContent", ErrorContent)
+	instance.SetConst(variable.NewString("PrintContent"), instance.PrintContent)
+	instance.SetConst(variable.NewString("ErrorContent"), instance.ErrorContent)
 	return instance
 }

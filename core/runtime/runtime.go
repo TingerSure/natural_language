@@ -8,6 +8,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox"
 	"github.com/TingerSure/natural_language/core/sandbox/closure"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"os"
 )
@@ -110,14 +111,17 @@ type RuntimeParam struct {
 }
 
 func NewRuntime(param *RuntimeParam) *Runtime {
-
 	runtime := &Runtime{
 		lexer:     lexer.NewLexer(),
 		grammar:   grammar.NewGrammar(),
 		ambiguity: ambiguity.NewAmbiguity(),
 		libs:      tree.NewLibraryManager(),
 		languages: tree.NewLanguageManager(),
-		rootSpace: closure.NewClosure(nil),
+		rootSpace: closure.NewClosure(nil, &closure.ClosureParam{
+			StringCreator: func(value string) concept.String {
+				return variable.NewString(value)
+			},
+		}),
 	}
 	runtime.box = sandbox.NewSandbox(&sandbox.SandboxParam{
 		Root: runtime.rootSpace,

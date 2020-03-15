@@ -2,7 +2,7 @@ package concept
 
 type Param interface {
 	Variable
-	Set(key string, value Variable)
-	Get(key string) Variable
-	Init(params map[string]Variable)
+	Set(String, Variable)
+	Get(String) Variable
+	Init(func(func(String, Variable) bool) bool)
 }

@@ -3,6 +3,7 @@ package index
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 const (
@@ -21,11 +22,11 @@ func (s *ThisIndex) ToString(prefix string) string {
 }
 
 func (s *ThisIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
-	return space.GetBubble(thisIndexKey)
+	return space.GetBubble(variable.NewString(thisIndexKey))
 }
 
 func (s *ThisIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
-	return interrupt.NewException("read only", "This cannot be changed.")
+	return interrupt.NewException(variable.NewString("read only"), variable.NewString("This cannot be changed."))
 
 }
 

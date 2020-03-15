@@ -28,7 +28,7 @@ func (s *SearchIndex) ToString(prefix string) string {
 
 func (s *SearchIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	var selected concept.Variable = nil
-	space.IterateHistory(func(key string, value concept.Variable) bool {
+	space.IterateHistory(func(_ concept.String, value concept.Variable) bool {
 		for _, item := range s.items {
 			if !item.Match(value) {
 				return false
@@ -44,7 +44,7 @@ func (s *SearchIndex) Get(space concept.Closure) (concept.Variable, concept.Inte
 }
 
 func (s *SearchIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
-	return interrupt.NewException("read only", "Search index cannot be changed.")
+	return interrupt.NewException(variable.NewString("read only"), variable.NewString("Search index cannot be changed."))
 }
 
 func NewSearchIndex(items []concept.Matcher) *SearchIndex {

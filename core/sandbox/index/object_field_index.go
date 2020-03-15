@@ -28,7 +28,7 @@ func (s *ObjectFieldIndex) Get(space concept.Closure) (concept.Variable, concept
 	}
 	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
 	if !ok {
-		return nil, interrupt.NewException("type error", "There is not an effective object When system call the ObjectFieldIndex.Get")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("There is not an effective object When system call the ObjectFieldIndex.Get"))
 	}
 	return object.GetField(s.key)
 }
@@ -40,7 +40,7 @@ func (s *ObjectFieldIndex) Set(space concept.Closure, value concept.Variable) co
 	}
 	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
 	if !ok {
-		return interrupt.NewException("type error", "There is not an effective object When system call the ObjectFieldIndex.Set")
+		return interrupt.NewException(variable.NewString("type error"), variable.NewString("There is not an effective object When system call the ObjectFieldIndex.Set"))
 	}
 	return object.SetField(s.key, value)
 }

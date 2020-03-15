@@ -44,7 +44,7 @@ func (s *ResaultIndex) Get(space concept.Closure) (concept.Variable, concept.Int
 }
 
 func (s *ResaultIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
-	return interrupt.NewException("read only", "Resault index cannot be changed.")
+	return interrupt.NewException(variable.NewString("read only"), variable.NewString("Resault index cannot be changed."))
 }
 
 func NewResaultIndex(items []concept.Matcher) *ResaultIndex {

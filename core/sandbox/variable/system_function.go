@@ -11,16 +11,16 @@ const (
 )
 
 type SystemFunction struct {
-	paramNames  []string
-	returnNames []string
+	paramNames  []concept.String
+	returnNames []concept.String
 	funcs       func(concept.Param, concept.Object) (concept.Param, concept.Exception)
 }
 
-func (s *SystemFunction) ParamNames() []string {
+func (s *SystemFunction) ParamNames() []concept.String {
 	return s.paramNames
 }
 
-func (s *SystemFunction) ReturnNames() []string {
+func (s *SystemFunction) ReturnNames() []concept.String {
 	return s.returnNames
 }
 
@@ -42,8 +42,8 @@ func (s *SystemFunction) FunctionType() string {
 
 func NewSystemFunction(
 	funcs func(concept.Param, concept.Object) (concept.Param, concept.Exception),
-	paramNames []string,
-	returnNames []string,
+	paramNames []concept.String,
+	returnNames []concept.String,
 ) *SystemFunction {
 	return &SystemFunction{
 		funcs: funcs,

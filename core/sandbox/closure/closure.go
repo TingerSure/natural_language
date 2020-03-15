@@ -3,6 +3,7 @@ package closure
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/sandbox/component"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 )
@@ -13,18 +14,16 @@ const (
 )
 
 type Closure struct {
-	returns   map[string]concept.Variable
-	value     map[string]concept.Variable
-	local     map[string]bool
+	param     *ClosureParam
+	returns   *component.Mapping //map[string]concept.Variable
+	local     *component.Mapping //map[string]concept.Variable
 	parent    concept.Closure
 	history   *History
 	extempore *Extempore
 }
 
-func (c *Closure) IterateHistory(match func(string, concept.Variable) bool) bool {
-	var selectedKey string
-	var selectedTypes int
-	ok := c.history.Iterate(func(key string, types int) bool {
+func (c *Closure) IterateHistory(match func(concept.String, concept.Variable) bool) bool {
+	return c.history.Iterate(func(key concept.String, types int) bool {
 		var value concept.Variable
 		var suspend concept.Interrupt
 		switch types {
@@ -39,46 +38,42 @@ func (c *Closure) IterateHistory(match func(string, concept.Variable) bool) bool
 				return false
 			}
 		}
-		selectedKey = key
-		selectedTypes = types
-		return match(key, value)
+		if match(key, value) {
+			c.history.Set(key, types)
+			return true
+		}
+		return false
 	})
-	if ok {
-		c.history.Set(selectedKey, selectedTypes)
-	}
-	return ok
 }
 
 func (c *Closure) IterateExtempore(match func(concept.Index, concept.Variable) bool) bool {
 	return c.extempore.Iterate(match)
 }
 
-func (c *Closure) IterateLocal(match func(string, concept.Variable) bool) bool {
-	for key, value := range c.value {
-		if match(key, value) {
+func (c *Closure) IterateLocal(match func(concept.String, concept.Variable) bool) bool {
+	return c.local.Iterate(func(key concept.String, value interface{}) bool {
+		if match(key, value.(concept.Variable)) {
 			c.history.Set(key, historyTypeLocal)
 			return true
 		}
-	}
-	return false
+		return false
+	})
 }
 
-func (c *Closure) IterateBubble(match func(string, concept.Variable) bool) bool {
+func (c *Closure) IterateBubble(match func(concept.String, concept.Variable) bool) bool {
 	if c.IterateLocal(match) {
 		return true
 	}
-	if c.parent == nil {
+	if nl_interface.IsNil(c.parent) {
 		return false
 	}
-	var selectedKey string
-	ok := c.parent.IterateBubble(func(key string, value concept.Variable) bool {
-		selectedKey = key
-		return match(key, value)
+	return c.parent.IterateBubble(func(key concept.String, value concept.Variable) bool {
+		if match(key, value.(concept.Variable)) {
+			c.history.Set(key, historyTypeBubble)
+			return true
+		}
+		return false
 	})
-	if ok {
-		c.history.Set(selectedKey, historyTypeBubble)
-	}
-	return ok
 }
 
 func (c *Closure) SetParent(parent concept.Closure) {
@@ -89,58 +84,64 @@ func (c *Closure) AddExtempore(index concept.Index, value concept.Variable) {
 	c.extempore.Add(index, value)
 }
 
-func (c *Closure) SetReturn(key string, value concept.Variable) {
-	c.returns[key] = value
+func (c *Closure) SetReturn(key concept.String, value concept.Variable) {
+	c.returns.Set(key, value)
 }
 
 func (c *Closure) MergeReturn(other concept.Closure) {
-	for key, value := range other.Return() {
-		c.returns[key] = value
-	}
+	other.IterateReturn(func(key concept.String, value concept.Variable) bool {
+		c.returns.Set(key, value)
+		return false
+	})
 }
 
-func (c *Closure) Return() map[string]concept.Variable {
-	return c.returns
+func (c *Closure) IterateReturn(on func(key concept.String, value concept.Variable) bool) bool {
+	return c.returns.Iterate(func(key concept.String, value interface{}) bool {
+		return on(key, value.(concept.Variable))
+	})
 }
 
-func (c *Closure) InitLocal(key string) {
-	c.local[key] = true
+func (c *Closure) InitLocal(key concept.String, defaultValue concept.Variable) {
+	c.local.Init(key, defaultValue)
 }
 
-func (c *Closure) GetLocal(key string) (concept.Variable, concept.Interrupt) {
-	if !c.local[key] {
-		return nil, interrupt.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
-	}
-	c.history.Set(key, historyTypeLocal)
-	return c.value[key], nil
-}
-
-func (c *Closure) SetLocal(key string, value concept.Variable) concept.Interrupt {
-	if !c.local[key] {
-		return interrupt.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
+func (c *Closure) GetLocal(key concept.String) (concept.Variable, concept.Interrupt) {
+	value := c.local.Get(key)
+	if nl_interface.IsNil(value) {
+		return nil, interrupt.NewException(c.param.StringCreator("none pionter"), c.param.StringCreator(fmt.Sprintf("Undefined variable: \"%v\".", key)))
 	}
 	c.history.Set(key, historyTypeLocal)
-	c.value[key] = value
+	return value.(concept.Variable), nil
+}
+
+func (c *Closure) SetLocal(key concept.String, value concept.Variable) concept.Interrupt {
+	if !c.local.Set(key, value) {
+		return interrupt.NewException(c.param.StringCreator("none pionter"), c.param.StringCreator(fmt.Sprintf("Undefined variable: \"%v\".", key)))
+	}
+	c.history.Set(key, historyTypeLocal)
 	return nil
 }
 
-func (c *Closure) GetBubble(key string) (concept.Variable, concept.Interrupt) {
-	if c.local[key] {
-		return c.GetLocal(key)
+func (c *Closure) GetBubble(key concept.String) (concept.Variable, concept.Interrupt) {
+	value, suspend := c.GetLocal(key)
+	if nl_interface.IsNil(suspend) {
+		c.history.Set(key, historyTypeBubble)
+		return value, nil
 	}
 	if c.parent != nil {
-		value, suspend := c.parent.GetBubble(key)
+		value, suspend = c.parent.GetBubble(key)
 		if nl_interface.IsNil(suspend) {
 			c.history.Set(key, historyTypeBubble)
 		}
 		return value, suspend
 	}
-	return nil, interrupt.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
+	return nil, interrupt.NewException(c.param.StringCreator("none pionter"), c.param.StringCreator(fmt.Sprintf("Undefined variable: \"%v\".", key)))
 }
 
-func (c *Closure) SetBubble(key string, value concept.Variable) concept.Interrupt {
-	if c.local[key] {
-		return c.SetLocal(key, value)
+func (c *Closure) SetBubble(key concept.String, value concept.Variable) concept.Interrupt {
+	suspend := c.SetLocal(key, value)
+	if nl_interface.IsNil(suspend) {
+		return nil
 	}
 	if c.parent != nil {
 		suspend := c.parent.SetBubble(key, value)
@@ -149,19 +150,27 @@ func (c *Closure) SetBubble(key string, value concept.Variable) concept.Interrup
 		}
 		return suspend
 	}
-	return interrupt.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
+	return interrupt.NewException(c.param.StringCreator("none pionter"), c.param.StringCreator(fmt.Sprintf("Undefined variable: \"%v\".", key)))
 }
 
 func (c *Closure) Clear() {
 }
 
-func NewClosure(parent concept.Closure) *Closure {
+type ClosureParam struct {
+	StringCreator func(string) concept.String
+}
+
+func NewClosure(parent concept.Closure, param *ClosureParam) *Closure {
 	return &Closure{
 		parent:    parent,
-		returns:   make(map[string]concept.Variable),
-		value:     make(map[string]concept.Variable),
-		local:     make(map[string]bool),
+		param:     param,
 		history:   NewHistory(),
 		extempore: NewExtempore(),
+		returns: component.NewMapping(&component.MappingParam{
+			AutoInit: true,
+		}),
+		local: component.NewMapping(&component.MappingParam{
+			AutoInit: false,
+		}),
 	}
 }

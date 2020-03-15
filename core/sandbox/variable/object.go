@@ -3,9 +3,9 @@ package variable
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/sandbox/component"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
-	"github.com/TingerSure/natural_language/core/sandbox/variable/component"
 	"strings"
 )
 
@@ -94,7 +94,7 @@ func (o *Object) GetMapping(class string, alias string) (map[concept.String]conc
 			return reflection.GetMapping(), nil
 		}
 	}
-	return nil, interrupt.NewException("system error", fmt.Sprintf("No mapping who's class is \"%v\" and alias is \"%v\"", class, alias))
+	return nil, interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("No mapping who's class is \"%v\" and alias is \"%v\"", class, alias)))
 }
 
 func (o *Object) RemoveClass(class string, alias string) concept.Exception {
@@ -104,14 +104,14 @@ func (o *Object) RemoveClass(class string, alias string) concept.Exception {
 			return nil
 		}
 	}
-	return interrupt.NewException("system error", fmt.Sprintf("No class who's name is \"%v\" and alias is \"%v\"", class, alias))
+	return interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("No class who's name is \"%v\" and alias is \"%v\"", class, alias)))
 
 }
 
 func (o *Object) AddClass(class concept.Class, alias string, mapping map[concept.String]concept.String) concept.Exception {
 	for _, old := range o.reflections {
 		if old.GetClass().GetName() == class.GetName() && old.GetAlias() == alias {
-			return interrupt.NewException("system error", "Duplicate class reflections are added.")
+			return interrupt.NewException(NewString("system error"), NewString("Duplicate class reflections are added."))
 		}
 	}
 	o.reflections = append(o.reflections, component.NewClassReflectionWithMapping(class, mapping, alias))
@@ -131,7 +131,7 @@ func (o *Object) InitField(specimen concept.String, defaultValue concept.Variabl
 
 func (o *Object) SetField(specimen concept.String, value concept.Variable) concept.Exception {
 	if !o.fields.Has(specimen) {
-		return interrupt.NewException("system error", fmt.Sprintf("There is no field called \"%v\" to be set here.", specimen.ToString("")))
+		return interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("There is no field called \"%v\" to be set here.", specimen.ToString(""))))
 	}
 	o.fields.Set(specimen, value)
 	return nil
@@ -140,7 +140,7 @@ func (o *Object) SetField(specimen concept.String, value concept.Variable) conce
 func (o *Object) GetField(specimen concept.String) (concept.Variable, concept.Exception) {
 	value := o.fields.Get(specimen)
 	if nl_interface.IsNil(value) {
-		return nil, interrupt.NewException("system error", fmt.Sprintf("There is no field called \"%v\" to be got here.", specimen.ToString("")))
+		return nil, interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("There is no field called \"%v\" to be got here.", specimen.ToString(""))))
 	}
 	return value.(concept.Variable), nil
 }
@@ -157,7 +157,7 @@ func (o *Object) SetMethod(specimen concept.String, value concept.Function) conc
 func (o *Object) GetMethod(specimen concept.String) (concept.Function, concept.Exception) {
 	value := o.methods.Get(specimen)
 	if nl_interface.IsNil(value) {
-		return nil, interrupt.NewException("system error", fmt.Sprintf("no method called %v", specimen.ToString("")))
+		return nil, interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("no method called %v", specimen.ToString(""))))
 	}
 	return value.(concept.Function), nil
 }

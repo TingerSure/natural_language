@@ -104,3 +104,11 @@ func NewString(value string) *String {
 		mapping: make(map[string]string),
 	}
 }
+
+func StringJoin(values []concept.String, separator string) string {
+	paramsToString := make([]string, 0, len(values))
+	for _, value := range values {
+		paramsToString = append(paramsToString, value.ToString(""))
+	}
+	return strings.Join(paramsToString, separator)
+}

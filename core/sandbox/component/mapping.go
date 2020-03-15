@@ -1,6 +1,7 @@
 package component
 
 import (
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 )
 
@@ -13,10 +14,26 @@ func (k *Mapping) Size() int {
 	return len(k.values)
 }
 
+func (k *Mapping) Init(specimen concept.String, defaultValue interface{}) bool {
+	exist := k.Iterate(func(key concept.String, value interface{}) bool {
+		if key.EqualLanguage(specimen) {
+			if nl_interface.IsNil(value) {
+				k.values[specimen.Clone()] = defaultValue
+			}
+			return true
+		}
+		return false
+	})
+	if !exist {
+		k.values[specimen.Clone()] = defaultValue
+	}
+	return exist
+}
+
 func (k *Mapping) Set(specimen concept.String, value interface{}) bool {
 	exist := k.Iterate(func(key concept.String, _ interface{}) bool {
 		if key.EqualLanguage(specimen) {
-			k.values[key] = value
+			k.values[specimen.Clone()] = value
 			return true
 		}
 		return false

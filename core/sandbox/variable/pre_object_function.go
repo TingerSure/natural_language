@@ -16,11 +16,11 @@ type PreObjectFunction struct {
 	object   concept.Object
 }
 
-func (s *PreObjectFunction) ParamNames() []string {
+func (s *PreObjectFunction) ParamNames() []concept.String {
 	return s.function.ParamNames()
 }
 
-func (s *PreObjectFunction) ReturnNames() []string {
+func (s *PreObjectFunction) ReturnNames() []concept.String {
 	return s.function.ReturnNames()
 }
 

@@ -29,7 +29,7 @@ func (s *ObjectMethodIndex) Get(space concept.Closure) (concept.Variable, concep
 
 	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
 	if !ok {
-		return nil, interrupt.NewException("type error", "There is not an effective object When system call the ObjectMethodIndex.Get")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("There is not an effective object When system call the ObjectMethodIndex.Get"))
 	}
 
 	function, suspend := object.GetMethod(s.key)
@@ -37,7 +37,7 @@ func (s *ObjectMethodIndex) Get(space concept.Closure) (concept.Variable, concep
 		return nil, suspend
 	}
 	if nl_interface.IsNil(function) {
-		return nil, interrupt.NewException("runtime error", fmt.Sprintf("Object don't have a method named %s.", s.key))
+		return nil, interrupt.NewException(variable.NewString("runtime error"), variable.NewString(fmt.Sprintf("Object don't have a method named %s.", s.key)))
 	}
 
 	return variable.NewPreObjectFunction(function, object), nil
@@ -50,12 +50,12 @@ func (s *ObjectMethodIndex) Set(space concept.Closure, preFunction concept.Varia
 	}
 	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
 	if !ok {
-		return interrupt.NewException("type error", "There is not an effective object When system call the ObjectMethodIndex.Set")
+		return interrupt.NewException(variable.NewString("type error"), variable.NewString("There is not an effective object When system call the ObjectMethodIndex.Set"))
 	}
 
 	function, ok := variable.VariableFamilyInstance.IsFunctionHome(preFunction)
 	if !ok {
-		return interrupt.NewException("type error", "There is not an effective function When system call the ObjectMethodIndex.Set")
+		return interrupt.NewException(variable.NewString("type error"), variable.NewString("There is not an effective function When system call the ObjectMethodIndex.Set"))
 	}
 
 	return object.SetMethod(s.key, function)

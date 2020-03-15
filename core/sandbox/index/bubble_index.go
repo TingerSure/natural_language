@@ -5,7 +5,7 @@ import (
 )
 
 type BubbleIndex struct {
-	key string
+	key concept.String
 }
 
 func (s *BubbleIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
@@ -13,7 +13,7 @@ func (s *BubbleIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 }
 
 func (s *BubbleIndex) ToString(prefix string) string {
-	return s.key
+	return s.key.ToString(prefix)
 }
 
 func (s *BubbleIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
@@ -24,7 +24,7 @@ func (s *BubbleIndex) Set(space concept.Closure, value concept.Variable) concept
 	return space.SetBubble(s.key, value)
 }
 
-func NewBubbleIndex(key string) *BubbleIndex {
+func NewBubbleIndex(key concept.String) *BubbleIndex {
 	return &BubbleIndex{
 		key: key,
 	}

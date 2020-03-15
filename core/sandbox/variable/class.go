@@ -2,8 +2,8 @@ package variable
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/sandbox/component"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/variable/component"
 	"strings"
 )
 

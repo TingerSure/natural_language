@@ -10,8 +10,8 @@ const (
 )
 
 type Exception struct {
-	name    string
-	message string
+	name    concept.String
+	message concept.String
 	stacks  []concept.ExceptionStack
 }
 
@@ -30,7 +30,7 @@ func (e *Exception) AddStack(stack concept.ExceptionStack) concept.Exception {
 }
 
 func (e *Exception) Copy() concept.Exception {
-	newOne := NewException(e.name, e.message)
+	newOne := NewException(e.name.Clone(), e.message.Clone())
 	e.IterateStacks(func(stack concept.ExceptionStack) bool {
 		newOne.AddStack(stack)
 		return false
@@ -42,19 +42,19 @@ func (e *Exception) InterruptType() string {
 	return ExceptionInterruptType
 }
 
-func (e *Exception) Name() string {
+func (e *Exception) Name() concept.String {
 	return e.name
 }
 
-func (e *Exception) Message() string {
+func (e *Exception) Message() concept.String {
 	return e.message
 }
 
 func (e *Exception) ToString(prefix string) string {
-	return fmt.Sprintf("[%v] %v", e.name, e.message)
+	return fmt.Sprintf("[%v] %v", e.name.ToString(prefix), e.message.ToString(prefix))
 }
 
-func NewException(name string, message string) *Exception {
+func NewException(name concept.String, message concept.String) *Exception {
 	return &Exception{
 		name:    name,
 		message: message,

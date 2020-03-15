@@ -123,11 +123,16 @@ func (f *For) End() *code_block.CodeBlock {
 }
 
 func NewFor() *For {
+	param := &code_block.CodeBlockParam{
+		StringCreator: func(value string) concept.String {
+			return variable.NewString(value)
+		},
+	}
 	back := &For{
 		tag:  "",
-		init: code_block.NewCodeBlock(),
-		end:  code_block.NewCodeBlock(),
-		body: code_block.NewCodeBlock(),
+		init: code_block.NewCodeBlock(param),
+		end:  code_block.NewCodeBlock(param),
+		body: code_block.NewCodeBlock(param),
 	}
 	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
 	return back

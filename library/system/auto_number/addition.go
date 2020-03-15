@@ -50,5 +50,5 @@ func init() {
 		},
 	)
 
-	AutoNumberClass.SetMethod(AdditionKey, Addition)
+	AutoNumberClass.SetMethod(variable.NewString(AdditionKey), Addition)
 }

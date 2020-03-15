@@ -3,6 +3,7 @@ package index
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type ConstIndex struct {
@@ -22,7 +23,7 @@ func (s *ConstIndex) Get(space concept.Closure) (concept.Variable, concept.Inter
 }
 
 func (s *ConstIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
-	return interrupt.NewException("read only", "Constants cannot be changed.")
+	return interrupt.NewException(variable.NewString("read only"), variable.NewString("Constants cannot be changed."))
 }
 
 func NewConstIndex(value concept.Variable) *ConstIndex {

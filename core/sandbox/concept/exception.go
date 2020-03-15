@@ -3,8 +3,8 @@ package concept
 type Exception interface {
 	Interrupt
 	ToString
-	Name() string
-	Message() string
+	Name() String
+	Message() String
 	Copy() Exception
 	IterateStacks(func(ExceptionStack) bool) bool
 	AddStack(ExceptionStack) Exception

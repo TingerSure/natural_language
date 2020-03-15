@@ -2,18 +2,18 @@ package concept
 
 type Closure interface {
 	SetParent(Closure)
-	SetReturn(string, Variable)
+	SetReturn(String, Variable)
 	MergeReturn(Closure)
-	Return() map[string]Variable
-	InitLocal(string)
-	GetLocal(string) (Variable, Interrupt)
-	SetLocal(string, Variable) Interrupt
-	GetBubble(string) (Variable, Interrupt)
-	SetBubble(string, Variable) Interrupt
+	IterateReturn(func(String, Variable) bool) bool
+	InitLocal(String, Variable)
+	GetLocal(String) (Variable, Interrupt)
+	SetLocal(String, Variable) Interrupt
+	GetBubble(String) (Variable, Interrupt)
+	SetBubble(String, Variable) Interrupt
 	AddExtempore(Index, Variable)
-	IterateHistory(func(string, Variable) bool) bool
+	IterateHistory(func(String, Variable) bool) bool
 	IterateExtempore(func(Index, Variable) bool) bool
-	IterateLocal(func(string, Variable) bool) bool
-	IterateBubble(func(string, Variable) bool) bool
+	IterateLocal(func(String, Variable) bool) bool
+	IterateBubble(func(String, Variable) bool) bool
 	Clear()
 }

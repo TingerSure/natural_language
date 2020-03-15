@@ -9,7 +9,8 @@ import (
 )
 
 type CodeBlock struct {
-	flow []concept.Index
+	flow  []concept.Index
+	param *CodeBlockParam
 }
 
 func (c *CodeBlock) Size() int {
@@ -63,11 +64,13 @@ func (f *CodeBlock) Exec(
 	init func(concept.Closure) concept.Interrupt,
 ) (concept.Closure, concept.Interrupt) {
 
-	if parent == nil && returnBubble {
+	if parent == nil {
 		returnBubble = false
 	}
 
-	space := closure.NewClosure(parent)
+	space := closure.NewClosure(parent, &closure.ClosureParam{
+		StringCreator: f.param.StringCreator,
+	})
 	defer func() {
 		if returnBubble {
 			parent.MergeReturn(space)
@@ -90,6 +93,12 @@ func (f *CodeBlock) Exec(
 	return space, nil
 }
 
-func NewCodeBlock() *CodeBlock {
-	return &CodeBlock{}
+type CodeBlockParam struct {
+	StringCreator func(string) concept.String
+}
+
+func NewCodeBlock(param *CodeBlockParam) *CodeBlock {
+	return &CodeBlock{
+		param: param,
+	}
 }

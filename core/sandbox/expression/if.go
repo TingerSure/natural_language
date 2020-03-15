@@ -35,7 +35,11 @@ func (f *If) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) 
 	if nl_interface.IsNil(f.condition) {
 		return nil, interrupt.NewException("system error", "No condition for judgment.")
 	}
-	initSpace := closure.NewClosure(parent)
+	initSpace := closure.NewClosure(parent, &closure.ClosureParam{
+		StringCreator: func(value string) concept.String {
+			return variable.NewString(value)
+		},
+	})
 	defer initSpace.Clear()
 	defer parent.MergeReturn(initSpace)
 
@@ -74,9 +78,14 @@ func (f *If) Secondary() *code_block.CodeBlock {
 }
 
 func NewIf() *If {
+	param := &code_block.CodeBlockParam{
+		StringCreator: func(value string) concept.String {
+			return variable.NewString(value)
+		},
+	}
 	back := &If{
-		primary:   code_block.NewCodeBlock(),
-		secondary: code_block.NewCodeBlock(),
+		primary:   code_block.NewCodeBlock(param),
+		secondary: code_block.NewCodeBlock(param),
 	}
 	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
 	return back

@@ -1,28 +1,32 @@
 package interrupt
 
+import (
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
+)
+
 const (
 	BreakInterruptType = "break"
 )
 
 type Break struct {
-	tag string
+	tag concept.String
 }
 
 func (e *Break) InterruptType() string {
 	return BreakInterruptType
 }
 
-func (e *Break) Tag() string {
+func (e *Break) Tag() concept.String {
 	return e.tag
 }
 
 func NewBreak() *Break {
 	return &Break{
-		tag: "",
+		tag: nil,
 	}
 }
 
-func NewBreakWithTag(tag string) *Break {
+func NewBreakWithTag(tag concept.String) *Break {
 	return &Break{
 		tag: tag,
 	}

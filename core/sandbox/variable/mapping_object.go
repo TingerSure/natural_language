@@ -23,7 +23,7 @@ func NewMappingObject(object concept.Object, className string, alias string) (*M
 
 	class := object.GetClass(className)
 	if nl_interface.IsNil(class) {
-		return nil, interrupt.NewException("system error", "Class name does not exist.")
+		return nil, interrupt.NewException(NewString("system error"), NewString("Class name does not exist."))
 	}
 
 	mapping, exception := object.GetMapping(className, alias)
@@ -71,7 +71,7 @@ func (m *MappingObject) IsClassAlias(className string, alias string) bool {
 
 func (m *MappingObject) GetMapping(className string, alias string) (map[concept.String]concept.String, concept.Exception) {
 	if className != m.className || alias != m.alias {
-		return nil, interrupt.NewException("system error", fmt.Sprintf("No mapping who's class is \"%v\" and alias is \"%v\"", className, alias))
+		return nil, interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("No mapping who's class is \"%v\" and alias is \"%v\"", className, alias)))
 	}
 	var mapping map[concept.String]concept.String
 	for key, _ := range m.mapping {
@@ -122,7 +122,7 @@ func (m *MappingObject) GetField(specimen concept.String) (concept.Variable, con
 }
 
 func (m *MappingObject) InitField(concept.String, concept.Variable) concept.Exception {
-	return interrupt.NewException("system error", "Mapping object cannot init.")
+	return interrupt.NewException(NewString("system error"), NewString("Mapping object cannot init."))
 }
 
 func (m *MappingObject) HasField(specimen concept.String) bool {
@@ -134,13 +134,13 @@ func (m *MappingObject) HasMethod(specimen concept.String) bool {
 }
 
 func (m *MappingObject) SetMethod(specimen concept.String, value concept.Function) concept.Exception {
-	return interrupt.NewException("system error", "Mapping object cannot set method.")
+	return interrupt.NewException(NewString("system error"), NewString("Mapping object cannot set method."))
 }
 
 func (m *MappingObject) GetMethod(specimen concept.String) (concept.Function, concept.Exception) {
 	value := m.class.GetMethod(specimen)
 	if nl_interface.IsNil(value) {
-		return nil, interrupt.NewException("system error", fmt.Sprintf("no method called %v", specimen.ToString("")))
+		return nil, interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("no method called %v", specimen.ToString(""))))
 	}
 	return value, nil
 }

@@ -1,7 +1,11 @@
 package closure
 
+import (
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
+)
+
 type historyNode struct {
-	key   string
+	key   concept.String
 	types int
 	next  *historyNode
 }
@@ -14,7 +18,7 @@ func (c *History) Clear() {
 	c.root = nil
 }
 
-func (c *History) Iterate(match func(string, int) bool) bool {
+func (c *History) Iterate(match func(concept.String, int) bool) bool {
 	for cursor := c.root; cursor != nil; cursor = cursor.next {
 		if match(cursor.key, cursor.types) {
 			return true
@@ -23,11 +27,11 @@ func (c *History) Iterate(match func(string, int) bool) bool {
 	return false
 }
 
-func (c *History) Set(key string, types int) {
+func (c *History) Set(key concept.String, types int) {
 	var last *historyNode
 	var hit *historyNode
 	for cursor := c.root; cursor != nil; cursor = cursor.next {
-		if cursor.key == key && cursor.types == types {
+		if cursor.key.EqualLanguage(key) && cursor.types == types {
 			hit = cursor
 			break
 		}

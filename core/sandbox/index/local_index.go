@@ -5,7 +5,7 @@ import (
 )
 
 type LocalIndex struct {
-	key string
+	key concept.String
 }
 
 func (s *LocalIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
@@ -13,7 +13,7 @@ func (s *LocalIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 }
 
 func (s *LocalIndex) ToString(prefix string) string {
-	return s.key
+	return s.key.ToString(prefix)
 }
 
 func (s *LocalIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
@@ -24,7 +24,7 @@ func (s *LocalIndex) Set(space concept.Closure, value concept.Variable) concept.
 	return space.SetLocal(s.key, value)
 }
 
-func NewLocalIndex(key string) *LocalIndex {
+func NewLocalIndex(key concept.String) *LocalIndex {
 	return &LocalIndex{
 		key: key,
 	}

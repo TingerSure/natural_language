@@ -1,7 +1,5 @@
 package tree
 
-import ()
-
 type Language struct {
 	packages map[string]Package
 	name     string

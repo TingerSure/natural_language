@@ -10,14 +10,14 @@ import (
 )
 
 type SystemLibrary struct {
-	pages map[string]tree.Page
+	pages map[string]*tree.Page
 }
 
-func (s *SystemLibrary) GetPage(name string) tree.Page {
+func (s *SystemLibrary) GetPage(name string) *tree.Page {
 	return s.pages[name]
 }
 
-func (s *SystemLibrary) SetPage(name string, value tree.Page) tree.Library {
+func (s *SystemLibrary) SetPage(name string, value *tree.Page) tree.Library {
 	s.pages[name] = value
 	return s
 }
@@ -29,7 +29,7 @@ type SystemLibraryParam struct {
 func NewSystemLibrary(param *SystemLibraryParam) *SystemLibrary {
 	stdObject := std.NewStd(param.Std)
 	system := &SystemLibrary{
-		pages: map[string]tree.Page{
+		pages: map[string]*tree.Page{
 			"std":         stdObject,
 			"question":    question.NewQuestion(stdObject),
 			"operator":    operator.NewOperator(),

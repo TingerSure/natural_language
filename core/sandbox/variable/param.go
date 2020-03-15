@@ -2,6 +2,7 @@ package variable
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/sandbox/component"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"strings"
 )
@@ -12,19 +13,20 @@ const (
 )
 
 type Param struct {
-	values map[string]concept.Variable
+	values *component.Mapping //map[string]concept.Variable
 }
 
 func (a *Param) ToString(prefix string) string {
-	if 0 == len(a.values) {
+	if 0 == a.values.Size() {
 		return "{}"
 	}
 	subPrefix := fmt.Sprintf("%v\t", prefix)
-	paramsToString := make([]string, 0, len(a.values))
+	paramsToString := make([]string, 0, a.values.Size())
 
-	for key, value := range a.values {
-		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key, value.ToString(subPrefix)))
-	}
+	a.values.Iterate(func(key concept.String, value interface{}) bool {
+		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.ToString(subPrefix), value.(concept.ToString).ToString(subPrefix)))
+		return false
+	})
 
 	return fmt.Sprintf("{\n%v\n%v}", strings.Join(paramsToString, ",\n"), prefix)
 }
@@ -33,34 +35,40 @@ func (o *Param) Type() string {
 	return VariableParamType
 }
 
-func (o *Param) Set(key string, value concept.Variable) {
-	o.values[key] = value
+func (o *Param) Set(key concept.String, value concept.Variable) {
+	o.values.Set(key, value)
 }
 
-func (o *Param) Get(key string) concept.Variable {
-	return o.values[key]
+func (o *Param) Get(key concept.String) concept.Variable {
+	return o.values.Get(key).(concept.Variable)
 }
 
 func (o *Param) Copy() *Param {
 	param := NewParam()
-	for key, value := range o.values {
-		param.Set(key, value)
-	}
+	o.values.Iterate(func(key concept.String, value interface{}) bool {
+		param.Set(key, value.(concept.Variable))
+		return false
+	})
 	return param
 }
 
-func (o *Param) Init(params map[string]concept.Variable) {
-	o.values = params
+func (o *Param) Init(iterator func(func(concept.String, concept.Variable) bool) bool) {
+	iterator(func(key concept.String, value concept.Variable) bool {
+		o.Set(key, value)
+		return false
+	})
 }
 
 func NewParam() *Param {
 	return &Param{
-		values: make(map[string]concept.Variable),
+		values: component.NewMapping(&component.MappingParam{
+			AutoInit: true,
+		}),
 	}
 }
 
-func NewParamWithInit(params map[string]concept.Variable) *Param {
-	return &Param{
-		values: params,
-	}
+func NewParamWithIterate(iterator func(func(concept.String, concept.Variable) bool) bool) *Param {
+	param := NewParam()
+	param.Init(iterator)
+	return param
 }

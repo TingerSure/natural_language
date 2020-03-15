@@ -8,7 +8,7 @@ import (
 )
 
 type Question struct {
-	*tree.PageAdaptor
+	*tree.Page
 	output *std.Std
 }
 
@@ -28,10 +28,10 @@ func (q *Question) What(input concept.Param, object concept.Object) (concept.Par
 func NewQuestion(output *std.Std) tree.Page {
 
 	instance := &Question{
-		PageAdaptor: tree.NewPageAdaptor(),
-		output:      output,
+		Page:   tree.NewPage(),
+		output: output,
 	}
-	instance.SetFunction("HowMany", variable.NewSystemFunction(
+	instance.SetFunction(variable.NewString("HowMany"), variable.NewSystemFunction(
 		instance.HowMany,
 		[]string{
 			HowManyContent,
@@ -41,7 +41,7 @@ func NewQuestion(output *std.Std) tree.Page {
 		},
 	))
 
-	instance.SetFunction("What", variable.NewSystemFunction(
+	instance.SetFunction(variable.NewString("What"), variable.NewSystemFunction(
 		instance.What,
 		[]string{
 			WhatContent,
@@ -50,7 +50,7 @@ func NewQuestion(output *std.Std) tree.Page {
 			WhatContent,
 		},
 	))
-	instance.SetConst("HowManyContent", HowManyContent)
-	instance.SetConst("WhatContent", WhatContent)
+	instance.SetConst(variable.NewString("HowManyContent"), HowManyContent)
+	instance.SetConst(variable.NewString("WhatContent"), WhatContent)
 	return instance
 }

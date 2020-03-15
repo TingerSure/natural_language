@@ -14,7 +14,7 @@ const (
 )
 
 type Operator struct {
-	*tree.PageAdaptor
+	*tree.Page
 	AdditionFunc       *variable.Function
 	DivisionFunc       *variable.Function
 	MultiplicationFunc *variable.Function
@@ -23,19 +23,19 @@ type Operator struct {
 
 func NewOperator() *Operator {
 	instance := &Operator{
-		PageAdaptor:        tree.NewPageAdaptor(),
+		Page:               tree.NewPage(),
 		AdditionFunc:       additionFunc,
 		DivisionFunc:       divisionFunc,
 		MultiplicationFunc: multiplicationFunc,
 		SubtractionFunc:    subtractionFunc,
 	}
-	instance.SetFunction("AdditionFunc", instance.AdditionFunc)
-	instance.SetFunction("DivisionFunc", instance.DivisionFunc)
-	instance.SetFunction("MultiplicationFunc", instance.MultiplicationFunc)
-	instance.SetFunction("SubtractionFunc", instance.SubtractionFunc)
-	instance.SetConst("Left", Left)
-	instance.SetConst("Right", Right)
-	instance.SetConst("Result", Result)
+	instance.SetFunction(variable.NewString("AdditionFunc"), instance.AdditionFunc)
+	instance.SetFunction(variable.NewString("DivisionFunc"), instance.DivisionFunc)
+	instance.SetFunction(variable.NewString("MultiplicationFunc"), instance.MultiplicationFunc)
+	instance.SetFunction(variable.NewString("SubtractionFunc"), instance.SubtractionFunc)
+	instance.SetConst(variable.NewString("Left"), Left)
+	instance.SetConst(variable.NewString("Right"), Right)
+	instance.SetConst(variable.NewString("Result"), Result)
 	return instance
 }
 
