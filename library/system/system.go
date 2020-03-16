@@ -29,7 +29,7 @@ type SystemLibraryParam struct {
 func NewSystemLibrary(param *SystemLibraryParam) *SystemLibrary {
 	stdObject := std.NewStd(param.Std)
 	system := &SystemLibrary{
-		pages: map[string]*tree.Page{
+		pages: map[string]tree.Page{
 			"std":         stdObject,
 			"question":    question.NewQuestion(stdObject),
 			"operator":    operator.NewOperator(),

@@ -11,13 +11,13 @@ import (
 
 type ParamSet struct {
 	*adaptor.ExpressionIndex
-	key   string
+	key   concept.String
 	value concept.Index
 	param concept.Index
 }
 
 func (a *ParamSet) ToString(prefix string) string {
-	return fmt.Sprintf("%v[%v] = %v", a.param.ToString(prefix), a.key, a.value.ToString(prefix))
+	return fmt.Sprintf("%v[%v] = %v", a.param.ToString(prefix), a.key.ToString(prefix), a.value.ToString(prefix))
 }
 
 func (a *ParamSet) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
@@ -28,7 +28,7 @@ func (a *ParamSet) Exec(space concept.Closure) (concept.Variable, concept.Interr
 	}
 	param, yesParam := variable.VariableFamilyInstance.IsParam(preParam)
 	if !yesParam {
-		return nil, interrupt.NewException("type error", "Only Param can be set in ParamSet")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only Param can be set in ParamSet"))
 	}
 
 	preValue, suspend := a.value.Get(space)
@@ -40,7 +40,7 @@ func (a *ParamSet) Exec(space concept.Closure) (concept.Variable, concept.Interr
 	return preValue, nil
 }
 
-func NewParamSet(param concept.Index, key string, value concept.Index) *ParamSet {
+func NewParamSet(param concept.Index, key concept.String, value concept.Index) *ParamSet {
 	back := &ParamSet{
 		key:   key,
 		value: value,
@@ -51,5 +51,5 @@ func NewParamSet(param concept.Index, key string, value concept.Index) *ParamSet
 }
 
 func NewParamSetWithoutKey(param concept.Index, value concept.Index) *ParamSet {
-	return NewParamSet(param, variable.ParamDefaultKey, value)
+	return NewParamSet(param, variable.NewString(variable.ParamDefaultKey), value)
 }

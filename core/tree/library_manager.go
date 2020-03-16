@@ -8,14 +8,14 @@ type LibraryManager struct {
 	librarys map[string]Library
 }
 
-func (l *LibraryManager) GetLibraryPage(libraryName string, pageName string) *Page {
+func (l *LibraryManager) GetLibraryPage(libraryName string, pageName string) Page {
 	if libraryName == "" {
 		return l.GetPage(pageName)
 	}
 	return l.GetLibrary(libraryName).GetPage(pageName)
 }
 
-func (l *LibraryManager) GetPage(pageName string) *Page {
+func (l *LibraryManager) GetPage(pageName string) Page {
 	for _, library := range l.librarys {
 		page := library.GetPage(pageName)
 		if !nl_interface.IsNil(page) {

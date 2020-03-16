@@ -13,11 +13,12 @@ import (
 
 var (
 	expressionForDefaultCondition = index.NewConstIndex(variable.NewBool(true))
+	expressionForDefaultTag       = variable.NewString("")
 )
 
 type For struct {
 	*adaptor.ExpressionIndex
-	tag       string
+	tag       concept.String
 	condition concept.Index
 	init      *code_block.CodeBlock
 	end       *code_block.CodeBlock
@@ -54,7 +55,7 @@ body:
 
 		condition, yes := variable.VariableFamilyInstance.IsBool(preCondition)
 		if !yes {
-			return nil, interrupt.NewException("type error", "Only bool can be judged.")
+			return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only bool can be judged."))
 		}
 
 		if !condition.Value() {
@@ -68,7 +69,7 @@ body:
 			case interrupt.BreakInterruptType:
 				breaks, yes := interrupt.InterruptFamilyInstance.IsBreak(suspend)
 				if !yes {
-					return nil, interrupt.NewException("system panic", fmt.Sprintf("BreakInterruptType does not mean a Break anymore.\n%+v", suspend))
+					return nil, interrupt.NewException(variable.NewString("system panic"), variable.NewString(fmt.Sprintf("BreakInterruptType does not mean a Break anymore.\n%+v", suspend)))
 				}
 				if !f.IsMyTag(breaks.Tag()) {
 					return nil, suspend
@@ -77,7 +78,7 @@ body:
 			case interrupt.ContinueInterruptType:
 				continues, yes := interrupt.InterruptFamilyInstance.IsContinue(suspend)
 				if !yes {
-					return nil, interrupt.NewException("system panic", fmt.Sprintf("ContinueInterruptType does not mean a Continue anymore.\n%+v", suspend))
+					return nil, interrupt.NewException(variable.NewString("system panic"), variable.NewString(fmt.Sprintf("ContinueInterruptType does not mean a Continue anymore.\n%+v", suspend)))
 				}
 				if !f.IsMyTag(continues.Tag()) {
 					return nil, suspend
@@ -96,14 +97,16 @@ body:
 	return nil, nil
 }
 
-func (f *For) SetTag(tag string) {
+func (f *For) SetTag(tag concept.String) {
 	f.tag = tag
 }
-func (f *For) Tag() string {
+func (f *For) Tag() concept.String {
 	return f.tag
 }
-func (f *For) IsMyTag(tag string) bool {
-	if tag == "" || tag == f.tag {
+func (f *For) IsMyTag(tag concept.String) bool {
+	if tag.Equal(expressionForDefaultTag) ||
+		tag.Equal(f.tag) ||
+		tag.EqualLanguage(f.tag) {
 		return true
 	}
 	return false
@@ -129,7 +132,7 @@ func NewFor() *For {
 		},
 	}
 	back := &For{
-		tag:  "",
+		tag:  expressionForDefaultTag,
 		init: code_block.NewCodeBlock(param),
 		end:  code_block.NewCodeBlock(param),
 		body: code_block.NewCodeBlock(param),

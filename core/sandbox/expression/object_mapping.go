@@ -31,7 +31,7 @@ func (a *ObjectMapping) Exec(space concept.Closure) (concept.Variable, concept.I
 	}
 	object, yesObject := variable.VariableFamilyInstance.IsObject(preObject)
 	if !yesObject {
-		return nil, interrupt.NewException("type error", "Only Object can be get in ObjectMapping")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only Object can be get in ObjectMapping"))
 	}
 
 	mappingObject, exception := variable.NewMappingObject(object, a.class, a.alias)

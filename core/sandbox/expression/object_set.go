@@ -28,7 +28,7 @@ func (a *ObjectSet) Exec(space concept.Closure) (concept.Variable, concept.Inter
 	}
 	object, yesObject := variable.VariableFamilyInstance.IsObject(preObject)
 	if !yesObject {
-		return nil, interrupt.NewException("type error", "Only Object can be get in ObjectSet")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only Object can be get in ObjectSet"))
 	}
 
 	preValue, suspend := a.value.Get(space)

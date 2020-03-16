@@ -11,7 +11,7 @@ import (
 
 type ParamGet struct {
 	*adaptor.ExpressionIndex
-	key   string
+	key   concept.String
 	param concept.Index
 }
 
@@ -27,13 +27,13 @@ func (a *ParamGet) Exec(space concept.Closure) (concept.Variable, concept.Interr
 	}
 	param, yesParam := variable.VariableFamilyInstance.IsParam(preParam)
 	if !yesParam {
-		return nil, interrupt.NewException("type error", "Only Param can be get in ParamGet")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only Param can be get in ParamGet"))
 	}
 
 	return param.Get(a.key), nil
 }
 
-func NewParamGet(param concept.Index, key string) *ParamGet {
+func NewParamGet(param concept.Index, key concept.String) *ParamGet {
 	back := &ParamGet{
 		key:   key,
 		param: param,
@@ -43,5 +43,5 @@ func NewParamGet(param concept.Index, key string) *ParamGet {
 }
 
 func NewParamGetWithoutKey(param concept.Index) *ParamGet {
-	return NewParamGet(param, variable.ParamDefaultKey)
+	return NewParamGet(param, variable.NewString(variable.ParamDefaultKey))
 }

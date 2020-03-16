@@ -33,7 +33,7 @@ func (a *ObjectCall) Exec(space concept.Closure) (concept.Variable, concept.Inte
 
 	object, yesObject := variable.VariableFamilyInstance.IsObject(preObject)
 	if !yesObject {
-		return nil, interrupt.NewException("type error", "Only Object can be called in ObjectCall")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only Object can be called in ObjectCall"))
 	}
 
 	method, suspend := object.GetMethod(a.key)
@@ -48,7 +48,7 @@ func (a *ObjectCall) Exec(space concept.Closure) (concept.Variable, concept.Inte
 	yesParam := false
 	param, yesParam := variable.VariableFamilyInstance.IsParam(preParam)
 	if !yesParam {
-		return nil, interrupt.NewException("type error", "Only Param can are passed to a Function")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only Param can are passed to a Function"))
 	}
 
 	return method.Exec(param, object)

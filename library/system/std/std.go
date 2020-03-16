@@ -18,7 +18,7 @@ const (
 )
 
 type Std struct {
-	*tree.Page
+	tree.Page
 	param        *StdParam
 	PrintContent concept.String
 	ErrorContent concept.String
@@ -41,7 +41,7 @@ func (s *Std) Error(input concept.Param, object concept.Object) (concept.Param, 
 func NewStd(param *StdParam) *Std {
 	instance := &Std{
 		param:        param,
-		Page:         tree.NewPage(),
+		Page:         tree.NewPageAdaptor(),
 		PrintContent: variable.NewString(PrintContent),
 		ErrorContent: variable.NewString(ErrorContent),
 	}

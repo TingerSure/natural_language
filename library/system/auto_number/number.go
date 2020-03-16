@@ -32,13 +32,13 @@ func NewAutoNumberObject(value *variable.Number) concept.Object {
 }
 
 type AutoNumber struct {
-	*tree.Page
+	tree.Page
 	AutoNumberClass concept.Class
 }
 
 func NewAutoNumber() *AutoNumber {
 	instance := &AutoNumber{
-		Page:            tree.NewPage(),
+		Page:            tree.NewPageAdaptor(),
 		AutoNumberClass: AutoNumberClass,
 	}
 	instance.SetClass(variable.NewString("AutoNumberClass"), AutoNumberClass)

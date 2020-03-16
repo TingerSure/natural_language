@@ -34,7 +34,7 @@ func (a *BinaryOperatorNumber) Exec(space concept.Closure) (concept.Variable, co
 	left, yesLeft := variable.VariableFamilyInstance.IsNumber(preLeft)
 	right, yesRight := variable.VariableFamilyInstance.IsNumber(preRight)
 	if !yesLeft || !yesRight {
-		return nil, interrupt.NewException("type error", "Only numbers can be added.")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only numbers can be added."))
 	}
 	return a.exec(left, right)
 }

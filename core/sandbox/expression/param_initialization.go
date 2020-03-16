@@ -9,25 +9,26 @@ import (
 
 type ParamInitialization struct {
 	*adaptor.ExpressionIndex
-	param       string
+	param       concept.String
 	defaltValue concept.Index
 }
 
 func (a *ParamInitialization) ToString(prefix string) string {
-	return fmt.Sprintf("var %v = %v", a.param, a.defaltValue.ToString(prefix))
+	return fmt.Sprintf("var %v = %v", a.param.ToString(prefix), a.defaltValue.ToString(prefix))
 }
 
 func (a *ParamInitialization) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
-	space.InitLocal(a.param)
+
 	value, suspend := a.defaltValue.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
 	}
-	return value, space.SetLocal(a.param, value)
+	space.InitLocal(a.param, value)
+	return value, nil
 
 }
 
-func NewParamInitialization(param string, defaltValue concept.Index) *ParamInitialization {
+func NewParamInitialization(param concept.String, defaltValue concept.Index) *ParamInitialization {
 	back := &ParamInitialization{
 		param:       param,
 		defaltValue: defaltValue,

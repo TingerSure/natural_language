@@ -11,7 +11,7 @@ import (
 
 type NewParam struct {
 	*adaptor.ExpressionIndex
-	values map[string]concept.Index
+	values map[concept.String]concept.Index
 }
 
 func (a *NewParam) ToString(prefix string) string {
@@ -22,7 +22,7 @@ func (a *NewParam) ToString(prefix string) string {
 	paramsToString := make([]string, 0, len(a.values))
 
 	for key, value := range a.values {
-		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key, value.ToString(subPrefix)))
+		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.ToString(subPrefix), value.ToString(subPrefix)))
 	}
 
 	return fmt.Sprintf("{\n%v\n%v}", strings.Join(paramsToString, ",\n"), prefix)
@@ -32,18 +32,28 @@ func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interr
 	if len(a.values) == 0 {
 		return variable.NewParam(), nil
 	}
-	params := map[string]concept.Variable{}
-	for key, index := range a.values {
-		value, suspend := index.Get(space)
-		if !nl_interface.IsNil(suspend) {
-			return nil, suspend
+	var suspend concept.Interrupt = nil
+
+	param := variable.NewParamWithIterate(func(on func(concept.String, concept.Variable) bool) bool {
+		for key, index := range a.values {
+			value, subSsuspend := index.Get(space)
+			if !nl_interface.IsNil(subSsuspend) {
+				suspend = subSsuspend
+				return true
+			}
+			return on(key, value)
 		}
-		params[key] = value
+		return false
+
+	})
+
+	if !nl_interface.IsNil(suspend) {
+		return nil, suspend
 	}
-	return variable.NewParamWithInit(params), nil
+	return param, nil
 }
 
-func NewNewParamWithInit(values map[string]concept.Index) *NewParam {
+func NewNewParamWithInit(values map[concept.String]concept.Index) *NewParam {
 	back := NewNewParam()
 	back.values = values
 	return back

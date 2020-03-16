@@ -13,7 +13,7 @@ const (
 )
 
 type Param struct {
-	values *component.Mapping //map[string]concept.Variable
+	values *component.Mapping
 }
 
 func (a *Param) ToString(prefix string) string {

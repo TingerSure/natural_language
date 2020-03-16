@@ -27,7 +27,7 @@ func (a *ObjectGet) Exec(space concept.Closure) (concept.Variable, concept.Inter
 	}
 	object, yesObject := variable.VariableFamilyInstance.IsObject(preObject)
 	if !yesObject {
-		return nil, interrupt.NewException("type error", "Only Object can be get in ObjectGet")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only Object can be get in ObjectGet"))
 	}
 
 	value, suspend := object.GetField(a.key)
@@ -35,7 +35,7 @@ func (a *ObjectGet) Exec(space concept.Closure) (concept.Variable, concept.Inter
 		return nil, suspend
 	}
 	if nl_interface.IsNil(value) {
-		return nil, interrupt.NewException("type error", fmt.Sprintf("%v is empty.", a.ToString("")))
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString(fmt.Sprintf("%v is empty.", a.ToString(""))))
 	}
 	return value, nil
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type Object struct {
-	*tree.Page
+	tree.Page
 	Create    *variable.SystemFunction
 	GetField  *variable.SystemFunction
 	HasField  *variable.SystemFunction
@@ -19,7 +19,7 @@ type Object struct {
 
 func NewObject() *Object {
 	instance := &Object{
-		Page:      tree.NewPage(),
+		Page:      tree.NewPageAdaptor(),
 		Create:    Create,
 		GetField:  GetField,
 		HasField:  HasField,

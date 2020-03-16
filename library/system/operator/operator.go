@@ -7,14 +7,14 @@ import (
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
-const (
-	Left   = "left"
-	Right  = "right"
-	Result = "result"
+var (
+	Left   = variable.NewString("left")
+	Right  = variable.NewString("right")
+	Result = variable.NewString("result")
 )
 
 type Operator struct {
-	*tree.Page
+	tree.Page
 	AdditionFunc       *variable.Function
 	DivisionFunc       *variable.Function
 	MultiplicationFunc *variable.Function
@@ -23,7 +23,7 @@ type Operator struct {
 
 func NewOperator() *Operator {
 	instance := &Operator{
-		Page:               tree.NewPage(),
+		Page:               tree.NewPageAdaptor(),
 		AdditionFunc:       additionFunc,
 		DivisionFunc:       divisionFunc,
 		MultiplicationFunc: multiplicationFunc,

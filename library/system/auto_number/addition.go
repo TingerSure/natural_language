@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	AdditionTargetNotExistException           = interrupt.NewException("type error", "AdditionTargetNotExistException")
-	AdditionAutoObjectValueTypeErrorException = interrupt.NewException("type error", "AdditionAutoObjectValueTypeErrorException")
+	AdditionTargetNotExistException           = interrupt.NewException(variable.NewString("type error"), variable.NewString("AdditionTargetNotExistException"))
+	AdditionAutoObjectValueTypeErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("AdditionAutoObjectValueTypeErrorException"))
 
 	AdditionTarget = "target"
 	AdditionResult = "result"

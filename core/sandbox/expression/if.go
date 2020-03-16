@@ -33,7 +33,7 @@ func (f *If) ToString(prefix string) string {
 func (f *If) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) {
 
 	if nl_interface.IsNil(f.condition) {
-		return nil, interrupt.NewException("system error", "No condition for judgment.")
+		return nil, interrupt.NewException(variable.NewString("system error"), variable.NewString("No condition for judgment."))
 	}
 	initSpace := closure.NewClosure(parent, &closure.ClosureParam{
 		StringCreator: func(value string) concept.String {
@@ -50,7 +50,7 @@ func (f *If) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) 
 
 	condition, yes := variable.VariableFamilyInstance.IsBool(preCondition)
 	if !yes {
-		return nil, interrupt.NewException("type error", "Only bool can be judged.")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only bool can be judged."))
 	}
 
 	var active *code_block.CodeBlock

@@ -31,7 +31,7 @@ func (a *Call) Exec(space concept.Closure) (concept.Variable, concept.Interrupt)
 	}
 	funcs, yesFuncs := variable.VariableFamilyInstance.IsFunctionHome(preFuncs)
 	if !yesFuncs {
-		return nil, interrupt.NewException("type error", "Only Function can be Called.")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only Function can be Called."))
 	}
 
 	preParam, suspend := a.param.Get(space)
@@ -41,7 +41,7 @@ func (a *Call) Exec(space concept.Closure) (concept.Variable, concept.Interrupt)
 	yesParam := false
 	param, yesParam := variable.VariableFamilyInstance.IsParam(preParam)
 	if !yesParam {
-		return nil, interrupt.NewException("type error", "Only Param can are passed to a Function")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only Param can are passed to a Function"))
 	}
 
 	return funcs.Exec(param, nil)

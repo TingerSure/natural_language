@@ -40,7 +40,7 @@ func (a *ClassRegister) Exec(space concept.Closure) (concept.Variable, concept.I
 	}
 	object, yesObject := variable.VariableFamilyInstance.IsObject(preObject)
 	if !yesObject {
-		return nil, interrupt.NewException("type error", "Only Object can be use in ClassRegister")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only Object can be use in ClassRegister"))
 	}
 
 	preClass, suspend := a.class.Get(space)
@@ -49,11 +49,11 @@ func (a *ClassRegister) Exec(space concept.Closure) (concept.Variable, concept.I
 	}
 	class, yesClass := variable.VariableFamilyInstance.IsClass(preClass)
 	if !yesClass {
-		return nil, interrupt.NewException("type error", "Only Class can be use in ClassRegister")
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only Class can be use in ClassRegister"))
 	}
 
 	if object.CheckMapping(class, a.mapping) {
-		return nil, interrupt.NewException("type error", fmt.Sprintf("Class \"%v\" cannot register to Object \"%v\".", a.class.ToString(""), a.object.ToString("")))
+		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString(fmt.Sprintf("Class \"%v\" cannot register to Object \"%v\".", a.class.ToString(""), a.object.ToString(""))))
 	}
 
 	return object, object.AddClass(class, a.alias, a.mapping)
