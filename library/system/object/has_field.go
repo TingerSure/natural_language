@@ -6,15 +6,15 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
-const (
-	HasFieldContent = "object"
-	HasFieldKey     = "key"
-	HasFieldExist   = "exist"
+var (
+	HasFieldContent = variable.NewString("object")
+	HasFieldKey     = variable.NewString("key")
+	HasFieldExist   = variable.NewString("exist")
 )
 
 var (
-	HasFieldObjectErrorException = interrupt.NewException("type error", "HasFieldObjectErrorException")
-	HasFieldKeyErrorException    = interrupt.NewException("type error", "HasFieldKeyErrorException")
+	HasFieldObjectErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasFieldObjectErrorException"))
+	HasFieldKeyErrorException    = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasFieldKeyErrorException"))
 )
 
 var (
@@ -34,15 +34,13 @@ func init() {
 				return nil, HasFieldKeyErrorException.Copy().AddStack(HasField)
 			}
 
-			return variable.NewParamWithInit(map[string]concept.Variable{
-				HasFieldExist: variable.NewBool(object.HasField(key.Value())),
-			}), nil
+			return variable.NewParam().Set(HasFieldExist, variable.NewBool(object.HasField(key))), nil
 		},
-		[]string{
+		[]concept.String{
 			HasFieldContent,
 			HasFieldKey,
 		},
-		[]string{
+		[]concept.String{
 			HasFieldExist,
 		},
 	)

@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	AutoNumberClassValue   = "value"
+	AutoNumberClassValue   = variable.NewString("value")
 	AutoNumberClassName    = "system.auto_number"
 	AutoNumberClass        = variable.NewClass(AutoNumberClassName)
-	AutoNumberClassMapping = map[string]string{
+	AutoNumberClassMapping = map[concept.String]concept.String{
 		AutoNumberClassValue: AutoNumberClassValue,
 	}
 )
@@ -43,7 +43,7 @@ func NewAutoNumber() *AutoNumber {
 	}
 	instance.SetClass(variable.NewString("AutoNumberClass"), AutoNumberClass)
 	instance.SetConst(variable.NewString("AutoNumberClassValue"), AutoNumberClassValue)
-	instance.SetConst(variable.NewString("AutoNumberClassName"), AutoNumberClassName)
+	instance.SetConst(variable.NewString("AutoNumberClassName"), variable.NewString(AutoNumberClassName))
 
 	return instance
 }

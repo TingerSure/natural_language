@@ -7,16 +7,16 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
-const (
-	SetFieldContent = "object"
-	SetFieldKey     = "key"
-	SetFieldValue   = "value"
+var (
+	SetFieldContent = variable.NewString("object")
+	SetFieldKey     = variable.NewString("key")
+	SetFieldValue   = variable.NewString("value")
 )
 
 var (
-	SetFieldObjectErrorException = interrupt.NewException("type error", "SetFieldObjectErrorException")
-	SetFieldKeyErrorException    = interrupt.NewException("type error", "SetFieldKeyErrorException")
-	SetFieldKeyNotExistException = interrupt.NewException("type error", "SetFieldKeyNotExistException")
+	SetFieldObjectErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetFieldObjectErrorException"))
+	SetFieldKeyErrorException    = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetFieldKeyErrorException"))
+	SetFieldKeyNotExistException = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetFieldKeyNotExistException"))
 )
 
 var (
@@ -35,7 +35,7 @@ func init() {
 			if !ok {
 				return nil, SetFieldKeyErrorException.Copy().AddStack(SetField)
 			}
-			if !object.HasField(key.Value()) {
+			if !object.HasField(key) {
 				return nil, SetFieldKeyNotExistException.Copy().AddStack(SetField)
 			}
 
@@ -44,21 +44,19 @@ func init() {
 				value = variable.NewNull()
 			}
 
-			suspend := object.SetField(key.Value(), value)
+			suspend := object.SetField(key, value)
 			if !nl_interface.IsNil(suspend) {
 				return nil, suspend.AddStack(SetField)
 			}
 
-			return variable.NewParamWithInit(map[string]concept.Variable{
-				SetFieldContent: object,
-			}), nil
+			return variable.NewParam().Set(SetFieldContent, object), nil
 		},
-		[]string{
+		[]concept.String{
 			SetFieldContent,
 			SetFieldKey,
 			SetFieldValue,
 		},
-		[]string{
+		[]concept.String{
 			SetFieldContent,
 		},
 	)

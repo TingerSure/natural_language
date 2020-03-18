@@ -10,14 +10,14 @@ import (
 )
 
 type SystemLibrary struct {
-	pages map[string]*tree.Page
+	pages map[string]tree.Page
 }
 
-func (s *SystemLibrary) GetPage(name string) *tree.Page {
+func (s *SystemLibrary) GetPage(name string) tree.Page {
 	return s.pages[name]
 }
 
-func (s *SystemLibrary) SetPage(name string, value *tree.Page) tree.Library {
+func (s *SystemLibrary) SetPage(name string, value tree.Page) tree.Library {
 	s.pages[name] = value
 	return s
 }

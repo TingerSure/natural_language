@@ -7,16 +7,16 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
-const (
-	InitFieldContent      = "object"
-	InitFieldKey          = "key"
-	InitFieldDefaultValue = "default_value"
+var (
+	InitFieldContent      = variable.NewString("object")
+	InitFieldKey          = variable.NewString("key")
+	InitFieldDefaultValue = variable.NewString("default_value")
 )
 
 var (
-	InitFieldObjectErrorException = interrupt.NewException("type error", "InitFieldObjectErrorException")
-	InitFieldKeyErrorException    = interrupt.NewException("type error", "InitFieldKeyErrorException")
-	InitFieldKeyExistException    = interrupt.NewException("type error", "InitFieldKeyExistException")
+	InitFieldObjectErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("InitFieldObjectErrorException"))
+	InitFieldKeyErrorException    = interrupt.NewException(variable.NewString("type error"), variable.NewString("InitFieldKeyErrorException"))
+	InitFieldKeyExistException    = interrupt.NewException(variable.NewString("type error"), variable.NewString("InitFieldKeyExistException"))
 )
 
 var (
@@ -35,7 +35,7 @@ func init() {
 			if !ok {
 				return nil, InitFieldKeyErrorException.Copy().AddStack(InitField)
 			}
-			if object.HasField(key.Value()) {
+			if object.HasField(key) {
 				return nil, InitFieldKeyExistException.Copy().AddStack(InitField)
 			}
 
@@ -44,21 +44,19 @@ func init() {
 				defaultValue = variable.NewNull()
 			}
 
-			suspend := object.InitField(key.Value(), defaultValue)
+			suspend := object.InitField(key, defaultValue)
 			if !nl_interface.IsNil(suspend) {
 				return nil, suspend.AddStack(InitField)
 			}
 
-			return variable.NewParamWithInit(map[string]concept.Variable{
-				InitFieldContent: object,
-			}), nil
+			return variable.NewParam().Set(InitFieldContent, object), nil
 		},
-		[]string{
+		[]concept.String{
 			InitFieldContent,
 			InitFieldKey,
 			InitFieldDefaultValue,
 		},
-		[]string{
+		[]concept.String{
 			InitFieldContent,
 		},
 	)

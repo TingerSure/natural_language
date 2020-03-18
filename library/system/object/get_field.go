@@ -8,16 +8,16 @@ import (
 	"github.com/TingerSure/natural_language/library/system/auto_number"
 )
 
-const (
-	GetFieldContent = "object"
-	GetFieldKey     = "key"
-	GetFieldValue   = "value"
+var (
+	GetFieldContent = variable.NewString("object")
+	GetFieldKey     = variable.NewString("key")
+	GetFieldValue   = variable.NewString("value")
 )
 
 var (
-	GetFieldObjectErrorException = interrupt.NewException("type error", "GetFieldObjectErrorException")
-	GetFieldKeyErrorException    = interrupt.NewException("type error", "GetFieldKeyErrorException")
-	GetFieldKeyNotExistException = interrupt.NewException("type error", "GetFieldKeyNotExistException")
+	GetFieldObjectErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetFieldObjectErrorException"))
+	GetFieldKeyErrorException    = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetFieldKeyErrorException"))
+	GetFieldKeyNotExistException = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetFieldKeyNotExistException"))
 )
 
 var (
@@ -41,24 +41,22 @@ func init() {
 			if !ok {
 				return nil, GetFieldKeyErrorException.Copy().AddStack(GetField)
 			}
-			if !object.HasField(key.Value()) {
+			if !object.HasField(key) {
 				return nil, GetFieldKeyNotExistException.Copy().AddStack(GetField)
 			}
 
-			value, suspend := object.GetField(key.Value())
+			value, suspend := object.GetField(key)
 			if !nl_interface.IsNil(suspend) {
 				return nil, suspend.AddStack(GetField)
 			}
 
-			return variable.NewParamWithInit(map[string]concept.Variable{
-				GetFieldValue: value,
-			}), nil
+			return variable.NewParam().Set(GetFieldValue, value), nil
 		},
-		[]string{
+		[]concept.String{
 			GetFieldContent,
 			GetFieldKey,
 		},
-		[]string{
+		[]concept.String{
 			GetFieldValue,
 		},
 	)

@@ -44,6 +44,9 @@ func (n *String) IsLanguage(language string, value string) bool {
 }
 
 func (n *String) EqualLanguage(other concept.String) bool {
+	if n.Equal(other) {
+		return true
+	}
 	hit := false
 	return !n.IterateLanguages(func(language string, value string) bool {
 		return other.IterateLanguages(func(otherLanguage string, otherValue string) bool {

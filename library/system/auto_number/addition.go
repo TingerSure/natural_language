@@ -11,11 +11,10 @@ var (
 	AdditionTargetNotExistException           = interrupt.NewException(variable.NewString("type error"), variable.NewString("AdditionTargetNotExistException"))
 	AdditionAutoObjectValueTypeErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("AdditionAutoObjectValueTypeErrorException"))
 
-	AdditionTarget = "target"
-	AdditionResult = "result"
-
-	Addition    concept.Function = nil
-	AdditionKey                  = "addition"
+	AdditionTarget                  = variable.NewString("target")
+	AdditionResult                  = variable.NewString("result")
+	AdditionKey                     = variable.NewString("addition")
+	Addition       concept.Function = nil
 )
 
 func init() {
@@ -37,18 +36,15 @@ func init() {
 				return nil, AdditionTargetNotExistException.Copy().AddStack(Addition)
 			}
 
-			return variable.NewParamWithInit(map[string]concept.Variable{
-				AdditionResult: variable.NewNumber(left.Value() + right.Value()),
-			}), nil
-
+			return variable.NewParam().Set(AdditionResult, variable.NewNumber(left.Value()+right.Value())), nil
 		},
-		[]string{
+		[]concept.String{
 			AdditionTarget,
 		},
-		[]string{
+		[]concept.String{
 			AdditionResult,
 		},
 	)
 
-	AutoNumberClass.SetMethod(variable.NewString(AdditionKey), Addition)
+	AutoNumberClass.SetMethod(AdditionKey, Addition)
 }

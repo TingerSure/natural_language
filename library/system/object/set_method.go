@@ -7,16 +7,16 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
-const (
-	SetMethodContent  = "object"
-	SetMethodKey      = "key"
-	SetMethodFunction = "function"
+var (
+	SetMethodContent  = variable.NewString("object")
+	SetMethodKey      = variable.NewString("key")
+	SetMethodFunction = variable.NewString("function")
 )
 
 var (
-	SetMethodObjectErrorException   = interrupt.NewException("type error", "SetMethodObjectErrorException")
-	SetMethodKeyErrorException      = interrupt.NewException("type error", "SetMethodKeyErrorException")
-	SetMethodFunctionErrorException = interrupt.NewException("type error", "SetMethodFunctionErrorException")
+	SetMethodObjectErrorException   = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetMethodObjectErrorException"))
+	SetMethodKeyErrorException      = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetMethodKeyErrorException"))
+	SetMethodFunctionErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetMethodFunctionErrorException"))
 )
 
 var (
@@ -41,21 +41,19 @@ func init() {
 				return nil, SetMethodFunctionErrorException.Copy().AddStack(SetMethod)
 			}
 
-			suspend := object.SetMethod(key.Value(), function)
+			suspend := object.SetMethod(key, function)
 			if !nl_interface.IsNil(suspend) {
 				return nil, suspend.AddStack(SetMethod)
 			}
 
-			return variable.NewParamWithInit(map[string]concept.Variable{
-				SetMethodContent: object,
-			}), nil
+			return variable.NewParam().Set(SetMethodContent, object), nil
 		},
-		[]string{
+		[]concept.String{
 			SetMethodContent,
 			SetMethodKey,
 			SetMethodFunction,
 		},
-		[]string{
+		[]concept.String{
 			SetMethodContent,
 		},
 	)

@@ -7,16 +7,16 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
-const (
-	GetMethodContent  = "object"
-	GetMethodKey      = "key"
-	GetMethodFunction = "function"
+var (
+	GetMethodContent  = variable.NewString("object")
+	GetMethodKey      = variable.NewString("key")
+	GetMethodFunction = variable.NewString("function")
 )
 
 var (
-	GetMethodObjectErrorException = interrupt.NewException("type error", "GetMethodObjectErrorException")
-	GetMethodKeyErrorException    = interrupt.NewException("type error", "GetMethodKeyErrorException")
-	GetMethodKeyNotExistException = interrupt.NewException("type error", "GetMethodKeyNotExistException")
+	GetMethodObjectErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetMethodObjectErrorException"))
+	GetMethodKeyErrorException    = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetMethodKeyErrorException"))
+	GetMethodKeyNotExistException = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetMethodKeyNotExistException"))
 )
 
 var (
@@ -35,24 +35,22 @@ func init() {
 			if !ok {
 				return nil, GetMethodKeyErrorException.Copy().AddStack(GetMethod)
 			}
-			if !object.HasMethod(key.Value()) {
+			if !object.HasMethod(key) {
 				return nil, GetMethodKeyNotExistException.Copy().AddStack(GetMethod)
 			}
 
-			function, suspend := object.GetMethod(key.Value())
+			function, suspend := object.GetMethod(key)
 			if !nl_interface.IsNil(suspend) {
 				return nil, suspend.AddStack(GetMethod)
 			}
 
-			return variable.NewParamWithInit(map[string]concept.Variable{
-				GetMethodFunction: function,
-			}), nil
+			return variable.NewParam().Set(GetMethodFunction, function), nil
 		},
-		[]string{
+		[]concept.String{
 			GetMethodContent,
 			GetMethodKey,
 		},
-		[]string{
+		[]concept.String{
 			GetMethodFunction,
 		},
 	)

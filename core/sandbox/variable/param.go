@@ -35,8 +35,9 @@ func (o *Param) Type() string {
 	return VariableParamType
 }
 
-func (o *Param) Set(key concept.String, value concept.Variable) {
+func (o *Param) Set(key concept.String, value concept.Variable) concept.Param {
 	o.values.Set(key, value)
+	return o
 }
 
 func (o *Param) Get(key concept.String) concept.Variable {

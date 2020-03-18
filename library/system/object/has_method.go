@@ -6,15 +6,15 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
-const (
-	HasMethodContent = "object"
-	HasMethodKey     = "key"
-	HasMethodExist   = "exist"
+var (
+	HasMethodContent = variable.NewString("object")
+	HasMethodKey     = variable.NewString("key")
+	HasMethodExist   = variable.NewString("exist")
 )
 
 var (
-	HasMethodObjectErrorException = interrupt.NewException("type error", "HasMethodObjectErrorException")
-	HasMethodKeyErrorException    = interrupt.NewException("type error", "HasMethodKeyErrorException")
+	HasMethodObjectErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasMethodObjectErrorException"))
+	HasMethodKeyErrorException    = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasMethodKeyErrorException"))
 )
 
 var (
@@ -34,15 +34,13 @@ func init() {
 				return nil, HasMethodKeyErrorException.Copy().AddStack(HasMethod)
 			}
 
-			return variable.NewParamWithInit(map[string]concept.Variable{
-				HasMethodExist: variable.NewBool(object.HasMethod(key.Value())),
-			}), nil
+			return variable.NewParam().Set(HasMethodExist, variable.NewBool(object.HasMethod(key))), nil
 		},
-		[]string{
+		[]concept.String{
 			HasMethodContent,
 			HasMethodKey,
 		},
-		[]string{
+		[]concept.String{
 			HasMethodExist,
 		},
 	)
