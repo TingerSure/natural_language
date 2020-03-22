@@ -19,7 +19,7 @@ type HowMany struct {
 	adaptor.SourceAdaptor
 	parent            *Question
 	libs              *tree.LibraryManager
-	libHowManyContent string
+	libHowManyContent concept.String
 	libHowManyFunc    concept.Function
 	HowManyFunc       *variable.Function
 }
@@ -33,7 +33,7 @@ func (p *HowMany) init() *HowMany {
 			expression.NewParamGet(
 				expression.NewCall(
 					index.NewConstIndex(p.libHowManyFunc),
-					expression.NewNewParamWithInit(map[string]concept.Index{
+					expression.NewNewParamWithInit(map[concept.String]concept.Index{
 						p.libHowManyContent: index.NewBubbleIndex(p.parent.QuestionParam),
 					}),
 				),
@@ -79,7 +79,7 @@ func NewHowMany(libs *tree.LibraryManager, parent *Question) *HowMany {
 	return (&HowMany{
 		libs:              libs,
 		parent:            parent,
-		libHowManyContent: page.GetConst("HowManyContent"),
-		libHowManyFunc:    page.GetFunction("HowMany"),
+		libHowManyContent: page.GetConst(variable.NewString("HowManyContent")),
+		libHowManyFunc:    page.GetFunction(variable.NewString("HowMany")),
 	}).init()
 }

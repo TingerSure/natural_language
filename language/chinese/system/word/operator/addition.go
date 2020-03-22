@@ -3,6 +3,7 @@ package operator
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
@@ -55,6 +56,6 @@ func (p *Addition) GetVocabularyRules() []*tree.VocabularyRule {
 func NewAddition(libs *tree.LibraryManager) *Addition {
 	return (&Addition{
 		libs:     libs,
-		operator: libs.GetLibraryPage("system", "operator").GetFunction("AdditionFunc"),
+		operator: libs.GetLibraryPage("system", "operator").GetFunction(variable.NewString("AdditionFunc")),
 	})
 }

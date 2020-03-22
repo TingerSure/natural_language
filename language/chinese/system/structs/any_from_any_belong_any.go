@@ -4,6 +4,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/expression"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
@@ -24,9 +25,9 @@ var (
 type AnyFromAnyBelongAny struct {
 	adaptor.SourceAdaptor
 	libs            *tree.LibraryManager
-	GetFieldValue   string
-	GetFieldKey     string
-	GetFieldContent string
+	GetFieldValue   concept.String
+	GetFieldKey     concept.String
+	GetFieldContent concept.String
 	GetField        concept.Function
 }
 
@@ -39,7 +40,7 @@ func (p *AnyFromAnyBelongAny) GetStructRules() []*tree.StructRule {
 						return expression.NewParamGet(
 							expression.NewCall(
 								index.NewConstIndex(p.GetField),
-								expression.NewNewParamWithInit(map[string]concept.Index{
+								expression.NewNewParamWithInit(map[concept.String]concept.Index{
 									p.GetFieldContent: phrase[0].Index(),
 									p.GetFieldKey:     phrase[2].Index(),
 								}),
@@ -66,9 +67,9 @@ func NewAnyFromAnyBelongAny(libs *tree.LibraryManager) *AnyFromAnyBelongAny {
 	libObject := libs.GetLibraryPage("system", "object")
 	return (&AnyFromAnyBelongAny{
 		libs:            libs,
-		GetFieldValue:   libObject.GetConst("GetFieldValue"),
-		GetFieldKey:     libObject.GetConst("GetFieldKey"),
-		GetFieldContent: libObject.GetConst("GetFieldContent"),
-		GetField:        libObject.GetFunction("GetField"),
+		GetFieldValue:   libObject.GetConst(variable.NewString("GetFieldValue")),
+		GetFieldKey:     libObject.GetConst(variable.NewString("GetFieldKey")),
+		GetFieldContent: libObject.GetConst(variable.NewString("GetFieldContent")),
+		GetField:        libObject.GetFunction(variable.NewString("GetField")),
 	})
 }

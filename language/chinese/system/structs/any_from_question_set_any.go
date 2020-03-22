@@ -36,7 +36,7 @@ func (p *AnyFromQuestionSetAny) GetStructRules() []*tree.StructRule {
 						return expression.NewParamGet(
 							expression.NewCall(
 								phrase[0].Index(),
-								expression.NewNewParamWithInit(map[string]concept.Index{
+								expression.NewNewParamWithInit(map[concept.String]concept.Index{
 									p.questionPackage.QuestionParam: phrase[2].Index(),
 								}),
 							),

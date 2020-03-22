@@ -19,7 +19,7 @@ type What struct {
 	adaptor.SourceAdaptor
 	parent         *Question
 	libs           *tree.LibraryManager
-	libWhatContent string
+	libWhatContent concept.String
 	libWhatFunc    concept.Function
 	WhatFunc       *variable.Function
 }
@@ -33,7 +33,7 @@ func (p *What) init() *What {
 			expression.NewParamGet(
 				expression.NewCall(
 					index.NewConstIndex(p.libWhatFunc),
-					expression.NewNewParamWithInit(map[string]concept.Index{
+					expression.NewNewParamWithInit(map[concept.String]concept.Index{
 						p.libWhatContent: index.NewBubbleIndex(p.parent.QuestionParam),
 					}),
 				),
@@ -79,7 +79,7 @@ func NewWhat(libs *tree.LibraryManager, parent *Question) *What {
 	return (&What{
 		libs:           libs,
 		parent:         parent,
-		libWhatContent: page.GetConst("WhatContent"),
-		libWhatFunc:    page.GetFunction("What"),
+		libWhatContent: page.GetConst(variable.NewString("WhatContent")),
+		libWhatFunc:    page.GetFunction(variable.NewString("What")),
 	}).init()
 }
