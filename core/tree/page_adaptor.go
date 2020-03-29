@@ -3,6 +3,7 @@ package tree
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/component"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type PageAdaptor struct {
@@ -41,13 +42,16 @@ func (p *PageAdaptor) SetConst(key concept.String, value concept.String) Page {
 func NewPageAdaptor() *PageAdaptor {
 	return &PageAdaptor{
 		functions: component.NewMapping(&component.MappingParam{
-			AutoInit: true,
+			AutoInit:   true,
+			EmptyValue: variable.NewNull(),
 		}),
 		classes: component.NewMapping(&component.MappingParam{
-			AutoInit: true,
+			AutoInit:   true,
+			EmptyValue: variable.NewNull(),
 		}),
 		consts: component.NewMapping(&component.MappingParam{
-			AutoInit: true,
+			AutoInit:   true,
+			EmptyValue: variable.NewNull(),
 		}),
 	}
 }

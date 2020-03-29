@@ -121,6 +121,9 @@ func NewRuntime(param *RuntimeParam) *Runtime {
 			StringCreator: func(value string) concept.String {
 				return variable.NewString(value)
 			},
+			EmptyCreator: func() concept.Null {
+				return variable.NewNull()
+			},
 		}),
 	}
 	runtime.box = sandbox.NewSandbox(&sandbox.SandboxParam{

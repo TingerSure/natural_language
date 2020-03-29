@@ -6,8 +6,8 @@ import (
 )
 
 type Mapping struct {
-	autoInit bool
-	values   map[concept.String]interface{}
+	param  *MappingParam
+	values map[concept.String]interface{}
 }
 
 func (k *Mapping) Size() int {
@@ -15,6 +15,9 @@ func (k *Mapping) Size() int {
 }
 
 func (k *Mapping) Init(specimen concept.String, defaultValue interface{}) bool {
+	if nl_interface.IsNil(defaultValue) {
+		defaultValue = k.param.EmptyValue
+	}
 	exist := k.Iterate(func(key concept.String, value interface{}) bool {
 		if key.EqualLanguage(specimen) {
 			if nl_interface.IsNil(value) {
@@ -31,6 +34,9 @@ func (k *Mapping) Init(specimen concept.String, defaultValue interface{}) bool {
 }
 
 func (k *Mapping) Set(specimen concept.String, value interface{}) bool {
+	if nl_interface.IsNil(value) {
+		value = k.param.EmptyValue
+	}
 	exist := k.Iterate(func(key concept.String, _ interface{}) bool {
 		if key.EqualLanguage(specimen) {
 			k.values[specimen.Clone()] = value
@@ -39,7 +45,7 @@ func (k *Mapping) Set(specimen concept.String, value interface{}) bool {
 		return false
 	})
 
-	if !exist && k.autoInit {
+	if !exist && k.param.AutoInit {
 		k.values[specimen.Clone()] = value
 	}
 
@@ -47,7 +53,7 @@ func (k *Mapping) Set(specimen concept.String, value interface{}) bool {
 }
 
 func (k *Mapping) Get(specimen concept.String) interface{} {
-	var choosen interface{} = nil
+	var choosen interface{} = k.param.EmptyValue
 	k.Iterate(func(key concept.String, value interface{}) bool {
 		if key.EqualLanguage(specimen) {
 			choosen = value
@@ -74,12 +80,13 @@ func (k *Mapping) Iterate(on func(concept.String, interface{}) bool) bool {
 }
 
 type MappingParam struct {
-	AutoInit bool
+	AutoInit   bool
+	EmptyValue interface{}
 }
 
 func NewMapping(param *MappingParam) *Mapping {
 	return &Mapping{
-		values:   make(map[concept.String]interface{}),
-		autoInit: param.AutoInit,
+		values: make(map[concept.String]interface{}),
+		param:  param,
 	}
 }

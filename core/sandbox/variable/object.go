@@ -200,10 +200,12 @@ func (o *Object) Type() string {
 func NewObject() *Object {
 	return &Object{
 		fields: component.NewMapping(&component.MappingParam{
-			AutoInit: false,
+			AutoInit:   false,
+			EmptyValue: NewNull(),
 		}),
 		methods: component.NewMapping(&component.MappingParam{
-			AutoInit: true,
+			AutoInit:   true,
+			EmptyValue: NewNull(),
 		}),
 		reflections: make([]*component.ClassReflection, 0),
 	}

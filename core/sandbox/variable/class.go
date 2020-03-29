@@ -144,16 +144,20 @@ func NewClass(name string) *Class {
 	return &Class{
 		name: name,
 		methods: component.NewMapping(&component.MappingParam{
-			AutoInit: true,
+			AutoInit:   true,
+			EmptyValue: NewNull(),
 		}),
 		fields: component.NewMapping(&component.MappingParam{
-			AutoInit: true,
+			AutoInit:   true,
+			EmptyValue: NewNull(),
 		}),
 		staticMethods: component.NewMapping(&component.MappingParam{
-			AutoInit: true,
+			AutoInit:   true,
+			EmptyValue: NewNull(),
 		}),
 		staticFields: component.NewMapping(&component.MappingParam{
-			AutoInit: true,
+			AutoInit:   true,
+			EmptyValue: NewNull(),
 		}),
 	}
 }

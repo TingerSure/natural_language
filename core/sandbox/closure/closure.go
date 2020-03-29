@@ -158,6 +158,7 @@ func (c *Closure) Clear() {
 
 type ClosureParam struct {
 	StringCreator func(string) concept.String
+	EmptyCreator  func() concept.Null
 }
 
 func NewClosure(parent concept.Closure, param *ClosureParam) *Closure {
@@ -167,10 +168,12 @@ func NewClosure(parent concept.Closure, param *ClosureParam) *Closure {
 		history:   NewHistory(),
 		extempore: NewExtempore(),
 		returns: component.NewMapping(&component.MappingParam{
-			AutoInit: true,
+			AutoInit:   true,
+			EmptyValue: param.EmptyCreator(),
 		}),
 		local: component.NewMapping(&component.MappingParam{
-			AutoInit: false,
+			AutoInit:   false,
+			EmptyValue: param.EmptyCreator(),
 		}),
 	}
 }

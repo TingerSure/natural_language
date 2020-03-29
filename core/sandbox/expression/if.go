@@ -39,6 +39,9 @@ func (f *If) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) 
 		StringCreator: func(value string) concept.String {
 			return variable.NewString(value)
 		},
+		EmptyCreator: func() concept.Null {
+			return variable.NewNull()
+		},
 	})
 	defer initSpace.Clear()
 	defer parent.MergeReturn(initSpace)

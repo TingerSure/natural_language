@@ -70,6 +70,7 @@ func (f *CodeBlock) Exec(
 
 	space := closure.NewClosure(parent, &closure.ClosureParam{
 		StringCreator: f.param.StringCreator,
+		EmptyCreator:  f.param.EmptyCreator,
 	})
 	defer func() {
 		if returnBubble {
@@ -95,6 +96,7 @@ func (f *CodeBlock) Exec(
 
 type CodeBlockParam struct {
 	StringCreator func(string) concept.String
+	EmptyCreator  func() concept.Null
 }
 
 func NewCodeBlock(param *CodeBlockParam) *CodeBlock {

@@ -63,7 +63,8 @@ func (o *Param) Init(iterator func(func(concept.String, concept.Variable) bool) 
 func NewParam() *Param {
 	return &Param{
 		values: component.NewMapping(&component.MappingParam{
-			AutoInit: true,
+			AutoInit:   true,
+			EmptyValue: NewNull(),
 		}),
 	}
 }
