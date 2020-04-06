@@ -5,7 +5,16 @@ import (
 )
 
 type LibraryManager struct {
-	librarys map[string]Library
+	libraries map[string]Library
+}
+
+func (l *LibraryManager) PageIterate(on func(page Page) bool) bool {
+	for _, lib := range l.libraries {
+		if lib.PageIterate(on) {
+			return true
+		}
+	}
+	return false
 }
 
 func (l *LibraryManager) GetLibraryPage(libraryName string, pageName string) Page {
@@ -16,7 +25,7 @@ func (l *LibraryManager) GetLibraryPage(libraryName string, pageName string) Pag
 }
 
 func (l *LibraryManager) GetPage(pageName string) Page {
-	for _, library := range l.librarys {
+	for _, library := range l.libraries {
 		page := library.GetPage(pageName)
 		if !nl_interface.IsNil(page) {
 			return page
@@ -26,7 +35,7 @@ func (l *LibraryManager) GetPage(pageName string) Page {
 }
 
 func (l *LibraryManager) AddLibrary(name string, lib Library) {
-	l.librarys[name] = lib
+	l.libraries[name] = lib
 }
 
 func (l *LibraryManager) AddSystemLibrary(lib Library) {
@@ -34,11 +43,11 @@ func (l *LibraryManager) AddSystemLibrary(lib Library) {
 }
 
 func (l *LibraryManager) GetLibrary(name string) Library {
-	return l.librarys[name]
+	return l.libraries[name]
 }
 
 func NewLibraryManager() *LibraryManager {
 	return &LibraryManager{
-		librarys: map[string]Library{},
+		libraries: map[string]Library{},
 	}
 }

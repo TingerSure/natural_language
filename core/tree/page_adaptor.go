@@ -10,6 +10,7 @@ type PageAdaptor struct {
 	functions *component.Mapping
 	classes   *component.Mapping
 	consts    *component.Mapping
+	sources   []Source
 }
 
 func (p *PageAdaptor) GetFunction(key concept.String) concept.Function {
@@ -39,6 +40,14 @@ func (p *PageAdaptor) SetConst(key concept.String, value concept.String) Page {
 	return p
 }
 
+func (p *PageAdaptor) GetSources() []Source {
+	return p.sources
+}
+
+func (p *PageAdaptor) AddSource(source Source) {
+	p.sources = append(p.sources, source)
+}
+
 func NewPageAdaptor() *PageAdaptor {
 	return &PageAdaptor{
 		functions: component.NewMapping(&component.MappingParam{
@@ -53,5 +62,6 @@ func NewPageAdaptor() *PageAdaptor {
 			AutoInit:   true,
 			EmptyValue: variable.NewNull(),
 		}),
+		sources: []Source{},
 	}
 }

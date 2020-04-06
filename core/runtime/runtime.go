@@ -18,7 +18,6 @@ type Runtime struct {
 	grammar         *grammar.Grammar
 	ambiguity       *ambiguity.Ambiguity
 	libs            *tree.LibraryManager
-	languages       *tree.LanguageManager
 	box             *sandbox.Sandbox
 	rootSpace       *closure.Closure
 	defaultLanguage string
@@ -35,12 +34,9 @@ func (r *Runtime) GetDefaultLanguage() string {
 func (r *Runtime) GetLibraryManager() *tree.LibraryManager {
 	return r.libs
 }
-func (r *Runtime) GetLanguageManager() *tree.LanguageManager {
-	return r.languages
-}
 
-func (r *Runtime) Bind(languageName string) {
-	r.languages.GetLanguage(languageName).PackagesIterate(func(_ string, instance tree.Package) bool {
+func (r *Runtime) Bind() {
+	r.libs.PageIterate(func(instance tree.Page) bool {
 		for _, source := range instance.GetSources() {
 			r.lexer.AddNaturalSource(source)
 			r.grammar.AddStructRule(source.GetStructRules())
@@ -116,7 +112,6 @@ func NewRuntime(param *RuntimeParam) *Runtime {
 		grammar:   grammar.NewGrammar(),
 		ambiguity: ambiguity.NewAmbiguity(),
 		libs:      tree.NewLibraryManager(),
-		languages: tree.NewLanguageManager(),
 		rootSpace: closure.NewClosure(nil, &closure.ClosureParam{
 			StringCreator: func(value string) concept.String {
 				return variable.NewString(value)

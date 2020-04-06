@@ -14,9 +14,9 @@ import (
 	"github.com/TingerSure/natural_language/language/chinese/system/word/verb/set"
 )
 
-func NewSystem(libs *tree.LibraryManager) *tree.PackageAdaptor {
+func NewSystem(libs *tree.LibraryManager) tree.Page {
 
-	system := tree.NewPackageAdaptor()
+	system := tree.NewPageAdaptor()
 	system.AddSource(pronoun.NewIt(libs))
 
 	system.AddSource(pronoun.NewResult(libs))
