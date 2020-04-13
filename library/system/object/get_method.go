@@ -8,22 +8,25 @@ import (
 )
 
 var (
-	GetMethodContent  = variable.NewString("object")
-	GetMethodKey      = variable.NewString("key")
-	GetMethodFunction = variable.NewString("function")
+	GetMethodContentName  = "object"
+	GetMethodKeyName      = "key"
+	GetMethodFunctionName = "function"
+
+	GetMethodObjectErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetMethodObjectErrorException"))
+	GetMethodKeyErrorExceptionTemplate    = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetMethodKeyErrorException"))
+	GetMethodKeyNotExistExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetMethodKeyNotExistException"))
 )
 
-var (
-	GetMethodObjectErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetMethodObjectErrorException"))
-	GetMethodKeyErrorException    = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetMethodKeyErrorException"))
-	GetMethodKeyNotExistException = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetMethodKeyNotExistException"))
-)
+func initGetMethod(instance *Object) {
+	GetMethodContent := variable.NewString(GetMethodContentName)
+	GetMethodKey := variable.NewString(GetMethodKeyName)
+	GetMethodFunction := variable.NewString(GetMethodFunctionName)
 
-var (
-	GetMethod *variable.SystemFunction = nil
-)
+	GetMethodObjectErrorException := GetMethodObjectErrorExceptionTemplate.Copy()
+	GetMethodKeyErrorException := GetMethodKeyErrorExceptionTemplate.Copy()
+	GetMethodKeyNotExistException := GetMethodKeyNotExistExceptionTemplate.Copy()
 
-func init() {
+	var GetMethod concept.Function
 	GetMethod = variable.NewSystemFunction(
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(GetMethodContent))
@@ -54,4 +57,15 @@ func init() {
 			GetMethodFunction,
 		},
 	)
+
+	instance.SetException(variable.NewString("GetMethodObjectErrorException"), GetMethodObjectErrorException)
+	instance.SetException(variable.NewString("GetMethodKeyErrorException"), GetMethodKeyErrorException)
+	instance.SetException(variable.NewString("GetMethodKeyNotExistException"), GetMethodKeyNotExistException)
+
+	instance.SetConst(variable.NewString("GetMethodContent"), GetMethodContent)
+	instance.SetConst(variable.NewString("GetMethodKey"), GetMethodKey)
+	instance.SetConst(variable.NewString("GetMethodFunction"), GetMethodFunction)
+
+	instance.SetFunction(variable.NewString("GetMethod"), GetMethod)
+
 }

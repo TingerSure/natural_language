@@ -38,7 +38,7 @@ func (s *Std) Error(input concept.Param, object concept.Object) (concept.Param, 
 	return input, nil
 }
 
-func NewStd(param *StdParam) *Std {
+func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 	instance := &Std{
 		param:        param,
 		Page:         tree.NewPageAdaptor(),

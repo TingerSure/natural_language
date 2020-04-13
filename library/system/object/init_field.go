@@ -8,22 +8,25 @@ import (
 )
 
 var (
-	InitFieldContent      = variable.NewString("object")
-	InitFieldKey          = variable.NewString("key")
-	InitFieldDefaultValue = variable.NewString("default_value")
+	InitFieldContentName      = "object"
+	InitFieldKeyName          = "key"
+	InitFieldDefaultValueName = "default_value"
+
+	InitFieldObjectErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("InitFieldObjectErrorException"))
+	InitFieldKeyErrorExceptionTemplate    = interrupt.NewException(variable.NewString("type error"), variable.NewString("InitFieldKeyErrorException"))
+	InitFieldKeyExistExceptionTemplate    = interrupt.NewException(variable.NewString("type error"), variable.NewString("InitFieldKeyExistException"))
 )
 
-var (
-	InitFieldObjectErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("InitFieldObjectErrorException"))
-	InitFieldKeyErrorException    = interrupt.NewException(variable.NewString("type error"), variable.NewString("InitFieldKeyErrorException"))
-	InitFieldKeyExistException    = interrupt.NewException(variable.NewString("type error"), variable.NewString("InitFieldKeyExistException"))
-)
+func initInitField(instance *Object) {
+	InitFieldContent := variable.NewString(InitFieldContentName)
+	InitFieldKey := variable.NewString(InitFieldKeyName)
+	InitFieldDefaultValue := variable.NewString(InitFieldDefaultValueName)
 
-var (
-	InitField *variable.SystemFunction = nil
-)
+	InitFieldObjectErrorException := InitFieldObjectErrorExceptionTemplate.Copy()
+	InitFieldKeyErrorException := InitFieldKeyErrorExceptionTemplate.Copy()
+	InitFieldKeyExistException := InitFieldKeyExistExceptionTemplate.Copy()
 
-func init() {
+	var InitField concept.Function
 	InitField = variable.NewSystemFunction(
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(InitFieldContent))
@@ -60,4 +63,15 @@ func init() {
 			InitFieldContent,
 		},
 	)
+
+	instance.SetException(variable.NewString("InitFieldObjectErrorException"), InitFieldObjectErrorException)
+	instance.SetException(variable.NewString("InitFieldKeyErrorException"), InitFieldKeyErrorException)
+	instance.SetException(variable.NewString("InitFieldKeyExistException"), InitFieldKeyExistException)
+
+	instance.SetConst(variable.NewString("InitFieldContent"), InitFieldContent)
+	instance.SetConst(variable.NewString("InitFieldKey"), InitFieldKey)
+	instance.SetConst(variable.NewString("InitFieldDefaultValue"), InitFieldDefaultValue)
+
+	instance.SetFunction(variable.NewString("InitField"), InitField)
+
 }

@@ -7,21 +7,23 @@ import (
 )
 
 var (
-	HasMethodContent = variable.NewString("object")
-	HasMethodKey     = variable.NewString("key")
-	HasMethodExist   = variable.NewString("exist")
+	HasMethodContentName = "object"
+	HasMethodKeyName     = "key"
+	HasMethodExistName   = "exist"
+
+	HasMethodObjectErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasMethodObjectErrorException"))
+	HasMethodKeyErrorExceptionTemplate    = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasMethodKeyErrorException"))
 )
 
-var (
-	HasMethodObjectErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasMethodObjectErrorException"))
-	HasMethodKeyErrorException    = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasMethodKeyErrorException"))
-)
+func initHasMethod(instance *Object) {
+	HasMethodContent := variable.NewString(HasMethodContentName)
+	HasMethodKey := variable.NewString(HasMethodKeyName)
+	HasMethodExist := variable.NewString(HasMethodExistName)
 
-var (
-	HasMethod *variable.SystemFunction = nil
-)
+	HasMethodObjectErrorException := HasMethodObjectErrorExceptionTemplate.Copy()
+	HasMethodKeyErrorException := HasMethodKeyErrorExceptionTemplate.Copy()
 
-func init() {
+	var HasMethod concept.Function
 	HasMethod = variable.NewSystemFunction(
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(HasMethodContent))
@@ -44,4 +46,14 @@ func init() {
 			HasMethodExist,
 		},
 	)
+
+	instance.SetException(variable.NewString("HasMethodObjectErrorException"), HasMethodObjectErrorException)
+	instance.SetException(variable.NewString("HasMethodKeyErrorException"), HasMethodKeyErrorException)
+
+	instance.SetConst(variable.NewString("HasMethodContent"), HasMethodContent)
+	instance.SetConst(variable.NewString("HasMethodKey"), HasMethodKey)
+	instance.SetConst(variable.NewString("HasMethodExist"), HasMethodExist)
+
+	instance.SetFunction(variable.NewString("HasMethod"), HasMethod)
+
 }

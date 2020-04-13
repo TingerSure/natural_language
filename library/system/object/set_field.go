@@ -8,22 +8,26 @@ import (
 )
 
 var (
-	SetFieldContent = variable.NewString("object")
-	SetFieldKey     = variable.NewString("key")
-	SetFieldValue   = variable.NewString("value")
+	SetFieldContentName = "object"
+	SetFieldKeyName     = "key"
+	SetFieldValueName   = "value"
+
+	SetFieldObjectErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetFieldObjectErrorException"))
+	SetFieldKeyErrorExceptionTemplate    = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetFieldKeyErrorException"))
+	SetFieldKeyNotExistExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetFieldKeyNotExistException"))
 )
 
-var (
-	SetFieldObjectErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetFieldObjectErrorException"))
-	SetFieldKeyErrorException    = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetFieldKeyErrorException"))
-	SetFieldKeyNotExistException = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetFieldKeyNotExistException"))
-)
+func initSetField(instance *Object) {
+	SetFieldContent := variable.NewString(SetFieldContentName)
+	SetFieldKey := variable.NewString(SetFieldKeyName)
+	SetFieldValue := variable.NewString(SetFieldValueName)
 
-var (
-	SetField *variable.SystemFunction = nil
-)
+	SetFieldObjectErrorException := SetFieldObjectErrorExceptionTemplate.Copy()
+	SetFieldKeyErrorException := SetFieldKeyErrorExceptionTemplate.Copy()
+	SetFieldKeyNotExistException := SetFieldKeyNotExistExceptionTemplate.Copy()
 
-func init() {
+	var SetField concept.Function
+
 	SetField = variable.NewSystemFunction(
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(SetFieldContent))
@@ -60,4 +64,15 @@ func init() {
 			SetFieldContent,
 		},
 	)
+
+	instance.SetException(variable.NewString("SetFieldObjectErrorException"), SetFieldObjectErrorException)
+	instance.SetException(variable.NewString("SetFieldKeyErrorException"), SetFieldKeyErrorException)
+	instance.SetException(variable.NewString("SetFieldKeyNotExistException"), SetFieldKeyNotExistException)
+
+	instance.SetConst(variable.NewString("SetFieldContent"), SetFieldContent)
+	instance.SetConst(variable.NewString("SetFieldKey"), SetFieldKey)
+	instance.SetConst(variable.NewString("SetFieldValue"), SetFieldValue)
+
+	instance.SetFunction(variable.NewString("SetField"), SetField)
+
 }

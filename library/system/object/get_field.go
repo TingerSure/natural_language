@@ -9,22 +9,25 @@ import (
 )
 
 var (
-	GetFieldContent = variable.NewString("object")
-	GetFieldKey     = variable.NewString("key")
-	GetFieldValue   = variable.NewString("value")
+	GetFieldContentName = "object"
+	GetFieldKeyName     = "key"
+	GetFieldValueName   = "value"
+
+	GetFieldObjectErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetFieldObjectErrorException"))
+	GetFieldKeyErrorExceptionTemplate    = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetFieldKeyErrorException"))
+	GetFieldKeyNotExistExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetFieldKeyNotExistException"))
 )
 
-var (
-	GetFieldObjectErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetFieldObjectErrorException"))
-	GetFieldKeyErrorException    = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetFieldKeyErrorException"))
-	GetFieldKeyNotExistException = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetFieldKeyNotExistException"))
-)
+func initGetField(instance *Object) {
+	GetFieldContent := variable.NewString(GetFieldContentName)
+	GetFieldKey := variable.NewString(GetFieldKeyName)
+	GetFieldValue := variable.NewString(GetFieldValueName)
 
-var (
-	GetField *variable.SystemFunction = nil
-)
+	GetFieldObjectErrorException := GetFieldObjectErrorExceptionTemplate.Copy()
+	GetFieldKeyErrorException := GetFieldKeyErrorExceptionTemplate.Copy()
+	GetFieldKeyNotExistException := GetFieldKeyNotExistExceptionTemplate.Copy()
 
-func init() {
+	var GetField concept.Function
 	GetField = variable.NewSystemFunction(
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			content := input.Get(GetFieldContent)
@@ -60,4 +63,14 @@ func init() {
 			GetFieldValue,
 		},
 	)
+
+	instance.SetException(variable.NewString("GetFieldObjectErrorException"), GetFieldObjectErrorException)
+	instance.SetException(variable.NewString("GetFieldKeyErrorException"), GetFieldKeyErrorException)
+	instance.SetException(variable.NewString("GetFieldKeyNotExistException"), GetFieldKeyNotExistException)
+
+	instance.SetConst(variable.NewString("GetFieldContent"), GetFieldContent)
+	instance.SetConst(variable.NewString("GetFieldKey"), GetFieldKey)
+	instance.SetConst(variable.NewString("GetFieldValue"), GetFieldValue)
+
+	instance.SetFunction(variable.NewString("GetField"), GetField)
 }

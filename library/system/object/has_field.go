@@ -7,21 +7,24 @@ import (
 )
 
 var (
-	HasFieldContent = variable.NewString("object")
-	HasFieldKey     = variable.NewString("key")
-	HasFieldExist   = variable.NewString("exist")
+	HasFieldContentName = "object"
+	HasFieldKeyName     = "key"
+	HasFieldExistName   = "exist"
+
+	HasFieldObjectErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasFieldObjectErrorException"))
+	HasFieldKeyErrorExceptionTemplate    = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasFieldKeyErrorException"))
 )
 
-var (
-	HasFieldObjectErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasFieldObjectErrorException"))
-	HasFieldKeyErrorException    = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasFieldKeyErrorException"))
-)
+func initHasField(instance *Object) {
 
-var (
-	HasField *variable.SystemFunction = nil
-)
+	HasFieldContent := variable.NewString(HasFieldContentName)
+	HasFieldKey := variable.NewString(HasFieldKeyName)
+	HasFieldExist := variable.NewString(HasFieldExistName)
 
-func init() {
+	HasFieldObjectErrorException := HasFieldObjectErrorExceptionTemplate.Copy()
+	HasFieldKeyErrorException := HasFieldKeyErrorExceptionTemplate.Copy()
+
+	var HasField concept.Function
 	HasField = variable.NewSystemFunction(
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(HasFieldContent))
@@ -44,4 +47,14 @@ func init() {
 			HasFieldExist,
 		},
 	)
+
+	instance.SetException(variable.NewString("HasFieldObjectErrorException"), HasFieldObjectErrorException)
+	instance.SetException(variable.NewString("HasFieldKeyErrorException"), HasFieldKeyErrorException)
+
+	instance.SetConst(variable.NewString("HasFieldContent"), HasFieldContent)
+	instance.SetConst(variable.NewString("HasFieldKey"), HasFieldKey)
+	instance.SetConst(variable.NewString("HasFieldExist"), HasFieldExist)
+
+	instance.SetFunction(variable.NewString("HasField"), HasField)
+
 }

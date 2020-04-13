@@ -9,13 +9,10 @@ import (
 
 type Question struct {
 	tree.Page
-	output *std.Std
+	output         *std.Std
+	HowManyContent concept.String
+	WhatContent    concept.String
 }
-
-var (
-	HowManyContent = std.PrintContent
-	WhatContent    = std.PrintContent
-)
 
 func (q *Question) HowMany(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 	return q.output.Print(input, object)
@@ -25,32 +22,34 @@ func (q *Question) What(input concept.Param, object concept.Object) (concept.Par
 	return q.output.Print(input, object)
 }
 
-func NewQuestion(output *std.Std) *Question {
+func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 
 	instance := &Question{
-		Page:   tree.NewPageAdaptor(),
-		output: output,
+		Page:           tree.NewPageAdaptor(),
+		output:         output,
+		HowManyContent: output.PrintContent.Clone(),
+		WhatContent:    output.PrintContent.Clone(),
 	}
 	instance.SetFunction(variable.NewString("HowMany"), variable.NewSystemFunction(
 		instance.HowMany,
 		[]concept.String{
-			variable.NewString(HowManyContent),
+			instance.HowManyContent,
 		},
 		[]concept.String{
-			variable.NewString(HowManyContent),
+			instance.HowManyContent,
 		},
 	))
 
 	instance.SetFunction(variable.NewString("What"), variable.NewSystemFunction(
 		instance.What,
 		[]concept.String{
-			variable.NewString(WhatContent),
+			instance.WhatContent,
 		},
 		[]concept.String{
-			variable.NewString(WhatContent),
+			instance.WhatContent,
 		},
 	))
-	instance.SetConst(variable.NewString("HowManyContent"), variable.NewString(HowManyContent))
-	instance.SetConst(variable.NewString("WhatContent"), variable.NewString(WhatContent))
+	instance.SetConst(variable.NewString("HowManyContent"), instance.HowManyContent)
+	instance.SetConst(variable.NewString("WhatContent"), instance.HowManyContent)
 	return instance
 }

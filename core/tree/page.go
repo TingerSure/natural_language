@@ -11,6 +11,8 @@ type Page interface {
 	SetClass(concept.String, concept.Class) Page
 	GetConst(concept.String) concept.String
 	SetConst(concept.String, concept.String) Page
+	GetException(concept.String) concept.Exception
+	SetException(concept.String, concept.Exception) Page
 	GetSources() []Source
 	AddSource(Source)
 }

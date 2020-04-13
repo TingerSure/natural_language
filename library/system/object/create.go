@@ -6,13 +6,16 @@ import (
 )
 
 var (
-	CreateContent = variable.NewString("object")
-
-	Create *variable.SystemFunction = nil
+	CreateContentName = "object"
 )
 
-func init() {
-	Create = variable.NewSystemFunction(
+func initCreate(instance *Object) {
+
+	CreateContent := variable.NewString(CreateContentName)
+
+	instance.SetConst(variable.NewString("CreateContent"), CreateContent)
+
+	instance.SetFunction(variable.NewString("Create"), variable.NewSystemFunction(
 		func(_ concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			return variable.NewParam().Set(CreateContent, variable.NewObject()), nil
 		},
@@ -20,5 +23,5 @@ func init() {
 		[]concept.String{
 			CreateContent,
 		},
-	)
+	))
 }

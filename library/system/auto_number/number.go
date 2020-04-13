@@ -36,7 +36,7 @@ type AutoNumber struct {
 	AutoNumberClass concept.Class
 }
 
-func NewAutoNumber() *AutoNumber {
+func NewAutoNumber(libs *tree.LibraryManager) *AutoNumber {
 	instance := &AutoNumber{
 		Page:            tree.NewPageAdaptor(),
 		AutoNumberClass: AutoNumberClass,

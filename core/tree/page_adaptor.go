@@ -7,10 +7,20 @@ import (
 )
 
 type PageAdaptor struct {
-	functions *component.Mapping
-	classes   *component.Mapping
-	consts    *component.Mapping
-	sources   []Source
+	functions  *component.Mapping
+	classes    *component.Mapping
+	consts     *component.Mapping
+	exceptions *component.Mapping
+	sources    []Source
+}
+
+func (p *PageAdaptor) GetException(key concept.String) concept.Exception {
+	return p.exceptions.Get(key).(concept.Exception)
+}
+
+func (p *PageAdaptor) SetException(key concept.String, value concept.Exception) Page {
+	p.exceptions.Set(key, value)
+	return p
 }
 
 func (p *PageAdaptor) GetFunction(key concept.String) concept.Function {

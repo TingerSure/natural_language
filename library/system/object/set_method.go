@@ -8,22 +8,26 @@ import (
 )
 
 var (
-	SetMethodContent  = variable.NewString("object")
-	SetMethodKey      = variable.NewString("key")
-	SetMethodFunction = variable.NewString("function")
+	SetMethodContentName  = "object"
+	SetMethodKeyName      = "key"
+	SetMethodFunctionName = "function"
+
+	SetMethodObjectErrorExceptionTemplate   = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetMethodObjectErrorException"))
+	SetMethodKeyErrorExceptionTemplate      = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetMethodKeyErrorException"))
+	SetMethodFunctionErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetMethodFunctionErrorException"))
 )
 
-var (
-	SetMethodObjectErrorException   = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetMethodObjectErrorException"))
-	SetMethodKeyErrorException      = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetMethodKeyErrorException"))
-	SetMethodFunctionErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetMethodFunctionErrorException"))
-)
+func initSetMethod(instance *Object) {
+	SetMethodContent := variable.NewString(SetMethodContentName)
+	SetMethodKey := variable.NewString(SetMethodKeyName)
+	SetMethodFunction := variable.NewString(SetMethodFunctionName)
 
-var (
-	SetMethod *variable.SystemFunction = nil
-)
+	SetMethodObjectErrorException := SetMethodObjectErrorExceptionTemplate.Copy()
+	SetMethodKeyErrorException := SetMethodKeyErrorExceptionTemplate.Copy()
+	SetMethodFunctionErrorException := SetMethodFunctionErrorExceptionTemplate.Copy()
 
-func init() {
+	var SetMethod concept.Function
+
 	SetMethod = variable.NewSystemFunction(
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(SetMethodContent))
@@ -57,4 +61,15 @@ func init() {
 			SetMethodContent,
 		},
 	)
+
+	instance.SetException(variable.NewString("SetMethodObjectErrorException"), SetMethodObjectErrorException)
+	instance.SetException(variable.NewString("SetMethodKeyErrorException"), SetMethodKeyErrorException)
+	instance.SetException(variable.NewString("SetMethodFunctionErrorException"), SetMethodFunctionErrorException)
+
+	instance.SetConst(variable.NewString("SetMethodContent"), SetMethodContent)
+	instance.SetConst(variable.NewString("SetMethodKey"), SetMethodKey)
+	instance.SetConst(variable.NewString("SetMethodFunction"), SetMethodFunction)
+
+	instance.SetFunction(variable.NewString("SetMethod"), SetMethod)
+
 }
