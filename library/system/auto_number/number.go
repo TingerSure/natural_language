@@ -8,42 +8,47 @@ import (
 )
 
 var (
-	AutoNumberClassValue   = variable.NewString("value")
-	AutoNumberClassName    = "system.auto_number"
-	AutoNumberClass        = variable.NewClass(AutoNumberClassName)
-	AutoNumberClassMapping = map[concept.String]concept.String{
-		AutoNumberClassValue: AutoNumberClassValue,
-	}
+	AutoNumberValueName      = "value"
+	AutoNumberClassValueName = AutoNumberValueName
+	AutoNumberClassName      = "system.auto_number"
 )
-
-func init() {
-	AutoNumberClass.SetField(AutoNumberClassValue, variable.NewNumber(0))
-}
-
-func NewAutoNumberObject(value *variable.Number) concept.Object {
-	auto := variable.NewObject()
-	auto.InitField(AutoNumberClassValue, value)
-	auto.AddClass(AutoNumberClass, "", AutoNumberClassMapping)
-	object, suspend := variable.NewMappingObject(auto, AutoNumberClassName, "")
-	if !nl_interface.IsNil(suspend) {
-		panic(suspend)
-	}
-	return object
-}
 
 type AutoNumber struct {
 	tree.Page
-	AutoNumberClass concept.Class
+	AutoNumberValue      concept.String
+	AutoNumberClassValue concept.String
+	AutoNumberClass      concept.Class
+	NewAutoNumberObject  func(*variable.Number) concept.Object
 }
 
 func NewAutoNumber(libs *tree.LibraryManager) *AutoNumber {
 	instance := &AutoNumber{
-		Page:            tree.NewPageAdaptor(),
-		AutoNumberClass: AutoNumberClass,
+		Page:                 tree.NewPageAdaptor(),
+		AutoNumberValue:      variable.NewString(AutoNumberValueName),
+		AutoNumberClassValue: variable.NewString(AutoNumberClassValueName),
+		AutoNumberClass:      variable.NewClass(AutoNumberClassName),
 	}
-	instance.SetClass(variable.NewString("AutoNumberClass"), AutoNumberClass)
-	instance.SetConst(variable.NewString("AutoNumberClassValue"), AutoNumberClassValue)
-	instance.SetConst(variable.NewString("AutoNumberClassName"), variable.NewString(AutoNumberClassName))
+
+	instance.AutoNumberClass.SetField(instance.AutoNumberClassValue, variable.NewNumber(0))
+
+	instance.NewAutoNumberObject = func(value *variable.Number) concept.Object {
+		auto := variable.NewObject()
+		auto.InitField(instance.AutoNumberValue, value)
+		auto.AddClass(instance.AutoNumberClass, "", map[concept.String]concept.String{
+			instance.AutoNumberClassValue: instance.AutoNumberValue,
+		})
+		object, suspend := variable.NewMappingObject(auto, AutoNumberClassName, "")
+		if !nl_interface.IsNil(suspend) {
+			panic(suspend)
+		}
+		return object
+	}
+
+	initAddition(instance)
+
+	instance.SetClass(variable.NewString("AutoNumberClass"), instance.AutoNumberClass)
+	instance.SetConst(variable.NewString("AutoNumberClassValue"), instance.AutoNumberClassValue)
+	instance.SetConst(variable.NewString("AutoNumberValue"), instance.AutoNumberValue)
 
 	return instance
 }

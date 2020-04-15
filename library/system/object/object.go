@@ -2,15 +2,18 @@ package object
 
 import (
 	"github.com/TingerSure/natural_language/core/tree"
+	"github.com/TingerSure/natural_language/library/system/auto_number"
 )
 
 type Object struct {
 	tree.Page
+	*auto_number.AutoNumber
 }
 
-func NewObject(libs *tree.LibraryManager) *Object {
+func NewObject(libs *tree.LibraryManager, autoNumber *auto_number.AutoNumber) *Object {
 	instance := &Object{
-		Page: tree.NewPageAdaptor(),
+		Page:       tree.NewPageAdaptor(),
+		AutoNumber: autoNumber,
 	}
 	initCreate(instance)
 	initGetField(instance)

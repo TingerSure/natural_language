@@ -15,12 +15,18 @@ type SystemLibraryParam struct {
 
 func NewSystemLibrary(libs *tree.LibraryManager, param *SystemLibraryParam) tree.Library {
 	system := tree.NewLibraryAdaptor()
+
 	stdInstance := std.NewStd(libs, param.Std)
 	system.SetPage("std", stdInstance)
+
 	system.SetPage("question", question.NewQuestion(libs, stdInstance))
+
 	system.SetPage("operator", operator.NewOperator(libs))
-	system.SetPage("object", object.NewObject(libs))
-	system.SetPage("auto_number", auto_number.NewAutoNumber(libs))
+
+	autoNumber := auto_number.NewAutoNumber(libs)
+	system.SetPage("auto_number", autoNumber)
+
+	system.SetPage("object", object.NewObject(libs, autoNumber))
 
 	return system
 }

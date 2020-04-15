@@ -5,7 +5,6 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
-	"github.com/TingerSure/natural_language/library/system/auto_number"
 )
 
 var (
@@ -35,7 +34,7 @@ func initGetField(instance *Object) {
 			if objectHome, ok := variable.VariableFamilyInstance.IsObjectHome(content); ok {
 				object = objectHome
 			} else if number, ok := variable.VariableFamilyInstance.IsNumber(content); ok {
-				object = auto_number.NewAutoNumberObject(number)
+				object = instance.AutoNumber.NewAutoNumberObject(number)
 			} else {
 				return nil, GetFieldObjectErrorException.Copy().AddStack(GetField)
 			}

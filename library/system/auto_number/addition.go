@@ -8,20 +8,27 @@ import (
 )
 
 var (
-	AdditionTargetNotExistException           = interrupt.NewException(variable.NewString("type error"), variable.NewString("AdditionTargetNotExistException"))
-	AdditionAutoObjectValueTypeErrorException = interrupt.NewException(variable.NewString("type error"), variable.NewString("AdditionAutoObjectValueTypeErrorException"))
+	AdditionTargetNotExistExceptionTemplate           = interrupt.NewException(variable.NewString("type error"), variable.NewString("AdditionTargetNotExistException"))
+	AdditionAutoObjectValueTypeErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("AdditionAutoObjectValueTypeErrorException"))
 
-	AdditionTarget                  = variable.NewString("target")
-	AdditionResult                  = variable.NewString("result")
-	AdditionKey                     = variable.NewString("addition")
-	Addition       concept.Function = nil
+	AdditionTargetName = "target"
+	AdditionResultName = "result"
+	AdditionKeyName    = "addition"
 )
 
-func init() {
+func initAddition(instance *AutoNumber) {
+
+	AdditionTarget := variable.NewString(AdditionTargetName)
+	AdditionResult := variable.NewString(AdditionResultName)
+	AdditionKey := variable.NewString(AdditionKeyName)
+	AdditionTargetNotExistException := AdditionTargetNotExistExceptionTemplate.Copy()
+	AdditionAutoObjectValueTypeErrorException := AdditionAutoObjectValueTypeErrorExceptionTemplate.Copy()
+
+	var Addition concept.Function = nil
 
 	Addition = variable.NewSystemFunction(
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
-			preLeft, suspend := object.GetField(AutoNumberClassValue)
+			preLeft, suspend := object.GetField(instance.AutoNumberClassValue)
 			if !nl_interface.IsNil(suspend) {
 				return nil, suspend
 			}
@@ -46,5 +53,12 @@ func init() {
 		},
 	)
 
-	AutoNumberClass.SetMethod(AdditionKey, Addition)
+	instance.AutoNumberClass.SetMethod(AdditionKey, Addition)
+
+	instance.SetException(variable.NewString("AdditionTargetNotExistException"), AdditionTargetNotExistException)
+	instance.SetException(variable.NewString("AdditionAutoObjectValueTypeErrorException"), AdditionAutoObjectValueTypeErrorException)
+
+	instance.SetConst(variable.NewString("AdditionTarget"), AdditionTarget)
+	instance.SetConst(variable.NewString("AdditionResult"), AdditionResult)
+	instance.SetConst(variable.NewString("AdditionKey"), AdditionKey)
 }
