@@ -22,7 +22,7 @@ var (
 )
 
 type NumberFromNumberOperatorNumber struct {
-	adaptor.SourceAdaptor
+	*adaptor.SourceAdaptor
 	operatorLeft   concept.String
 	operatorRight  concept.String
 	operatorResult concept.String
@@ -61,9 +61,10 @@ func (p *NumberFromNumberOperatorNumber) GetName() string {
 	return NumberFromNumberOperatorNumberName
 }
 
-func NewNumberFromNumberOperatorNumber(libs *tree.LibraryManager) *NumberFromNumberOperatorNumber {
-	page := libs.GetLibraryPage("system", "operator")
+func NewNumberFromNumberOperatorNumber(param *adaptor.SourceAdaptorParam) *NumberFromNumberOperatorNumber {
+	page := Libs.GetLibraryPage("system", "operator")
 	return (&NumberFromNumberOperatorNumber{
+		SourceAdaptor:  adaptor.NewSourceAdaptor(param),
 		operatorLeft:   page.GetConst(variable.NewString("Left")),
 		operatorRight:  page.GetConst(variable.NewString("Right")),
 		operatorResult: page.GetConst(variable.NewString("Result")),

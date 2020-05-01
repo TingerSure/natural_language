@@ -18,7 +18,7 @@ const (
 )
 
 type Belong struct {
-	adaptor.SourceAdaptor
+	*adaptor.SourceAdaptor
 }
 
 func (p *Belong) GetName() string {
@@ -40,7 +40,7 @@ func (p *Belong) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(variable.NewString(treasure.GetWord().GetContext()))
+						return index.NewConstIndex(variable.NewString(BelongTo))
 					},
 					Content: treasure,
 					Types:   phrase_type.AuxiliaryBelong,
@@ -51,6 +51,8 @@ func (p *Belong) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewBelong(libs *tree.LibraryManager) *Belong {
-	return (&Belong{})
+func NewBelong(param *adaptor.SourceAdaptorParam) *Belong {
+	return (&Belong{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
+	})
 }

@@ -14,41 +14,39 @@ import (
 	"github.com/TingerSure/natural_language/language/chinese/system/word/verb/set"
 )
 
-func NewSystem(libs *tree.LibraryManager) tree.Page {
+func NewSystem(param *adaptor.SourceAdaptorParam) tree.Page {
 
 	system := tree.NewPageAdaptor()
-	system.AddSource(pronoun.NewIt(libs))
+	system.AddSource(pronoun.NewIt(param))
 
-	system.AddSource(pronoun.NewResult(libs))
+	system.AddSource(pronoun.NewResult(param))
 
-	system.AddSource(set.NewSet(libs))
+	system.AddSource(set.NewSet(param))
 
-	questionPackage := question.NewQuestion(libs)
-	system.AddSource(questionPackage)
-	system.AddSource(question.NewWhat(libs, questionPackage))
-	system.AddSource(question.NewHowMany(libs, questionPackage))
+	system.AddSource(question.NewWhat(param))
+	system.AddSource(question.NewHowMany(param))
 
-	system.AddSource(auxiliary.NewBelong(libs))
+	system.AddSource(auxiliary.NewBelong(param))
 
-	system.AddSource(unknown.NewUnknown(libs))
+	system.AddSource(unknown.NewUnknown(param))
 
-	system.AddSource(number.NewNumber(libs))
+	system.AddSource(number.NewNumber(param))
 
-	system.AddSource(operator.NewAddition(libs))
-	system.AddSource(operator.NewSubtraction(libs))
-	system.AddSource(operator.NewDivision(libs))
-	system.AddSource(operator.NewMultiplication(libs))
+	system.AddSource(operator.NewAddition(param))
+	system.AddSource(operator.NewSubtraction(param))
+	system.AddSource(operator.NewDivision(param))
+	system.AddSource(operator.NewMultiplication(param))
 
-	system.AddSource(brackets.NewBracketsLeft(libs))
-	system.AddSource(brackets.NewBracketsRight(libs))
+	system.AddSource(brackets.NewBracketsLeft(param))
+	system.AddSource(brackets.NewBracketsRight(param))
 
-	system.AddSource(structs.NewAnyFromAnyBelongAny(libs))
-	system.AddSource(structs.NewNumberFromNumberOperatorNumber(libs))
-	system.AddSource(structs.NewAnyFromBracketAnyBracket(libs))
-	system.AddSource(structs.NewAnyFromQuestionSetAny(libs, questionPackage))
-	system.AddSource(structs.NewAnyFromAnySetQuestion(libs, questionPackage))
+	system.AddSource(structs.NewAnyFromAnyBelongAny(param))
+	system.AddSource(structs.NewNumberFromNumberOperatorNumber(param))
+	system.AddSource(structs.NewAnyFromBracketAnyBracket(param))
+	system.AddSource(structs.NewAnyFromQuestionSetAny(param, questionPackage))
+	system.AddSource(structs.NewAnyFromAnySetQuestion(param, questionPackage))
 
-	system.AddSource(priority.NewOperatorLevel(libs))
-	system.AddSource(priority.NewBelong(libs))
+	system.AddSource(priority.NewOperatorLevel(param))
+	system.AddSource(priority.NewBelong(param))
 	return system
 }

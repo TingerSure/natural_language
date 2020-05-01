@@ -20,8 +20,7 @@ var (
 )
 
 type Multiplication struct {
-	adaptor.SourceAdaptor
-	libs     *tree.LibraryManager
+	*adaptor.SourceAdaptor
 	operator concept.Function
 }
 
@@ -53,9 +52,10 @@ func (p *Multiplication) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewMultiplication(libs *tree.LibraryManager) *Multiplication {
-	return (&Multiplication{
-		libs:     libs,
-		operator: libs.GetLibraryPage("system", "operator").GetFunction(variable.NewString("MultiplicationFunc")),
+func NewMultiplication(param *adaptor.SourceAdaptorParam) *Multiplication {
+	instance := (&Multiplication{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
+	instance.operator = instance.Libs.GetLibraryPage("system", "operator").GetFunction(variable.NewString("MultiplicationFunc"))
+	return instance
 }

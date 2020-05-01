@@ -4,8 +4,21 @@ import (
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
+type SourceAdaptorParam struct {
+	Libs     *tree.LibraryManager
+	Language string
+}
+
 type SourceAdaptor struct {
-	Libs *tree.LibraryManager
+	Libs     *tree.LibraryManager
+	Language string
+}
+
+func NewSourceAdaptor(param *SourceAdaptorParam) *SourceAdaptor {
+	return &SourceAdaptor{
+		Libs:     param.Libs,
+		Language: param.Language,
+	}
 }
 
 func (*SourceAdaptor) GetWords(string) []*tree.Word {

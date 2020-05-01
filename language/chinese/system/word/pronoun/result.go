@@ -2,8 +2,7 @@ package pronoun
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/index"
-	"github.com/TingerSure/natural_language/core/sandbox/matcher"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
@@ -22,7 +21,8 @@ var (
 )
 
 type Result struct {
-	adaptor.SourceAdaptor
+	*adaptor.SourceAdaptor
+	ResultIndex concept.Index
 }
 
 func (p *Result) GetName() string {
@@ -42,11 +42,7 @@ func (p *Result) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewResaultIndex([]concept.Matcher{
-							matcher.NewSystemMatcher(func(concept.Variable) bool {
-								return true
-							}),
-						})
+						return p.ResultIndex
 					},
 					Content: treasure,
 					Types:   phrase_type.Any,
@@ -57,6 +53,11 @@ func (p *Result) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewResult(libs *tree.LibraryManager) *Result {
-	return (&Result{})
+func NewResult(param *adaptor.SourceAdaptorParam) *Result {
+	instance := (&Result{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
+	})
+	page := instance.Libs.GetLibraryPage("system", "pronoun")
+	instance.ResultIndex = page.GetIndex(variable.NewString("Result"))
+	return instance
 }

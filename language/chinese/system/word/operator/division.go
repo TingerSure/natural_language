@@ -20,8 +20,7 @@ var (
 )
 
 type Division struct {
-	adaptor.SourceAdaptor
-	libs     *tree.LibraryManager
+	*adaptor.SourceAdaptor
 	operator concept.Function
 }
 
@@ -53,9 +52,10 @@ func (p *Division) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewDivision(libs *tree.LibraryManager) *Division {
-	return (&Division{
-		libs:     libs,
-		operator: libs.GetLibraryPage("system", "operator").GetFunction(variable.NewString("DivisionFunc")),
+func NewDivision(param *adaptor.SourceAdaptorParam) *Division {
+	instance := (&Division{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
+	instance.operator = instance.Libs.GetLibraryPage("system", "operator").GetFunction(variable.NewString("DivisionFunc"))
+	return instance
 }

@@ -15,7 +15,7 @@ const (
 )
 
 type Unknown struct {
-	adaptor.SourceAdaptor
+	*adaptor.SourceAdaptor
 }
 
 func (p *Unknown) GetName() string {
@@ -42,6 +42,8 @@ func (p *Unknown) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewUnknown(libs *tree.LibraryManager) *Unknown {
-	return (&Unknown{})
+func NewUnknown(param *adaptor.SourceAdaptorParam) *Unknown {
+	return (&Unknown{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
+	})
 }

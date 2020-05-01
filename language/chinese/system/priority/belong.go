@@ -11,7 +11,7 @@ const (
 )
 
 type Belong struct {
-	adaptor.SourceAdaptor
+	*adaptor.SourceAdaptor
 }
 
 func (o *Belong) GetPriorityRules() []*tree.PriorityRule {
@@ -41,6 +41,8 @@ func (p *Belong) GetName() string {
 	return belongName
 }
 
-func NewBelong(libs *tree.LibraryManager) *Belong {
-	return (&Belong{})
+func NewBelong(param *adaptor.SourceAdaptorParam) *Belong {
+	return (&Belong{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
+	})
 }

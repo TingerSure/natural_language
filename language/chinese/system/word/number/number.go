@@ -20,7 +20,7 @@ var (
 )
 
 type Number struct {
-	adaptor.SourceAdaptor
+	*adaptor.SourceAdaptor
 }
 
 func (p *Number) GetName() string {
@@ -59,6 +59,8 @@ func (p *Number) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewNumber(libs *tree.LibraryManager) *Number {
-	return (&Number{})
+func NewNumber(param *adaptor.SourceAdaptorParam) *Number {
+	return (&Number{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
+	})
 }

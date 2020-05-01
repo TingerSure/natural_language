@@ -23,8 +23,7 @@ var (
 )
 
 type AnyFromAnyBelongAny struct {
-	adaptor.SourceAdaptor
-	libs            *tree.LibraryManager
+	*adaptor.SourceAdaptor
 	GetFieldValue   concept.String
 	GetFieldKey     concept.String
 	GetFieldContent concept.String
@@ -63,10 +62,10 @@ func (p *AnyFromAnyBelongAny) GetName() string {
 	return AnyFromAnyBelongAnyName
 }
 
-func NewAnyFromAnyBelongAny(libs *tree.LibraryManager) *AnyFromAnyBelongAny {
-	libObject := libs.GetLibraryPage("system", "object")
+func NewAnyFromAnyBelongAny(param *adaptor.SourceAdaptorParam) *AnyFromAnyBelongAny {
+	libObject := Libs.GetLibraryPage("system", "object")
 	return (&AnyFromAnyBelongAny{
-		libs:            libs,
+		SourceAdaptor:   adaptor.NewSourceAdaptor(param),
 		GetFieldValue:   libObject.GetConst(variable.NewString("GetFieldValue")),
 		GetFieldKey:     libObject.GetConst(variable.NewString("GetFieldKey")),
 		GetFieldContent: libObject.GetConst(variable.NewString("GetFieldContent")),

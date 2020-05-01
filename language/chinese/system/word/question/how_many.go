@@ -2,7 +2,6 @@ package question
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/expression"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
@@ -16,32 +15,8 @@ const (
 )
 
 type HowMany struct {
-	adaptor.SourceAdaptor
-	parent            *Question
-	libs              *tree.LibraryManager
-	libHowManyContent concept.String
-	libHowManyFunc    concept.Function
-	HowManyFunc       *variable.Function
-}
-
-func (p *HowMany) init() *HowMany {
-	p.HowManyFunc = variable.NewFunction(nil)
-	p.HowManyFunc.AddParamName(p.parent.QuestionParam)
-	p.HowManyFunc.Body().AddStep(
-		expression.NewReturn(
-			p.parent.QuestionResult,
-			expression.NewParamGet(
-				expression.NewCall(
-					index.NewConstIndex(p.libHowManyFunc),
-					expression.NewNewParamWithInit(map[concept.String]concept.Index{
-						p.libHowManyContent: index.NewBubbleIndex(p.parent.QuestionParam),
-					}),
-				),
-				p.libHowManyContent,
-			),
-		),
-	)
-	return p
+	*adaptor.SourceAdaptor
+	HowManyFunc concept.Function
 }
 
 func (p *HowMany) GetName() string {
@@ -74,12 +49,12 @@ func (p *HowMany) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewHowMany(libs *tree.LibraryManager, parent *Question) *HowMany {
-	page := libs.GetLibraryPage("system", "question")
-	return (&HowMany{
-		libs:              libs,
-		parent:            parent,
-		libHowManyContent: page.GetConst(variable.NewString("HowManyContent")),
-		libHowManyFunc:    page.GetFunction(variable.NewString("HowMany")),
-	}).init()
+func NewHowMany(param *adaptor.SourceAdaptorParam) *HowMany {
+	instance := (&HowMany{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
+	})
+	page := instance.Libs.GetLibraryPage("system", "question")
+	instance.HowManyFunc = page.GetFunction(variable.NewString("HowMany"))
+
+	return instance
 }

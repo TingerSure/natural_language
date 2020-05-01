@@ -10,6 +10,10 @@ import (
 	"os"
 )
 
+const (
+	ChineseName = "chinese"
+)
+
 func getVM() *runtime.Runtime {
 	VM := runtime.NewRuntime(&runtime.RuntimeParam{
 		OnError: func(err error) {
@@ -30,9 +34,9 @@ func getVM() *runtime.Runtime {
 			},
 		},
 	}))
-	VM.GetLibraryManager().AddLibrary(chinese.ChineseName, chinese.NewChinese(VM.GetLibraryManager()))
+	VM.GetLibraryManager().AddLibrary(ChineseName, chinese.NewChinese(VM.GetLibraryManager(), ChineseName))
 	VM.Bind()
-	VM.SetDefaultLanguage(chinese.ChineseName)
+	VM.SetDefaultLanguage(ChineseName)
 	return VM
 }
 

@@ -22,7 +22,7 @@ var (
 )
 
 type AnyFromQuestionSetAny struct {
-	adaptor.SourceAdaptor
+	*adaptor.SourceAdaptor
 	questionPackage *question.Question
 }
 
@@ -60,8 +60,9 @@ func (p *AnyFromQuestionSetAny) GetName() string {
 	return AnyFromQuestionSetAnyName
 }
 
-func NewAnyFromQuestionSetAny(libs *tree.LibraryManager, questionPackage *question.Question) *AnyFromQuestionSetAny {
+func NewAnyFromQuestionSetAny(param *adaptor.SourceAdaptorParam, questionPackage *question.Question) *AnyFromQuestionSetAny {
 	return (&AnyFromQuestionSetAny{
+		SourceAdaptor:   adaptor.NewSourceAdaptor(param),
 		questionPackage: questionPackage,
 	})
 }

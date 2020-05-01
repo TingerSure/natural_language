@@ -7,49 +7,63 @@ import (
 	"github.com/TingerSure/natural_language/library/system/std"
 )
 
+const (
+	QuestionParam  = "param"
+	QuestionResult = "result"
+)
+
 type Question struct {
 	tree.Page
-	output         *std.Std
-	HowManyContent concept.String
-	WhatContent    concept.String
+	output        *std.Std
+	HowManyParam  concept.String
+	WhatParam     concept.String
+	HowManyResult concept.String
+	WhatResult    concept.String
 }
 
 func (q *Question) HowMany(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
-	return q.output.Print(input, object)
+	outParam, suspend := q.output.Print(variable.NewParam().Set(q.output.PrintContent, input.Get(q.HowManyParam)), object)
+	return variable.NewParam().Set(q.HowManyResult, outParam.Get(q.output.PrintContent)), suspend
 }
 
 func (q *Question) What(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
-	return q.output.Print(input, object)
+	outParam, suspend := q.output.Print(variable.NewParam().Set(q.output.PrintContent, input.Get(q.WhatParam)), object)
+	return variable.NewParam().Set(q.WhatResult, outParam.Get(q.output.PrintContent)), suspend
 }
 
 func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 
 	instance := &Question{
-		Page:           tree.NewPageAdaptor(),
-		output:         output,
-		HowManyContent: output.PrintContent.Clone(),
-		WhatContent:    output.PrintContent.Clone(),
+		Page:          tree.NewPageAdaptor(),
+		output:        output,
+		HowManyParam:  variable.NewString(QuestionParam),
+		WhatParam:     variable.NewString(QuestionParam),
+		HowManyResult: variable.NewString(QuestionResult),
+		WhatResult:    variable.NewString(QuestionResult),
 	}
 	instance.SetFunction(variable.NewString("HowMany"), variable.NewSystemFunction(
 		instance.HowMany,
 		[]concept.String{
-			instance.HowManyContent,
+			instance.HowManyParam,
 		},
 		[]concept.String{
-			instance.HowManyContent,
+			instance.HowManyResult,
 		},
 	))
 
 	instance.SetFunction(variable.NewString("What"), variable.NewSystemFunction(
 		instance.What,
 		[]concept.String{
-			instance.WhatContent,
+			instance.WhatParam,
 		},
 		[]concept.String{
-			instance.WhatContent,
+			instance.WhatResult,
 		},
 	))
-	instance.SetConst(variable.NewString("HowManyContent"), instance.HowManyContent)
-	instance.SetConst(variable.NewString("WhatContent"), instance.HowManyContent)
+
+	instance.SetConst(variable.NewString("HowManyParam"), instance.HowManyParam)
+	instance.SetConst(variable.NewString("WhatParam"), instance.HowManyParam)
+	instance.SetConst(variable.NewString("HowManyResult"), instance.HowManyResult)
+	instance.SetConst(variable.NewString("WhatResult"), instance.HowManyResult)
 	return instance
 }

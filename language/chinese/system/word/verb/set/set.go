@@ -24,7 +24,9 @@ var (
 )
 
 type Set struct {
-	adaptor.SourceAdaptor
+	*adaptor.SourceAdaptor
+	Is    concept.String
+	Equal concept.String
 }
 
 func (s *Set) GetName() string {
@@ -41,9 +43,14 @@ func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 				return treasure.GetSource() == s
 			},
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
+				set := s.Is
+				if treasure.GetWord().GetContext() == Equal {
+					set = s.Equal
+				}
+
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(variable.NewString(treasure.GetWord().GetContext()))
+						return index.NewConstIndex(set)
 					},
 					Content: treasure,
 					Types:   phrase_type.Set,
@@ -54,6 +61,15 @@ func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewSet(libs *tree.LibraryManager) *Set {
-	return (&Set{})
+func NewSet(param *adaptor.SourceAdaptorParam) *Set {
+	set := (&Set{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
+	})
+
+	setPage := set.Libs.GetLibraryPage("system", "set")
+
+	set.Is = setPage.GetConst(variable.NewString("Is"))
+	set.Equal = setPage.GetConst(variable.NewString("Equal"))
+
+	return set
 }

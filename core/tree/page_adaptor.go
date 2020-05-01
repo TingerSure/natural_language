@@ -11,7 +11,17 @@ type PageAdaptor struct {
 	classes    *component.Mapping
 	consts     *component.Mapping
 	exceptions *component.Mapping
+	indexes    *component.Mapping
 	sources    []Source
+}
+
+func (p *PageAdaptor) GetIndex(key concept.String) concept.Index {
+	return p.indexes.Get(key).(concept.Index)
+}
+
+func (p *PageAdaptor) SetIndex(key concept.String, value concept.Index) Page {
+	p.indexes.Set(key, value)
+	return p
 }
 
 func (p *PageAdaptor) GetException(key concept.String) concept.Exception {
@@ -60,6 +70,14 @@ func (p *PageAdaptor) AddSource(source Source) {
 
 func NewPageAdaptor() *PageAdaptor {
 	return &PageAdaptor{
+		indexes: component.NewMapping(&component.MappingParam{
+			AutoInit:   true,
+			EmptyValue: variable.NewNull(),
+		}),
+		exceptions: component.NewMapping(&component.MappingParam{
+			AutoInit:   true,
+			EmptyValue: variable.NewNull(),
+		}),
 		functions: component.NewMapping(&component.MappingParam{
 			AutoInit:   true,
 			EmptyValue: variable.NewNull(),

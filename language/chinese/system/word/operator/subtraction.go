@@ -24,8 +24,7 @@ func init() {
 }
 
 type Subtraction struct {
-	adaptor.SourceAdaptor
-	libs     *tree.LibraryManager
+	*adaptor.SourceAdaptor
 	operator concept.Function
 }
 
@@ -57,9 +56,10 @@ func (p *Subtraction) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewSubtraction(libs *tree.LibraryManager) *Subtraction {
-	return (&Subtraction{
-		libs:     libs,
-		operator: libs.GetLibraryPage("system", "operator").GetFunction(variable.NewString("MultiplicationFunc")),
+func NewSubtraction(param *adaptor.SourceAdaptorParam) *Subtraction {
+	instance := (&Subtraction{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
+	instance.operator = instance.Libs.GetLibraryPage("system", "operator").GetFunction(variable.NewString("MultiplicationFunc"))
+	return instance
 }

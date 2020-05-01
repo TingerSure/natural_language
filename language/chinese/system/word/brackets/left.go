@@ -16,11 +16,11 @@ const (
 
 var (
 	LeftWord  []*tree.Word = []*tree.Word{tree.NewWord(LeftCharactor)}
-	LeftIndex              = index.NewConstIndex(variable.NewString(LeftCharactor))
+	LeftIndex              = variable.NewString(LeftCharactor)
 )
 
 type BracketsLeft struct {
-	adaptor.SourceAdaptor
+	*adaptor.SourceAdaptor
 }
 
 func (s *BracketsLeft) GetName() string {
@@ -39,7 +39,7 @@ func (s *BracketsLeft) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return LeftIndex
+						return index.NewConstIndex(LeftIndex.Clone())
 					},
 					Content: treasure,
 					Types:   phrase_type.BracketsLeft,
@@ -50,6 +50,8 @@ func (s *BracketsLeft) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewBracketsLeft(libs *tree.LibraryManager) *BracketsLeft {
-	return (&BracketsLeft{})
+func NewBracketsLeft(param *adaptor.SourceAdaptorParam) *BracketsLeft {
+	return (&BracketsLeft{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
+	})
 }

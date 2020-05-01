@@ -2,7 +2,6 @@ package question
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/expression"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
@@ -16,32 +15,8 @@ const (
 )
 
 type What struct {
-	adaptor.SourceAdaptor
-	parent         *Question
-	libs           *tree.LibraryManager
-	libWhatContent concept.String
-	libWhatFunc    concept.Function
-	WhatFunc       *variable.Function
-}
-
-func (p *What) init() *What {
-	p.WhatFunc = variable.NewFunction(nil)
-	p.WhatFunc.AddParamName(p.parent.QuestionParam)
-	p.WhatFunc.Body().AddStep(
-		expression.NewReturn(
-			p.parent.QuestionResult,
-			expression.NewParamGet(
-				expression.NewCall(
-					index.NewConstIndex(p.libWhatFunc),
-					expression.NewNewParamWithInit(map[concept.String]concept.Index{
-						p.libWhatContent: index.NewBubbleIndex(p.parent.QuestionParam),
-					}),
-				),
-				p.libWhatContent,
-			),
-		),
-	)
-	return p
+	*adaptor.SourceAdaptor
+	WhatFunc concept.Function
 }
 
 func (p *What) GetName() string {
@@ -74,12 +49,12 @@ func (p *What) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewWhat(libs *tree.LibraryManager, parent *Question) *What {
-	page := libs.GetLibraryPage("system", "question")
-	return (&What{
-		libs:           libs,
-		parent:         parent,
-		libWhatContent: page.GetConst(variable.NewString("WhatContent")),
-		libWhatFunc:    page.GetFunction(variable.NewString("What")),
-	}).init()
+func NewWhat(param *adaptor.SourceAdaptorParam) *What {
+	instance := (&What{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
+	})
+	page := instance.Libs.GetLibraryPage("system", "question")
+	instance.WhatFunc = page.GetFunction(variable.NewString("What"))
+
+	return instance
 }

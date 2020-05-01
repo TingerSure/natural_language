@@ -20,7 +20,7 @@ var (
 )
 
 type AnyFromBracketAnyBracket struct {
-	adaptor.SourceAdaptor
+	*adaptor.SourceAdaptor
 }
 
 func (p *AnyFromBracketAnyBracket) GetStructRules() []*tree.StructRule {
@@ -49,6 +49,8 @@ func (p *AnyFromBracketAnyBracket) GetName() string {
 	return AnyFromBracketAnyBracketName
 }
 
-func NewAnyFromBracketAnyBracket(libs *tree.LibraryManager) *AnyFromBracketAnyBracket {
-	return (&AnyFromBracketAnyBracket{})
+func NewAnyFromBracketAnyBracket(param *adaptor.SourceAdaptorParam) *AnyFromBracketAnyBracket {
+	return (&AnyFromBracketAnyBracket{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
+	})
 }

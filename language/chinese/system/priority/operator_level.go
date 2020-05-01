@@ -12,7 +12,7 @@ const (
 )
 
 type OperatorLevel struct {
-	adaptor.SourceAdaptor
+	*adaptor.SourceAdaptor
 }
 
 func (o *OperatorLevel) getLevel(key string) int {
@@ -73,6 +73,8 @@ func (p *OperatorLevel) GetName() string {
 	return operatorLevelName
 }
 
-func NewOperatorLevel(libs *tree.LibraryManager) *OperatorLevel {
-	return (&OperatorLevel{})
+func NewOperatorLevel(param *adaptor.SourceAdaptorParam) *OperatorLevel {
+	return (&OperatorLevel{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
+	})
 }

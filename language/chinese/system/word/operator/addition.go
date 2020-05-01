@@ -20,8 +20,7 @@ var (
 )
 
 type Addition struct {
-	adaptor.SourceAdaptor
-	libs     *tree.LibraryManager
+	*adaptor.SourceAdaptor
 	operator concept.Function
 }
 
@@ -53,9 +52,10 @@ func (p *Addition) GetVocabularyRules() []*tree.VocabularyRule {
 	}
 }
 
-func NewAddition(libs *tree.LibraryManager) *Addition {
-	return (&Addition{
-		libs:     libs,
-		operator: libs.GetLibraryPage("system", "operator").GetFunction(variable.NewString("AdditionFunc")),
+func NewAddition(param *adaptor.SourceAdaptorParam) *Addition {
+	instance := (&Addition{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
+	instance.operator = instance.Libs.GetLibraryPage("system", "operator").GetFunction(variable.NewString("AdditionFunc"))
+	return instance
 }
