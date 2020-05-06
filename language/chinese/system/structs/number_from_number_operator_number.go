@@ -13,6 +13,12 @@ const (
 	NumberFromNumberOperatorNumberName string = "structs.number.number_operator_number"
 )
 
+const (
+	ItemLeft   = "left"
+	ItemRight  = "right"
+	ItemResult = "result"
+)
+
 var (
 	NumberFromNumberOperatorNumberList []*tree.PhraseType = []*tree.PhraseType{
 		phrase_type.Number,
@@ -23,9 +29,6 @@ var (
 
 type NumberFromNumberOperatorNumber struct {
 	*adaptor.SourceAdaptor
-	operatorLeft   concept.String
-	operatorRight  concept.String
-	operatorResult concept.String
 }
 
 func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
@@ -39,11 +42,11 @@ func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
 							expression.NewCall(
 								phrase[1].Index(),
 								expression.NewNewParamWithInit(map[concept.String]concept.Index{
-									p.operatorLeft:  phrase[0].Index(),
-									p.operatorRight: phrase[2].Index(),
+									variable.NewString(ItemLeft):  phrase[0].Index(),
+									variable.NewString(ItemRight): phrase[2].Index(),
 								}),
 							),
-							p.operatorResult,
+							variable.NewString(ItemResult),
 						)
 					},
 					Size:  len(NumberFromNumberOperatorNumberList),
@@ -62,11 +65,7 @@ func (p *NumberFromNumberOperatorNumber) GetName() string {
 }
 
 func NewNumberFromNumberOperatorNumber(param *adaptor.SourceAdaptorParam) *NumberFromNumberOperatorNumber {
-	page := Libs.GetLibraryPage("system", "operator")
 	return (&NumberFromNumberOperatorNumber{
-		SourceAdaptor:  adaptor.NewSourceAdaptor(param),
-		operatorLeft:   page.GetConst(variable.NewString("Left")),
-		operatorRight:  page.GetConst(variable.NewString("Right")),
-		operatorResult: page.GetConst(variable.NewString("Result")),
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 }

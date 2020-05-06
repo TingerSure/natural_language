@@ -2,6 +2,7 @@ package system
 
 import (
 	"github.com/TingerSure/natural_language/core/tree"
+	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/system/priority"
 	"github.com/TingerSure/natural_language/language/chinese/system/structs"
 	"github.com/TingerSure/natural_language/language/chinese/system/word/auxiliary"
@@ -43,8 +44,8 @@ func NewSystem(param *adaptor.SourceAdaptorParam) tree.Page {
 	system.AddSource(structs.NewAnyFromAnyBelongAny(param))
 	system.AddSource(structs.NewNumberFromNumberOperatorNumber(param))
 	system.AddSource(structs.NewAnyFromBracketAnyBracket(param))
-	system.AddSource(structs.NewAnyFromQuestionSetAny(param, questionPackage))
-	system.AddSource(structs.NewAnyFromAnySetQuestion(param, questionPackage))
+	system.AddSource(structs.NewAnyFromQuestionSetAny(param))
+	system.AddSource(structs.NewAnyFromAnySetQuestion(param))
 
 	system.AddSource(priority.NewOperatorLevel(param))
 	system.AddSource(priority.NewBelong(param))

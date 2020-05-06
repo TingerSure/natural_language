@@ -3,10 +3,10 @@ package structs
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/expression"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
-	"github.com/TingerSure/natural_language/language/chinese/system/word/question"
 )
 
 const (
@@ -23,7 +23,6 @@ var (
 
 type AnyFromAnySetQuestion struct {
 	*adaptor.SourceAdaptor
-	questionPackage *question.Question
 }
 
 func (p *AnyFromAnySetQuestion) GetStructRules() []*tree.StructRule {
@@ -37,10 +36,10 @@ func (p *AnyFromAnySetQuestion) GetStructRules() []*tree.StructRule {
 							expression.NewCall(
 								phrase[2].Index(),
 								expression.NewNewParamWithInit(map[concept.String]concept.Index{
-									p.questionPackage.QuestionParam: phrase[0].Index(),
+									variable.NewString(QuestionParam): phrase[0].Index(),
 								}),
 							),
-							p.questionPackage.QuestionResult,
+							variable.NewString(QuestionResult),
 						)
 					},
 					Size: len(anyFromAnySetQuestionList),
@@ -60,9 +59,8 @@ func (p *AnyFromAnySetQuestion) GetName() string {
 	return AnyFromAnySetQuestionName
 }
 
-func NewAnyFromAnySetQuestion(param *adaptor.SourceAdaptorParam, questionPackage *question.Question) *AnyFromAnySetQuestion {
+func NewAnyFromAnySetQuestion(param *adaptor.SourceAdaptorParam) *AnyFromAnySetQuestion {
 	return (&AnyFromAnySetQuestion{
-		SourceAdaptor:   adaptor.NewSourceAdaptor(param),
-		questionPackage: questionPackage,
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 }

@@ -63,12 +63,15 @@ func (p *AnyFromAnyBelongAny) GetName() string {
 }
 
 func NewAnyFromAnyBelongAny(param *adaptor.SourceAdaptorParam) *AnyFromAnyBelongAny {
-	libObject := Libs.GetLibraryPage("system", "object")
-	return (&AnyFromAnyBelongAny{
-		SourceAdaptor:   adaptor.NewSourceAdaptor(param),
-		GetFieldValue:   libObject.GetConst(variable.NewString("GetFieldValue")),
-		GetFieldKey:     libObject.GetConst(variable.NewString("GetFieldKey")),
-		GetFieldContent: libObject.GetConst(variable.NewString("GetFieldContent")),
-		GetField:        libObject.GetFunction(variable.NewString("GetField")),
+	instance := (&AnyFromAnyBelongAny{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
+	libObject := instance.Libs.GetLibraryPage("system", "object")
+
+	instance.GetFieldValue = libObject.GetConst(variable.NewString("GetFieldValue"))
+	instance.GetFieldKey = libObject.GetConst(variable.NewString("GetFieldKey"))
+	instance.GetFieldContent = libObject.GetConst(variable.NewString("GetFieldContent"))
+	instance.GetField = libObject.GetFunction(variable.NewString("GetField"))
+
+	return instance
 }

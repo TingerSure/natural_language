@@ -27,7 +27,6 @@ func NewOperatorItem(create func(concept.Index, concept.Index) concept.Expressio
 		Left:   variable.NewString(ItemLeft),
 		Right:  variable.NewString(ItemRight),
 		Result: variable.NewString(ItemResult),
-		Func:   variable.NewFunction(nil),
 	}
 	instance.Func = variable.NewFunction(nil)
 	instance.Func.AddParamName(instance.Left)
