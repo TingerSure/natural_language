@@ -60,6 +60,6 @@ func NewSubtraction(param *adaptor.SourceAdaptorParam) *Subtraction {
 	instance := (&Subtraction{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
-	instance.operator = instance.Libs.GetLibraryPage("system", "operator").GetFunction(variable.NewString("MultiplicationFunc"))
+	instance.operator = instance.Libs.GetLibraryPage("system", "operator").GetFunction(variable.NewString("SubtractionFunc"))
 	return instance
 }
