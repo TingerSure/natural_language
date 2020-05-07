@@ -7,7 +7,12 @@ import (
 
 type Mapping struct {
 	param  *MappingParam
-	values map[concept.String]interface{}
+	values []*MappingItem
+}
+
+type MappingItem struct {
+	key   concept.String
+	value interface{}
 }
 
 func (k *Mapping) Size() int {
@@ -18,17 +23,20 @@ func (k *Mapping) Init(specimen concept.String, defaultValue interface{}) bool {
 	if nl_interface.IsNil(defaultValue) {
 		defaultValue = k.param.EmptyValue
 	}
-	exist := k.Iterate(func(key concept.String, value interface{}) bool {
-		if key.EqualLanguage(specimen) {
-			if nl_interface.IsNil(value) {
-				k.values[specimen.Clone()] = defaultValue
+	exist := k.iterate(func(item *MappingItem) bool {
+		if item.key.EqualLanguage(specimen) {
+			if nl_interface.IsNil(item.value) {
+				item.value = defaultValue
 			}
 			return true
 		}
 		return false
 	})
 	if !exist {
-		k.values[specimen.Clone()] = defaultValue
+		k.values = append(k.values, &MappingItem{
+			key:   specimen.Clone(),
+			value: defaultValue,
+		})
 	}
 	return exist
 }
@@ -37,16 +45,19 @@ func (k *Mapping) Set(specimen concept.String, value interface{}) bool {
 	if nl_interface.IsNil(value) {
 		value = k.param.EmptyValue
 	}
-	exist := k.Iterate(func(key concept.String, _ interface{}) bool {
-		if key.EqualLanguage(specimen) {
-			k.values[specimen.Clone()] = value
+	exist := k.iterate(func(item *MappingItem) bool {
+		if item.key.EqualLanguage(specimen) {
+			item.value = value
 			return true
 		}
 		return false
 	})
 
 	if !exist && k.param.AutoInit {
-		k.values[specimen.Clone()] = value
+		k.values = append(k.values, &MappingItem{
+			key:   specimen.Clone(),
+			value: value,
+		})
 	}
 
 	return exist
@@ -54,9 +65,9 @@ func (k *Mapping) Set(specimen concept.String, value interface{}) bool {
 
 func (k *Mapping) Get(specimen concept.String) interface{} {
 	var choosen interface{} = k.param.EmptyValue
-	k.Iterate(func(key concept.String, value interface{}) bool {
-		if key.EqualLanguage(specimen) {
-			choosen = value
+	k.iterate(func(item *MappingItem) bool {
+		if item.key.EqualLanguage(specimen) {
+			choosen = item.value
 			return true
 		}
 		return false
@@ -65,18 +76,24 @@ func (k *Mapping) Get(specimen concept.String) interface{} {
 }
 
 func (k *Mapping) Has(specimen concept.String) bool {
-	return k.Iterate(func(key concept.String, _ interface{}) bool {
-		return key.EqualLanguage(specimen)
+	return k.iterate(func(item *MappingItem) bool {
+		return item.key.EqualLanguage(specimen)
 	})
 }
 
-func (k *Mapping) Iterate(on func(concept.String, interface{}) bool) bool {
-	for key, value := range k.values {
-		if on(key, value) {
+func (k *Mapping) iterate(on func(item *MappingItem) bool) bool {
+	for _, item := range k.values {
+		if on(item) {
 			return true
 		}
 	}
 	return false
+}
+
+func (k *Mapping) Iterate(on func(key concept.String, value interface{}) bool) bool {
+	return k.iterate(func(item *MappingItem) bool {
+		return on(item.key, item.value)
+	})
 }
 
 type MappingParam struct {
@@ -86,7 +103,7 @@ type MappingParam struct {
 
 func NewMapping(param *MappingParam) *Mapping {
 	return &Mapping{
-		values: make(map[concept.String]interface{}),
+		values: make([]*MappingItem, 0),
 		param:  param,
 	}
 }
