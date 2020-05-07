@@ -31,9 +31,6 @@ func (a *BinaryOperatorNumber) Exec(space concept.Closure) (concept.Variable, co
 		return nil, suspend
 	}
 
-	fmt.Printf("BinaryOperatorNumber.ToString = %+v\n",a.ToString(""))
-	fmt.Printf("BinaryOperatorNumber.preLeft = %+v\n",preLeft)
-	fmt.Printf("BinaryOperatorNumber.preRight = %+v\n",preRight)
 	left, yesLeft := variable.VariableFamilyInstance.IsNumber(preLeft)
 	right, yesRight := variable.VariableFamilyInstance.IsNumber(preRight)
 	if !yesLeft || !yesRight {

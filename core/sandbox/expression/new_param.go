@@ -36,12 +36,14 @@ func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interr
 
 	param := variable.NewParamWithIterate(func(on func(concept.String, concept.Variable) bool) bool {
 		for key, index := range a.values {
-			value, subSsuspend := index.Get(space)
-			if !nl_interface.IsNil(subSsuspend) {
-				suspend = subSsuspend
+			value, subSuspend := index.Get(space)
+			if !nl_interface.IsNil(subSuspend) {
+				suspend = subSuspend
 				return true
 			}
-			return on(key, value)
+			if on(key, value) {
+				return true
+			}
 		}
 		return false
 
