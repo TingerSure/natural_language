@@ -123,9 +123,7 @@ func (o *Object) HasField(specimen concept.String) bool {
 }
 
 func (o *Object) InitField(specimen concept.String, defaultValue concept.Variable) concept.Exception {
-	if !o.fields.Has(specimen) {
-		o.fields.Set(specimen, defaultValue)
-	}
+	o.fields.Init(specimen, defaultValue)
 	return nil
 }
 
