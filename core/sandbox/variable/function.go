@@ -95,6 +95,9 @@ func NewFunction(parent concept.Closure) *Function {
 			StringCreator: func(value string) concept.String {
 				return NewString(value)
 			},
+			EmptyCreator: func() concept.Null {
+				return NewNull()
+			},
 		}),
 	}
 }

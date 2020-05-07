@@ -130,6 +130,9 @@ func NewFor() *For {
 		StringCreator: func(value string) concept.String {
 			return variable.NewString(value)
 		},
+		EmptyCreator: func() concept.Null {
+			return variable.NewNull()
+		},
 	}
 	back := &For{
 		tag:  expressionForDefaultTag,

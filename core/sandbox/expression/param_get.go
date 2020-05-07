@@ -16,7 +16,7 @@ type ParamGet struct {
 }
 
 func (a *ParamGet) ToString(prefix string) string {
-	return fmt.Sprintf("%v[%v]", a.param.ToString(prefix), a.key)
+	return fmt.Sprintf("%v[%v]", a.param.ToString(prefix), a.key.ToString(prefix))
 }
 
 func (a *ParamGet) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
