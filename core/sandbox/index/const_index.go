@@ -30,6 +30,10 @@ func (s *ConstIndex) ToString(prefix string) string {
 	return s.value.ToString(prefix)
 }
 
+func (s *ConstIndex) Value() concept.Variable {
+	return s.value
+}
+
 func (s *ConstIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	return s.value, nil
 }
