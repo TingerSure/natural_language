@@ -11,6 +11,18 @@ type FunctionEnd struct {
 	*adaptor.ExpressionIndex
 }
 
+var (
+	FunctionEndLanguageSeeds = map[string]func(string, *FunctionEnd) string{}
+)
+
+func (f *FunctionEnd) ToLanguage(language string) string {
+	seed := FunctionEndLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *FunctionEnd) ToString(prefix string) string {
 	return fmt.Sprintf("end")
 }

@@ -13,6 +13,18 @@ const (
 type ThisIndex struct {
 }
 
+var (
+	ThisIndexLanguageSeeds = map[string]func(string, *ThisIndex) string{}
+)
+
+func (f *ThisIndex) ToLanguage(language string) string {
+	seed := ThisIndexLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (s *ThisIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }

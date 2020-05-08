@@ -19,6 +19,18 @@ type Class struct {
 	staticFields  *component.Mapping
 }
 
+var (
+	ClassLanguageSeeds = map[string]func(string, *Class) string{}
+)
+
+func (f *Class) ToLanguage(language string) string {
+	seed := ClassLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (c *Class) ToString(prefix string) string {
 	subprefix := fmt.Sprintf("%v\t", prefix)
 

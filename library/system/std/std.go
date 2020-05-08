@@ -46,6 +46,7 @@ func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 		ErrorContent: variable.NewString(ErrorContent),
 	}
 	instance.SetFunction(variable.NewString("Print"), variable.NewSystemFunction(
+		variable.NewString("Print"),
 		instance.Print,
 		[]concept.String{
 			instance.PrintContent,
@@ -55,6 +56,7 @@ func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 		},
 	))
 	instance.SetFunction(variable.NewString("Error"), variable.NewSystemFunction(
+		variable.NewString("Error"),
 		instance.Error,
 		[]concept.String{
 			instance.ErrorContent,

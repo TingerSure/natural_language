@@ -16,9 +16,22 @@ const (
 )
 
 type Function struct {
+	name       concept.String
 	body       *code_block.CodeBlock
 	paramNames []concept.String
 	parent     concept.Closure
+}
+
+var (
+	FunctionLanguageSeeds = map[string]func(string, *Function) string{}
+)
+
+func (f *Function) ToLanguage(language string) string {
+	seed := FunctionLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
 }
 
 func (s *Function) ParamNames() []concept.String {
@@ -87,9 +100,14 @@ func (s *Function) Type() string {
 	return VariableFunctionType
 }
 
-func NewFunction(parent concept.Closure) *Function {
+func (s *Function) Name() concept.String {
+	return s.name
+}
+
+func NewFunction(name concept.String, parent concept.Closure) *Function {
 
 	return &Function{
+		name:   name,
 		parent: parent,
 		body: code_block.NewCodeBlock(&code_block.CodeBlockParam{
 			StringCreator: func(value string) concept.String {

@@ -16,6 +16,18 @@ type ObjectMapping struct {
 	alias  string
 }
 
+var (
+	ObjectMappingLanguageSeeds = map[string]func(string, *ObjectMapping) string{}
+)
+
+func (f *ObjectMapping) ToLanguage(language string) string {
+	seed := ObjectMappingLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *ObjectMapping) ToString(prefix string) string {
 	if a.alias == "" {
 		return fmt.Sprintf("%v<%v>", a.object.ToString(prefix), a.class)

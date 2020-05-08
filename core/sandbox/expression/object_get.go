@@ -15,6 +15,18 @@ type ObjectGet struct {
 	object concept.Index
 }
 
+var (
+	ObjectGetLanguageSeeds = map[string]func(string, *ObjectGet) string{}
+)
+
+func (f *ObjectGet) ToLanguage(language string) string {
+	seed := ObjectGetLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *ObjectGet) ToString(prefix string) string {
 	return fmt.Sprintf("%v.%v", a.object.ToString(prefix), a.key.ToString(prefix))
 }

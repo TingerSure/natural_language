@@ -17,6 +17,18 @@ type BinaryOperatorNumber struct {
 	exec  func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt)
 }
 
+var (
+	BinaryOperatorNumberLanguageSeeds = map[string]func(string, *BinaryOperatorNumber) string{}
+)
+
+func (f *BinaryOperatorNumber) ToLanguage(language string) string {
+	seed := BinaryOperatorNumberLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *BinaryOperatorNumber) ToString(prefix string) string {
 	return fmt.Sprintf("%v %v %v", a.left.ToString(prefix), a.sign, a.right.ToString(prefix))
 }

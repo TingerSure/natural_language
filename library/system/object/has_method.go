@@ -25,6 +25,7 @@ func initHasMethod(instance *Object) {
 
 	var HasMethod concept.Function
 	HasMethod = variable.NewSystemFunction(
+		variable.NewString("HasMethod"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(HasMethodContent))
 			if !ok {

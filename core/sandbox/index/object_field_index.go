@@ -13,6 +13,18 @@ type ObjectFieldIndex struct {
 	object concept.Index
 }
 
+var (
+	ObjectFieldIndexLanguageSeeds = map[string]func(string, *ObjectFieldIndex) string{}
+)
+
+func (f *ObjectFieldIndex) ToLanguage(language string) string {
+	seed := ObjectFieldIndexLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (s *ObjectFieldIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }

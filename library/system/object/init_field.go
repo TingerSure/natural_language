@@ -28,6 +28,7 @@ func initInitField(instance *Object) {
 
 	var InitField concept.Function
 	InitField = variable.NewSystemFunction(
+		variable.NewString("InitField"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(InitFieldContent))
 			if !ok {

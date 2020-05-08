@@ -25,6 +25,18 @@ type For struct {
 	body      *code_block.CodeBlock
 }
 
+var (
+	ForLanguageSeeds = map[string]func(string, *For) string{}
+)
+
+func (f *For) ToLanguage(language string) string {
+	seed := ForLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (f *For) SubCodeBlockIterate(onIndex func(concept.Index) bool) bool {
 	return f.init.Iterate(onIndex) || f.end.Iterate(onIndex) || f.body.Iterate(onIndex)
 }

@@ -13,6 +13,18 @@ const (
 type SelfIndex struct {
 }
 
+var (
+	SelfIndexLanguageSeeds = map[string]func(string, *SelfIndex) string{}
+)
+
+func (f *SelfIndex) ToLanguage(language string) string {
+	seed := SelfIndexLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (s *SelfIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }

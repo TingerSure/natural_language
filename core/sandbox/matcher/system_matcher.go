@@ -9,6 +9,18 @@ type SystemMatcher struct {
 	match func(concept.Variable) bool
 }
 
+var (
+	SystemMatcherLanguageSeeds = map[string]func(string, *SystemMatcher) string{}
+)
+
+func (f *SystemMatcher) ToLanguage(language string) string {
+	seed := SystemMatcherLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (c *SystemMatcher) ToString(string) string {
 	return fmt.Sprintf("system_matcher")
 }

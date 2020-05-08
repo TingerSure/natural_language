@@ -10,6 +10,18 @@ type MethodMatcher struct {
 	methodName concept.String
 }
 
+var (
+	MethodMatcherLanguageSeeds = map[string]func(string, *MethodMatcher) string{}
+)
+
+func (f *MethodMatcher) ToLanguage(language string) string {
+	seed := MethodMatcherLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (c *MethodMatcher) ToString(prefix string) string {
 	return fmt.Sprintf("method=%v", c.methodName.ToString(prefix))
 }

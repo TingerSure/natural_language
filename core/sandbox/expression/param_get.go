@@ -15,6 +15,18 @@ type ParamGet struct {
 	param concept.Index
 }
 
+var (
+	ParamGetLanguageSeeds = map[string]func(string, *ParamGet) string{}
+)
+
+func (f *ParamGet) ToLanguage(language string) string {
+	seed := ParamGetLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *ParamGet) ToString(prefix string) string {
 	return fmt.Sprintf("%v[%v]", a.param.ToString(prefix), a.key.ToString(prefix))
 }

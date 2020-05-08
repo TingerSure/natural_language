@@ -15,6 +15,18 @@ type String struct {
 	mapping map[string]string
 }
 
+var (
+	StringLanguageSeeds = map[string]func(string, *String) string{}
+)
+
+func (f *String) ToLanguage(language string) string {
+	seed := StringLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (n *String) GetSystem() string {
 	return n.value
 }

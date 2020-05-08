@@ -27,6 +27,7 @@ func initAddition(instance *AutoNumber) {
 	var Addition concept.Function = nil
 
 	Addition = variable.NewSystemFunction(
+		AdditionKey.Clone(),
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 			preLeft, suspend := object.GetField(instance.AutoNumberClassValue)
 			if !nl_interface.IsNil(suspend) {

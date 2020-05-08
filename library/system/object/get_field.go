@@ -28,6 +28,7 @@ func initGetField(instance *Object) {
 
 	var GetField concept.Function
 	GetField = variable.NewSystemFunction(
+		variable.NewString("GetField"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			content := input.Get(GetFieldContent)
 			var object concept.Object

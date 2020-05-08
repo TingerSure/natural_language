@@ -16,6 +16,18 @@ type Param struct {
 	values *component.Mapping
 }
 
+var (
+	ParamLanguageSeeds = map[string]func(string, *Param) string{}
+)
+
+func (f *Param) ToLanguage(language string) string {
+	seed := ParamLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *Param) ToString(prefix string) string {
 	if 0 == a.values.Size() {
 		return "{}"

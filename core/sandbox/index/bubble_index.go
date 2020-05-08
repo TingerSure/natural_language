@@ -8,6 +8,18 @@ type BubbleIndex struct {
 	key concept.String
 }
 
+var (
+	BubbleIndexLanguageSeeds = map[string]func(string, *BubbleIndex) string{}
+)
+
+func (f *BubbleIndex) ToLanguage(language string) string {
+	seed := BubbleIndexLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (s *BubbleIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }

@@ -13,6 +13,18 @@ type ParamInitialization struct {
 	defaltValue concept.Index
 }
 
+var (
+	ParamInitializationLanguageSeeds = map[string]func(string, *ParamInitialization) string{}
+)
+
+func (f *ParamInitialization) ToLanguage(language string) string {
+	seed := ParamInitializationLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *ParamInitialization) ToString(prefix string) string {
 	return fmt.Sprintf("var %v = %v", a.param.ToString(prefix), a.defaltValue.ToString(prefix))
 }

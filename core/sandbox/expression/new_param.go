@@ -14,6 +14,18 @@ type NewParam struct {
 	values map[concept.String]concept.Index
 }
 
+var (
+	NewParamLanguageSeeds = map[string]func(string, *NewParam) string{}
+)
+
+func (f *NewParam) ToLanguage(language string) string {
+	seed := NewParamLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *NewParam) ToString(prefix string) string {
 	if 0 == len(a.values) {
 		return "{}"

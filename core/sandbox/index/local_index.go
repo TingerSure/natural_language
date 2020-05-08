@@ -8,6 +8,18 @@ type LocalIndex struct {
 	key concept.String
 }
 
+var (
+	LocalIndexLanguageSeeds = map[string]func(string, *LocalIndex) string{}
+)
+
+func (f *LocalIndex) ToLanguage(language string) string {
+	seed := LocalIndexLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (s *LocalIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }

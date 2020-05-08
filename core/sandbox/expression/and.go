@@ -10,6 +10,18 @@ type And struct {
 	*template.BinaryOperatorBool
 }
 
+var (
+	AndLanguageSeeds = map[string]func(string, *And) string{}
+)
+
+func (f *And) ToLanguage(language string) string {
+	seed := AndLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func NewAnd(left concept.Index, right concept.Index) *And {
 	return &And{
 		template.NewBinaryOperatorBool("&&", left, right, func(left *variable.Bool, right *variable.Bool) (concept.Variable, concept.Interrupt) {

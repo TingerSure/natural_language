@@ -10,6 +10,18 @@ type Addition struct {
 	*template.BinaryOperatorNumber
 }
 
+var (
+	AdditionLanguageSeeds = map[string]func(string, *Addition) string{}
+)
+
+func (f *Addition) ToLanguage(language string) string {
+	seed := AdditionLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func NewAddition(left concept.Index, right concept.Index) *Addition {
 	return &Addition{
 		template.NewBinaryOperatorNumber("+", left, right, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {

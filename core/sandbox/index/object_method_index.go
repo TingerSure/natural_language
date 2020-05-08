@@ -13,6 +13,18 @@ type ObjectMethodIndex struct {
 	object concept.Index
 }
 
+var (
+	ObjectMethodIndexLanguageSeeds = map[string]func(string, *ObjectMethodIndex) string{}
+)
+
+func (f *ObjectMethodIndex) ToLanguage(language string) string {
+	seed := ObjectMethodIndexLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (s *ObjectMethodIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }

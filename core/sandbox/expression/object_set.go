@@ -16,6 +16,18 @@ type ObjectSet struct {
 	value  concept.Index
 }
 
+var (
+	ObjectSetLanguageSeeds = map[string]func(string, *ObjectSet) string{}
+)
+
+func (f *ObjectSet) ToLanguage(language string) string {
+	seed := ObjectSetLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *ObjectSet) ToString(prefix string) string {
 	return fmt.Sprintf("%v.%v = %v", a.object.ToString(prefix), a.key.ToString(prefix), a.value.ToString(prefix))
 }

@@ -29,6 +29,7 @@ func initSetField(instance *Object) {
 	var SetField concept.Function
 
 	SetField = variable.NewSystemFunction(
+		variable.NewString("SetField"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(SetFieldContent))
 			if !ok {

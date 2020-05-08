@@ -26,6 +26,7 @@ func initHasField(instance *Object) {
 
 	var HasField concept.Function
 	HasField = variable.NewSystemFunction(
+		variable.NewString("HasField"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(HasFieldContent))
 			if !ok {

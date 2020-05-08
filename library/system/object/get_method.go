@@ -28,6 +28,7 @@ func initGetMethod(instance *Object) {
 
 	var GetMethod concept.Function
 	GetMethod = variable.NewSystemFunction(
+		variable.NewString("GetMethod"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(GetMethodContent))
 			if !ok {

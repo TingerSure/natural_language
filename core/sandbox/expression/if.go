@@ -18,6 +18,18 @@ type If struct {
 	secondary *code_block.CodeBlock
 }
 
+var (
+	IfLanguageSeeds = map[string]func(string, *If) string{}
+)
+
+func (f *If) ToLanguage(language string) string {
+	seed := IfLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (f *If) SubCodeBlockIterate(onIndex func(concept.Index) bool) bool {
 	return f.primary.Iterate(onIndex) || f.secondary.Iterate(onIndex)
 }

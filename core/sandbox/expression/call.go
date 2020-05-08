@@ -20,6 +20,18 @@ type Call struct {
 	param concept.Index
 }
 
+var (
+	CallLanguageSeeds = map[string]func(string, *Call) string{}
+)
+
+func (f *Call) ToLanguage(language string) string {
+	seed := CallLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *Call) ToString(prefix string) string {
 	return fmt.Sprintf("%v(%v)", a.funcs.ToString(prefix), a.param.ToString(prefix))
 }

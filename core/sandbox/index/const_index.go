@@ -10,6 +10,18 @@ type ConstIndex struct {
 	value concept.Variable
 }
 
+var (
+	ConstIndexLanguageSeeds = map[string]func(string, *ConstIndex) string{}
+)
+
+func (f *ConstIndex) ToLanguage(language string) string {
+	seed := ConstIndexLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (s *ConstIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }

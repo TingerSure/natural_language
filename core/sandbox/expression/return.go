@@ -13,6 +13,18 @@ type Return struct {
 	result concept.Index
 }
 
+var (
+	ReturnLanguageSeeds = map[string]func(string, *Return) string{}
+)
+
+func (f *Return) ToLanguage(language string) string {
+	seed := ReturnLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *Return) Key() concept.String {
 	return a.key
 }

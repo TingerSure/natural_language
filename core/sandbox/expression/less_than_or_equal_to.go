@@ -10,6 +10,18 @@ type LessThanOrEqualTo struct {
 	*template.BinaryOperatorNumber
 }
 
+var (
+	LessThanOrEqualToLanguageSeeds = map[string]func(string, *LessThanOrEqualTo) string{}
+)
+
+func (f *LessThanOrEqualTo) ToLanguage(language string) string {
+	seed := LessThanOrEqualToLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func NewLessThanOrEqualTo(left concept.Index, right concept.Index) *LessThanOrEqualTo {
 	return &LessThanOrEqualTo{
 		template.NewBinaryOperatorNumber("<=", left, right, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {

@@ -15,6 +15,18 @@ type Exception struct {
 	stacks  []concept.ExceptionStack
 }
 
+var (
+	ExceptionLanguageSeeds = map[string]func(string, *Exception) string{}
+)
+
+func (f *Exception) ToLanguage(language string) string {
+	seed := ExceptionLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (e *Exception) IterateStacks(listener func(concept.ExceptionStack) bool) bool {
 	for _, stack := range e.stacks {
 		if listener(stack) {

@@ -1,5 +1,6 @@
 package concept
 
 type ToString interface {
-	ToString(string) string
+	ToString(prefix string) string
+	ToLanguage(language string) string
 }

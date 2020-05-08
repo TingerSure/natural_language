@@ -11,6 +11,18 @@ type ClassMatcher struct {
 	alias     string
 }
 
+var (
+	ClassMatcherLanguageSeeds = map[string]func(string, *ClassMatcher) string{}
+)
+
+func (f *ClassMatcher) ToLanguage(language string) string {
+	seed := ClassMatcherLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (c *ClassMatcher) ToString(string) string {
 	if c.alias == "" {
 		return fmt.Sprintf("class=%v", c.className)

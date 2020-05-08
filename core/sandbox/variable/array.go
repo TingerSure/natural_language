@@ -16,6 +16,18 @@ type Array struct {
 	length int
 }
 
+var (
+	ArrayLanguageSeeds = map[string]func(string, *Array) string{}
+)
+
+func (f *Array) ToLanguage(language string) string {
+	seed := ArrayLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *Array) ToString(prefix string) string {
 	itemPrefix := fmt.Sprintf("%v\t", prefix)
 	valuesToStrings := make([]string, 0, len(a.values))

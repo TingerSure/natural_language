@@ -22,13 +22,13 @@ type OperatorItem struct {
 	Result concept.String
 }
 
-func NewOperatorItem(create func(concept.Index, concept.Index) concept.Expression) *OperatorItem {
+func NewOperatorItem(name string, create func(concept.Index, concept.Index) concept.Expression) *OperatorItem {
 	instance := &OperatorItem{
 		Left:   variable.NewString(ItemLeft),
 		Right:  variable.NewString(ItemRight),
 		Result: variable.NewString(ItemResult),
 	}
-	instance.Func = variable.NewFunction(nil)
+	instance.Func = variable.NewFunction(variable.NewString(name), nil)
 	instance.Func.AddParamName(instance.Left)
 	instance.Func.AddParamName(instance.Right)
 	instance.Func.Body().AddStep(
@@ -64,16 +64,17 @@ func NewOperator(libs *tree.LibraryManager) *Operator {
 	instance := (&Operator{
 		Page: tree.NewPageAdaptor(),
 		Items: map[string]*OperatorItem{
-			AdditionName: NewOperatorItem(func(left concept.Index, right concept.Index) concept.Expression {
+
+			AdditionName: NewOperatorItem(AdditionName, func(left concept.Index, right concept.Index) concept.Expression {
 				return expression.NewAddition(left, right)
 			}),
-			DivisionName: NewOperatorItem(func(left concept.Index, right concept.Index) concept.Expression {
+			DivisionName: NewOperatorItem(DivisionName, func(left concept.Index, right concept.Index) concept.Expression {
 				return expression.NewDivision(left, right)
 			}),
-			MultiplicationName: NewOperatorItem(func(left concept.Index, right concept.Index) concept.Expression {
+			MultiplicationName: NewOperatorItem(MultiplicationName, func(left concept.Index, right concept.Index) concept.Expression {
 				return expression.NewMultiplication(left, right)
 			}),
-			SubtractionName: NewOperatorItem(func(left concept.Index, right concept.Index) concept.Expression {
+			SubtractionName: NewOperatorItem(SubtractionName, func(left concept.Index, right concept.Index) concept.Expression {
 				return expression.NewSubtraction(left, right)
 			}),
 		},

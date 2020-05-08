@@ -16,6 +16,7 @@ func initCreate(instance *Object) {
 	instance.SetConst(variable.NewString("CreateContent"), CreateContent)
 
 	instance.SetFunction(variable.NewString("Create"), variable.NewSystemFunction(
+		variable.NewString("Create"),
 		func(_ concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			return variable.NewParam().Set(CreateContent, variable.NewObject()), nil
 		},

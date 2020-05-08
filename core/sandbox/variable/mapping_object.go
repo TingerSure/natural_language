@@ -19,6 +19,18 @@ type MappingObject struct {
 	object    concept.Object
 }
 
+var (
+	MappingObjectLanguageSeeds = map[string]func(string, *MappingObject) string{}
+)
+
+func (f *MappingObject) ToLanguage(language string) string {
+	seed := MappingObjectLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func NewMappingObject(object concept.Object, className string, alias string) (*MappingObject, concept.Exception) {
 
 	class := object.GetClass(className)

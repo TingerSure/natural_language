@@ -16,6 +16,18 @@ type PreObjectFunction struct {
 	object   concept.Object
 }
 
+var (
+	PreObjectFunctionLanguageSeeds = map[string]func(string, *PreObjectFunction) string{}
+)
+
+func (f *PreObjectFunction) ToLanguage(language string) string {
+	seed := PreObjectFunctionLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (s *PreObjectFunction) ParamNames() []concept.String {
 	return s.function.ParamNames()
 }
@@ -41,6 +53,10 @@ func (s *PreObjectFunction) Type() string {
 
 func (s *PreObjectFunction) FunctionType() string {
 	return FunctionPreObjectFunctionType
+}
+
+func (s *PreObjectFunction) Name() concept.String {
+	return s.function.Name()
 }
 
 func NewPreObjectFunction(

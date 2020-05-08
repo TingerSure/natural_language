@@ -11,6 +11,18 @@ type Division struct {
 	*template.BinaryOperatorNumber
 }
 
+var (
+	DivisionLanguageSeeds = map[string]func(string, *Division) string{}
+)
+
+func (f *Division) ToLanguage(language string) string {
+	seed := DivisionLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func NewDivision(left concept.Index, right concept.Index) *Division {
 	return &Division{
 		template.NewBinaryOperatorNumber("/", left, right, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Interrupt) {

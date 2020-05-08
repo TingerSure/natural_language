@@ -13,6 +13,18 @@ type SearchIndex struct {
 	items []concept.Matcher
 }
 
+var (
+	SearchIndexLanguageSeeds = map[string]func(string, *SearchIndex) string{}
+)
+
+func (f *SearchIndex) ToLanguage(language string) string {
+	seed := SearchIndexLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (s *SearchIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }

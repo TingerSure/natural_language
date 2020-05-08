@@ -1,7 +1,6 @@
 package variable
 
 import (
-	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 )
 
@@ -11,9 +10,26 @@ const (
 )
 
 type SystemFunction struct {
+	name        concept.String
 	paramNames  []concept.String
 	returnNames []concept.String
 	funcs       func(concept.Param, concept.Object) (concept.Param, concept.Exception)
+}
+
+var (
+	SystemFunctionLanguageSeeds = map[string]func(string, *SystemFunction) string{}
+)
+
+func (f *SystemFunction) ToLanguage(language string) string {
+	seed := SystemFunctionLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
+func (s *SystemFunction) Name() concept.String {
+	return s.name
 }
 
 func (s *SystemFunction) ParamNames() []concept.String {
@@ -25,7 +41,7 @@ func (s *SystemFunction) ReturnNames() []concept.String {
 }
 
 func (f *SystemFunction) ToString(prefix string) string {
-	return fmt.Sprintf("system_function")
+	return f.name.ToString(prefix)
 }
 
 func (f *SystemFunction) Exec(params concept.Param, object concept.Object) (concept.Param, concept.Exception) {
@@ -41,11 +57,15 @@ func (s *SystemFunction) FunctionType() string {
 }
 
 func NewSystemFunction(
+	name concept.String,
 	funcs func(concept.Param, concept.Object) (concept.Param, concept.Exception),
 	paramNames []concept.String,
 	returnNames []concept.String,
 ) *SystemFunction {
 	return &SystemFunction{
-		funcs: funcs,
+		name:        name,
+		funcs:       funcs,
+		paramNames:  paramNames,
+		returnNames: returnNames,
 	}
 }

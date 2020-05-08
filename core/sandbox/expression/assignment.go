@@ -13,6 +13,18 @@ type Assignment struct {
 	to   concept.Index
 }
 
+var (
+	AssignmentLanguageSeeds = map[string]func(string, *Assignment) string{}
+)
+
+func (f *Assignment) ToLanguage(language string) string {
+	seed := AssignmentLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *Assignment) ToString(prefix string) string {
 	return fmt.Sprintf("%v = %v", a.to.ToString(prefix), a.from.ToString(prefix))
 }

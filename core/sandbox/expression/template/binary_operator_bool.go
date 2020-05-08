@@ -17,6 +17,18 @@ type BinaryOperatorBool struct {
 	exec  func(left *variable.Bool, right *variable.Bool) (concept.Variable, concept.Interrupt)
 }
 
+var (
+	BinaryOperatorBoolLanguageSeeds = map[string]func(string, *BinaryOperatorBool) string{}
+)
+
+func (f *BinaryOperatorBool) ToLanguage(language string) string {
+	seed := BinaryOperatorBoolLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *BinaryOperatorBool) ToString(prefix string) string {
 	return fmt.Sprintf("%v %v %v", a.left.ToString(prefix), a.sign, a.right.ToString(prefix))
 }

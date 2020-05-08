@@ -29,6 +29,7 @@ func initSetMethod(instance *Object) {
 	var SetMethod concept.Function
 
 	SetMethod = variable.NewSystemFunction(
+		variable.NewString("SetMethod"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(SetMethodContent))
 			if !ok {

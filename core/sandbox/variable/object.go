@@ -19,6 +19,18 @@ type Object struct {
 	reflections []*component.ClassReflection
 }
 
+var (
+	ObjectLanguageSeeds = map[string]func(string, *Object) string{}
+)
+
+func (f *Object) ToLanguage(language string) string {
+	seed := ObjectLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (o *Object) GetClasses() []string {
 	classes := []string{}
 	for _, reflection := range o.reflections {

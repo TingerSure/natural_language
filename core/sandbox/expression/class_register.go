@@ -18,6 +18,18 @@ type ClassRegister struct {
 	alias   string
 }
 
+var (
+	ClassRegisterLanguageSeeds = map[string]func(string, *ClassRegister) string{}
+)
+
+func (f *ClassRegister) ToLanguage(language string) string {
+	seed := ClassRegisterLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
 func (a *ClassRegister) ToString(prefix string) string {
 	subprefix := fmt.Sprintf("%v\t", prefix)
 	items := []string{}

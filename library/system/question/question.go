@@ -42,6 +42,7 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 		WhatResult:    variable.NewString(QuestionResult),
 	}
 	instance.SetFunction(variable.NewString("HowMany"), variable.NewSystemFunction(
+		variable.NewString("HowMany"),
 		instance.HowMany,
 		[]concept.String{
 			instance.HowManyParam,
@@ -52,6 +53,7 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 	))
 
 	instance.SetFunction(variable.NewString("What"), variable.NewSystemFunction(
+		variable.NewString("What"),
 		instance.What,
 		[]concept.String{
 			instance.WhatParam,

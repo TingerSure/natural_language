@@ -17,6 +17,18 @@ type ObjectCall struct {
 }
 
 var (
+	ObjectCallLanguageSeeds = map[string]func(string, *ObjectCall) string{}
+)
+
+func (f *ObjectCall) ToLanguage(language string) string {
+	seed := ObjectCallLanguageSeeds[language]
+	if seed == nil {
+		return f.ToString("")
+	}
+	return seed(language, f)
+}
+
+var (
 	objectCallDefaultParam = callDefaultParam
 )
 
