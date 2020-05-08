@@ -40,7 +40,7 @@ func getVM() *runtime.Runtime {
 	return VM
 }
 
-func test4() {
+func test() {
 
 	VM := getVM()
 	err := VM.Start()
@@ -70,5 +70,5 @@ func test4() {
 }
 
 func main() {
-	test4()
+	test()
 }
