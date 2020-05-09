@@ -3,7 +3,7 @@ package closure
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/sandbox/component"
+
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 )
@@ -15,8 +15,8 @@ const (
 
 type Closure struct {
 	param     *ClosureParam
-	returns   *component.Mapping //map[string]concept.Variable
-	local     *component.Mapping //map[string]concept.Variable
+	returns   *concept.Mapping //map[string]concept.Variable
+	local     *concept.Mapping //map[string]concept.Variable
 	parent    concept.Closure
 	history   *History
 	extempore *Extempore
@@ -167,11 +167,11 @@ func NewClosure(parent concept.Closure, param *ClosureParam) *Closure {
 		param:     param,
 		history:   NewHistory(),
 		extempore: NewExtempore(),
-		returns: component.NewMapping(&component.MappingParam{
+		returns: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: param.EmptyCreator(),
 		}),
-		local: component.NewMapping(&component.MappingParam{
+		local: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   false,
 			EmptyValue: param.EmptyCreator(),
 		}),

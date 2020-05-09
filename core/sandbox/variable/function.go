@@ -6,6 +6,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/code_block"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
+	"github.com/TingerSure/natural_language/core/sandbox/variable/adaptor"
 )
 
 const (
@@ -16,6 +17,7 @@ const (
 )
 
 type Function struct {
+	*adaptor.AdaptorFunction
 	name       concept.String
 	body       *code_block.CodeBlock
 	paramNames []concept.String
@@ -107,8 +109,9 @@ func (s *Function) Name() concept.String {
 func NewFunction(name concept.String, parent concept.Closure) *Function {
 
 	return &Function{
-		name:   name,
-		parent: parent,
+		AdaptorFunction: adaptor.NewAdaptorFunction(),
+		name:            name,
+		parent:          parent,
 		body: code_block.NewCodeBlock(&code_block.CodeBlockParam{
 			StringCreator: func(value string) concept.String {
 				return NewString(value)

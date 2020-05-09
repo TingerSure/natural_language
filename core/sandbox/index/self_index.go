@@ -13,6 +13,14 @@ const (
 type SelfIndex struct {
 }
 
+const (
+	IndexSelfType = "Self"
+)
+
+func (f *SelfIndex) Type() string {
+	return IndexSelfType
+}
+
 var (
 	SelfIndexLanguageSeeds = map[string]func(string, *SelfIndex) string{}
 )

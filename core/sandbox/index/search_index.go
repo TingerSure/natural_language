@@ -13,6 +13,14 @@ type SearchIndex struct {
 	items []concept.Matcher
 }
 
+const (
+	IndexSearchType = "Search"
+)
+
+func (f *SearchIndex) Type() string {
+	return IndexSearchType
+}
+
 var (
 	SearchIndexLanguageSeeds = map[string]func(string, *SearchIndex) string{}
 )

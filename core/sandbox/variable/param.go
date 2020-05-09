@@ -2,7 +2,7 @@ package variable
 
 import (
 	"fmt"
-	"github.com/TingerSure/natural_language/core/sandbox/component"
+
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"strings"
 )
@@ -13,7 +13,7 @@ const (
 )
 
 type Param struct {
-	values *component.Mapping
+	values *concept.Mapping
 }
 
 var (
@@ -56,6 +56,12 @@ func (o *Param) Get(key concept.String) concept.Variable {
 	return o.values.Get(key).(concept.Variable)
 }
 
+func (o *Param) Iterate(on func(concept.String, concept.Variable) bool) bool {
+	return o.values.Iterate(func(key concept.String, value interface{}) bool {
+		return on(key, value.(concept.Variable))
+	})
+}
+
 func (o *Param) Copy() *Param {
 	param := NewParam()
 	o.values.Iterate(func(key concept.String, value interface{}) bool {
@@ -74,7 +80,7 @@ func (o *Param) Init(iterator func(func(concept.String, concept.Variable) bool) 
 
 func NewParam() *Param {
 	return &Param{
-		values: component.NewMapping(&component.MappingParam{
+		values: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: NewNull(),
 		}),

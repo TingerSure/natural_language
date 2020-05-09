@@ -10,6 +10,14 @@ type ConstIndex struct {
 	value concept.Variable
 }
 
+const (
+	IndexConstType = "Const"
+)
+
+func (f *ConstIndex) Type() string {
+	return IndexConstType
+}
+
 var (
 	ConstIndexLanguageSeeds = map[string]func(string, *ConstIndex) string{}
 )

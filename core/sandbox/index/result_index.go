@@ -13,6 +13,14 @@ type ResaultIndex struct {
 	items []concept.Matcher
 }
 
+const (
+	IndexResaultType = "Resault"
+)
+
+func (f *ResaultIndex) Type() string {
+	return IndexResaultType
+}
+
 var (
 	ResaultIndexLanguageSeeds = map[string]func(string, *ResaultIndex) string{}
 )

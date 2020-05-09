@@ -12,6 +12,14 @@ var (
 	BubbleIndexLanguageSeeds = map[string]func(string, *BubbleIndex) string{}
 )
 
+const (
+	IndexBubbleType = "Bubble"
+)
+
+func (f *BubbleIndex) Type() string {
+	return IndexBubbleType
+}
+
 func (f *BubbleIndex) ToLanguage(language string) string {
 	seed := BubbleIndexLanguageSeeds[language]
 	if seed == nil {
@@ -26,6 +34,10 @@ func (s *BubbleIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 
 func (s *BubbleIndex) ToString(prefix string) string {
 	return s.key.ToString(prefix)
+}
+
+func (s *BubbleIndex) Key() concept.String {
+	return s.key
 }
 
 func (s *BubbleIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {

@@ -2,7 +2,7 @@ package variable
 
 import (
 	"fmt"
-	"github.com/TingerSure/natural_language/core/sandbox/component"
+
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"strings"
 )
@@ -13,10 +13,10 @@ const (
 
 type Class struct {
 	name          string
-	methods       *component.Mapping
-	fields        *component.Mapping
-	staticMethods *component.Mapping
-	staticFields  *component.Mapping
+	methods       *concept.Mapping
+	fields        *concept.Mapping
+	staticMethods *concept.Mapping
+	staticFields  *concept.Mapping
 }
 
 var (
@@ -155,19 +155,19 @@ func (c *Class) IterateStaticFields(on func(key concept.String, value concept.Va
 func NewClass(name string) *Class {
 	return &Class{
 		name: name,
-		methods: component.NewMapping(&component.MappingParam{
+		methods: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: NewNull(),
 		}),
-		fields: component.NewMapping(&component.MappingParam{
+		fields: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: NewNull(),
 		}),
-		staticMethods: component.NewMapping(&component.MappingParam{
+		staticMethods: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: NewNull(),
 		}),
-		staticFields: component.NewMapping(&component.MappingParam{
+		staticFields: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: NewNull(),
 		}),

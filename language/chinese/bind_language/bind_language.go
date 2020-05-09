@@ -8,4 +8,5 @@ import (
 func BindLanguage(libs *tree.LibraryManager, language string) {
 	sandbox.VariableBindLanguage(libs, language)
 	sandbox.IndexBindLanguage(libs, language)
+	sandbox.ExpressionBindLanguage(libs, language)
 }

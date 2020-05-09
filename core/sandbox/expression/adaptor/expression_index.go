@@ -10,6 +10,14 @@ type ExpressionIndex struct {
 	exec func(concept.Closure) (concept.Variable, concept.Interrupt)
 }
 
+var (
+	IndexExpressionType = "Bubble"
+)
+
+func (e *ExpressionIndex) Type() string {
+	return IndexExpressionType
+}
+
 func (e *ExpressionIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }

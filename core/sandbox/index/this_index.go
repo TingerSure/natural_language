@@ -13,6 +13,14 @@ const (
 type ThisIndex struct {
 }
 
+const (
+	IndexThisType = "This"
+)
+
+func (f *ThisIndex) Type() string {
+	return IndexThisType
+}
+
 var (
 	ThisIndexLanguageSeeds = map[string]func(string, *ThisIndex) string{}
 )

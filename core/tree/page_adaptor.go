@@ -1,17 +1,16 @@
 package tree
 
 import (
-	"github.com/TingerSure/natural_language/core/sandbox/component"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type PageAdaptor struct {
-	functions  *component.Mapping
-	classes    *component.Mapping
-	consts     *component.Mapping
-	exceptions *component.Mapping
-	indexes    *component.Mapping
+	functions  *concept.Mapping
+	classes    *concept.Mapping
+	consts     *concept.Mapping
+	exceptions *concept.Mapping
+	indexes    *concept.Mapping
 	sources    []Source
 }
 
@@ -70,23 +69,23 @@ func (p *PageAdaptor) AddSource(source Source) {
 
 func NewPageAdaptor() *PageAdaptor {
 	return &PageAdaptor{
-		indexes: component.NewMapping(&component.MappingParam{
+		indexes: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: variable.NewNull(),
 		}),
-		exceptions: component.NewMapping(&component.MappingParam{
+		exceptions: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: variable.NewNull(),
 		}),
-		functions: component.NewMapping(&component.MappingParam{
+		functions: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: variable.NewNull(),
 		}),
-		classes: component.NewMapping(&component.MappingParam{
+		classes: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: variable.NewNull(),
 		}),
-		consts: component.NewMapping(&component.MappingParam{
+		consts: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: variable.NewNull(),
 		}),

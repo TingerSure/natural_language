@@ -13,6 +13,14 @@ type ObjectFieldIndex struct {
 	object concept.Index
 }
 
+const (
+	IndexObjectFieldType = "ObjectField"
+)
+
+func (f *ObjectFieldIndex) Type() string {
+	return IndexObjectFieldType
+}
+
 var (
 	ObjectFieldIndexLanguageSeeds = map[string]func(string, *ObjectFieldIndex) string{}
 )

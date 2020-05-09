@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/variable/adaptor"
 )
 
 const (
@@ -12,6 +13,7 @@ const (
 )
 
 type PreObjectFunction struct {
+	*adaptor.AdaptorFunction
 	function concept.Function
 	object   concept.Object
 }
@@ -64,7 +66,8 @@ func NewPreObjectFunction(
 	object concept.Object,
 ) *PreObjectFunction {
 	return &PreObjectFunction{
-		function: function,
-		object:   object,
+		AdaptorFunction: adaptor.NewAdaptorFunction(),
+		function:        function,
+		object:          object,
 	}
 }

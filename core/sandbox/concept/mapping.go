@@ -1,8 +1,7 @@
-package component
+package concept
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/sandbox/concept"
 )
 
 type Mapping struct {
@@ -11,7 +10,7 @@ type Mapping struct {
 }
 
 type MappingItem struct {
-	key   concept.String
+	key   String
 	value interface{}
 }
 
@@ -19,7 +18,7 @@ func (k *Mapping) Size() int {
 	return len(k.values)
 }
 
-func (k *Mapping) Init(specimen concept.String, defaultValue interface{}) bool {
+func (k *Mapping) Init(specimen String, defaultValue interface{}) bool {
 	if nl_interface.IsNil(defaultValue) {
 		defaultValue = k.param.EmptyValue
 	}
@@ -41,7 +40,7 @@ func (k *Mapping) Init(specimen concept.String, defaultValue interface{}) bool {
 	return exist
 }
 
-func (k *Mapping) Set(specimen concept.String, value interface{}) bool {
+func (k *Mapping) Set(specimen String, value interface{}) bool {
 	if nl_interface.IsNil(value) {
 		value = k.param.EmptyValue
 	}
@@ -63,7 +62,7 @@ func (k *Mapping) Set(specimen concept.String, value interface{}) bool {
 	return exist
 }
 
-func (k *Mapping) Get(specimen concept.String) interface{} {
+func (k *Mapping) Get(specimen String) interface{} {
 	var choosen interface{} = k.param.EmptyValue
 	k.iterate(func(item *MappingItem) bool {
 		if item.key.EqualLanguage(specimen) {
@@ -75,7 +74,7 @@ func (k *Mapping) Get(specimen concept.String) interface{} {
 	return choosen
 }
 
-func (k *Mapping) Has(specimen concept.String) bool {
+func (k *Mapping) Has(specimen String) bool {
 	return k.iterate(func(item *MappingItem) bool {
 		return item.key.EqualLanguage(specimen)
 	})
@@ -90,7 +89,7 @@ func (k *Mapping) iterate(on func(item *MappingItem) bool) bool {
 	return false
 }
 
-func (k *Mapping) Iterate(on func(key concept.String, value interface{}) bool) bool {
+func (k *Mapping) Iterate(on func(key String, value interface{}) bool) bool {
 	return k.iterate(func(item *MappingItem) bool {
 		return on(item.key, item.value)
 	})

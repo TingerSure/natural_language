@@ -20,6 +20,14 @@ type Call struct {
 	param concept.Index
 }
 
+func (c *Call) Function() concept.Index {
+	return c.funcs
+}
+
+func (c *Call) Param() concept.Index {
+	return c.param
+}
+
 var (
 	CallLanguageSeeds = map[string]func(string, *Call) string{}
 )

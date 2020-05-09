@@ -18,6 +18,15 @@ var (
 	NewParamLanguageSeeds = map[string]func(string, *NewParam) string{}
 )
 
+func (f *NewParam) Iterate(on func(concept.String, concept.Index) bool) bool {
+	for key, value := range f.values {
+		if on(key, value) {
+			return true
+		}
+	}
+	return false
+}
+
 func (f *NewParam) ToLanguage(language string) string {
 	seed := NewParamLanguageSeeds[language]
 	if seed == nil {

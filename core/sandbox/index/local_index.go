@@ -8,6 +8,14 @@ type LocalIndex struct {
 	key concept.String
 }
 
+const (
+	IndexLocalType = "Local"
+)
+
+func (f *LocalIndex) Type() string {
+	return IndexLocalType
+}
+
 var (
 	LocalIndexLanguageSeeds = map[string]func(string, *LocalIndex) string{}
 )
@@ -26,6 +34,10 @@ func (s *LocalIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 
 func (s *LocalIndex) ToString(prefix string) string {
 	return s.key.ToString(prefix)
+}
+
+func (s *LocalIndex) Key() concept.String {
+	return s.key
 }
 
 func (s *LocalIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {

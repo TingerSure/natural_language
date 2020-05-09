@@ -3,7 +3,7 @@ package variable
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/sandbox/component"
+
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"strings"
@@ -14,9 +14,9 @@ const (
 )
 
 type Object struct {
-	fields      *component.Mapping
-	methods     *component.Mapping
-	reflections []*component.ClassReflection
+	fields      *concept.Mapping
+	methods     *concept.Mapping
+	reflections []*concept.ClassReflection
 }
 
 var (
@@ -126,7 +126,7 @@ func (o *Object) AddClass(class concept.Class, alias string, mapping map[concept
 			return interrupt.NewException(NewString("system error"), NewString("Duplicate class reflections are added."))
 		}
 	}
-	o.reflections = append(o.reflections, component.NewClassReflectionWithMapping(class, mapping, alias))
+	o.reflections = append(o.reflections, concept.NewClassReflectionWithMapping(class, mapping, alias))
 	return nil
 }
 
@@ -209,14 +209,14 @@ func (o *Object) Type() string {
 
 func NewObject() *Object {
 	return &Object{
-		fields: component.NewMapping(&component.MappingParam{
+		fields: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   false,
 			EmptyValue: NewNull(),
 		}),
-		methods: component.NewMapping(&component.MappingParam{
+		methods: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: NewNull(),
 		}),
-		reflections: make([]*component.ClassReflection, 0),
+		reflections: make([]*concept.ClassReflection, 0),
 	}
 }

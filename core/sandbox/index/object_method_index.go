@@ -13,6 +13,14 @@ type ObjectMethodIndex struct {
 	object concept.Index
 }
 
+const (
+	IndexObjectMethodType = "ObjectMethod"
+)
+
+func (f *ObjectMethodIndex) Type() string {
+	return IndexObjectMethodType
+}
+
 var (
 	ObjectMethodIndexLanguageSeeds = map[string]func(string, *ObjectMethodIndex) string{}
 )

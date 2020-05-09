@@ -8,4 +8,6 @@ type Function interface {
 	FunctionType() string
 	ParamNames() []String
 	ReturnNames() []String
+	GetLanguageOnCallSeed(string) func(Function, *Mapping) string
+	SetLanguageOnCallSeed(string, func(Function, *Mapping) string)
 }

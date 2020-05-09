@@ -2,6 +2,7 @@ package variable
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/variable/adaptor"
 )
 
 const (
@@ -10,6 +11,7 @@ const (
 )
 
 type SystemFunction struct {
+	*adaptor.AdaptorFunction
 	name        concept.String
 	paramNames  []concept.String
 	returnNames []concept.String
@@ -63,9 +65,10 @@ func NewSystemFunction(
 	returnNames []concept.String,
 ) *SystemFunction {
 	return &SystemFunction{
-		name:        name,
-		funcs:       funcs,
-		paramNames:  paramNames,
-		returnNames: returnNames,
+		AdaptorFunction: adaptor.NewAdaptorFunction(),
+		name:            name,
+		funcs:           funcs,
+		paramNames:      paramNames,
+		returnNames:     returnNames,
 	}
 }
