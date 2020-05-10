@@ -18,6 +18,14 @@ type SystemFunction struct {
 	funcs       func(concept.Param, concept.Object) (concept.Param, concept.Exception)
 }
 
+func (f *SystemFunction) ParamFormat(params *concept.Mapping) *concept.Mapping {
+	return f.AdaptorFunction.AdaptorParamFormat(f, params)
+}
+
+func (f *SystemFunction) ReturnFormat(back concept.String) concept.String {
+	return f.AdaptorFunction.AdaptorReturnFormat(f, back)
+}
+
 var (
 	SystemFunctionLanguageSeeds = map[string]func(string, *SystemFunction) string{}
 )

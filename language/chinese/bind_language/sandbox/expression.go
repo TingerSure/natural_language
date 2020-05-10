@@ -26,6 +26,7 @@ func ExpressionBindLanguage(libs *tree.LibraryManager, language string) {
 	}
 
 	expression.ParamGetLanguageSeeds[language] = func(language string, instance *expression.ParamGet) string {
+		key := instance.Key()
 		callIndex, yesCallIndex := instance.Param().(*expression.Call)
 		if yesCallIndex {
 			constIndexFuncs, yesIndexFuncs := index.IndexFamilyInstance.IsConstIndex(callIndex.Function())
@@ -35,41 +36,27 @@ func ExpressionBindLanguage(libs *tree.LibraryManager, language string) {
 					if len(funcsHome.ReturnNames()) == 1 {
 						return instance.Param().ToLanguage(language)
 					}
+					key = funcsHome.ReturnFormat(key)
 				}
 			}
 		}
-		return fmt.Sprintf("%v的%v", instance.Param().ToLanguage(language), instance.Key().ToLanguage(language))
+		return fmt.Sprintf("%v的%v", instance.Param().ToLanguage(language), key.ToLanguage(language))
 
 	}
 
 	expression.CallLanguageSeeds[language] = func(language string, instance *expression.Call) string {
 
-		defaultLanguage := func() string {
-			return fmt.Sprintf("以%v来%v", instance.Param().ToLanguage(language), instance.Function().ToLanguage(language))
-		}
-
 		var funcs concept.Function = nil
-		constIndexFuncs, yesIndexFuncs := index.IndexFamilyInstance.IsConstIndex(instance.Function())
-		if yesIndexFuncs {
-			funcsHome, yesFuncs := variable.VariableFamilyInstance.IsFunctionHome(constIndexFuncs.Value())
-			if yesFuncs {
-				funcs = funcsHome
-			}
-		}
-		if !nl_interface.IsNil(funcs) {
-			return defaultLanguage()
-		}
-
-		seed := funcs.GetLanguageOnCallSeed(language)
-		if seed == nil {
-			return defaultLanguage()
-		}
-
-		paramCanUse := false
 		param := concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: variable.NewNull(),
 		})
+		paramCanUse := false
+
+		constIndexFuncs, yesIndexFuncs := index.IndexFamilyInstance.IsConstIndex(instance.Function())
+		if yesIndexFuncs {
+			funcs, _ = variable.VariableFamilyInstance.IsFunctionHome(constIndexFuncs.Value())
+		}
 
 		constIndexParam, yesIndexParam := index.IndexFamilyInstance.IsConstIndex(instance.Param())
 		if yesIndexParam {
@@ -93,10 +80,27 @@ func ExpressionBindLanguage(libs *tree.LibraryManager, language string) {
 				})
 			}
 		}
+
 		if !paramCanUse {
-			return defaultLanguage()
+			return fmt.Sprintf("以%v来%v", instance.Param().ToLanguage(language), instance.Function().ToLanguage(language))
 		}
-		return seed(funcs, param)
+
+		if !nl_interface.IsNil(funcs) {
+			seed := funcs.GetLanguageOnCallSeed(language)
+			param = funcs.ParamFormat(param)
+			if seed != nil {
+				return seed(funcs, param)
+			}
+		}
+
+		items := []string{}
+		param.Iterate(func(key concept.String, value interface{}) bool {
+			items = append(items, fmt.Sprintf("%v作为%v", value.(concept.ToString).ToLanguage(language), key.ToLanguage(language)))
+			return false
+		})
+
+		return fmt.Sprintf("以%v来%v", strings.Join(items, ""), instance.Function().ToLanguage(language))
+
 	}
 
 }

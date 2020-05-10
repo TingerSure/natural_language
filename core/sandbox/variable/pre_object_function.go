@@ -18,6 +18,14 @@ type PreObjectFunction struct {
 	object   concept.Object
 }
 
+func (f *PreObjectFunction) ParamFormat(params *concept.Mapping) *concept.Mapping {
+	return f.AdaptorFunction.AdaptorParamFormat(f, params)
+}
+
+func (f *PreObjectFunction) ReturnFormat(back concept.String) concept.String {
+	return f.AdaptorFunction.AdaptorReturnFormat(f, back)
+}
+
 var (
 	PreObjectFunctionLanguageSeeds = map[string]func(string, *PreObjectFunction) string{}
 )

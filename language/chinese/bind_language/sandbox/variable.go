@@ -10,7 +10,7 @@ import (
 
 func VariableBindLanguage(libs *tree.LibraryManager, language string) {
 	variable.StringLanguageSeeds[language] = func(language string, instance *variable.String) string {
-		return instance.Value()
+		return instance.GetLanguage(language)
 	}
 
 	variable.NumberLanguageSeeds[language] = func(language string, instance *variable.Number) string {

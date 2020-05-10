@@ -14,6 +14,10 @@ type MappingItem struct {
 	value interface{}
 }
 
+func (m *Mapping) Param() *MappingParam {
+	return m.param
+}
+
 func (k *Mapping) Size() int {
 	return len(k.values)
 }

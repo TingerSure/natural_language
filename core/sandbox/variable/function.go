@@ -28,6 +28,14 @@ var (
 	FunctionLanguageSeeds = map[string]func(string, *Function) string{}
 )
 
+func (f *Function) ParamFormat(params *concept.Mapping) *concept.Mapping {
+	return f.AdaptorFunction.AdaptorParamFormat(f, params)
+}
+
+func (f *Function) ReturnFormat(back concept.String) concept.String {
+	return f.AdaptorFunction.AdaptorReturnFormat(f, back)
+}
+
 func (f *Function) ToLanguage(language string) string {
 	seed := FunctionLanguageSeeds[language]
 	if seed == nil {

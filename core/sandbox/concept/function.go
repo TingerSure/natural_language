@@ -10,4 +10,6 @@ type Function interface {
 	ReturnNames() []String
 	GetLanguageOnCallSeed(string) func(Function, *Mapping) string
 	SetLanguageOnCallSeed(string, func(Function, *Mapping) string)
+	ParamFormat(*Mapping) *Mapping
+	ReturnFormat(String) String
 }
