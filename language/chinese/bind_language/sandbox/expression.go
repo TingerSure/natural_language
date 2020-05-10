@@ -8,9 +8,40 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
+	"strings"
 )
 
 func ExpressionBindLanguage(libs *tree.LibraryManager, language string) {
+
+	expression.NewParamLanguageSeeds[language] = func(language string, instance *expression.NewParam) string {
+		items := []string{}
+
+		instance.Iterate(func(key concept.String, value concept.Index) bool {
+			items = append(items, fmt.Sprintf("%v作为%v", value.ToLanguage(language), key.ToLanguage(language)))
+			return false
+		})
+
+		return strings.Join(items, "")
+
+	}
+
+	expression.ParamGetLanguageSeeds[language] = func(language string, instance *expression.ParamGet) string {
+		callIndex, yesCallIndex := instance.Param().(*expression.Call)
+		if yesCallIndex {
+			constIndexFuncs, yesIndexFuncs := index.IndexFamilyInstance.IsConstIndex(callIndex.Function())
+			if yesIndexFuncs {
+				funcsHome, yesFuncs := variable.VariableFamilyInstance.IsFunctionHome(constIndexFuncs.Value())
+				if yesFuncs {
+					if len(funcsHome.ReturnNames()) == 1 {
+						return instance.Param().ToLanguage(language)
+					}
+				}
+			}
+		}
+		return fmt.Sprintf("%v的%v", instance.Param().ToLanguage(language), instance.Key().ToLanguage(language))
+
+	}
+
 	expression.CallLanguageSeeds[language] = func(language string, instance *expression.Call) string {
 
 		defaultLanguage := func() string {

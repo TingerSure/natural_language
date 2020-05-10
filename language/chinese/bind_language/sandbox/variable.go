@@ -25,7 +25,7 @@ func VariableBindLanguage(libs *tree.LibraryManager, language string) {
 		items := []string{}
 
 		instance.Iterate(func(key concept.String, value concept.Variable) bool {
-			items = append(items, fmt.Sprintf("%v作为%v", key.ToLanguage(language), value.ToLanguage(language)))
+			items = append(items, fmt.Sprintf("%v作为%v", value.ToLanguage(language), key.ToLanguage(language)))
 			return false
 		})
 

@@ -11,7 +11,7 @@ type ExpressionIndex struct {
 }
 
 var (
-	IndexExpressionType = "Bubble"
+	IndexExpressionType = "Expression"
 )
 
 func (e *ExpressionIndex) Type() string {

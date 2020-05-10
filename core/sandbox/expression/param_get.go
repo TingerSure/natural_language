@@ -15,6 +15,14 @@ type ParamGet struct {
 	param concept.Index
 }
 
+func (f *ParamGet) Key() concept.String {
+	return f.key
+}
+
+func (f *ParamGet) Param() concept.Index {
+	return f.param
+}
+
 var (
 	ParamGetLanguageSeeds = map[string]func(string, *ParamGet) string{}
 )
