@@ -5,6 +5,7 @@ import (
 	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/language/chinese"
+	"github.com/TingerSure/natural_language/language/english"
 	"github.com/TingerSure/natural_language/library/system"
 	"github.com/TingerSure/natural_language/library/system/std"
 	"os"
@@ -12,6 +13,7 @@ import (
 
 const (
 	ChineseName = "chinese"
+	EnglishName = "english"
 )
 
 func getVM() *runtime.Runtime {
@@ -36,6 +38,7 @@ func getVM() *runtime.Runtime {
 	}))
 	VM.GetLibraryManager().AddLibrary(ChineseName, chinese.NewChinese(VM.GetLibraryManager(), ChineseName))
 	chinese.ChineseBindLanguage(VM.GetLibraryManager(), ChineseName)
+	english.EnglishBindLanguage(VM.GetLibraryManager(), EnglishName)
 	VM.Bind()
 	VM.SetDefaultLanguage(ChineseName)
 	return VM
@@ -59,6 +62,7 @@ func test() {
 			}
 
 			fmt.Printf("\033[1;32m[TRANSLATE]:\033[00m %v\n", index.ToLanguage(ChineseName))
+			fmt.Printf("\033[1;32m[TRANSLATE]:\033[00m %v\n", index.ToLanguage(EnglishName))
 
 			return true
 		},

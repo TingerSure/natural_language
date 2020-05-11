@@ -15,16 +15,16 @@ func OperatorBindLanguage(libs *tree.LibraryManager, language string) {
 	AdditionRight := operator.GetConst(variable.NewString("AdditionRight"))
 	AdditionResult := operator.GetConst(variable.NewString("AdditionResult"))
 
-	AdditionLeft.SetLanguage(language, "被加数")
-	AdditionRight.SetLanguage(language, "加数")
-	AdditionResult.SetLanguage(language, "和")
+	AdditionLeft.SetLanguage(language, "augend")
+	AdditionRight.SetLanguage(language, "addend")
+	AdditionResult.SetLanguage(language, "sum")
 
-	AdditionFunc.Name().SetLanguage(language, "相加")
+	AdditionFunc.Name().SetLanguage(language, "add")
 
 	AdditionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
 		left := param.Get(AdditionLeft).(concept.ToString)
 		right := param.Get(AdditionRight).(concept.ToString)
-		return fmt.Sprintf("%v加上%v", left.ToLanguage(language), right.ToLanguage(language))
+		return fmt.Sprintf("%v plus %v", left.ToLanguage(language), right.ToLanguage(language))
 	})
 
 	SubtractionFunc := operator.GetFunction(variable.NewString("SubtractionFunc"))
@@ -32,16 +32,16 @@ func OperatorBindLanguage(libs *tree.LibraryManager, language string) {
 	SubtractionRight := operator.GetConst(variable.NewString("SubtractionRight"))
 	SubtractionResult := operator.GetConst(variable.NewString("SubtractionResult"))
 
-	SubtractionLeft.SetLanguage(language, "被减数")
-	SubtractionRight.SetLanguage(language, "减数")
-	SubtractionResult.SetLanguage(language, "差")
+	SubtractionLeft.SetLanguage(language, "minuend")
+	SubtractionRight.SetLanguage(language, "subtrahend")
+	SubtractionResult.SetLanguage(language, "difference")
 
-	SubtractionFunc.Name().SetLanguage(language, "相减")
+	SubtractionFunc.Name().SetLanguage(language, "subtract")
 
 	SubtractionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
 		left := param.Get(SubtractionLeft).(concept.ToString)
 		right := param.Get(SubtractionRight).(concept.ToString)
-		return fmt.Sprintf("%v减去%v", left.ToLanguage(language), right.ToLanguage(language))
+		return fmt.Sprintf("%v minus %v", left.ToLanguage(language), right.ToLanguage(language))
 	})
 
 	MultiplicationFunc := operator.GetFunction(variable.NewString("MultiplicationFunc"))
@@ -49,16 +49,16 @@ func OperatorBindLanguage(libs *tree.LibraryManager, language string) {
 	MultiplicationRight := operator.GetConst(variable.NewString("MultiplicationRight"))
 	MultiplicationResult := operator.GetConst(variable.NewString("MultiplicationResult"))
 
-	MultiplicationLeft.SetLanguage(language, "被乘数")
-	MultiplicationRight.SetLanguage(language, "乘数")
-	MultiplicationResult.SetLanguage(language, "积")
+	MultiplicationLeft.SetLanguage(language, "multiplicand")
+	MultiplicationRight.SetLanguage(language, "multiplier")
+	MultiplicationResult.SetLanguage(language, "product")
 
-	MultiplicationFunc.Name().SetLanguage(language, "相乘")
+	MultiplicationFunc.Name().SetLanguage(language, "multiply")
 
 	MultiplicationFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
 		left := param.Get(MultiplicationLeft).(concept.ToString)
 		right := param.Get(MultiplicationRight).(concept.ToString)
-		return fmt.Sprintf("%v乘以%v", left.ToLanguage(language), right.ToLanguage(language))
+		return fmt.Sprintf("%v times %v", left.ToLanguage(language), right.ToLanguage(language))
 	})
 
 	DivisionFunc := operator.GetFunction(variable.NewString("DivisionFunc"))
@@ -66,16 +66,16 @@ func OperatorBindLanguage(libs *tree.LibraryManager, language string) {
 	DivisionRight := operator.GetConst(variable.NewString("DivisionRight"))
 	DivisionResult := operator.GetConst(variable.NewString("DivisionResult"))
 
-	DivisionLeft.SetLanguage(language, "被除数")
-	DivisionRight.SetLanguage(language, "除数")
-	DivisionResult.SetLanguage(language, "商")
+	DivisionLeft.SetLanguage(language, "dividend")
+	DivisionRight.SetLanguage(language, "divisor")
+	DivisionResult.SetLanguage(language, "quotient")
 
-	DivisionFunc.Name().SetLanguage(language, "相除")
+	DivisionFunc.Name().SetLanguage(language, "divide")
 
 	DivisionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
 		left := param.Get(DivisionLeft).(concept.ToString)
 		right := param.Get(DivisionRight).(concept.ToString)
-		return fmt.Sprintf("%v除以%v", left.ToLanguage(language), right.ToLanguage(language))
+		return fmt.Sprintf("%v divided by %v", left.ToLanguage(language), right.ToLanguage(language))
 	})
 
 }
