@@ -1,9 +1,9 @@
 package operator
 
 import (
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/expression"
-	"github.com/TingerSure/natural_language/core/sandbox/index"
+	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 )
@@ -14,31 +14,46 @@ const (
 	ItemResult = "result"
 )
 
+var (
+	OperatorTypeErrorExceptionTemplate   = interrupt.NewException(variable.NewString("type error"), variable.NewString("OperatorTypeErrorException"))
+	OperatorDivisorZeroExceptionTemplate = interrupt.NewException(variable.NewString("param error"), variable.NewString("OperatorDivisorZeroException"))
+)
+
 type OperatorItem struct {
 	Name   string
-	Func   *variable.Function
+	Func   *variable.SystemFunction
 	Left   concept.String
 	Right  concept.String
 	Result concept.String
 }
 
-func NewOperatorItem(name string, create func(concept.Index, concept.Index) concept.Expression) *OperatorItem {
+func NewOperatorItem(name string, exec func(*variable.Number, *variable.Number) (*variable.Number, concept.Exception)) *OperatorItem {
 	instance := &OperatorItem{
 		Left:   variable.NewString(ItemLeft),
 		Right:  variable.NewString(ItemRight),
 		Result: variable.NewString(ItemResult),
 	}
-	instance.Func = variable.NewFunction(variable.NewString(name), nil)
-	instance.Func.AddParamName(instance.Left)
-	instance.Func.AddParamName(instance.Right)
-	instance.Func.Body().AddStep(
-		expression.NewReturn(
+	instance.Func = variable.NewSystemFunction(
+		variable.NewString(name),
+		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+			left, yesLeft := variable.VariableFamilyInstance.IsNumber(input.Get(instance.Left))
+			right, yesRight := variable.VariableFamilyInstance.IsNumber(input.Get(instance.Right))
+			if !yesLeft || !yesRight {
+				return nil, OperatorTypeErrorExceptionTemplate.Copy().AddStack(instance.Func)
+			}
+			result, exception := exec(left, right)
+			if !nl_interface.IsNil(exception) {
+				return nil, exception.Copy().AddStack(instance.Func)
+			}
+			return variable.NewParam().Set(instance.Result, result), nil
+		},
+		[]concept.String{
+			instance.Left,
+			instance.Right,
+		},
+		[]concept.String{
 			instance.Result,
-			create(
-				index.NewLocalIndex(instance.Left),
-				index.NewLocalIndex(instance.Right),
-			),
-		),
+		},
 	)
 	return instance
 }
@@ -65,17 +80,20 @@ func NewOperator(libs *tree.LibraryManager) *Operator {
 		Page: tree.NewPageAdaptor(),
 		Items: map[string]*OperatorItem{
 
-			AdditionName: NewOperatorItem(AdditionName, func(left concept.Index, right concept.Index) concept.Expression {
-				return expression.NewAddition(left, right)
+			AdditionName: NewOperatorItem(AdditionName, func(left *variable.Number, right *variable.Number) (*variable.Number, concept.Exception) {
+				return variable.NewNumber(left.Value() + right.Value()), nil
 			}),
-			DivisionName: NewOperatorItem(DivisionName, func(left concept.Index, right concept.Index) concept.Expression {
-				return expression.NewDivision(left, right)
+			DivisionName: NewOperatorItem(DivisionName, func(left *variable.Number, right *variable.Number) (*variable.Number, concept.Exception) {
+				if right.Value() == 0 {
+					return nil, OperatorDivisorZeroExceptionTemplate
+				}
+				return variable.NewNumber(left.Value() / right.Value()), nil
 			}),
-			MultiplicationName: NewOperatorItem(MultiplicationName, func(left concept.Index, right concept.Index) concept.Expression {
-				return expression.NewMultiplication(left, right)
+			MultiplicationName: NewOperatorItem(MultiplicationName, func(left *variable.Number, right *variable.Number) (*variable.Number, concept.Exception) {
+				return variable.NewNumber(left.Value() * right.Value()), nil
 			}),
-			SubtractionName: NewOperatorItem(SubtractionName, func(left concept.Index, right concept.Index) concept.Expression {
-				return expression.NewSubtraction(left, right)
+			SubtractionName: NewOperatorItem(SubtractionName, func(left *variable.Number, right *variable.Number) (*variable.Number, concept.Exception) {
+				return variable.NewNumber(left.Value() - right.Value()), nil
 			}),
 		},
 	})
