@@ -27,7 +27,7 @@ type OperatorItem struct {
 	Result concept.String
 }
 
-func NewOperatorItem(name string, exec func(*variable.Number, *variable.Number) (concept.Variable, concept.Exception)) *OperatorItem {
+func NewNumberOperatorNumberItem(name string, exec func(*variable.Number, *variable.Number) (concept.Variable, concept.Exception)) *OperatorItem {
 	instance := &OperatorItem{
 		Left:   variable.NewString(OperatorLeft),
 		Right:  variable.NewString(OperatorRight),
@@ -38,6 +38,37 @@ func NewOperatorItem(name string, exec func(*variable.Number, *variable.Number) 
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 			left, yesLeft := variable.VariableFamilyInstance.IsNumber(input.Get(instance.Left))
 			right, yesRight := variable.VariableFamilyInstance.IsNumber(input.Get(instance.Right))
+			if !yesLeft || !yesRight {
+				return nil, OperatorTypeErrorExceptionTemplate.Copy().AddStack(instance.Func)
+			}
+			result, exception := exec(left, right)
+			if !nl_interface.IsNil(exception) {
+				return nil, exception.Copy().AddStack(instance.Func)
+			}
+			return variable.NewParam().Set(instance.Result, result), nil
+		},
+		[]concept.String{
+			instance.Left,
+			instance.Right,
+		},
+		[]concept.String{
+			instance.Result,
+		},
+	)
+	return instance
+}
+
+func NewBoolOperatorBoolItem(name string, exec func(*variable.Bool, *variable.Bool) (concept.Variable, concept.Exception)) *OperatorItem {
+	instance := &OperatorItem{
+		Left:   variable.NewString(OperatorLeft),
+		Right:  variable.NewString(OperatorRight),
+		Result: variable.NewString(OperatorResult),
+	}
+	instance.Func = variable.NewSystemFunction(
+		variable.NewString(name),
+		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+			left, yesLeft := variable.VariableFamilyInstance.IsBool(input.Get(instance.Left))
+			right, yesRight := variable.VariableFamilyInstance.IsBool(input.Get(instance.Right))
 			if !yesLeft || !yesRight {
 				return nil, OperatorTypeErrorExceptionTemplate.Copy().AddStack(instance.Func)
 			}
@@ -69,7 +100,11 @@ const (
 	LessThanName             = "LessThan"
 	GreaterThanOrEqualToName = "GreaterThanOrEqualTo"
 	LessThanOrEqualToName    = "LessThanOrEqualTo"
+	OrName                   = "Or"
+	AndName                  = "And"
+)
 
+const (
 	FuncName   = "Func"
 	LeftName   = "Left"
 	RightName  = "Right"
@@ -86,38 +121,44 @@ func NewOperator(libs *tree.LibraryManager) *Operator {
 		Page: tree.NewPageAdaptor(),
 		Items: map[string]*OperatorItem{
 
-			AdditionName: NewOperatorItem(AdditionName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
+			AdditionName: NewNumberOperatorNumberItem(AdditionName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 				return variable.NewNumber(left.Value() + right.Value()), nil
 			}),
-			DivisionName: NewOperatorItem(DivisionName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
+			DivisionName: NewNumberOperatorNumberItem(DivisionName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 				if right.Value() == 0 {
 					return nil, OperatorDivisorZeroExceptionTemplate
 				}
 				return variable.NewNumber(left.Value() / right.Value()), nil
 			}),
-			MultiplicationName: NewOperatorItem(MultiplicationName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
+			MultiplicationName: NewNumberOperatorNumberItem(MultiplicationName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 				return variable.NewNumber(left.Value() * right.Value()), nil
 			}),
-			SubtractionName: NewOperatorItem(SubtractionName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
+			SubtractionName: NewNumberOperatorNumberItem(SubtractionName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 				return variable.NewNumber(left.Value() - right.Value()), nil
 			}),
-			EqualToName: NewOperatorItem(EqualToName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
+			EqualToName: NewNumberOperatorNumberItem(EqualToName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 				return variable.NewBool(left.Value() == right.Value()), nil
 			}),
-			NotEqualToName: NewOperatorItem(NotEqualToName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
+			NotEqualToName: NewNumberOperatorNumberItem(NotEqualToName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 				return variable.NewBool(left.Value() != right.Value()), nil
 			}),
-			GreaterThanName: NewOperatorItem(GreaterThanName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
+			GreaterThanName: NewNumberOperatorNumberItem(GreaterThanName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 				return variable.NewBool(left.Value() > right.Value()), nil
 			}),
-			LessThanName: NewOperatorItem(LessThanName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
+			LessThanName: NewNumberOperatorNumberItem(LessThanName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 				return variable.NewBool(left.Value() < right.Value()), nil
 			}),
-			GreaterThanOrEqualToName: NewOperatorItem(GreaterThanOrEqualToName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
+			GreaterThanOrEqualToName: NewNumberOperatorNumberItem(GreaterThanOrEqualToName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 				return variable.NewBool(left.Value() >= right.Value()), nil
 			}),
-			LessThanOrEqualToName: NewOperatorItem(LessThanOrEqualToName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
+			LessThanOrEqualToName: NewNumberOperatorNumberItem(LessThanOrEqualToName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 				return variable.NewBool(left.Value() <= right.Value()), nil
+			}),
+			OrName: NewBoolOperatorBoolItem(OrName, func(left *variable.Bool, right *variable.Bool) (concept.Variable, concept.Exception) {
+				return variable.NewBool(left.Value() || right.Value()), nil
+			}),
+			AndName: NewBoolOperatorBoolItem(AndName, func(left *variable.Bool, right *variable.Bool) (concept.Variable, concept.Exception) {
+				return variable.NewBool(left.Value() && right.Value()), nil
 			}),
 		},
 	})
