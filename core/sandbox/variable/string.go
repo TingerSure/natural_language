@@ -87,14 +87,7 @@ func (n *String) IterateLanguages(on func(string, string) bool) bool {
 }
 
 func (n *String) ToString(prefix string) string {
-	if len(n.mapping) == 0 {
-		return fmt.Sprintf("\"%v\"", n.value)
-	}
-	paramsToString := make([]string, 0, len(n.mapping))
-	for language, value := range n.mapping {
-		paramsToString = append(paramsToString, fmt.Sprintf("%v.\"%v\"", language, value))
-	}
-	return fmt.Sprintf("\"%v\"<%v>", n.value, strings.Join(paramsToString, ", "))
+	return fmt.Sprintf("\"%v\"", n.value)
 }
 
 func (n *String) Value() string {
