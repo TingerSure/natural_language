@@ -1,6 +1,7 @@
 package question
 
 import (
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
@@ -31,7 +32,7 @@ func (q *Question) What(input concept.Param, object concept.Object) (concept.Par
 	return variable.NewParam().Set(q.WhatResult, outParam.Get(q.output.PrintContent)), suspend
 }
 
-func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
+func NewQuestion(libs *runtime.LibraryManager, output *std.Std) *Question {
 
 	instance := &Question{
 		Page:          tree.NewPageAdaptor(),

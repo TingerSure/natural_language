@@ -1,16 +1,17 @@
 package adaptor
 
 import (
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type SourceAdaptorParam struct {
-	Libs     *tree.LibraryManager
+	Libs     *runtime.LibraryManager
 	Language string
 }
 
 type SourceAdaptor struct {
-	Libs     *tree.LibraryManager
+	Libs     *runtime.LibraryManager
 	Language string
 }
 

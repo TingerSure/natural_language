@@ -1,6 +1,7 @@
 package set
 
 import (
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 )
@@ -9,7 +10,7 @@ type Set struct {
 	tree.Page
 }
 
-func NewSet(libs *tree.LibraryManager) *Set {
+func NewSet(libs *runtime.LibraryManager) *Set {
 	instance := &Set{
 		Page: tree.NewPageAdaptor(),
 	}

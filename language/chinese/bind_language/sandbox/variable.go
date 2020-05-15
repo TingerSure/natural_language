@@ -2,13 +2,13 @@ package sandbox
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
-	"github.com/TingerSure/natural_language/core/tree"
 	"strings"
 )
 
-func VariableBindLanguage(libs *tree.LibraryManager, language string) {
+func VariableBindLanguage(libs *runtime.LibraryManager, language string) {
 	variable.StringLanguageSeeds[language] = func(language string, instance *variable.String) string {
 		return instance.GetLanguage(language)
 	}

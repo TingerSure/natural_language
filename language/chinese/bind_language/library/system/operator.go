@@ -2,12 +2,12 @@ package system
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
-	"github.com/TingerSure/natural_language/core/tree"
 )
 
-func OperatorBindLanguage(libs *tree.LibraryManager, language string) {
+func OperatorBindLanguage(libs *runtime.LibraryManager, language string) {
 	operator := libs.GetLibraryPage("system", "operator")
 
 	AdditionFunc := operator.GetFunction(variable.NewString("AdditionFunc"))

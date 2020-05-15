@@ -2,12 +2,12 @@ package system
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
-	"github.com/TingerSure/natural_language/core/tree"
 )
 
-func ObjectBindlanguage(libs *tree.LibraryManager, language string) {
+func ObjectBindlanguage(libs *runtime.LibraryManager, language string) {
 	instance := libs.GetLibraryPage("system", "object")
 
 	// GetFieldObjectErrorException := instance.GetException(variable.NewString("GetFieldObjectErrorException"))

@@ -17,7 +17,7 @@ type Runtime struct {
 	lexer           *lexer.Lexer
 	grammar         *grammar.Grammar
 	ambiguity       *ambiguity.Ambiguity
-	libs            *tree.LibraryManager
+	libs            *LibraryManager
 	box             *sandbox.Sandbox
 	rootSpace       *closure.Closure
 	defaultLanguage string
@@ -31,7 +31,7 @@ func (r *Runtime) GetDefaultLanguage() string {
 	return r.defaultLanguage
 }
 
-func (r *Runtime) GetLibraryManager() *tree.LibraryManager {
+func (r *Runtime) GetLibraryManager() *LibraryManager {
 	return r.libs
 }
 
@@ -111,7 +111,7 @@ func NewRuntime(param *RuntimeParam) *Runtime {
 		lexer:     lexer.NewLexer(),
 		grammar:   grammar.NewGrammar(),
 		ambiguity: ambiguity.NewAmbiguity(),
-		libs:      tree.NewLibraryManager(),
+		libs:      NewLibraryManager(),
 		rootSpace: closure.NewClosure(nil, &closure.ClosureParam{
 			StringCreator: func(value string) concept.String {
 				return variable.NewString(value)

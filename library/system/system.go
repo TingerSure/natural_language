@@ -1,6 +1,7 @@
 package system
 
 import (
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/library/system/auto_number"
 	"github.com/TingerSure/natural_language/library/system/object"
@@ -15,7 +16,7 @@ type SystemLibraryParam struct {
 	Std *std.StdParam
 }
 
-func NewSystemLibrary(libs *tree.LibraryManager, param *SystemLibraryParam) tree.Library {
+func NewSystemLibrary(libs *runtime.LibraryManager, param *SystemLibraryParam) tree.Library {
 	system := tree.NewLibraryAdaptor()
 
 	stdInstance := std.NewStd(libs, param.Std)

@@ -1,6 +1,7 @@
 package pronoun
 
 import (
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/matcher"
@@ -14,7 +15,7 @@ type Pronoun struct {
 	Result concept.Index
 }
 
-func NewPronoun(libs *tree.LibraryManager) *Pronoun {
+func NewPronoun(libs *runtime.LibraryManager) *Pronoun {
 	instance := &Pronoun{
 		Page: tree.NewPageAdaptor(),
 		It: index.NewSearchIndex([]concept.Matcher{

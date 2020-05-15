@@ -2,6 +2,7 @@ package operator
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
@@ -116,7 +117,7 @@ type Operator struct {
 	Items map[string]*OperatorItem
 }
 
-func NewOperator(libs *tree.LibraryManager) *Operator {
+func NewOperator(libs *runtime.LibraryManager) *Operator {
 	instance := (&Operator{
 		Page: tree.NewPageAdaptor(),
 		Items: map[string]*OperatorItem{
