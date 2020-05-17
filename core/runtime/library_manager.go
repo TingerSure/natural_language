@@ -2,11 +2,13 @@ package runtime
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/sandbox/seed"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type LibraryManager struct {
 	libraries map[string]tree.Library
+	Sandbox   *seed.SandboxSeed
 }
 
 func (l *LibraryManager) PageIterate(on func(page tree.Page) bool) bool {
@@ -50,5 +52,6 @@ func (l *LibraryManager) GetLibrary(name string) tree.Library {
 func NewLibraryManager() *LibraryManager {
 	return &LibraryManager{
 		libraries: map[string]tree.Library{},
+		Sandbox:   seed.NewSandboxSeed(),
 	}
 }

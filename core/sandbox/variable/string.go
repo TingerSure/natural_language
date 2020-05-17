@@ -113,6 +113,23 @@ func NewString(value string) *String {
 	}
 }
 
+type StringSeed struct {
+	Seeds map[string]func(string, *String) string
+}
+
+func (s *StringSeed) New(value string) *String {
+	return &String{
+		value:   value,
+		mapping: make(map[string]string),
+	}
+}
+
+func NewStringSeed() *StringSeed {
+	return &StringSeed{
+		Seeds: map[string]func(string, *String) string{},
+	}
+}
+
 func StringJoin(values []concept.String, separator string) string {
 	paramsToString := make([]string, 0, len(values))
 	for _, value := range values {
