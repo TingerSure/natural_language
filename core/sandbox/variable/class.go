@@ -2,7 +2,6 @@ package variable
 
 import (
 	"fmt"
-
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"strings"
 )
@@ -11,24 +10,23 @@ const (
 	VariableClassType = "class"
 )
 
+type ClassSeed interface {
+	ToLanguage(string, *Class) string
+	Type() string
+	NewEmpty() concept.Null
+}
+
 type Class struct {
 	name          string
 	methods       *concept.Mapping
 	fields        *concept.Mapping
 	staticMethods *concept.Mapping
 	staticFields  *concept.Mapping
+	seed          ClassSeed
 }
 
-var (
-	ClassLanguageSeeds = map[string]func(string, *Class) string{}
-)
-
 func (f *Class) ToLanguage(language string) string {
-	seed := ClassLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (c *Class) ToString(prefix string) string {
@@ -57,7 +55,7 @@ func (c *Class) ToString(prefix string) string {
 }
 
 func (c *Class) Type() string {
-	return VariableClassType
+	return c.seed.Type()
 }
 
 func (c *Class) GetName() string {
@@ -152,24 +150,57 @@ func (c *Class) IterateStaticFields(on func(key concept.String, value concept.Va
 	})
 }
 
-func NewClass(name string) *Class {
+type ClassCreatorParam struct {
+	NullCreator func() concept.Null
+}
+
+type ClassCreator struct {
+	Seeds map[string]func(string, *Class) string
+	param *ClassCreatorParam
+}
+
+func (s *ClassCreator) New(name string) *Class {
 	return &Class{
 		name: name,
 		methods: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: NewNull(),
+			EmptyValue: s.NewEmpty(),
 		}),
 		fields: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: NewNull(),
+			EmptyValue: s.NewEmpty(),
 		}),
 		staticMethods: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: NewNull(),
+			EmptyValue: s.NewEmpty(),
 		}),
 		staticFields: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: NewNull(),
+			EmptyValue: s.NewEmpty(),
 		}),
+		seed: s,
+	}
+}
+
+func (s *ClassCreator) ToLanguage(language string, instance *Class) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *ClassCreator) Type() string {
+	return VariableClassType
+}
+
+func (s *ClassCreator) NewEmpty() concept.Null {
+	return s.param.NullCreator()
+}
+
+func NewClassCreator(param *ClassCreatorParam) *ClassCreator {
+	return &ClassCreator{
+		Seeds: map[string]func(string, *Class) string{},
+		param: param,
 	}
 }

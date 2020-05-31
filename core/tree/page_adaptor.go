@@ -2,7 +2,7 @@ package tree
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
+	"github.com/TingerSure/natural_language/core/sandbox/creator"
 )
 
 type PageAdaptor struct {
@@ -67,27 +67,27 @@ func (p *PageAdaptor) AddSource(source Source) {
 	p.sources = append(p.sources, source)
 }
 
-func NewPageAdaptor() *PageAdaptor {
+func NewPageAdaptor(sandboxSeed *creator.SandboxCreator) *PageAdaptor {
 	return &PageAdaptor{
 		indexes: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: variable.NewNull(),
+			EmptyValue: sandboxSeed.Variable.Null.New(),
 		}),
 		exceptions: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: variable.NewNull(),
+			EmptyValue: sandboxSeed.Variable.Null.New(),
 		}),
 		functions: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: variable.NewNull(),
+			EmptyValue: sandboxSeed.Variable.Null.New(),
 		}),
 		classes: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: variable.NewNull(),
+			EmptyValue: sandboxSeed.Variable.Null.New(),
 		}),
 		consts: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: variable.NewNull(),
+			EmptyValue: sandboxSeed.Variable.Null.New(),
 		}),
 		sources: []Source{},
 	}

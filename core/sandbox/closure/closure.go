@@ -3,9 +3,7 @@ package closure
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 )
 
 const (
@@ -13,13 +11,18 @@ const (
 	historyTypeBubble = 2
 )
 
+type ClosureSeed interface {
+	NewException(string, string) concept.Exception
+	NewEmpty() concept.Null
+}
+
 type Closure struct {
-	param     *ClosureParam
-	returns   *concept.Mapping //map[string]concept.Variable
-	local     *concept.Mapping //map[string]concept.Variable
+	returns   *concept.Mapping
+	local     *concept.Mapping
 	parent    concept.Closure
 	history   *History
 	extempore *Extempore
+	seed      ClosureSeed
 }
 
 func (c *Closure) IterateHistory(match func(concept.String, concept.Variable) bool) bool {
@@ -108,7 +111,7 @@ func (c *Closure) InitLocal(key concept.String, defaultValue concept.Variable) {
 func (c *Closure) GetLocal(key concept.String) (concept.Variable, concept.Interrupt) {
 	value := c.local.Get(key)
 	if nl_interface.IsNil(value) {
-		return nil, interrupt.NewException(c.param.StringCreator("none pionter"), c.param.StringCreator(fmt.Sprintf("Undefined variable: \"%v\".", key)))
+		return nil, c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 	}
 	c.history.Set(key, historyTypeLocal)
 	return value.(concept.Variable), nil
@@ -116,7 +119,7 @@ func (c *Closure) GetLocal(key concept.String) (concept.Variable, concept.Interr
 
 func (c *Closure) SetLocal(key concept.String, value concept.Variable) concept.Interrupt {
 	if !c.local.Set(key, value) {
-		return interrupt.NewException(c.param.StringCreator("none pionter"), c.param.StringCreator(fmt.Sprintf("Undefined variable: \"%v\".", key)))
+		return c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 	}
 	c.history.Set(key, historyTypeLocal)
 	return nil
@@ -135,7 +138,7 @@ func (c *Closure) GetBubble(key concept.String) (concept.Variable, concept.Inter
 		}
 		return value, suspend
 	}
-	return nil, interrupt.NewException(c.param.StringCreator("none pionter"), c.param.StringCreator(fmt.Sprintf("Undefined variable: \"%v\".", key)))
+	return nil, c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 }
 
 func (c *Closure) SetBubble(key concept.String, value concept.Variable) concept.Interrupt {
@@ -150,30 +153,48 @@ func (c *Closure) SetBubble(key concept.String, value concept.Variable) concept.
 		}
 		return suspend
 	}
-	return interrupt.NewException(c.param.StringCreator("none pionter"), c.param.StringCreator(fmt.Sprintf("Undefined variable: \"%v\".", key)))
+	return c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 }
 
 func (c *Closure) Clear() {
 }
 
-type ClosureParam struct {
-	StringCreator func(string) concept.String
-	EmptyCreator  func() concept.Null
+type ClosureCreatorParam struct {
+	ExceptionCreator func(string, string) concept.Exception
+	EmptyCreator     func() concept.Null
 }
 
-func NewClosure(parent concept.Closure, param *ClosureParam) *Closure {
+type ClosureCreator struct {
+	param *ClosureCreatorParam
+}
+
+func (s *ClosureCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
+}
+
+func (s *ClosureCreator) NewEmpty() concept.Null {
+	return s.param.EmptyCreator()
+}
+
+func (s *ClosureCreator) New(parent concept.Closure) *Closure {
 	return &Closure{
 		parent:    parent,
-		param:     param,
 		history:   NewHistory(),
 		extempore: NewExtempore(),
 		returns: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: param.EmptyCreator(),
+			EmptyValue: s.NewEmpty(),
 		}),
 		local: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   false,
-			EmptyValue: param.EmptyCreator(),
+			EmptyValue: s.NewEmpty(),
 		}),
+		seed: s,
+	}
+}
+
+func NewClosureCreator(param *ClosureCreatorParam) *ClosureCreator {
+	return &ClosureCreator{
+		param: param,
 	}
 }

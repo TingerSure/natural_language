@@ -3,7 +3,6 @@ package adaptor
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type ExpressionIndex struct {
@@ -27,7 +26,7 @@ func (e *ExpressionIndex) Get(space concept.Closure) (concept.Variable, concept.
 }
 
 func (e *ExpressionIndex) Set(concept.Closure, concept.Variable) concept.Interrupt {
-	return interrupt.NewException(variable.NewString("read only"), variable.NewString("Expression result does not need to be changed."))
+	return interrupt.NewException("read only", "Expression result does not need to be changed.")
 }
 
 func NewExpressionIndex(exec func(concept.Closure) (concept.Variable, concept.Interrupt)) *ExpressionIndex {

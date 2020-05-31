@@ -11,5 +11,6 @@ type String interface {
 	EqualLanguage(String) bool
 	Equal(String) bool
 	Clone() String
+	CloneTo(String)
 	IterateLanguages(func(string, string) bool) bool
 }

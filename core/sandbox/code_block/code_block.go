@@ -3,14 +3,17 @@ package code_block
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/sandbox/closure"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"strings"
 )
 
+type CodeBlockSeed interface {
+	NewClosure(concept.Closure) concept.Closure
+}
+
 type CodeBlock struct {
-	flow  []concept.Index
-	param *CodeBlockParam
+	flow []concept.Index
+	seed CodeBlockSeed
 }
 
 func (c *CodeBlock) Size() int {
@@ -68,10 +71,7 @@ func (f *CodeBlock) Exec(
 		returnBubble = false
 	}
 
-	space := closure.NewClosure(parent, &closure.ClosureParam{
-		StringCreator: f.param.StringCreator,
-		EmptyCreator:  f.param.EmptyCreator,
-	})
+	space := f.seed.NewClosure(parent)
 	defer func() {
 		if returnBubble {
 			parent.MergeReturn(space)
@@ -94,13 +94,36 @@ func (f *CodeBlock) Exec(
 	return space, nil
 }
 
-type CodeBlockParam struct {
-	StringCreator func(string) concept.String
-	EmptyCreator  func() concept.Null
+type CodeBlockCreatorParam struct {
+	ClosureCreator func(concept.Closure) concept.Closure
 }
 
-func NewCodeBlock(param *CodeBlockParam) *CodeBlock {
+type CodeBlockCreator struct {
+	Seeds map[string]func(string, *CodeBlock) string
+	param *CodeBlockCreatorParam
+}
+
+func (s *CodeBlockCreator) New() *CodeBlock {
 	return &CodeBlock{
+		seed: s,
+	}
+}
+
+func (s *CodeBlockCreator) ToLanguage(language string, instance *CodeBlock) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *CodeBlockCreator) NewClosure(parent concept.Closure) concept.Closure {
+	return s.param.ClosureCreator(parent)
+}
+
+func NewCodeBlockCreator(param *CodeBlockCreatorParam) *CodeBlockCreator {
+	return &CodeBlockCreator{
+		Seeds: map[string]func(string, *CodeBlock) string{},
 		param: param,
 	}
 }

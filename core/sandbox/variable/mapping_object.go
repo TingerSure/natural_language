@@ -4,12 +4,17 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 )
 
 const (
 	VariableMappingObjectType = "mapping_object"
 )
+
+type MappingObjectSeed interface {
+	ToLanguage(string, *MappingObject) string
+	Type() string
+	NewException(string, string) concept.Exception
+}
 
 type MappingObject struct {
 	mapping   map[concept.String]concept.String
@@ -17,40 +22,13 @@ type MappingObject struct {
 	class     concept.Class
 	className string
 	object    concept.Object
+	seed      MappingObjectSeed
 }
-
-var (
-	MappingObjectLanguageSeeds = map[string]func(string, *MappingObject) string{}
-)
 
 func (f *MappingObject) ToLanguage(language string) string {
-	seed := MappingObjectLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
-func NewMappingObject(object concept.Object, className string, alias string) (*MappingObject, concept.Exception) {
-
-	class := object.GetClass(className)
-	if nl_interface.IsNil(class) {
-		return nil, interrupt.NewException(NewString("system error"), NewString("Class name does not exist."))
-	}
-
-	mapping, exception := object.GetMapping(className, alias)
-	if !nl_interface.IsNil(exception) {
-		return nil, exception
-	}
-
-	return &MappingObject{
-		mapping:   mapping,
-		alias:     alias,
-		class:     class,
-		className: className,
-		object:    object,
-	}, nil
-}
 func (m *MappingObject) GetSource() concept.Object {
 	return m.object
 }
@@ -83,13 +61,9 @@ func (m *MappingObject) IsClassAlias(className string, alias string) bool {
 
 func (m *MappingObject) GetMapping(className string, alias string) (map[concept.String]concept.String, concept.Exception) {
 	if className != m.className || alias != m.alias {
-		return nil, interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("No mapping who's class is \"%v\" and alias is \"%v\"", className, alias)))
+		return nil, m.seed.NewException("system error", fmt.Sprintf("No mapping who's class is \"%v\" and alias is \"%v\"", className, alias))
 	}
-	var mapping map[concept.String]concept.String
-	for key, _ := range m.mapping {
-		mapping[key] = key
-	}
-	return mapping, nil
+	return m.mapping, nil
 }
 
 func (m *MappingObject) CheckMapping(concept.Class, map[concept.String]concept.String) bool {
@@ -105,7 +79,7 @@ func (a *MappingObject) ToString(prefix string) string {
 }
 
 func (m *MappingObject) Type() string {
-	return VariableMappingObjectType
+	return m.seed.Type()
 }
 
 func (m *MappingObject) specimenClassToObject(specimen concept.String) concept.String {
@@ -134,7 +108,7 @@ func (m *MappingObject) GetField(specimen concept.String) (concept.Variable, con
 }
 
 func (m *MappingObject) InitField(concept.String, concept.Variable) concept.Exception {
-	return interrupt.NewException(NewString("system error"), NewString("Mapping object cannot init."))
+	return m.seed.NewException("system error", "Mapping object cannot init.")
 }
 
 func (m *MappingObject) HasField(specimen concept.String) bool {
@@ -146,13 +120,67 @@ func (m *MappingObject) HasMethod(specimen concept.String) bool {
 }
 
 func (m *MappingObject) SetMethod(specimen concept.String, value concept.Function) concept.Exception {
-	return interrupt.NewException(NewString("system error"), NewString("Mapping object cannot set method."))
+	return m.seed.NewException("system error", "Mapping object cannot set method.")
 }
 
 func (m *MappingObject) GetMethod(specimen concept.String) (concept.Function, concept.Exception) {
 	value := m.class.GetMethod(specimen)
 	if nl_interface.IsNil(value) {
-		return nil, interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("no method called %v", specimen.ToString(""))))
+		return nil, m.seed.NewException("system error", fmt.Sprintf("no method called %v", specimen.ToString("")))
 	}
 	return value, nil
+}
+
+type MappingObjectCreatorParam struct {
+	ExceptionCreator func(string, string) concept.Exception
+}
+
+type MappingObjectCreator struct {
+	Seeds map[string]func(string, *MappingObject) string
+	param *MappingObjectCreatorParam
+}
+
+func (s *MappingObjectCreator) ToLanguage(language string, instance *MappingObject) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *MappingObjectCreator) Type() string {
+	return VariableObjectType
+}
+
+func (s *MappingObjectCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
+}
+
+func (s *MappingObjectCreator) New(object concept.Object, className string, alias string) (*MappingObject, concept.Exception) {
+
+	class := object.GetClass(className)
+	if nl_interface.IsNil(class) {
+		return nil, s.NewException("system error", "Class name does not exist.")
+	}
+
+	mapping, exception := object.GetMapping(className, alias)
+	if !nl_interface.IsNil(exception) {
+		return nil, exception
+	}
+
+	return &MappingObject{
+		mapping:   mapping,
+		alias:     alias,
+		class:     class,
+		className: className,
+		object:    object,
+		seed:      s,
+	}, nil
+}
+
+func NewMappingObjectCreator(param *MappingObjectCreatorParam) *MappingObjectCreator {
+	return &MappingObjectCreator{
+		Seeds: map[string]func(string, *MappingObject) string{},
+		param: param,
+	}
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox"
 	"github.com/TingerSure/natural_language/core/sandbox/closure"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"os"
 )
@@ -112,23 +111,12 @@ func NewRuntime(param *RuntimeParam) *Runtime {
 		grammar:   grammar.NewGrammar(),
 		ambiguity: ambiguity.NewAmbiguity(),
 		libs:      NewLibraryManager(),
-		rootSpace: closure.NewClosure(nil, &closure.ClosureParam{
-			StringCreator: func(value string) concept.String {
-				return variable.NewString(value)
-			},
-			EmptyCreator: func() concept.Null {
-				return variable.NewNull()
-			},
-		}),
 	}
+	runtime.rootSpace = runtime.libs.Sandbox.Closure.New(nil)
 	runtime.box = sandbox.NewSandbox(&sandbox.SandboxParam{
-		Root: runtime.rootSpace,
-		OnError: func(err error) {
-			param.OnError(err)
-		},
-		OnPrint: func(value concept.Variable) {
-			param.OnPrint(value)
-		},
+		Root:      runtime.rootSpace,
+		OnError:   param.OnError,
+		OnPrint:   param.OnPrint,
 		EventSize: param.EventSize,
 	})
 

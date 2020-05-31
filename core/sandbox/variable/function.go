@@ -16,17 +16,23 @@ const (
 	FunctionAutoParamThis = "this"
 )
 
+type FunctionSeed interface {
+	ToLanguage(string, *Function) string
+	Type() string
+	NewString(string) concept.String
+	NewException(string, string) concept.Exception
+	NewCodeBlock() *code_block.CodeBlock
+	NewParam() concept.Param
+}
+
 type Function struct {
 	*adaptor.AdaptorFunction
 	name       concept.String
 	body       *code_block.CodeBlock
 	paramNames []concept.String
 	parent     concept.Closure
+	seed       FunctionSeed
 }
-
-var (
-	FunctionLanguageSeeds = map[string]func(string, *Function) string{}
-)
 
 func (f *Function) ParamFormat(params *concept.Mapping) *concept.Mapping {
 	return f.AdaptorFunction.AdaptorParamFormat(f, params)
@@ -37,11 +43,7 @@ func (f *Function) ReturnFormat(back concept.String) concept.String {
 }
 
 func (f *Function) ToLanguage(language string) string {
-	seed := FunctionLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (s *Function) ParamNames() []concept.String {
@@ -79,8 +81,8 @@ func (f *Function) Body() *code_block.CodeBlock {
 func (f *Function) Exec(params concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 
 	space, suspend := f.body.Exec(f.parent, false, func(space concept.Closure) concept.Interrupt {
-		space.InitLocal(NewString(FunctionAutoParamSelf), f)
-		space.InitLocal(NewString(FunctionAutoParamThis), object)
+		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
+		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
 		for _, name := range f.paramNames {
 			space.InitLocal(name, params.Get(name))
 		}
@@ -93,40 +95,80 @@ func (f *Function) Exec(params concept.Param, object concept.Object) (concept.Pa
 		case interrupt.ExceptionInterruptType:
 			exception, yes := interrupt.InterruptFamilyInstance.IsException(suspend)
 			if !yes {
-				return nil, interrupt.NewException(NewString("system panic"), NewString(fmt.Sprintf("ExceptionInterruptType does not mean an Exception anymore.\n%+v", suspend)))
+				return nil, f.seed.NewException("system panic", fmt.Sprintf("ExceptionInterruptType does not mean an Exception anymore.\n%+v", suspend))
 			}
 			return nil, exception
 		case interrupt.EndInterruptType:
-			return NewParamWithIterate(space.IterateReturn), nil
+			return f.seed.NewParam().Init(space.IterateReturn), nil
 		default:
-			return nil, interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("Unknown Interrupt \"%v\".\n%+v", suspend.InterruptType(), suspend)))
+			return nil, f.seed.NewException("system error", fmt.Sprintf("Unknown Interrupt \"%v\".\n%+v", suspend.InterruptType(), suspend))
 		}
 	}
 
-	return NewParamWithIterate(space.IterateReturn), nil
+	return f.seed.NewParam().Init(space.IterateReturn), nil
 }
 
 func (s *Function) Type() string {
-	return VariableFunctionType
+	return s.seed.Type()
 }
 
 func (s *Function) Name() concept.String {
 	return s.name
 }
 
-func NewFunction(name concept.String, parent concept.Closure) *Function {
+type FunctionCreatorParam struct {
+	CodeBlockCreator func() *code_block.CodeBlock
+	StringCreator    func(string) concept.String
+	ParamCreator     func() concept.Param
+	ExceptionCreator func(string, string) concept.Exception
+}
 
+type FunctionCreator struct {
+	Seeds map[string]func(string, *Function) string
+	param *FunctionCreatorParam
+}
+
+func (s *FunctionCreator) New(name concept.String, parent concept.Closure) *Function {
 	return &Function{
 		AdaptorFunction: adaptor.NewAdaptorFunction(),
 		name:            name,
 		parent:          parent,
-		body: code_block.NewCodeBlock(&code_block.CodeBlockParam{
-			StringCreator: func(value string) concept.String {
-				return NewString(value)
-			},
-			EmptyCreator: func() concept.Null {
-				return NewNull()
-			},
-		}),
+		body:            s.NewCodeBlock(),
+		seed:            s,
+	}
+}
+
+func (s *FunctionCreator) ToLanguage(language string, instance *Function) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *FunctionCreator) Type() string {
+	return VariableFunctionType
+}
+
+func (s *FunctionCreator) NewCodeBlock() *code_block.CodeBlock {
+	return s.param.CodeBlockCreator()
+}
+
+func (s *FunctionCreator) NewString(value string) concept.String {
+	return s.param.StringCreator(value)
+}
+
+func (s *FunctionCreator) NewParam() concept.Param {
+	return s.param.ParamCreator()
+}
+
+func (s *FunctionCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
+}
+
+func NewFunctionCreator(param *FunctionCreatorParam) *FunctionCreator {
+	return &FunctionCreator{
+		Seeds: map[string]func(string, *Function) string{},
+		param: param,
 	}
 }

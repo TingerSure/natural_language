@@ -8,20 +8,18 @@ const (
 	VariableNumberType = "number"
 )
 
-type Number struct {
-	value float64
+type NumberSeed interface {
+	ToLanguage(string, *Number) string
+	Type() string
 }
 
-var (
-	NumberLanguageSeeds = map[string]func(string, *Number) string{}
-)
+type Number struct {
+	value float64
+	seed  NumberSeed
+}
 
 func (f *Number) ToLanguage(language string) string {
-	seed := NumberLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (a *Number) ToString(prefix string) string {
@@ -33,11 +31,34 @@ func (n *Number) Value() float64 {
 }
 
 func (n *Number) Type() string {
+	return n.seed.Type()
+}
+
+type NumberCreator struct {
+	Seeds map[string]func(string, *Number) string
+}
+
+func (s *NumberCreator) New(value float64) *Number {
+	return &Number{
+		value: value,
+		seed:  s,
+	}
+}
+
+func (s *NumberCreator) ToLanguage(language string, instance *Number) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *NumberCreator) Type() string {
 	return VariableNumberType
 }
 
-func NewNumber(value float64) *Number {
-	return &Number{
-		value: value,
+func NewNumberCreator() *NumberCreator {
+	return &NumberCreator{
+		Seeds: map[string]func(string, *Number) string{},
 	}
 }

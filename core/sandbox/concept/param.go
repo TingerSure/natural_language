@@ -4,6 +4,7 @@ type Param interface {
 	Variable
 	Set(String, Variable) Param
 	Get(String) Variable
-	Init(func(func(String, Variable) bool) bool)
+	Copy() Param
+	Init(func(func(String, Variable) bool) bool) Param
 	Iterate(func(String, Variable) bool) bool
 }

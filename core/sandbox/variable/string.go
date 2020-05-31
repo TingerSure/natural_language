@@ -10,21 +10,20 @@ const (
 	VariableStringType = "string"
 )
 
+type StringSeed interface {
+	ToLanguage(string, *String) string
+	Type() string
+	New(string) *String
+}
+
 type String struct {
 	value   string
 	mapping map[string]string
+	seed    StringSeed
 }
 
-var (
-	StringLanguageSeeds = map[string]func(string, *String) string{}
-)
-
 func (f *String) ToLanguage(language string) string {
-	seed := StringLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (n *String) GetSystem() string {
@@ -95,37 +94,49 @@ func (n *String) Value() string {
 }
 
 func (s *String) Type() string {
-	return VariableStringType
+	return s.seed.Type()
 }
 
 func (s *String) Clone() concept.String {
-	instance := NewString(s.value)
+	instance := s.seed.New(s.value)
 	for language, value := range s.mapping {
 		instance.mapping[language] = value
 	}
 	return instance
 }
 
-func NewString(value string) *String {
-	return &String{
-		value:   value,
-		mapping: make(map[string]string),
+func (s *String) CloneTo(instance concept.String) {
+	for language, value := range s.mapping {
+		instance.SetLanguage(language, value)
 	}
 }
 
-type StringSeed struct {
+type StringCreator struct {
 	Seeds map[string]func(string, *String) string
 }
 
-func (s *StringSeed) New(value string) *String {
+func (s *StringCreator) New(value string) *String {
 	return &String{
 		value:   value,
 		mapping: make(map[string]string),
+		seed:    s,
 	}
 }
 
-func NewStringSeed() *StringSeed {
-	return &StringSeed{
+func (s *StringCreator) ToLanguage(language string, instance *String) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *StringCreator) Type() string {
+	return VariableStringType
+}
+
+func NewStringCreator() *StringCreator {
+	return &StringCreator{
 		Seeds: map[string]func(string, *String) string{},
 	}
 }

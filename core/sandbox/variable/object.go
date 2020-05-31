@@ -3,9 +3,7 @@ package variable
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"strings"
 )
 
@@ -13,22 +11,22 @@ const (
 	VariableObjectType = "object"
 )
 
+type ObjectSeed interface {
+	ToLanguage(string, *Object) string
+	Type() string
+	NewEmpty() concept.Null
+	NewException(string, string) concept.Exception
+}
+
 type Object struct {
 	fields      *concept.Mapping
 	methods     *concept.Mapping
 	reflections []*concept.ClassReflection
+	seed        ObjectSeed
 }
 
-var (
-	ObjectLanguageSeeds = map[string]func(string, *Object) string{}
-)
-
 func (f *Object) ToLanguage(language string) string {
-	seed := ObjectLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (o *Object) GetClasses() []string {
@@ -106,7 +104,7 @@ func (o *Object) GetMapping(class string, alias string) (map[concept.String]conc
 			return reflection.GetMapping(), nil
 		}
 	}
-	return nil, interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("No mapping who's class is \"%v\" and alias is \"%v\"", class, alias)))
+	return nil, o.seed.NewException("system error", fmt.Sprintf("No mapping who's class is \"%v\" and alias is \"%v\"", class, alias))
 }
 
 func (o *Object) RemoveClass(class string, alias string) concept.Exception {
@@ -116,14 +114,14 @@ func (o *Object) RemoveClass(class string, alias string) concept.Exception {
 			return nil
 		}
 	}
-	return interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("No class who's name is \"%v\" and alias is \"%v\"", class, alias)))
+	return o.seed.NewException("system error", fmt.Sprintf("No class who's name is \"%v\" and alias is \"%v\"", class, alias))
 
 }
 
 func (o *Object) AddClass(class concept.Class, alias string, mapping map[concept.String]concept.String) concept.Exception {
 	for _, old := range o.reflections {
 		if old.GetClass().GetName() == class.GetName() && old.GetAlias() == alias {
-			return interrupt.NewException(NewString("system error"), NewString("Duplicate class reflections are added."))
+			return o.seed.NewException("system error", "Duplicate class reflections are added.")
 		}
 	}
 	o.reflections = append(o.reflections, concept.NewClassReflectionWithMapping(class, mapping, alias))
@@ -141,7 +139,7 @@ func (o *Object) InitField(specimen concept.String, defaultValue concept.Variabl
 
 func (o *Object) SetField(specimen concept.String, value concept.Variable) concept.Exception {
 	if !o.fields.Has(specimen) {
-		return interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("There is no field called \"%v\" to be set here.", specimen.ToString(""))))
+		return o.seed.NewException("system error", fmt.Sprintf("There is no field called \"%v\" to be set here.", specimen.ToString("")))
 	}
 	o.fields.Set(specimen, value)
 	return nil
@@ -150,7 +148,7 @@ func (o *Object) SetField(specimen concept.String, value concept.Variable) conce
 func (o *Object) GetField(specimen concept.String) (concept.Variable, concept.Exception) {
 	value := o.fields.Get(specimen)
 	if nl_interface.IsNil(value) {
-		return nil, interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("There is no field called \"%v\" to be got here.", specimen.ToString(""))))
+		return nil, o.seed.NewException("system error", fmt.Sprintf("There is no field called \"%v\" to be got here.", specimen.ToString("")))
 	}
 	return value.(concept.Variable), nil
 }
@@ -167,7 +165,7 @@ func (o *Object) SetMethod(specimen concept.String, value concept.Function) conc
 func (o *Object) GetMethod(specimen concept.String) (concept.Function, concept.Exception) {
 	value := o.methods.Get(specimen)
 	if nl_interface.IsNil(value) {
-		return nil, interrupt.NewException(NewString("system error"), NewString(fmt.Sprintf("no method called %v", specimen.ToString(""))))
+		return nil, o.seed.NewException("system error", fmt.Sprintf("no method called %v", specimen.ToString("")))
 	}
 	return value.(concept.Function), nil
 }
@@ -204,19 +202,56 @@ func (a *Object) ToString(prefix string) string {
 }
 
 func (o *Object) Type() string {
-	return VariableObjectType
+	return o.seed.Type()
 }
 
-func NewObject() *Object {
+type ObjectCreatorParam struct {
+	NullCreator      func() concept.Null
+	ExceptionCreator func(string, string) concept.Exception
+}
+
+type ObjectCreator struct {
+	Seeds map[string]func(string, *Object) string
+	param *ObjectCreatorParam
+}
+
+func (s *ObjectCreator) New() *Object {
 	return &Object{
 		fields: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   false,
-			EmptyValue: NewNull(),
+			EmptyValue: s.NewEmpty(),
 		}),
 		methods: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: NewNull(),
+			EmptyValue: s.NewEmpty(),
 		}),
 		reflections: make([]*concept.ClassReflection, 0),
+		seed:        s,
+	}
+}
+
+func (s *ObjectCreator) ToLanguage(language string, instance *Object) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *ObjectCreator) Type() string {
+	return VariableObjectType
+}
+
+func (s *ObjectCreator) NewEmpty() concept.Null {
+	return s.param.NullCreator()
+}
+func (s *ObjectCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
+}
+
+func NewObjectCreator(param *ObjectCreatorParam) *ObjectCreator {
+	return &ObjectCreator{
+		Seeds: map[string]func(string, *Object) string{},
+		param: param,
 	}
 }

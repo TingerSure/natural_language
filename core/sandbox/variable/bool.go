@@ -8,20 +8,18 @@ const (
 	VariableBoolType = "bool"
 )
 
-type Bool struct {
-	value bool
+type BoolSeed interface {
+	ToLanguage(string, *Bool) string
+	Type() string
 }
 
-var (
-	BoolLanguageSeeds = map[string]func(string, *Bool) string{}
-)
+type Bool struct {
+	value bool
+	seed  BoolSeed
+}
 
 func (f *Bool) ToLanguage(language string) string {
-	seed := BoolLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (a *Bool) ToString(prefix string) string {
@@ -33,11 +31,34 @@ func (n *Bool) Value() bool {
 }
 
 func (n *Bool) Type() string {
+	return n.seed.Type()
+}
+
+type BoolCreator struct {
+	Seeds map[string]func(string, *Bool) string
+}
+
+func (s *BoolCreator) New(value bool) *Bool {
+	return &Bool{
+		value: value,
+		seed:  s,
+	}
+}
+
+func (s *BoolCreator) ToLanguage(language string, instance *Bool) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *BoolCreator) Type() string {
 	return VariableBoolType
 }
 
-func NewBool(value bool) *Bool {
-	return &Bool{
-		value: value,
+func NewBoolCreator() *BoolCreator {
+	return &BoolCreator{
+		Seeds: map[string]func(string, *Bool) string{},
 	}
 }
