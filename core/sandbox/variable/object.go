@@ -81,7 +81,7 @@ func (o *Object) CheckMapping(class concept.Class, mapping map[concept.String]co
 	}
 
 	if class.IterateFields(func(key concept.String, _ concept.Variable) bool {
-		for specimen, _ := range mapping {
+		for specimen := range mapping {
 			if key.EqualLanguage(specimen) {
 				return false
 			}

@@ -1,7 +1,5 @@
 package concept
 
-import ()
-
 type ClassReflection struct {
 	class   Class
 	alias   string

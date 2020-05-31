@@ -10,8 +10,6 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
-var ()
-
 type CallSeed interface {
 	ToLanguage(string, *Call) string
 	NewException(string, string) concept.Exception
