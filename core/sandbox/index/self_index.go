@@ -2,15 +2,21 @@ package index
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 const (
 	selfIndexKey = "self"
 )
 
+type SelfIndexSeed interface {
+	ToLanguage(string, *SelfIndex) string
+	Type() string
+	NewException(string, string) concept.Exception
+	NewString(string) concept.String
+}
+
 type SelfIndex struct {
+	seed SelfIndexSeed
 }
 
 const (
@@ -18,19 +24,11 @@ const (
 )
 
 func (f *SelfIndex) Type() string {
-	return IndexSelfType
+	return f.seed.Type()
 }
 
-var (
-	SelfIndexLanguageSeeds = map[string]func(string, *SelfIndex) string{}
-)
-
 func (f *SelfIndex) ToLanguage(language string) string {
-	seed := SelfIndexLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (s *SelfIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
@@ -42,14 +40,52 @@ func (s *SelfIndex) ToString(prefix string) string {
 }
 
 func (s *SelfIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
-	return space.GetBubble(variable.NewString(selfIndexKey))
+	return space.GetBubble(s.seed.NewString(selfIndexKey))
 }
 
 func (s *SelfIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
-	return interrupt.NewException(variable.NewString("read only"), variable.NewString("Self cannot be changed."))
-
+	return s.seed.NewException("read only", "Self cannot be changed.")
 }
 
-func NewSelfIndex() *SelfIndex {
-	return &SelfIndex{}
+type SelfIndexCreatorParam struct {
+	ExceptionCreator func(string, string) concept.Exception
+	StringCreator    func(string) concept.String
+}
+
+type SelfIndexCreator struct {
+	Seeds map[string]func(string, *SelfIndex) string
+	param *SelfIndexCreatorParam
+}
+
+func (s *SelfIndexCreator) New() *SelfIndex {
+	return &SelfIndex{
+		seed: s,
+	}
+}
+
+func (s *SelfIndexCreator) ToLanguage(language string, instance *SelfIndex) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *SelfIndexCreator) Type() string {
+	return IndexSelfType
+}
+
+func (s *SelfIndexCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
+}
+
+func (s *SelfIndexCreator) NewString(value string) concept.String {
+	return s.param.StringCreator(value)
+}
+
+func NewSelfIndexCreator(param *SelfIndexCreatorParam) *SelfIndexCreator {
+	return &SelfIndexCreator{
+		Seeds: map[string]func(string, *SelfIndex) string{},
+		param: param,
+	}
 }

@@ -4,13 +4,19 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
+
+type ObjectFieldIndexSeed interface {
+	ToLanguage(string, *ObjectFieldIndex) string
+	Type() string
+	NewException(string, string) concept.Exception
+}
 
 type ObjectFieldIndex struct {
 	key    concept.String
 	object concept.Index
+	seed   ObjectFieldIndexSeed
 }
 
 const (
@@ -18,19 +24,11 @@ const (
 )
 
 func (f *ObjectFieldIndex) Type() string {
-	return IndexObjectFieldType
+	return f.seed.Type()
 }
 
-var (
-	ObjectFieldIndexLanguageSeeds = map[string]func(string, *ObjectFieldIndex) string{}
-)
-
 func (f *ObjectFieldIndex) ToLanguage(language string) string {
-	seed := ObjectFieldIndexLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (s *ObjectFieldIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
@@ -48,7 +46,7 @@ func (s *ObjectFieldIndex) Get(space concept.Closure) (concept.Variable, concept
 	}
 	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
 	if !ok {
-		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("There is not an effective object When system call the ObjectFieldIndex.Get"))
+		return nil, s.seed.NewException("type error", "There is not an effective object When system call the ObjectFieldIndex.Get")
 	}
 	return object.GetField(s.key)
 }
@@ -60,14 +58,46 @@ func (s *ObjectFieldIndex) Set(space concept.Closure, value concept.Variable) co
 	}
 	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
 	if !ok {
-		return interrupt.NewException(variable.NewString("type error"), variable.NewString("There is not an effective object When system call the ObjectFieldIndex.Set"))
+		return s.seed.NewException("type error", "There is not an effective object When system call the ObjectFieldIndex.Set")
 	}
 	return object.SetField(s.key, value)
 }
 
-func NewObjectFieldIndex(object concept.Index, key concept.String) *ObjectFieldIndex {
+type ObjectFieldIndexCreatorParam struct {
+	ExceptionCreator func(string, string) concept.Exception
+}
+
+type ObjectFieldIndexCreator struct {
+	Seeds map[string]func(string, *ObjectFieldIndex) string
+	param *ObjectFieldIndexCreatorParam
+}
+
+func (s *ObjectFieldIndexCreator) New(object concept.Index, key concept.String) *ObjectFieldIndex {
 	return &ObjectFieldIndex{
 		key:    key,
 		object: object,
+		seed:   s,
+	}
+}
+func (s *ObjectFieldIndexCreator) ToLanguage(language string, instance *ObjectFieldIndex) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *ObjectFieldIndexCreator) Type() string {
+	return IndexObjectFieldType
+}
+
+func (s *ObjectFieldIndexCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
+}
+
+func NewObjectFieldIndexCreator(param *ObjectFieldIndexCreatorParam) *ObjectFieldIndexCreator {
+	return &ObjectFieldIndexCreator{
+		Seeds: map[string]func(string, *ObjectFieldIndex) string{},
+		param: param,
 	}
 }

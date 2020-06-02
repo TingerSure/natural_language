@@ -4,8 +4,14 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 )
 
+type LocalIndexSeed interface {
+	ToLanguage(string, *LocalIndex) string
+	Type() string
+}
+
 type LocalIndex struct {
-	key concept.String
+	key  concept.String
+	seed LocalIndexSeed
 }
 
 const (
@@ -13,19 +19,11 @@ const (
 )
 
 func (f *LocalIndex) Type() string {
-	return IndexLocalType
+	return f.seed.Type()
 }
 
-var (
-	LocalIndexLanguageSeeds = map[string]func(string, *LocalIndex) string{}
-)
-
 func (f *LocalIndex) ToLanguage(language string) string {
-	seed := LocalIndexLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (s *LocalIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
@@ -48,8 +46,36 @@ func (s *LocalIndex) Set(space concept.Closure, value concept.Variable) concept.
 	return space.SetLocal(s.key, value)
 }
 
-func NewLocalIndex(key concept.String) *LocalIndex {
+type LocalIndexCreatorParam struct {
+}
+
+type LocalIndexCreator struct {
+	Seeds map[string]func(string, *LocalIndex) string
+	param *LocalIndexCreatorParam
+}
+
+func (s *LocalIndexCreator) New(key concept.String) *LocalIndex {
 	return &LocalIndex{
-		key: key,
+		key:  key,
+		seed: s,
+	}
+}
+
+func (s *LocalIndexCreator) ToLanguage(language string, instance *LocalIndex) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *LocalIndexCreator) Type() string {
+	return IndexLocalType
+}
+
+func NewLocalIndexCreator(param *LocalIndexCreatorParam) *LocalIndexCreator {
+	return &LocalIndexCreator{
+		Seeds: map[string]func(string, *LocalIndex) string{},
+		param: param,
 	}
 }

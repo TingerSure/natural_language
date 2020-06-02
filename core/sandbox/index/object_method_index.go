@@ -4,13 +4,19 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
+
+type ObjectMethodIndexSeed interface {
+	ToLanguage(string, *ObjectMethodIndex) string
+	Type() string
+	NewException(string, string) concept.Exception
+}
 
 type ObjectMethodIndex struct {
 	key    concept.String
 	object concept.Index
+	seed   ObjectMethodIndexSeed
 }
 
 const (
@@ -18,19 +24,11 @@ const (
 )
 
 func (f *ObjectMethodIndex) Type() string {
-	return IndexObjectMethodType
+	return f.seed.Type()
 }
 
-var (
-	ObjectMethodIndexLanguageSeeds = map[string]func(string, *ObjectMethodIndex) string{}
-)
-
 func (f *ObjectMethodIndex) ToLanguage(language string) string {
-	seed := ObjectMethodIndexLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (s *ObjectMethodIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
@@ -49,7 +47,7 @@ func (s *ObjectMethodIndex) Get(space concept.Closure) (concept.Variable, concep
 
 	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
 	if !ok {
-		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("There is not an effective object When system call the ObjectMethodIndex.Get"))
+		return nil, s.seed.NewException("type error", "There is not an effective object When system call the ObjectMethodIndex.Get")
 	}
 
 	function, suspend := object.GetMethod(s.key)
@@ -57,7 +55,7 @@ func (s *ObjectMethodIndex) Get(space concept.Closure) (concept.Variable, concep
 		return nil, suspend
 	}
 	if nl_interface.IsNil(function) {
-		return nil, interrupt.NewException(variable.NewString("runtime error"), variable.NewString(fmt.Sprintf("Object don't have a method named %s.", s.key)))
+		return nil, s.seed.NewException("runtime error", fmt.Sprintf("Object don't have a method named %s.", s.key))
 	}
 
 	return variable.NewPreObjectFunction(function, object), nil
@@ -70,20 +68,52 @@ func (s *ObjectMethodIndex) Set(space concept.Closure, preFunction concept.Varia
 	}
 	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
 	if !ok {
-		return interrupt.NewException(variable.NewString("type error"), variable.NewString("There is not an effective object When system call the ObjectMethodIndex.Set"))
+		return s.seed.NewException("type error", "There is not an effective object When system call the ObjectMethodIndex.Set")
 	}
 
 	function, ok := variable.VariableFamilyInstance.IsFunctionHome(preFunction)
 	if !ok {
-		return interrupt.NewException(variable.NewString("type error"), variable.NewString("There is not an effective function When system call the ObjectMethodIndex.Set"))
+		return s.seed.NewException("type error", "There is not an effective function When system call the ObjectMethodIndex.Set")
 	}
 
 	return object.SetMethod(s.key, function)
 }
 
-func NewObjectMethodIndex(object concept.Index, key concept.String) *ObjectMethodIndex {
+type ObjectMethodIndexCreatorParam struct {
+	ExceptionCreator func(string, string) concept.Exception
+}
+
+type ObjectMethodIndexCreator struct {
+	Seeds map[string]func(string, *ObjectMethodIndex) string
+	param *ObjectMethodIndexCreatorParam
+}
+
+func (s *ObjectMethodIndexCreator) New(object concept.Index, key concept.String) *ObjectMethodIndex {
 	return &ObjectMethodIndex{
 		key:    key,
 		object: object,
+		seed:   s,
+	}
+}
+func (s *ObjectMethodIndexCreator) ToLanguage(language string, instance *ObjectMethodIndex) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *ObjectMethodIndexCreator) Type() string {
+	return IndexObjectMethodType
+}
+
+func (s *ObjectMethodIndexCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
+}
+
+func NewObjectMethodIndexCreator(param *ObjectMethodIndexCreatorParam) *ObjectMethodIndexCreator {
+	return &ObjectMethodIndexCreator{
+		Seeds: map[string]func(string, *ObjectMethodIndex) string{},
+		param: param,
 	}
 }

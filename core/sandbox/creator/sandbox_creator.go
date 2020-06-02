@@ -8,6 +8,7 @@ import (
 
 type SandboxCreator struct {
 	Variable   *VariableCreator
+	Index      *IndexCreator
 	Interrupt  *InterruptCreator
 	Expression *ExpressionCreator
 	Closure    *closure.ClosureCreator
@@ -35,6 +36,18 @@ func NewSandboxCreator() *SandboxCreator {
 	instance.CodeBlock = code_block.NewCodeBlockCreator(&code_block.CodeBlockCreatorParam{
 		ClosureCreator: func(parent concept.Closure) concept.Closure {
 			return instance.Closure.New(parent)
+		},
+	})
+
+	instance.Index = NewIndexCreator(&IndexCreatorParam{
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Interrupt.Exception.NewOriginal(name, message)
+		},
+		NullCreator: func() concept.Null {
+			return instance.Variable.Null.New()
+		},
+		StringCreator: func(value string) concept.String {
+			return instance.Variable.String.New(value)
 		},
 	})
 

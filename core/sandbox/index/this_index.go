@@ -2,15 +2,21 @@ package index
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 const (
 	thisIndexKey = "this"
 )
 
+type ThisIndexSeed interface {
+	ToLanguage(string, *ThisIndex) string
+	Type() string
+	NewException(string, string) concept.Exception
+	NewString(string) concept.String
+}
+
 type ThisIndex struct {
+	seed ThisIndexSeed
 }
 
 const (
@@ -18,19 +24,11 @@ const (
 )
 
 func (f *ThisIndex) Type() string {
-	return IndexThisType
+	return f.seed.Type()
 }
 
-var (
-	ThisIndexLanguageSeeds = map[string]func(string, *ThisIndex) string{}
-)
-
 func (f *ThisIndex) ToLanguage(language string) string {
-	seed := ThisIndexLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (s *ThisIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
@@ -42,14 +40,53 @@ func (s *ThisIndex) ToString(prefix string) string {
 }
 
 func (s *ThisIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
-	return space.GetBubble(variable.NewString(thisIndexKey))
+	return space.GetBubble(s.seed.NewString(thisIndexKey))
 }
 
 func (s *ThisIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
-	return interrupt.NewException(variable.NewString("read only"), variable.NewString("This cannot be changed."))
+	return s.seed.NewException("read only", "This cannot be changed.")
 
 }
 
-func NewThisIndex() *ThisIndex {
-	return &ThisIndex{}
+type ThisIndexCreatorParam struct {
+	ExceptionCreator func(string, string) concept.Exception
+	StringCreator    func(string) concept.String
+}
+
+type ThisIndexCreator struct {
+	Seeds map[string]func(string, *ThisIndex) string
+	param *ThisIndexCreatorParam
+}
+
+func (s *ThisIndexCreator) New() *ThisIndex {
+	return &ThisIndex{
+		seed: s,
+	}
+}
+
+func (s *ThisIndexCreator) ToLanguage(language string, instance *ThisIndex) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *ThisIndexCreator) Type() string {
+	return IndexThisType
+}
+
+func (s *ThisIndexCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
+}
+
+func (s *ThisIndexCreator) NewString(value string) concept.String {
+	return s.param.StringCreator(value)
+}
+
+func NewThisIndexCreator(param *ThisIndexCreatorParam) *ThisIndexCreator {
+	return &ThisIndexCreator{
+		Seeds: map[string]func(string, *ThisIndex) string{},
+		param: param,
+	}
 }

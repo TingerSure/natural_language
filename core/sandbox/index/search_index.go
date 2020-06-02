@@ -4,13 +4,19 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"strings"
 )
 
+type SearchIndexSeed interface {
+	ToLanguage(string, *SearchIndex) string
+	Type() string
+	NewException(string, string) concept.Exception
+	NewNull() concept.Null
+}
+
 type SearchIndex struct {
 	items []concept.Matcher
+	seed  SearchIndexSeed
 }
 
 const (
@@ -18,19 +24,11 @@ const (
 )
 
 func (f *SearchIndex) Type() string {
-	return IndexSearchType
+	return f.seed.Type()
 }
 
-var (
-	SearchIndexLanguageSeeds = map[string]func(string, *SearchIndex) string{}
-)
-
 func (f *SearchIndex) ToLanguage(language string) string {
-	seed := SearchIndexLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (s *SearchIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
@@ -58,17 +56,54 @@ func (s *SearchIndex) Get(space concept.Closure) (concept.Variable, concept.Inte
 		return true
 	})
 	if nl_interface.IsNil(selected) {
-		selected = variable.NewNull()
+		selected = s.seed.NewNull()
 	}
 	return selected, nil
 }
 
 func (s *SearchIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
-	return interrupt.NewException(variable.NewString("read only"), variable.NewString("Search index cannot be changed."))
+	return s.seed.NewException("read only", "Search index cannot be changed.")
 }
 
-func NewSearchIndex(items []concept.Matcher) *SearchIndex {
+type SearchIndexCreatorParam struct {
+	ExceptionCreator func(string, string) concept.Exception
+	NullCreator      func() concept.Null
+}
+
+type SearchIndexCreator struct {
+	Seeds map[string]func(string, *SearchIndex) string
+	param *SearchIndexCreatorParam
+}
+
+func (s *SearchIndexCreator) New(items []concept.Matcher) *SearchIndex {
 	return &SearchIndex{
 		items: items,
+		seed:  s,
+	}
+}
+func (s *SearchIndexCreator) ToLanguage(language string, instance *SearchIndex) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *SearchIndexCreator) Type() string {
+	return IndexSearchType
+}
+
+func (s *SearchIndexCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
+}
+
+func (s *SearchIndexCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
+}
+
+func NewSearchIndexCreator(param *SearchIndexCreatorParam) *SearchIndexCreator {
+	return &SearchIndexCreator{
+		Seeds: map[string]func(string, *SearchIndex) string{},
+		param: param,
 	}
 }

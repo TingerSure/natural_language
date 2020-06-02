@@ -4,13 +4,19 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"strings"
 )
 
+type ResaultIndexSeed interface {
+	ToLanguage(string, *ResaultIndex) string
+	Type() string
+	NewException(string, string) concept.Exception
+	NewNull() concept.Null
+}
+
 type ResaultIndex struct {
 	items []concept.Matcher
+	seed  ResaultIndexSeed
 }
 
 const (
@@ -18,19 +24,11 @@ const (
 )
 
 func (f *ResaultIndex) Type() string {
-	return IndexResaultType
+	return f.seed.Type()
 }
 
-var (
-	ResaultIndexLanguageSeeds = map[string]func(string, *ResaultIndex) string{}
-)
-
 func (f *ResaultIndex) ToLanguage(language string) string {
-	seed := ResaultIndexLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (s *ResaultIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
@@ -58,17 +56,54 @@ func (s *ResaultIndex) Get(space concept.Closure) (concept.Variable, concept.Int
 		return true
 	})
 	if nl_interface.IsNil(selected) {
-		selected = variable.NewNull()
+		selected = s.seed.NewNull()
 	}
 	return selected, nil
 }
 
 func (s *ResaultIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
-	return interrupt.NewException(variable.NewString("read only"), variable.NewString("Resault index cannot be changed."))
+	return s.seed.NewException("read only", "Resault index cannot be changed.")
 }
 
-func NewResaultIndex(items []concept.Matcher) *ResaultIndex {
+type ResaultIndexCreatorParam struct {
+	ExceptionCreator func(string, string) concept.Exception
+	NullCreator      func() concept.Null
+}
+
+type ResaultIndexCreator struct {
+	Seeds map[string]func(string, *ResaultIndex) string
+	param *ResaultIndexCreatorParam
+}
+
+func (s *ResaultIndexCreator) New(items []concept.Matcher) *ResaultIndex {
 	return &ResaultIndex{
 		items: items,
+		seed:  s,
+	}
+}
+func (s *ResaultIndexCreator) ToLanguage(language string, instance *ResaultIndex) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *ResaultIndexCreator) Type() string {
+	return IndexResaultType
+}
+
+func (s *ResaultIndexCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
+}
+
+func (s *ResaultIndexCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
+}
+
+func NewResaultIndexCreator(param *ResaultIndexCreatorParam) *ResaultIndexCreator {
+	return &ResaultIndexCreator{
+		Seeds: map[string]func(string, *ResaultIndex) string{},
+		param: param,
 	}
 }
