@@ -7,6 +7,9 @@ import (
 
 type InterruptCreator struct {
 	Exception *interrupt.ExceptionCreator
+	End       *interrupt.EndCreator
+	Continue  *interrupt.ContinueCreator
+	Break     *interrupt.BreakCreator
 }
 
 type InterruptCreatorParam struct {
@@ -15,6 +18,9 @@ type InterruptCreatorParam struct {
 
 func NewInterruptCreator(param *InterruptCreatorParam) *InterruptCreator {
 	instance := &InterruptCreator{}
+	instance.Break = interrupt.NewBreakCreator(&interrupt.BreakCreatorParam{})
+	instance.Continue = interrupt.NewContinueCreator(&interrupt.ContinueCreatorParam{})
+	instance.End = interrupt.NewEndCreator(&interrupt.EndCreatorParam{})
 	instance.Exception = interrupt.NewExceptionCreator(&interrupt.ExceptionCreatorParam{
 		StringCreator: param.StringCreator,
 	})

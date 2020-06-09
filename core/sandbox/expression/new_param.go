@@ -5,18 +5,19 @@ import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/expression/adaptor"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"strings"
 )
+
+type NewParamSeed interface {
+	ToLanguage(string, *NewParam) string
+	NewParam() concept.Param
+}
 
 type NewParam struct {
 	*adaptor.ExpressionIndex
 	values map[concept.String]concept.Index
+	seed   NewParamSeed
 }
-
-var (
-	NewParamLanguageSeeds = map[string]func(string, *NewParam) string{}
-)
 
 func (f *NewParam) Iterate(on func(concept.String, concept.Index) bool) bool {
 	for key, value := range f.values {
@@ -28,11 +29,7 @@ func (f *NewParam) Iterate(on func(concept.String, concept.Index) bool) bool {
 }
 
 func (f *NewParam) ToLanguage(language string) string {
-	seed := NewParamLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (a *NewParam) ToString(prefix string) string {
@@ -51,11 +48,11 @@ func (a *NewParam) ToString(prefix string) string {
 
 func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	if len(a.values) == 0 {
-		return variable.NewParam(), nil
+		return a.seed.NewParam(), nil
 	}
 	var suspend concept.Interrupt = nil
 
-	param := variable.NewParamWithIterate(func(on func(concept.String, concept.Variable) bool) bool {
+	param := a.seed.NewParam().Init(func(on func(concept.String, concept.Variable) bool) bool {
 		for key, index := range a.values {
 			value, subSuspend := index.Get(space)
 			if !nl_interface.IsNil(subSuspend) {
@@ -76,14 +73,45 @@ func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interr
 	return param, nil
 }
 
-func NewNewParamWithInit(values map[concept.String]concept.Index) *NewParam {
-	back := NewNewParam()
+type NewParamCreatorParam struct {
+	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
+	ParamCreator           func() concept.Param
+}
+
+type NewParamCreator struct {
+	Seeds map[string]func(string, *NewParam) string
+	param *NewParamCreatorParam
+}
+
+func (s *NewParamCreator) New() *NewParam {
+	back := &NewParam{
+		seed: s,
+	}
+	back.ExpressionIndex = s.param.ExpressionIndexCreator(back.Exec)
+	return back
+}
+
+func (s *NewParamCreator) NewWithInit(values map[concept.String]concept.Index) *NewParam {
+	back := s.New()
 	back.values = values
 	return back
 }
 
-func NewNewParam() *NewParam {
-	back := &NewParam{}
-	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
-	return back
+func (s *NewParamCreator) NewParam() concept.Param {
+	return s.param.ParamCreator()
+}
+
+func (s *NewParamCreator) ToLanguage(language string, instance *NewParam) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func NewNewParamCreator(param *NewParamCreatorParam) *NewParamCreator {
+	return &NewParamCreator{
+		Seeds: map[string]func(string, *NewParam) string{},
+		param: param,
+	}
 }

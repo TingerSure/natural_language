@@ -8,26 +8,43 @@ const (
 	BreakInterruptType = "break"
 )
 
+type BreakSeed interface {
+	Type() string
+}
+
 type Break struct {
-	tag concept.String
+	tag  concept.String
+	seed BreakSeed
 }
 
 func (e *Break) InterruptType() string {
-	return BreakInterruptType
+	return e.seed.Type()
 }
 
 func (e *Break) Tag() concept.String {
 	return e.tag
 }
 
-func NewBreak() *Break {
+type BreakCreatorParam struct {
+}
+
+type BreakCreator struct {
+	param *BreakCreatorParam
+}
+
+func (s *BreakCreator) New(tag concept.String) *Break {
 	return &Break{
-		tag: nil,
+		tag:  tag,
+		seed: s,
 	}
 }
 
-func NewBreakWithTag(tag concept.String) *Break {
-	return &Break{
-		tag: tag,
+func (s *BreakCreator) Type() string {
+	return BreakInterruptType
+}
+
+func NewBreakCreator(param *BreakCreatorParam) *BreakCreator {
+	return &BreakCreator{
+		param: param,
 	}
 }

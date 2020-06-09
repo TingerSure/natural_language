@@ -6,7 +6,6 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/expression/adaptor"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
@@ -62,25 +61,28 @@ func (a *Call) Exec(space concept.Closure) (concept.Variable, concept.Interrupt)
 }
 
 type CallCreatorParam struct {
-	NewException func(string, string) concept.Exception
+	ExceptionCreator       func(string, string) concept.Exception
+	ParamCreator           func() concept.Param
+	ConstIndexCreator      func(concept.Variable) *index.ConstIndex
+	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
 }
 
 type CallCreator struct {
 	Seeds        map[string]func(string, *Call) string
 	param        *CallCreatorParam
-	defaultParam concept.Param
+	defaultParam concept.Index
 }
 
 func (s *CallCreator) New(funcs concept.Index, param concept.Index) *Call {
 	if nl_interface.IsNil(param) {
-		param = defaultParam
+		param = s.defaultParam
 	}
 	back := &Call{
 		funcs: funcs,
 		param: param,
 		seed:  s,
 	}
-	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	back.ExpressionIndex = s.param.ExpressionIndexCreator(back.Exec)
 	return back
 }
 
@@ -100,6 +102,6 @@ func NewCallCreator(param *CallCreatorParam) *CallCreator {
 	return &CallCreator{
 		Seeds:        map[string]func(string, *Call) string{},
 		param:        param,
-		defaultParam: index.NewConstIndex(param.ParamCreator()),
+		defaultParam: param.ConstIndexCreator(param.ParamCreator()),
 	}
 }

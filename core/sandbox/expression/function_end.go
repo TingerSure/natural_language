@@ -7,20 +7,18 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 )
 
-type FunctionEnd struct {
-	*adaptor.ExpressionIndex
+type FunctionEndSeed interface {
+	ToLanguage(string, *FunctionEnd) string
+	NewEnd() *interrupt.End
 }
 
-var (
-	FunctionEndLanguageSeeds = map[string]func(string, *FunctionEnd) string{}
-)
+type FunctionEnd struct {
+	*adaptor.ExpressionIndex
+	seed FunctionEndSeed
+}
 
 func (f *FunctionEnd) ToLanguage(language string) string {
-	seed := FunctionEndLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (a *FunctionEnd) ToString(prefix string) string {
@@ -28,11 +26,43 @@ func (a *FunctionEnd) ToString(prefix string) string {
 }
 
 func (a *FunctionEnd) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
-	return nil, interrupt.NewEnd()
+	return nil, a.seed.NewEnd()
 }
 
-func NewFunctionEnd() *FunctionEnd {
-	back := &FunctionEnd{}
-	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+type FunctionEndCreatorParam struct {
+	EndCreator             func() *interrupt.End
+	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
+}
+
+type FunctionEndCreator struct {
+	Seeds        map[string]func(string, *FunctionEnd) string
+	param        *FunctionEndCreatorParam
+	defaultParam concept.Index
+}
+
+func (s *FunctionEndCreator) New() *FunctionEnd {
+	back := &FunctionEnd{
+		seed: s,
+	}
+	back.ExpressionIndex = s.param.ExpressionIndexCreator(back.Exec)
 	return back
+}
+
+func (s *FunctionEndCreator) ToLanguage(language string, instance *FunctionEnd) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *FunctionEndCreator) NewEnd() *interrupt.End {
+	return s.param.EndCreator()
+}
+
+func NewFunctionEndCreator(param *FunctionEndCreatorParam) *FunctionEndCreator {
+	return &FunctionEndCreator{
+		Seeds: map[string]func(string, *FunctionEnd) string{},
+		param: param,
+	}
 }

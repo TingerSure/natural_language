@@ -8,26 +8,43 @@ const (
 	ContinueInterruptType = "continue"
 )
 
+type ContinueSeed interface {
+	Type() string
+}
+
 type Continue struct {
-	tag concept.String
+	tag  concept.String
+	seed ContinueSeed
 }
 
 func (e *Continue) InterruptType() string {
-	return ContinueInterruptType
+	return e.seed.Type()
 }
 
 func (e *Continue) Tag() concept.String {
 	return e.tag
 }
 
-func NewContinueWithTag(tag concept.String) *Continue {
+type ContinueCreatorParam struct {
+}
+
+type ContinueCreator struct {
+	param *ContinueCreatorParam
+}
+
+func (s *ContinueCreator) New(tag concept.String) *Continue {
 	return &Continue{
-		tag: tag,
+		tag:  tag,
+		seed: s,
 	}
 }
 
-func NewContinue() *Continue {
-	return &Continue{
-		tag: nil,
+func (s *ContinueCreator) Type() string {
+	return ContinueInterruptType
+}
+
+func NewContinueCreator(param *ContinueCreatorParam) *ContinueCreator {
+	return &ContinueCreator{
+		param: param,
 	}
 }

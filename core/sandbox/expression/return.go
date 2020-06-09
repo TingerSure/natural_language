@@ -7,22 +7,20 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/expression/adaptor"
 )
 
+type ReturnSeed interface {
+	ToLanguage(string, *Return) string
+}
+
 type Return struct {
 	*adaptor.ExpressionIndex
 	key    concept.String
 	result concept.Index
+	seed   ReturnSeed
 }
 
-var (
-	ReturnLanguageSeeds = map[string]func(string, *Return) string{}
-)
-
 func (f *Return) ToLanguage(language string) string {
-	seed := ReturnLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
+
 }
 
 func (a *Return) Key() concept.String {
@@ -43,11 +41,36 @@ func (a *Return) Exec(space concept.Closure) (concept.Variable, concept.Interrup
 	return result, nil
 }
 
-func NewReturn(key concept.String, result concept.Index) *Return {
+type ReturnCreatorParam struct {
+	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
+}
+
+type ReturnCreator struct {
+	Seeds map[string]func(string, *Return) string
+	param *ReturnCreatorParam
+}
+
+func (s *ReturnCreator) New(key concept.String, result concept.Index) *Return {
 	back := &Return{
 		key:    key,
 		result: result,
+		seed:   s,
 	}
-	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	back.ExpressionIndex = s.param.ExpressionIndexCreator(back.Exec)
 	return back
+}
+
+func (s *ReturnCreator) ToLanguage(language string, instance *Return) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func NewReturnCreator(param *ReturnCreatorParam) *ReturnCreator {
+	return &ReturnCreator{
+		Seeds: map[string]func(string, *Return) string{},
+		param: param,
+	}
 }

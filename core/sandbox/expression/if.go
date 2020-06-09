@@ -3,31 +3,30 @@ package expression
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/sandbox/closure"
+	// "github.com/TingerSure/natural_language/core/sandbox/closure"
 	"github.com/TingerSure/natural_language/core/sandbox/code_block"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/expression/adaptor"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
+	// "github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
+
+type IfSeed interface {
+	ToLanguage(string, *If) string
+	NewException(string, string) concept.Exception
+	NewClosure(concept.Closure) concept.Closure
+}
 
 type If struct {
 	*adaptor.ExpressionIndex
 	condition concept.Index
 	primary   *code_block.CodeBlock
 	secondary *code_block.CodeBlock
+	seed      IfSeed
 }
 
-var (
-	IfLanguageSeeds = map[string]func(string, *If) string{}
-)
-
 func (f *If) ToLanguage(language string) string {
-	seed := IfLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (f *If) SubCodeBlockIterate(onIndex func(concept.Index) bool) bool {
@@ -45,16 +44,9 @@ func (f *If) ToString(prefix string) string {
 func (f *If) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) {
 
 	if nl_interface.IsNil(f.condition) {
-		return nil, interrupt.NewException(variable.NewString("system error"), variable.NewString("No condition for judgment."))
+		return nil, f.seed.NewException("system error", "No condition for judgment.")
 	}
-	initSpace := closure.NewClosure(parent, &closure.ClosureParam{
-		StringCreator: func(value string) concept.String {
-			return variable.NewString(value)
-		},
-		EmptyCreator: func() concept.Null {
-			return variable.NewNull()
-		},
-	})
+	initSpace := f.seed.NewClosure(parent)
 	defer initSpace.Clear()
 	defer parent.MergeReturn(initSpace)
 
@@ -65,7 +57,7 @@ func (f *If) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) 
 
 	condition, yes := variable.VariableFamilyInstance.IsBool(preCondition)
 	if !yes {
-		return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only bool can be judged."))
+		return nil, f.seed.NewException("type error", "Only bool can be judged.")
 	}
 
 	var active *code_block.CodeBlock
@@ -92,19 +84,49 @@ func (f *If) Secondary() *code_block.CodeBlock {
 	return f.secondary
 }
 
-func NewIf() *If {
-	param := &code_block.CodeBlockParam{
-		StringCreator: func(value string) concept.String {
-			return variable.NewString(value)
-		},
-		EmptyCreator: func() concept.Null {
-			return variable.NewNull()
-		},
-	}
+type IfCreatorParam struct {
+	ExceptionCreator       func(string, string) concept.Exception
+	CodeBlockCreator       func() *code_block.CodeBlock
+	ClosureCreator         func(concept.Closure) concept.Closure
+	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
+}
+
+type IfCreator struct {
+	Seeds            map[string]func(string, *If) string
+	param            *IfCreatorParam
+	defaultCondition concept.Index
+	defaultTag       concept.String
+}
+
+func (s *IfCreator) New() *If {
 	back := &If{
-		primary:   code_block.NewCodeBlock(param),
-		secondary: code_block.NewCodeBlock(param),
+		primary:   s.param.CodeBlockCreator(),
+		secondary: s.param.CodeBlockCreator(),
+		seed:      s,
 	}
-	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	back.ExpressionIndex = s.param.ExpressionIndexCreator(back.Exec)
 	return back
+}
+
+func (s *IfCreator) ToLanguage(language string, instance *If) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *IfCreator) NewClosure(parent concept.Closure) concept.Closure {
+	return s.param.ClosureCreator(parent)
+}
+
+func (s *IfCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
+}
+
+func NewIfCreator(param *IfCreatorParam) *IfCreator {
+	return &IfCreator{
+		Seeds: map[string]func(string, *If) string{},
+		param: param,
+	}
 }

@@ -11,10 +11,12 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
-var (
-	expressionForDefaultCondition = index.NewConstIndex(variable.NewBool(true))
-	expressionForDefaultTag       = variable.NewString("")
-)
+type ForSeed interface {
+	ToLanguage(string, *For) string
+	GetDefaultCondition() concept.Index
+	GetDefaultTag() concept.String
+	NewException(string, string) concept.Exception
+}
 
 type For struct {
 	*adaptor.ExpressionIndex
@@ -23,18 +25,11 @@ type For struct {
 	init      *code_block.CodeBlock
 	end       *code_block.CodeBlock
 	body      *code_block.CodeBlock
+	seed      ForSeed
 }
 
-var (
-	ForLanguageSeeds = map[string]func(string, *For) string{}
-)
-
 func (f *For) ToLanguage(language string) string {
-	seed := ForLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (f *For) SubCodeBlockIterate(onIndex func(concept.Index) bool) bool {
@@ -48,7 +43,7 @@ func (f *For) ToString(prefix string) string {
 func (f *For) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) {
 
 	if nl_interface.IsNil(f.condition) {
-		f.condition = expressionForDefaultCondition
+		f.condition = f.seed.GetDefaultCondition()
 	}
 
 	initSpace, suspend := f.init.Exec(parent, false, nil)
@@ -67,7 +62,7 @@ body:
 
 		condition, yes := variable.VariableFamilyInstance.IsBool(preCondition)
 		if !yes {
-			return nil, interrupt.NewException(variable.NewString("type error"), variable.NewString("Only bool can be judged."))
+			return nil, f.seed.NewException("type error", "Only bool can be judged.")
 		}
 
 		if !condition.Value() {
@@ -81,7 +76,7 @@ body:
 			case interrupt.BreakInterruptType:
 				breaks, yes := interrupt.InterruptFamilyInstance.IsBreak(suspend)
 				if !yes {
-					return nil, interrupt.NewException(variable.NewString("system panic"), variable.NewString(fmt.Sprintf("BreakInterruptType does not mean a Break anymore.\n%+v", suspend)))
+					return nil, f.seed.NewException("system panic", fmt.Sprintf("BreakInterruptType does not mean a Break anymore.\n%+v", suspend))
 				}
 				if !f.IsMyTag(breaks.Tag()) {
 					return nil, suspend
@@ -90,7 +85,7 @@ body:
 			case interrupt.ContinueInterruptType:
 				continues, yes := interrupt.InterruptFamilyInstance.IsContinue(suspend)
 				if !yes {
-					return nil, interrupt.NewException(variable.NewString("system panic"), variable.NewString(fmt.Sprintf("ContinueInterruptType does not mean a Continue anymore.\n%+v", suspend)))
+					return nil, f.seed.NewException("system panic", fmt.Sprintf("ContinueInterruptType does not mean a Continue anymore.\n%+v", suspend))
 				}
 				if !f.IsMyTag(continues.Tag()) {
 					return nil, suspend
@@ -116,7 +111,7 @@ func (f *For) Tag() concept.String {
 	return f.tag
 }
 func (f *For) IsMyTag(tag concept.String) bool {
-	if tag.Equal(expressionForDefaultTag) ||
+	if tag.Equal(f.seed.GetDefaultTag()) ||
 		tag.Equal(f.tag) ||
 		tag.EqualLanguage(f.tag) {
 		return true
@@ -137,21 +132,58 @@ func (f *For) End() *code_block.CodeBlock {
 	return f.end
 }
 
-func NewFor() *For {
-	param := &code_block.CodeBlockParam{
-		StringCreator: func(value string) concept.String {
-			return variable.NewString(value)
-		},
-		EmptyCreator: func() concept.Null {
-			return variable.NewNull()
-		},
-	}
+type ForCreatorParam struct {
+	ExceptionCreator       func(string, string) concept.Exception
+	StringCreator          func(string) concept.String
+	BoolCreator            func(bool) *variable.Bool
+	CodeBlockCreator       func() *code_block.CodeBlock
+	ConstIndexCreator      func(concept.Variable) *index.ConstIndex
+	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
+}
+
+type ForCreator struct {
+	Seeds            map[string]func(string, *For) string
+	param            *ForCreatorParam
+	defaultCondition concept.Index
+	defaultTag       concept.String
+}
+
+func (s *ForCreator) New() *For {
 	back := &For{
-		tag:  expressionForDefaultTag,
-		init: code_block.NewCodeBlock(param),
-		end:  code_block.NewCodeBlock(param),
-		body: code_block.NewCodeBlock(param),
+		tag:  s.defaultTag,
+		init: s.param.CodeBlockCreator(),
+		end:  s.param.CodeBlockCreator(),
+		body: s.param.CodeBlockCreator(),
+		seed: s,
 	}
-	back.ExpressionIndex = adaptor.NewExpressionIndex(back.Exec)
+	back.ExpressionIndex = s.param.ExpressionIndexCreator(back.Exec)
 	return back
+}
+
+func (s *ForCreator) ToLanguage(language string, instance *For) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *ForCreator) GetDefaultCondition() concept.Index {
+	return s.defaultCondition
+}
+
+func (s *ForCreator) GetDefaultTag() concept.String {
+	return s.defaultTag
+}
+func (s *ForCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
+}
+
+func NewForCreator(param *ForCreatorParam) *ForCreator {
+	return &ForCreator{
+		Seeds:            map[string]func(string, *For) string{},
+		param:            param,
+		defaultCondition: param.ConstIndexCreator(param.BoolCreator(true)),
+		defaultTag:       param.StringCreator(""),
+	}
 }

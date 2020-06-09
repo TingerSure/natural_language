@@ -21,7 +21,6 @@ type FunctionSeed interface {
 	Type() string
 	NewString(string) concept.String
 	NewException(string, string) concept.Exception
-	NewCodeBlock() *code_block.CodeBlock
 	NewParam() concept.Param
 }
 
@@ -133,7 +132,7 @@ func (s *FunctionCreator) New(name concept.String, parent concept.Closure) *Func
 		AdaptorFunction: adaptor.NewAdaptorFunction(),
 		name:            name,
 		parent:          parent,
-		body:            s.NewCodeBlock(),
+		body:            s.param.CodeBlockCreator(),
 		seed:            s,
 	}
 }
@@ -148,10 +147,6 @@ func (s *FunctionCreator) ToLanguage(language string, instance *Function) string
 
 func (s *FunctionCreator) Type() string {
 	return VariableFunctionType
-}
-
-func (s *FunctionCreator) NewCodeBlock() *code_block.CodeBlock {
-	return s.param.CodeBlockCreator()
 }
 
 func (s *FunctionCreator) NewString(value string) concept.String {

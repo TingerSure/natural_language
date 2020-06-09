@@ -5,7 +5,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 )
 
-type InterruptCreator struct {
+type IndexCreator struct {
 	ConstIndex        *index.ConstIndexCreator
 	ObjectFieldIndex  *index.ObjectFieldIndexCreator
 	ObjectMethodIndex *index.ObjectMethodIndexCreator
@@ -17,14 +17,14 @@ type InterruptCreator struct {
 	LocalIndex        *index.LocalIndexCreator
 }
 
-type InterruptCreatorParam struct {
+type IndexCreatorParam struct {
 	ExceptionCreator func(string, string) concept.Exception
 	NullCreator      func() concept.Null
 	StringCreator    func(string) concept.String
 }
 
-func NewInterruptCreator(param *InterruptCreatorParam) *InterruptCreator {
-	instance := &InterruptCreator{}
+func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
+	instance := &IndexCreator{}
 	instance.LocalIndex = index.NewLocalIndexCreator(&index.LocalIndexCreatorParam{})
 	instance.BubbleIndex = index.NewBubbleIndexCreator(&index.BubbleIndexCreatorParam{})
 	instance.SelfIndex = index.NewSelfIndexCreator(&index.SelfIndexCreatorParam{
@@ -43,7 +43,7 @@ func NewInterruptCreator(param *InterruptCreatorParam) *InterruptCreator {
 		ExceptionCreator: param.ExceptionCreator,
 		NullCreator:      param.NullCreator,
 	})
-	instance.ObjectMethodIndex = index.NewObjectMethodIndexCreator(&index.ObjectFieldIndexCreatorParam{
+	instance.ObjectMethodIndex = index.NewObjectMethodIndexCreator(&index.ObjectMethodIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
 	})
 	instance.ObjectFieldIndex = index.NewObjectFieldIndexCreator(&index.ObjectFieldIndexCreatorParam{
