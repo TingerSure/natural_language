@@ -2,8 +2,8 @@ package object
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
@@ -11,20 +11,16 @@ var (
 	SetMethodContentName  = "object"
 	SetMethodKeyName      = "key"
 	SetMethodFunctionName = "function"
-
-	SetMethodObjectErrorExceptionTemplate   = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("SetMethodObjectErrorException"))
-	SetMethodKeyErrorExceptionTemplate      = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("SetMethodKeyErrorException"))
-	SetMethodFunctionErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("SetMethodFunctionErrorException"))
 )
 
-func initSetMethod(instance *Object) {
+func initSetMethod(libs *runtime.LibraryManager, instance *Object) {
 	SetMethodContent := libs.Sandbox.Variable.String.New(SetMethodContentName)
 	SetMethodKey := libs.Sandbox.Variable.String.New(SetMethodKeyName)
 	SetMethodFunction := libs.Sandbox.Variable.String.New(SetMethodFunctionName)
 
-	SetMethodObjectErrorException := SetMethodObjectErrorExceptionTemplate.Copy()
-	SetMethodKeyErrorException := SetMethodKeyErrorExceptionTemplate.Copy()
-	SetMethodFunctionErrorException := SetMethodFunctionErrorExceptionTemplate.Copy()
+	SetMethodObjectErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "SetMethodObjectErrorException")
+	SetMethodKeyErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "SetMethodKeyErrorException")
+	SetMethodFunctionErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "SetMethodFunctionErrorException")
 
 	var SetMethod concept.Function
 

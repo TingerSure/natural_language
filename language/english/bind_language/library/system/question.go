@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 func QuestionBindLanguage(libs *runtime.LibraryManager, language string) {

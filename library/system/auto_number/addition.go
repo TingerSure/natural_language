@@ -2,27 +2,24 @@ package auto_number
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 var (
-	AdditionTargetNotExistExceptionTemplate           = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("AdditionTargetNotExistException"))
-	AdditionAutoObjectValueTypeErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("AdditionAutoObjectValueTypeErrorException"))
-
 	AdditionTargetName = "target"
 	AdditionResultName = "result"
 	AdditionKeyName    = "addition"
 )
 
-func initAddition(instance *AutoNumber) {
+func initAddition(libs *runtime.LibraryManager, instance *AutoNumber) {
 
 	AdditionTarget := libs.Sandbox.Variable.String.New(AdditionTargetName)
 	AdditionResult := libs.Sandbox.Variable.String.New(AdditionResultName)
 	AdditionKey := libs.Sandbox.Variable.String.New(AdditionKeyName)
-	AdditionTargetNotExistException := AdditionTargetNotExistExceptionTemplate.Copy()
-	AdditionAutoObjectValueTypeErrorException := AdditionAutoObjectValueTypeErrorExceptionTemplate.Copy()
+	AdditionTargetNotExistException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "AdditionTargetNotExistException")
+	AdditionAutoObjectValueTypeErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "AdditionAutoObjectValueTypeErrorException")
 
 	var Addition concept.Function = nil
 

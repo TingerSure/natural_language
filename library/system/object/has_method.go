@@ -1,8 +1,8 @@
 package object
 
 import (
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
@@ -10,18 +10,15 @@ var (
 	HasMethodContentName = "object"
 	HasMethodKeyName     = "key"
 	HasMethodExistName   = "exist"
-
-	HasMethodObjectErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("HasMethodObjectErrorException"))
-	HasMethodKeyErrorExceptionTemplate    = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("HasMethodKeyErrorException"))
 )
 
-func initHasMethod(instance *Object) {
+func initHasMethod(libs *runtime.LibraryManager, instance *Object) {
 	HasMethodContent := libs.Sandbox.Variable.String.New(HasMethodContentName)
 	HasMethodKey := libs.Sandbox.Variable.String.New(HasMethodKeyName)
 	HasMethodExist := libs.Sandbox.Variable.String.New(HasMethodExistName)
 
-	HasMethodObjectErrorException := HasMethodObjectErrorExceptionTemplate.Copy()
-	HasMethodKeyErrorException := HasMethodKeyErrorExceptionTemplate.Copy()
+	HasMethodObjectErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "HasMethodObjectErrorException")
+	HasMethodKeyErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "HasMethodKeyErrorException")
 
 	var HasMethod concept.Function
 	HasMethod = libs.Sandbox.Variable.SystemFunction.New(
@@ -37,7 +34,7 @@ func initHasMethod(instance *Object) {
 				return nil, HasMethodKeyErrorException.Copy().AddStack(HasMethod)
 			}
 
-			return libs.Sandbox.Variable.Param.New().Set(HasMethodExist, variable.NewBool(object.HasMethod(key))), nil
+			return libs.Sandbox.Variable.Param.New().Set(HasMethodExist, libs.Sandbox.Variable.Bool.New(object.HasMethod(key))), nil
 		},
 		[]concept.String{
 			HasMethodContent,

@@ -17,7 +17,7 @@ import (
 
 func NewSystem(param *adaptor.SourceAdaptorParam) tree.Page {
 
-	system := tree.NewPageAdaptor(libs.Sandbox)
+	system := tree.NewPageAdaptor(param.Libs.Sandbox)
 	system.AddSource(pronoun.NewIt(param))
 
 	system.AddSource(pronoun.NewResult(param))

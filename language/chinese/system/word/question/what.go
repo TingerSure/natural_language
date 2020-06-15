@@ -2,8 +2,6 @@ package question
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/index"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
@@ -38,7 +36,7 @@ func (p *What) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return libs.Sandbox.Index.ConstIndex.New(p.WhatFunc)
+						return p.Libs.Sandbox.Index.ConstIndex.New(p.WhatFunc)
 					},
 					Content: treasure,
 					Types:   phrase_type.Question,
@@ -54,7 +52,7 @@ func NewWhat(param *adaptor.SourceAdaptorParam) *What {
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 	page := instance.Libs.GetLibraryPage("system", "question")
-	instance.WhatFunc = page.GetFunction(libs.Sandbox.Variable.String.New("What"))
+	instance.WhatFunc = page.GetFunction(instance.Libs.Sandbox.Variable.String.New("What"))
 
 	return instance
 }

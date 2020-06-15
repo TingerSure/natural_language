@@ -2,8 +2,8 @@ package object
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
@@ -11,20 +11,16 @@ var (
 	GetFieldContentName = "object"
 	GetFieldKeyName     = "key"
 	GetFieldValueName   = "value"
-
-	GetFieldObjectErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("GetFieldObjectErrorException"))
-	GetFieldKeyErrorExceptionTemplate    = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("GetFieldKeyErrorException"))
-	GetFieldKeyNotExistExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("GetFieldKeyNotExistException"))
 )
 
-func initGetField(instance *Object) {
+func initGetField(libs *runtime.LibraryManager, instance *Object) {
 	GetFieldContent := libs.Sandbox.Variable.String.New(GetFieldContentName)
 	GetFieldKey := libs.Sandbox.Variable.String.New(GetFieldKeyName)
 	GetFieldValue := libs.Sandbox.Variable.String.New(GetFieldValueName)
 
-	GetFieldObjectErrorException := GetFieldObjectErrorExceptionTemplate.Copy()
-	GetFieldKeyErrorException := GetFieldKeyErrorExceptionTemplate.Copy()
-	GetFieldKeyNotExistException := GetFieldKeyNotExistExceptionTemplate.Copy()
+	GetFieldObjectErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "GetFieldObjectErrorException")
+	GetFieldKeyErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "GetFieldKeyErrorException")
+	GetFieldKeyNotExistException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "GetFieldKeyNotExistException")
 
 	var GetField concept.Function
 	GetField = libs.Sandbox.Variable.SystemFunction.New(

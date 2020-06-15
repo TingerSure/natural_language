@@ -2,8 +2,8 @@ package object
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
@@ -11,20 +11,16 @@ var (
 	InitFieldContentName      = "object"
 	InitFieldKeyName          = "key"
 	InitFieldDefaultValueName = "default_value"
-
-	InitFieldObjectErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("InitFieldObjectErrorException"))
-	InitFieldKeyErrorExceptionTemplate    = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("InitFieldKeyErrorException"))
-	InitFieldKeyExistExceptionTemplate    = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("InitFieldKeyExistException"))
 )
 
-func initInitField(instance *Object) {
+func initInitField(libs *runtime.LibraryManager, instance *Object) {
 	InitFieldContent := libs.Sandbox.Variable.String.New(InitFieldContentName)
 	InitFieldKey := libs.Sandbox.Variable.String.New(InitFieldKeyName)
 	InitFieldDefaultValue := libs.Sandbox.Variable.String.New(InitFieldDefaultValueName)
 
-	InitFieldObjectErrorException := InitFieldObjectErrorExceptionTemplate.Copy()
-	InitFieldKeyErrorException := InitFieldKeyErrorExceptionTemplate.Copy()
-	InitFieldKeyExistException := InitFieldKeyExistExceptionTemplate.Copy()
+	InitFieldObjectErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "InitFieldObjectErrorException")
+	InitFieldKeyErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "InitFieldKeyErrorException")
+	InitFieldKeyExistException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "InitFieldKeyExistException")
 
 	var InitField concept.Function
 	InitField = libs.Sandbox.Variable.SystemFunction.New(

@@ -2,8 +2,6 @@ package brackets
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/index"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
@@ -15,12 +13,12 @@ const (
 )
 
 var (
-	LeftWord  []*tree.Word = []*tree.Word{tree.NewWord(LeftCharactor)}
-	LeftIndex              = libs.Sandbox.Variable.String.New(LeftCharactor)
+	LeftWord []*tree.Word = []*tree.Word{tree.NewWord(LeftCharactor)}
 )
 
 type BracketsLeft struct {
 	*adaptor.SourceAdaptor
+	LeftIndex concept.String
 }
 
 func (s *BracketsLeft) GetName() string {
@@ -39,7 +37,7 @@ func (s *BracketsLeft) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return libs.Sandbox.Index.ConstIndex.New(LeftIndex.Clone())
+						return s.Libs.Sandbox.Index.ConstIndex.New(s.LeftIndex.Clone())
 					},
 					Content: treasure,
 					Types:   phrase_type.BracketsLeft,
@@ -53,5 +51,6 @@ func (s *BracketsLeft) GetVocabularyRules() []*tree.VocabularyRule {
 func NewBracketsLeft(param *adaptor.SourceAdaptorParam) *BracketsLeft {
 	return (&BracketsLeft{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
+		LeftIndex:     param.Libs.Sandbox.Variable.String.New(LeftCharactor),
 	})
 }

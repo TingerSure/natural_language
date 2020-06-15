@@ -1,15 +1,15 @@
 package object
 
 import (
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 var (
 	CreateContentName = "object"
 )
 
-func initCreate(instance *Object) {
+func initCreate(libs *runtime.LibraryManager, instance *Object) {
 
 	CreateContent := libs.Sandbox.Variable.String.New(CreateContentName)
 
@@ -18,7 +18,7 @@ func initCreate(instance *Object) {
 	instance.SetFunction(libs.Sandbox.Variable.String.New("Create"), libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("Create"),
 		func(_ concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
-			return libs.Sandbox.Variable.Param.New().Set(CreateContent, variable.NewObject()), nil
+			return libs.Sandbox.Variable.Param.New().Set(CreateContent, libs.Sandbox.Variable.Object.New()), nil
 		},
 		[]concept.String{},
 		[]concept.String{

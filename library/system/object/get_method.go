@@ -2,8 +2,8 @@ package object
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
@@ -11,20 +11,16 @@ var (
 	GetMethodContentName  = "object"
 	GetMethodKeyName      = "key"
 	GetMethodFunctionName = "function"
-
-	GetMethodObjectErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("GetMethodObjectErrorException"))
-	GetMethodKeyErrorExceptionTemplate    = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("GetMethodKeyErrorException"))
-	GetMethodKeyNotExistExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("GetMethodKeyNotExistException"))
 )
 
-func initGetMethod(instance *Object) {
+func initGetMethod(libs *runtime.LibraryManager, instance *Object) {
 	GetMethodContent := libs.Sandbox.Variable.String.New(GetMethodContentName)
 	GetMethodKey := libs.Sandbox.Variable.String.New(GetMethodKeyName)
 	GetMethodFunction := libs.Sandbox.Variable.String.New(GetMethodFunctionName)
 
-	GetMethodObjectErrorException := GetMethodObjectErrorExceptionTemplate.Copy()
-	GetMethodKeyErrorException := GetMethodKeyErrorExceptionTemplate.Copy()
-	GetMethodKeyNotExistException := GetMethodKeyNotExistExceptionTemplate.Copy()
+	GetMethodObjectErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "GetMethodObjectErrorException")
+	GetMethodKeyErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "GetMethodKeyErrorException")
+	GetMethodKeyNotExistException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "GetMethodKeyNotExistException")
 
 	var GetMethod concept.Function
 	GetMethod = libs.Sandbox.Variable.SystemFunction.New(

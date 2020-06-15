@@ -2,7 +2,6 @@ package pronoun
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
@@ -58,6 +57,6 @@ func NewIt(param *adaptor.SourceAdaptorParam) *It {
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 	page := instance.Libs.GetLibraryPage("system", "pronoun")
-	instance.ItIndex = page.GetIndex(libs.Sandbox.Variable.String.New("It"))
+	instance.ItIndex = page.GetIndex(instance.Libs.Sandbox.Variable.String.New("It"))
 	return instance
 }

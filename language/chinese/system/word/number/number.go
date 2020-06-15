@@ -2,8 +2,6 @@ package number
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/index"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
@@ -48,7 +46,7 @@ func (p *Number) GetVocabularyRules() []*tree.VocabularyRule {
 						if err != nil {
 							panic(err)
 						}
-						return libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.Number.New(value))
+						return p.Libs.Sandbox.Index.ConstIndex.New(p.Libs.Sandbox.Variable.Number.New(value))
 					},
 					Content: treasure,
 					Types:   phrase_type.Number,

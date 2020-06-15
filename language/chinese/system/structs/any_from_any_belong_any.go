@@ -2,9 +2,6 @@ package structs
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/expression"
-	"github.com/TingerSure/natural_language/core/sandbox/index"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
@@ -36,10 +33,10 @@ func (p *AnyFromAnyBelongAny) GetStructRules() []*tree.StructRule {
 			Create: func() tree.Phrase {
 				return tree.NewPhraseStructAdaptor(&tree.PhraseStructAdaptorParam{
 					Index: func(phrase []tree.Phrase) concept.Index {
-						return libs.Sandbox.Expression.ParamGet.New(
-							libs.Sandbox.Expression.Call.New(
-								libs.Sandbox.Index.ConstIndex.New(p.GetField),
-								libs.Sandbox.Expression.NewParam.New().Init(map[concept.String]concept.Index{
+						return p.Libs.Sandbox.Expression.ParamGet.New(
+							p.Libs.Sandbox.Expression.Call.New(
+								p.Libs.Sandbox.Index.ConstIndex.New(p.GetField),
+								p.Libs.Sandbox.Expression.NewParam.New().Init(map[concept.String]concept.Index{
 									p.GetFieldContent: phrase[0].Index(),
 									p.GetFieldKey:     phrase[2].Index(),
 								}),
@@ -68,10 +65,10 @@ func NewAnyFromAnyBelongAny(param *adaptor.SourceAdaptorParam) *AnyFromAnyBelong
 	})
 	libObject := instance.Libs.GetLibraryPage("system", "object")
 
-	instance.GetFieldValue = libObject.GetConst(libs.Sandbox.Variable.String.New("GetFieldValue"))
-	instance.GetFieldKey = libObject.GetConst(libs.Sandbox.Variable.String.New("GetFieldKey"))
-	instance.GetFieldContent = libObject.GetConst(libs.Sandbox.Variable.String.New("GetFieldContent"))
-	instance.GetField = libObject.GetFunction(libs.Sandbox.Variable.String.New("GetField"))
+	instance.GetFieldValue = libObject.GetConst(instance.Libs.Sandbox.Variable.String.New("GetFieldValue"))
+	instance.GetFieldKey = libObject.GetConst(instance.Libs.Sandbox.Variable.String.New("GetFieldKey"))
+	instance.GetFieldContent = libObject.GetConst(instance.Libs.Sandbox.Variable.String.New("GetFieldContent"))
+	instance.GetField = libObject.GetFunction(instance.Libs.Sandbox.Variable.String.New("GetField"))
 
 	return instance
 }

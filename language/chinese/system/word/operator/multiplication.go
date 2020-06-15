@@ -2,8 +2,6 @@ package operator
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/index"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
@@ -41,7 +39,7 @@ func (p *Multiplication) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return libs.Sandbox.Index.ConstIndex.New(p.operator)
+						return p.Libs.Sandbox.Index.ConstIndex.New(p.operator)
 					},
 					Content: treasure,
 					Types:   phrase_type.Operator,
@@ -56,6 +54,6 @@ func NewMultiplication(param *adaptor.SourceAdaptorParam) *Multiplication {
 	instance := (&Multiplication{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
-	instance.operator = instance.Libs.GetLibraryPage("system", "operator").GetFunction(libs.Sandbox.Variable.String.New("MultiplicationFunc"))
+	instance.operator = instance.Libs.GetLibraryPage("system", "operator").GetFunction(instance.Libs.Sandbox.Variable.String.New("MultiplicationFunc"))
 	return instance
 }

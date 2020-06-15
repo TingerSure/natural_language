@@ -1,8 +1,8 @@
 package object
 
 import (
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
@@ -10,19 +10,16 @@ var (
 	HasFieldContentName = "object"
 	HasFieldKeyName     = "key"
 	HasFieldExistName   = "exist"
-
-	HasFieldObjectErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("HasFieldObjectErrorException"))
-	HasFieldKeyErrorExceptionTemplate    = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("HasFieldKeyErrorException"))
 )
 
-func initHasField(instance *Object) {
+func initHasField(libs *runtime.LibraryManager, instance *Object) {
 
 	HasFieldContent := libs.Sandbox.Variable.String.New(HasFieldContentName)
 	HasFieldKey := libs.Sandbox.Variable.String.New(HasFieldKeyName)
 	HasFieldExist := libs.Sandbox.Variable.String.New(HasFieldExistName)
 
-	HasFieldObjectErrorException := HasFieldObjectErrorExceptionTemplate.Copy()
-	HasFieldKeyErrorException := HasFieldKeyErrorExceptionTemplate.Copy()
+	HasFieldObjectErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "HasFieldObjectErrorException")
+	HasFieldKeyErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "HasFieldKeyErrorException")
 
 	var HasField concept.Function
 	HasField = libs.Sandbox.Variable.SystemFunction.New(
@@ -38,7 +35,7 @@ func initHasField(instance *Object) {
 				return nil, HasFieldKeyErrorException.Copy().AddStack(HasField)
 			}
 
-			return libs.Sandbox.Variable.Param.New().Set(HasFieldExist, variable.NewBool(object.HasField(key))), nil
+			return libs.Sandbox.Variable.Param.New().Set(HasFieldExist, libs.Sandbox.Variable.Bool.New(object.HasField(key))), nil
 		},
 		[]concept.String{
 			HasFieldContent,

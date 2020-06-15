@@ -2,7 +2,6 @@ package library
 
 import (
 	"github.com/TingerSure/natural_language/core/runtime"
-	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/english/bind_language/library/system"
 )
 

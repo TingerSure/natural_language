@@ -2,8 +2,6 @@ package set
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/index"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
@@ -50,7 +48,7 @@ func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return libs.Sandbox.Index.ConstIndex.New(set)
+						return s.Libs.Sandbox.Index.ConstIndex.New(set)
 					},
 					Content: treasure,
 					Types:   phrase_type.Set,
@@ -68,8 +66,9 @@ func NewSet(param *adaptor.SourceAdaptorParam) *Set {
 
 	setPage := set.Libs.GetLibraryPage("system", "set")
 
-	set.Is = setPage.GetConst(libs.Sandbox.Variable.String.New("Is"))
-	set.Equal = setPage.GetConst(libs.Sandbox.Variable.String.New("Equal"))
-
+	set.Is = setPage.GetConst(set.Libs.Sandbox.Variable.String.New("Is"))
+	set.Equal = setPage.GetConst(set.Libs.Sandbox.Variable.String.New("Equal"))
+	set.Is.SetLanguage(param.Language, Is)
+	set.Equal.SetLanguage(param.Language, Equal)
 	return set
 }

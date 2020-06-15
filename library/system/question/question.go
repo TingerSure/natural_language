@@ -3,7 +3,6 @@ package question
 import (
 	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/library/system/std"
 )
@@ -22,16 +21,6 @@ type Question struct {
 	WhatResult    concept.String
 }
 
-func (q *Question) HowMany(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
-	outParam, suspend := q.output.Print(libs.Sandbox.Variable.Param.New().Set(q.output.PrintContent, input.Get(q.HowManyParam)), object)
-	return libs.Sandbox.Variable.Param.New().Set(q.HowManyResult, outParam.Get(q.output.PrintContent)), suspend
-}
-
-func (q *Question) What(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
-	outParam, suspend := q.output.Print(libs.Sandbox.Variable.Param.New().Set(q.output.PrintContent, input.Get(q.WhatParam)), object)
-	return libs.Sandbox.Variable.Param.New().Set(q.WhatResult, outParam.Get(q.output.PrintContent)), suspend
-}
-
 func NewQuestion(libs *runtime.LibraryManager, output *std.Std) *Question {
 
 	instance := &Question{
@@ -44,7 +33,10 @@ func NewQuestion(libs *runtime.LibraryManager, output *std.Std) *Question {
 	}
 	instance.SetFunction(libs.Sandbox.Variable.String.New("HowMany"), libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("HowMany"),
-		instance.HowMany,
+		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+			outParam, suspend := instance.output.Print(libs.Sandbox.Variable.Param.New().Set(instance.output.PrintContent, input.Get(instance.HowManyParam)), object)
+			return libs.Sandbox.Variable.Param.New().Set(instance.HowManyResult, outParam.Get(instance.output.PrintContent)), suspend
+		},
 		[]concept.String{
 			instance.HowManyParam,
 		},
@@ -55,7 +47,10 @@ func NewQuestion(libs *runtime.LibraryManager, output *std.Std) *Question {
 
 	instance.SetFunction(libs.Sandbox.Variable.String.New("What"), libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("What"),
-		instance.What,
+		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+			outParam, suspend := instance.output.Print(libs.Sandbox.Variable.Param.New().Set(instance.output.PrintContent, input.Get(instance.WhatParam)), object)
+			return libs.Sandbox.Variable.Param.New().Set(instance.WhatResult, outParam.Get(instance.output.PrintContent)), suspend
+		},
 		[]concept.String{
 			instance.WhatParam,
 		},

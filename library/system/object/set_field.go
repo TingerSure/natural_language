@@ -2,8 +2,8 @@ package object
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
@@ -11,20 +11,16 @@ var (
 	SetFieldContentName = "object"
 	SetFieldKeyName     = "key"
 	SetFieldValueName   = "value"
-
-	SetFieldObjectErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("SetFieldObjectErrorException"))
-	SetFieldKeyErrorExceptionTemplate    = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("SetFieldKeyErrorException"))
-	SetFieldKeyNotExistExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("SetFieldKeyNotExistException"))
 )
 
-func initSetField(instance *Object) {
+func initSetField(libs *runtime.LibraryManager, instance *Object) {
 	SetFieldContent := libs.Sandbox.Variable.String.New(SetFieldContentName)
 	SetFieldKey := libs.Sandbox.Variable.String.New(SetFieldKeyName)
 	SetFieldValue := libs.Sandbox.Variable.String.New(SetFieldValueName)
 
-	SetFieldObjectErrorException := SetFieldObjectErrorExceptionTemplate.Copy()
-	SetFieldKeyErrorException := SetFieldKeyErrorExceptionTemplate.Copy()
-	SetFieldKeyNotExistException := SetFieldKeyNotExistExceptionTemplate.Copy()
+	SetFieldObjectErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "SetFieldObjectErrorException")
+	SetFieldKeyErrorException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "SetFieldKeyErrorException")
+	SetFieldKeyNotExistException := libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "SetFieldKeyNotExistException")
 
 	var SetField concept.Function
 

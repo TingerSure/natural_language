@@ -2,8 +2,6 @@ package structs
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/expression"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
@@ -38,15 +36,15 @@ func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
 			Create: func() tree.Phrase {
 				return tree.NewPhraseStructAdaptor(&tree.PhraseStructAdaptorParam{
 					Index: func(phrase []tree.Phrase) concept.Index {
-						return libs.Sandbox.Expression.ParamGet.New(
-							libs.Sandbox.Expression.Call.New(
+						return p.Libs.Sandbox.Expression.ParamGet.New(
+							p.Libs.Sandbox.Expression.Call.New(
 								phrase[1].Index(),
-								libs.Sandbox.Expression.NewParam.New().Init(map[concept.String]concept.Index{
-									libs.Sandbox.Variable.String.New(ItemLeft):  phrase[0].Index(),
-									libs.Sandbox.Variable.String.New(ItemRight): phrase[2].Index(),
+								p.Libs.Sandbox.Expression.NewParam.New().Init(map[concept.String]concept.Index{
+									p.Libs.Sandbox.Variable.String.New(ItemLeft):  phrase[0].Index(),
+									p.Libs.Sandbox.Variable.String.New(ItemRight): phrase[2].Index(),
 								}),
 							),
-							libs.Sandbox.Variable.String.New(ItemResult),
+							p.Libs.Sandbox.Variable.String.New(ItemResult),
 						)
 					},
 					Size:  len(NumberFromNumberOperatorNumberList),

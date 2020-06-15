@@ -27,25 +27,25 @@ func NewAutoNumber(libs *runtime.LibraryManager) *AutoNumber {
 		Page:                 tree.NewPageAdaptor(libs.Sandbox),
 		AutoNumberValue:      libs.Sandbox.Variable.String.New(AutoNumberValueName),
 		AutoNumberClassValue: libs.Sandbox.Variable.String.New(AutoNumberClassValueName),
-		AutoNumberClass:      variable.NewClass(AutoNumberClassName),
+		AutoNumberClass:      libs.Sandbox.Variable.Class.New(AutoNumberClassName),
 	}
 
 	instance.AutoNumberClass.SetField(instance.AutoNumberClassValue, libs.Sandbox.Variable.Number.New(0))
 
 	instance.NewAutoNumberObject = func(value *variable.Number) concept.Object {
-		auto := variable.NewObject()
+		auto := libs.Sandbox.Variable.Object.New()
 		auto.InitField(instance.AutoNumberValue, value)
 		auto.AddClass(instance.AutoNumberClass, "", map[concept.String]concept.String{
 			instance.AutoNumberClassValue: instance.AutoNumberValue,
 		})
-		object, suspend := variable.NewMappingObject(auto, AutoNumberClassName, "")
+		object, suspend := libs.Sandbox.Variable.MappingObject.New(auto, AutoNumberClassName, "")
 		if !nl_interface.IsNil(suspend) {
 			panic(suspend)
 		}
 		return object
 	}
 
-	initAddition(instance)
+	initAddition(libs, instance)
 
 	instance.SetClass(libs.Sandbox.Variable.String.New("AutoNumberClass"), instance.AutoNumberClass)
 	instance.SetConst(libs.Sandbox.Variable.String.New("AutoNumberClassValue"), instance.AutoNumberClassValue)

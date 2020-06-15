@@ -16,13 +16,13 @@ func NewObject(libs *runtime.LibraryManager, autoNumber *auto_number.AutoNumber)
 		Page:       tree.NewPageAdaptor(libs.Sandbox),
 		AutoNumber: autoNumber,
 	}
-	initCreate(instance)
-	initGetField(instance)
-	initGetMethod(instance)
-	initHasField(instance)
-	initHasMethod(instance)
-	initInitField(instance)
-	initSetField(instance)
-	initSetMethod(instance)
+	initCreate(libs, instance)
+	initGetField(libs, instance)
+	initGetMethod(libs, instance)
+	initHasField(libs, instance)
+	initHasMethod(libs, instance)
+	initInitField(libs, instance)
+	initSetField(libs, instance)
+	initSetMethod(libs, instance)
 	return instance
 }
