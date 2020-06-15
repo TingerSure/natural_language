@@ -10,15 +10,15 @@ import (
 func ObjectBindlanguage(libs *runtime.LibraryManager, language string) {
 	instance := libs.GetLibraryPage("system", "object")
 
-	// GetFieldObjectErrorException := instance.GetException(variable.NewString("GetFieldObjectErrorException"))
-	// GetFieldKeyErrorException := instance.GetException(variable.NewString("GetFieldKeyErrorException"))
-	// GetFieldKeyNotExistException := instance.GetException(variable.NewString("GetFieldKeyNotExistException"))
+	// GetFieldObjectErrorException := instance.GetException(libs.Sandbox.Variable.String.New("GetFieldObjectErrorException"))
+	// GetFieldKeyErrorException := instance.GetException(libs.Sandbox.Variable.String.New("GetFieldKeyErrorException"))
+	// GetFieldKeyNotExistException := instance.GetException(libs.Sandbox.Variable.String.New("GetFieldKeyNotExistException"))
 
-	GetFieldContent := instance.GetConst(variable.NewString("GetFieldContent"))
-	GetFieldKey := instance.GetConst(variable.NewString("GetFieldKey"))
-	GetFieldValue := instance.GetConst(variable.NewString("GetFieldValue"))
+	GetFieldContent := instance.GetConst(libs.Sandbox.Variable.String.New("GetFieldContent"))
+	GetFieldKey := instance.GetConst(libs.Sandbox.Variable.String.New("GetFieldKey"))
+	GetFieldValue := instance.GetConst(libs.Sandbox.Variable.String.New("GetFieldValue"))
 
-	GetField := instance.GetFunction(variable.NewString("GetField"))
+	GetField := instance.GetFunction(libs.Sandbox.Variable.String.New("GetField"))
 
 	GetFieldContent.SetLanguage(language, "object")
 	GetFieldKey.SetLanguage(language, "field")
