@@ -11,14 +11,14 @@ var (
 
 func initCreate(instance *Object) {
 
-	CreateContent := variable.NewString(CreateContentName)
+	CreateContent := libs.Sandbox.Variable.String.New(CreateContentName)
 
-	instance.SetConst(variable.NewString("CreateContent"), CreateContent)
+	instance.SetConst(libs.Sandbox.Variable.String.New("CreateContent"), CreateContent)
 
-	instance.SetFunction(variable.NewString("Create"), variable.NewSystemFunction(
-		variable.NewString("Create"),
+	instance.SetFunction(libs.Sandbox.Variable.String.New("Create"), libs.Sandbox.Variable.SystemFunction.New(
+		libs.Sandbox.Variable.String.New("Create"),
 		func(_ concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
-			return variable.NewParam().Set(CreateContent, variable.NewObject()), nil
+			return libs.Sandbox.Variable.Param.New().Set(CreateContent, variable.NewObject()), nil
 		},
 		[]concept.String{},
 		[]concept.String{

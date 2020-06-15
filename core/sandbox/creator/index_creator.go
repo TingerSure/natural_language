@@ -3,6 +3,7 @@ package creator
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type IndexCreator struct {
@@ -18,9 +19,10 @@ type IndexCreator struct {
 }
 
 type IndexCreatorParam struct {
-	ExceptionCreator func(string, string) concept.Exception
-	NullCreator      func() concept.Null
-	StringCreator    func(string) concept.String
+	ExceptionCreator         func(string, string) concept.Exception
+	NullCreator              func() concept.Null
+	StringCreator            func(string) concept.String
+	PreObjectFunctionCreator func(concept.Function, concept.Object) *variable.PreObjectFunction
 }
 
 func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
@@ -44,7 +46,8 @@ func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
 		NullCreator:      param.NullCreator,
 	})
 	instance.ObjectMethodIndex = index.NewObjectMethodIndexCreator(&index.ObjectMethodIndexCreatorParam{
-		ExceptionCreator: param.ExceptionCreator,
+		ExceptionCreator:         param.ExceptionCreator,
+		PreObjectFunctionCreator: param.PreObjectFunctionCreator,
 	})
 	instance.ObjectFieldIndex = index.NewObjectFieldIndexCreator(&index.ObjectFieldIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,

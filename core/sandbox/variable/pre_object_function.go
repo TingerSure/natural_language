@@ -12,10 +12,16 @@ const (
 	FunctionPreObjectFunctionType = "pre_object"
 )
 
+type PreObjectFunctionSeed interface {
+	ToLanguage(string, *PreObjectFunction) string
+	Type() string
+}
+
 type PreObjectFunction struct {
 	*adaptor.AdaptorFunction
 	function concept.Function
 	object   concept.Object
+	seed     PreObjectFunctionSeed
 }
 
 func (f *PreObjectFunction) ParamFormat(params *concept.Mapping) *concept.Mapping {
@@ -26,16 +32,8 @@ func (f *PreObjectFunction) ReturnFormat(back concept.String) concept.String {
 	return f.AdaptorFunction.AdaptorReturnFormat(f, back)
 }
 
-var (
-	PreObjectFunctionLanguageSeeds = map[string]func(string, *PreObjectFunction) string{}
-)
-
 func (f *PreObjectFunction) ToLanguage(language string) string {
-	seed := PreObjectFunctionLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (s *PreObjectFunction) ParamNames() []concept.String {
@@ -58,7 +56,7 @@ func (f *PreObjectFunction) Exec(params concept.Param, object concept.Object) (c
 }
 
 func (s *PreObjectFunction) Type() string {
-	return VariablePreObjectFunctionType
+	return s.seed.Type()
 }
 
 func (s *PreObjectFunction) FunctionType() string {
@@ -69,7 +67,15 @@ func (s *PreObjectFunction) Name() concept.String {
 	return s.function.Name()
 }
 
-func NewPreObjectFunction(
+type PreObjectFunctionCreatorParam struct {
+}
+
+type PreObjectFunctionCreator struct {
+	Seeds map[string]func(string, *PreObjectFunction) string
+	param *PreObjectFunctionCreatorParam
+}
+
+func (s *PreObjectFunctionCreator) New(
 	function concept.Function,
 	object concept.Object,
 ) *PreObjectFunction {
@@ -77,5 +83,25 @@ func NewPreObjectFunction(
 		AdaptorFunction: adaptor.NewAdaptorFunction(),
 		function:        function,
 		object:          object,
+		seed:            s,
+	}
+}
+
+func (s *PreObjectFunctionCreator) ToLanguage(language string, instance *PreObjectFunction) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *PreObjectFunctionCreator) Type() string {
+	return VariablePreObjectFunctionType
+}
+
+func NewPreObjectFunctionCreator(param *PreObjectFunctionCreatorParam) *PreObjectFunctionCreator {
+	return &PreObjectFunctionCreator{
+		Seeds: map[string]func(string, *PreObjectFunction) string{},
+		param: param,
 	}
 }

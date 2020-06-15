@@ -48,7 +48,7 @@ func (p *Number) GetVocabularyRules() []*tree.VocabularyRule {
 						if err != nil {
 							panic(err)
 						}
-						return index.NewConstIndex(variable.NewNumber(value))
+						return libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.Number.New(value))
 					},
 					Content: treasure,
 					Types:   phrase_type.Number,

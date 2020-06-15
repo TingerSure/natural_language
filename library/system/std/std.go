@@ -42,12 +42,12 @@ func (s *Std) Error(input concept.Param, object concept.Object) (concept.Param, 
 func NewStd(libs *runtime.LibraryManager, param *StdParam) *Std {
 	instance := &Std{
 		param:        param,
-		Page:         tree.NewPageAdaptor(),
-		PrintContent: variable.NewString(PrintContent),
-		ErrorContent: variable.NewString(ErrorContent),
+		Page:         tree.NewPageAdaptor(libs.Sandbox),
+		PrintContent: libs.Sandbox.Variable.String.New(PrintContent),
+		ErrorContent: libs.Sandbox.Variable.String.New(ErrorContent),
 	}
-	instance.SetFunction(variable.NewString("Print"), variable.NewSystemFunction(
-		variable.NewString("Print"),
+	instance.SetFunction(libs.Sandbox.Variable.String.New("Print"), libs.Sandbox.Variable.SystemFunction.New(
+		libs.Sandbox.Variable.String.New("Print"),
 		instance.Print,
 		[]concept.String{
 			instance.PrintContent,
@@ -56,8 +56,8 @@ func NewStd(libs *runtime.LibraryManager, param *StdParam) *Std {
 			instance.PrintContent,
 		},
 	))
-	instance.SetFunction(variable.NewString("Error"), variable.NewSystemFunction(
-		variable.NewString("Error"),
+	instance.SetFunction(libs.Sandbox.Variable.String.New("Error"), libs.Sandbox.Variable.SystemFunction.New(
+		libs.Sandbox.Variable.String.New("Error"),
 		instance.Error,
 		[]concept.String{
 			instance.ErrorContent,
@@ -66,7 +66,7 @@ func NewStd(libs *runtime.LibraryManager, param *StdParam) *Std {
 			instance.ErrorContent,
 		},
 	))
-	instance.SetConst(variable.NewString("PrintContent"), instance.PrintContent)
-	instance.SetConst(variable.NewString("ErrorContent"), instance.ErrorContent)
+	instance.SetConst(libs.Sandbox.Variable.String.New("PrintContent"), instance.PrintContent)
+	instance.SetConst(libs.Sandbox.Variable.String.New("ErrorContent"), instance.ErrorContent)
 	return instance
 }

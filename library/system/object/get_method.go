@@ -12,23 +12,23 @@ var (
 	GetMethodKeyName      = "key"
 	GetMethodFunctionName = "function"
 
-	GetMethodObjectErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetMethodObjectErrorException"))
-	GetMethodKeyErrorExceptionTemplate    = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetMethodKeyErrorException"))
-	GetMethodKeyNotExistExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetMethodKeyNotExistException"))
+	GetMethodObjectErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("GetMethodObjectErrorException"))
+	GetMethodKeyErrorExceptionTemplate    = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("GetMethodKeyErrorException"))
+	GetMethodKeyNotExistExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("GetMethodKeyNotExistException"))
 )
 
 func initGetMethod(instance *Object) {
-	GetMethodContent := variable.NewString(GetMethodContentName)
-	GetMethodKey := variable.NewString(GetMethodKeyName)
-	GetMethodFunction := variable.NewString(GetMethodFunctionName)
+	GetMethodContent := libs.Sandbox.Variable.String.New(GetMethodContentName)
+	GetMethodKey := libs.Sandbox.Variable.String.New(GetMethodKeyName)
+	GetMethodFunction := libs.Sandbox.Variable.String.New(GetMethodFunctionName)
 
 	GetMethodObjectErrorException := GetMethodObjectErrorExceptionTemplate.Copy()
 	GetMethodKeyErrorException := GetMethodKeyErrorExceptionTemplate.Copy()
 	GetMethodKeyNotExistException := GetMethodKeyNotExistExceptionTemplate.Copy()
 
 	var GetMethod concept.Function
-	GetMethod = variable.NewSystemFunction(
-		variable.NewString("GetMethod"),
+	GetMethod = libs.Sandbox.Variable.SystemFunction.New(
+		libs.Sandbox.Variable.String.New("GetMethod"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(GetMethodContent))
 			if !ok {
@@ -48,7 +48,7 @@ func initGetMethod(instance *Object) {
 				return nil, suspend.AddStack(GetMethod)
 			}
 
-			return variable.NewParam().Set(GetMethodFunction, function), nil
+			return libs.Sandbox.Variable.Param.New().Set(GetMethodFunction, function), nil
 		},
 		[]concept.String{
 			GetMethodContent,
@@ -59,14 +59,14 @@ func initGetMethod(instance *Object) {
 		},
 	)
 
-	instance.SetException(variable.NewString("GetMethodObjectErrorException"), GetMethodObjectErrorException)
-	instance.SetException(variable.NewString("GetMethodKeyErrorException"), GetMethodKeyErrorException)
-	instance.SetException(variable.NewString("GetMethodKeyNotExistException"), GetMethodKeyNotExistException)
+	instance.SetException(libs.Sandbox.Variable.String.New("GetMethodObjectErrorException"), GetMethodObjectErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("GetMethodKeyErrorException"), GetMethodKeyErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("GetMethodKeyNotExistException"), GetMethodKeyNotExistException)
 
-	instance.SetConst(variable.NewString("GetMethodContent"), GetMethodContent)
-	instance.SetConst(variable.NewString("GetMethodKey"), GetMethodKey)
-	instance.SetConst(variable.NewString("GetMethodFunction"), GetMethodFunction)
+	instance.SetConst(libs.Sandbox.Variable.String.New("GetMethodContent"), GetMethodContent)
+	instance.SetConst(libs.Sandbox.Variable.String.New("GetMethodKey"), GetMethodKey)
+	instance.SetConst(libs.Sandbox.Variable.String.New("GetMethodFunction"), GetMethodFunction)
 
-	instance.SetFunction(variable.NewString("GetMethod"), GetMethod)
+	instance.SetFunction(libs.Sandbox.Variable.String.New("GetMethod"), GetMethod)
 
 }

@@ -50,7 +50,7 @@ func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(set)
+						return libs.Sandbox.Index.ConstIndex.New(set)
 					},
 					Content: treasure,
 					Types:   phrase_type.Set,
@@ -68,8 +68,8 @@ func NewSet(param *adaptor.SourceAdaptorParam) *Set {
 
 	setPage := set.Libs.GetLibraryPage("system", "set")
 
-	set.Is = setPage.GetConst(variable.NewString("Is"))
-	set.Equal = setPage.GetConst(variable.NewString("Equal"))
+	set.Is = setPage.GetConst(libs.Sandbox.Variable.String.New("Is"))
+	set.Equal = setPage.GetConst(libs.Sandbox.Variable.String.New("Equal"))
 
 	return set
 }

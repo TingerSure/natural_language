@@ -11,22 +11,22 @@ var (
 	HasFieldKeyName     = "key"
 	HasFieldExistName   = "exist"
 
-	HasFieldObjectErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasFieldObjectErrorException"))
-	HasFieldKeyErrorExceptionTemplate    = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasFieldKeyErrorException"))
+	HasFieldObjectErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("HasFieldObjectErrorException"))
+	HasFieldKeyErrorExceptionTemplate    = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("HasFieldKeyErrorException"))
 )
 
 func initHasField(instance *Object) {
 
-	HasFieldContent := variable.NewString(HasFieldContentName)
-	HasFieldKey := variable.NewString(HasFieldKeyName)
-	HasFieldExist := variable.NewString(HasFieldExistName)
+	HasFieldContent := libs.Sandbox.Variable.String.New(HasFieldContentName)
+	HasFieldKey := libs.Sandbox.Variable.String.New(HasFieldKeyName)
+	HasFieldExist := libs.Sandbox.Variable.String.New(HasFieldExistName)
 
 	HasFieldObjectErrorException := HasFieldObjectErrorExceptionTemplate.Copy()
 	HasFieldKeyErrorException := HasFieldKeyErrorExceptionTemplate.Copy()
 
 	var HasField concept.Function
-	HasField = variable.NewSystemFunction(
-		variable.NewString("HasField"),
+	HasField = libs.Sandbox.Variable.SystemFunction.New(
+		libs.Sandbox.Variable.String.New("HasField"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(HasFieldContent))
 			if !ok {
@@ -38,7 +38,7 @@ func initHasField(instance *Object) {
 				return nil, HasFieldKeyErrorException.Copy().AddStack(HasField)
 			}
 
-			return variable.NewParam().Set(HasFieldExist, variable.NewBool(object.HasField(key))), nil
+			return libs.Sandbox.Variable.Param.New().Set(HasFieldExist, variable.NewBool(object.HasField(key))), nil
 		},
 		[]concept.String{
 			HasFieldContent,
@@ -49,13 +49,13 @@ func initHasField(instance *Object) {
 		},
 	)
 
-	instance.SetException(variable.NewString("HasFieldObjectErrorException"), HasFieldObjectErrorException)
-	instance.SetException(variable.NewString("HasFieldKeyErrorException"), HasFieldKeyErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("HasFieldObjectErrorException"), HasFieldObjectErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("HasFieldKeyErrorException"), HasFieldKeyErrorException)
 
-	instance.SetConst(variable.NewString("HasFieldContent"), HasFieldContent)
-	instance.SetConst(variable.NewString("HasFieldKey"), HasFieldKey)
-	instance.SetConst(variable.NewString("HasFieldExist"), HasFieldExist)
+	instance.SetConst(libs.Sandbox.Variable.String.New("HasFieldContent"), HasFieldContent)
+	instance.SetConst(libs.Sandbox.Variable.String.New("HasFieldKey"), HasFieldKey)
+	instance.SetConst(libs.Sandbox.Variable.String.New("HasFieldExist"), HasFieldExist)
 
-	instance.SetFunction(variable.NewString("HasField"), HasField)
+	instance.SetFunction(libs.Sandbox.Variable.String.New("HasField"), HasField)
 
 }

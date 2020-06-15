@@ -13,7 +13,7 @@ type Object struct {
 
 func NewObject(libs *runtime.LibraryManager, autoNumber *auto_number.AutoNumber) *Object {
 	instance := &Object{
-		Page:       tree.NewPageAdaptor(),
+		Page:       tree.NewPageAdaptor(libs.Sandbox),
 		AutoNumber: autoNumber,
 	}
 	initCreate(instance)

@@ -12,10 +12,10 @@ type Set struct {
 
 func NewSet(libs *runtime.LibraryManager) *Set {
 	instance := &Set{
-		Page: tree.NewPageAdaptor(),
+		Page: tree.NewPageAdaptor(libs.Sandbox),
 	}
 
-	instance.SetConst(variable.NewString("Is"), variable.NewString("Is"))
-	instance.SetConst(variable.NewString("Equal"), variable.NewString("Equal"))
+	instance.SetConst(libs.Sandbox.Variable.String.New("Is"), libs.Sandbox.Variable.String.New("Is"))
+	instance.SetConst(libs.Sandbox.Variable.String.New("Equal"), libs.Sandbox.Variable.String.New("Equal"))
 	return instance
 }

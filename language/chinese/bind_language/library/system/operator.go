@@ -10,10 +10,10 @@ import (
 func OperatorBindLanguage(libs *runtime.LibraryManager, language string) {
 	operator := libs.GetLibraryPage("system", "operator")
 
-	AdditionFunc := operator.GetFunction(variable.NewString("AdditionFunc"))
-	AdditionLeft := operator.GetConst(variable.NewString("AdditionLeft"))
-	AdditionRight := operator.GetConst(variable.NewString("AdditionRight"))
-	AdditionResult := operator.GetConst(variable.NewString("AdditionResult"))
+	AdditionFunc := operator.GetFunction(libs.Sandbox.Variable.String.New("AdditionFunc"))
+	AdditionLeft := operator.GetConst(libs.Sandbox.Variable.String.New("AdditionLeft"))
+	AdditionRight := operator.GetConst(libs.Sandbox.Variable.String.New("AdditionRight"))
+	AdditionResult := operator.GetConst(libs.Sandbox.Variable.String.New("AdditionResult"))
 
 	AdditionLeft.SetLanguage(language, "被加数")
 	AdditionRight.SetLanguage(language, "加数")
@@ -27,10 +27,10 @@ func OperatorBindLanguage(libs *runtime.LibraryManager, language string) {
 		return fmt.Sprintf("%v加上%v", left.ToLanguage(language), right.ToLanguage(language))
 	})
 
-	SubtractionFunc := operator.GetFunction(variable.NewString("SubtractionFunc"))
-	SubtractionLeft := operator.GetConst(variable.NewString("SubtractionLeft"))
-	SubtractionRight := operator.GetConst(variable.NewString("SubtractionRight"))
-	SubtractionResult := operator.GetConst(variable.NewString("SubtractionResult"))
+	SubtractionFunc := operator.GetFunction(libs.Sandbox.Variable.String.New("SubtractionFunc"))
+	SubtractionLeft := operator.GetConst(libs.Sandbox.Variable.String.New("SubtractionLeft"))
+	SubtractionRight := operator.GetConst(libs.Sandbox.Variable.String.New("SubtractionRight"))
+	SubtractionResult := operator.GetConst(libs.Sandbox.Variable.String.New("SubtractionResult"))
 
 	SubtractionLeft.SetLanguage(language, "被减数")
 	SubtractionRight.SetLanguage(language, "减数")
@@ -44,10 +44,10 @@ func OperatorBindLanguage(libs *runtime.LibraryManager, language string) {
 		return fmt.Sprintf("%v减去%v", left.ToLanguage(language), right.ToLanguage(language))
 	})
 
-	MultiplicationFunc := operator.GetFunction(variable.NewString("MultiplicationFunc"))
-	MultiplicationLeft := operator.GetConst(variable.NewString("MultiplicationLeft"))
-	MultiplicationRight := operator.GetConst(variable.NewString("MultiplicationRight"))
-	MultiplicationResult := operator.GetConst(variable.NewString("MultiplicationResult"))
+	MultiplicationFunc := operator.GetFunction(libs.Sandbox.Variable.String.New("MultiplicationFunc"))
+	MultiplicationLeft := operator.GetConst(libs.Sandbox.Variable.String.New("MultiplicationLeft"))
+	MultiplicationRight := operator.GetConst(libs.Sandbox.Variable.String.New("MultiplicationRight"))
+	MultiplicationResult := operator.GetConst(libs.Sandbox.Variable.String.New("MultiplicationResult"))
 
 	MultiplicationLeft.SetLanguage(language, "被乘数")
 	MultiplicationRight.SetLanguage(language, "乘数")
@@ -61,10 +61,10 @@ func OperatorBindLanguage(libs *runtime.LibraryManager, language string) {
 		return fmt.Sprintf("%v乘以%v", left.ToLanguage(language), right.ToLanguage(language))
 	})
 
-	DivisionFunc := operator.GetFunction(variable.NewString("DivisionFunc"))
-	DivisionLeft := operator.GetConst(variable.NewString("DivisionLeft"))
-	DivisionRight := operator.GetConst(variable.NewString("DivisionRight"))
-	DivisionResult := operator.GetConst(variable.NewString("DivisionResult"))
+	DivisionFunc := operator.GetFunction(libs.Sandbox.Variable.String.New("DivisionFunc"))
+	DivisionLeft := operator.GetConst(libs.Sandbox.Variable.String.New("DivisionLeft"))
+	DivisionRight := operator.GetConst(libs.Sandbox.Variable.String.New("DivisionRight"))
+	DivisionResult := operator.GetConst(libs.Sandbox.Variable.String.New("DivisionResult"))
 
 	DivisionLeft.SetLanguage(language, "被除数")
 	DivisionRight.SetLanguage(language, "除数")

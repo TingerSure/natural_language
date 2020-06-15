@@ -58,6 +58,6 @@ func NewResult(param *adaptor.SourceAdaptorParam) *Result {
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 	page := instance.Libs.GetLibraryPage("system", "pronoun")
-	instance.ResultIndex = page.GetIndex(variable.NewString("Result"))
+	instance.ResultIndex = page.GetIndex(libs.Sandbox.Variable.String.New("Result"))
 	return instance
 }

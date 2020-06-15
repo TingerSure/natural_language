@@ -11,6 +11,7 @@ type ObjectMethodIndexSeed interface {
 	ToLanguage(string, *ObjectMethodIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
+	NewPreObjectFunction(concept.Function, concept.Object) *variable.PreObjectFunction
 }
 
 type ObjectMethodIndex struct {
@@ -58,7 +59,7 @@ func (s *ObjectMethodIndex) Get(space concept.Closure) (concept.Variable, concep
 		return nil, s.seed.NewException("runtime error", fmt.Sprintf("Object don't have a method named %s.", s.key))
 	}
 
-	return variable.NewPreObjectFunction(function, object), nil
+	return s.seed.NewPreObjectFunction(function, object), nil
 }
 
 func (s *ObjectMethodIndex) Set(space concept.Closure, preFunction concept.Variable) concept.Interrupt {
@@ -80,7 +81,8 @@ func (s *ObjectMethodIndex) Set(space concept.Closure, preFunction concept.Varia
 }
 
 type ObjectMethodIndexCreatorParam struct {
-	ExceptionCreator func(string, string) concept.Exception
+	ExceptionCreator         func(string, string) concept.Exception
+	PreObjectFunctionCreator func(concept.Function, concept.Object) *variable.PreObjectFunction
 }
 
 type ObjectMethodIndexCreator struct {
@@ -109,6 +111,10 @@ func (s *ObjectMethodIndexCreator) Type() string {
 
 func (s *ObjectMethodIndexCreator) NewException(name string, message string) concept.Exception {
 	return s.param.ExceptionCreator(name, message)
+}
+
+func (s *ObjectMethodIndexCreator) NewPreObjectFunction(function concept.Function, object concept.Object) *variable.PreObjectFunction {
+	return s.param.PreObjectFunctionCreator(function, object)
 }
 
 func NewObjectMethodIndexCreator(param *ObjectMethodIndexCreatorParam) *ObjectMethodIndexCreator {

@@ -24,13 +24,13 @@ type AutoNumber struct {
 
 func NewAutoNumber(libs *runtime.LibraryManager) *AutoNumber {
 	instance := &AutoNumber{
-		Page:                 tree.NewPageAdaptor(),
-		AutoNumberValue:      variable.NewString(AutoNumberValueName),
-		AutoNumberClassValue: variable.NewString(AutoNumberClassValueName),
+		Page:                 tree.NewPageAdaptor(libs.Sandbox),
+		AutoNumberValue:      libs.Sandbox.Variable.String.New(AutoNumberValueName),
+		AutoNumberClassValue: libs.Sandbox.Variable.String.New(AutoNumberClassValueName),
 		AutoNumberClass:      variable.NewClass(AutoNumberClassName),
 	}
 
-	instance.AutoNumberClass.SetField(instance.AutoNumberClassValue, variable.NewNumber(0))
+	instance.AutoNumberClass.SetField(instance.AutoNumberClassValue, libs.Sandbox.Variable.Number.New(0))
 
 	instance.NewAutoNumberObject = func(value *variable.Number) concept.Object {
 		auto := variable.NewObject()
@@ -47,9 +47,9 @@ func NewAutoNumber(libs *runtime.LibraryManager) *AutoNumber {
 
 	initAddition(instance)
 
-	instance.SetClass(variable.NewString("AutoNumberClass"), instance.AutoNumberClass)
-	instance.SetConst(variable.NewString("AutoNumberClassValue"), instance.AutoNumberClassValue)
-	instance.SetConst(variable.NewString("AutoNumberValue"), instance.AutoNumberValue)
+	instance.SetClass(libs.Sandbox.Variable.String.New("AutoNumberClass"), instance.AutoNumberClass)
+	instance.SetConst(libs.Sandbox.Variable.String.New("AutoNumberClassValue"), instance.AutoNumberClassValue)
+	instance.SetConst(libs.Sandbox.Variable.String.New("AutoNumberValue"), instance.AutoNumberValue)
 
 	return instance
 }

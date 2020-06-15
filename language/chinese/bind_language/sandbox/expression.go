@@ -12,8 +12,7 @@ import (
 )
 
 func ExpressionBindLanguage(libs *runtime.LibraryManager, language string) {
-
-	expression.NewParamLanguageSeeds[language] = func(language string, instance *expression.NewParam) string {
+	libs.Sandbox.Expression.NewParam.Seeds[language] = func(language string, instance *expression.NewParam) string {
 		items := []string{}
 
 		instance.Iterate(func(key concept.String, value concept.Index) bool {
@@ -25,7 +24,7 @@ func ExpressionBindLanguage(libs *runtime.LibraryManager, language string) {
 
 	}
 
-	expression.ParamGetLanguageSeeds[language] = func(language string, instance *expression.ParamGet) string {
+	libs.Sandbox.Expression.ParamGet.Seeds[language] = func(language string, instance *expression.ParamGet) string {
 		key := instance.Key()
 		callIndex, yesCallIndex := instance.Param().(*expression.Call)
 		if yesCallIndex {
@@ -44,12 +43,12 @@ func ExpressionBindLanguage(libs *runtime.LibraryManager, language string) {
 
 	}
 
-	expression.CallLanguageSeeds[language] = func(language string, instance *expression.Call) string {
+	libs.Sandbox.Expression.Call.Seeds[language] = func(language string, instance *expression.Call) string {
 
 		var funcs concept.Function = nil
 		param := concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: variable.NewNull(),
+			EmptyValue: libs.Sandbox.Variable.Null.New(),
 		})
 		paramCanUse := false
 

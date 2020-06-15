@@ -36,10 +36,10 @@ func (p *AnyFromAnyBelongAny) GetStructRules() []*tree.StructRule {
 			Create: func() tree.Phrase {
 				return tree.NewPhraseStructAdaptor(&tree.PhraseStructAdaptorParam{
 					Index: func(phrase []tree.Phrase) concept.Index {
-						return expression.NewParamGet(
-							expression.NewCall(
-								index.NewConstIndex(p.GetField),
-								expression.NewNewParamWithInit(map[concept.String]concept.Index{
+						return libs.Sandbox.Expression.ParamGet.New(
+							libs.Sandbox.Expression.Call.New(
+								libs.Sandbox.Index.ConstIndex.New(p.GetField),
+								libs.Sandbox.Expression.NewParam.New().Init(map[concept.String]concept.Index{
 									p.GetFieldContent: phrase[0].Index(),
 									p.GetFieldKey:     phrase[2].Index(),
 								}),
@@ -68,10 +68,10 @@ func NewAnyFromAnyBelongAny(param *adaptor.SourceAdaptorParam) *AnyFromAnyBelong
 	})
 	libObject := instance.Libs.GetLibraryPage("system", "object")
 
-	instance.GetFieldValue = libObject.GetConst(variable.NewString("GetFieldValue"))
-	instance.GetFieldKey = libObject.GetConst(variable.NewString("GetFieldKey"))
-	instance.GetFieldContent = libObject.GetConst(variable.NewString("GetFieldContent"))
-	instance.GetField = libObject.GetFunction(variable.NewString("GetField"))
+	instance.GetFieldValue = libObject.GetConst(libs.Sandbox.Variable.String.New("GetFieldValue"))
+	instance.GetFieldKey = libObject.GetConst(libs.Sandbox.Variable.String.New("GetFieldKey"))
+	instance.GetFieldContent = libObject.GetConst(libs.Sandbox.Variable.String.New("GetFieldContent"))
+	instance.GetField = libObject.GetFunction(libs.Sandbox.Variable.String.New("GetField"))
 
 	return instance
 }

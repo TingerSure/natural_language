@@ -16,7 +16,7 @@ const (
 
 var (
 	RightWord  []*tree.Word = []*tree.Word{tree.NewWord(RightCharactor)}
-	RightIndex              = variable.NewString(RightCharactor)
+	RightIndex              = libs.Sandbox.Variable.String.New(RightCharactor)
 )
 
 type BracketsRight struct {
@@ -39,7 +39,7 @@ func (s *BracketsRight) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(RightIndex.Clone())
+						return libs.Sandbox.Index.ConstIndex.New(RightIndex.Clone())
 					},
 					Content: treasure,
 					Types:   phrase_type.BracketsRight,

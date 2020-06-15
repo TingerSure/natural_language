@@ -38,7 +38,7 @@ func (p *HowMany) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(p.HowManyFunc)
+						return libs.Sandbox.Index.ConstIndex.New(p.HowManyFunc)
 					},
 					Content: treasure,
 					Types:   phrase_type.Question,
@@ -54,7 +54,7 @@ func NewHowMany(param *adaptor.SourceAdaptorParam) *HowMany {
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 	page := instance.Libs.GetLibraryPage("system", "question")
-	instance.HowManyFunc = page.GetFunction(variable.NewString("HowMany"))
+	instance.HowManyFunc = page.GetFunction(libs.Sandbox.Variable.String.New("HowMany"))
 
 	return instance
 }

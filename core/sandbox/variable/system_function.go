@@ -10,12 +10,18 @@ const (
 	FunctionSystemFunctionType = "system"
 )
 
+type SystemFunctionSeed interface {
+	ToLanguage(string, *SystemFunction) string
+	Type() string
+}
+
 type SystemFunction struct {
 	*adaptor.AdaptorFunction
 	name        concept.String
 	paramNames  []concept.String
 	returnNames []concept.String
 	funcs       func(concept.Param, concept.Object) (concept.Param, concept.Exception)
+	seed        SystemFunctionSeed
 }
 
 func (f *SystemFunction) ParamFormat(params *concept.Mapping) *concept.Mapping {
@@ -26,16 +32,8 @@ func (f *SystemFunction) ReturnFormat(back concept.String) concept.String {
 	return f.AdaptorFunction.AdaptorReturnFormat(f, back)
 }
 
-var (
-	SystemFunctionLanguageSeeds = map[string]func(string, *SystemFunction) string{}
-)
-
 func (f *SystemFunction) ToLanguage(language string) string {
-	seed := SystemFunctionLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (s *SystemFunction) Name() concept.String {
@@ -59,14 +57,22 @@ func (f *SystemFunction) Exec(params concept.Param, object concept.Object) (conc
 }
 
 func (s *SystemFunction) Type() string {
-	return VariableSystemFunctionType
+	return s.seed.Type()
 }
 
 func (s *SystemFunction) FunctionType() string {
 	return FunctionSystemFunctionType
 }
 
-func NewSystemFunction(
+type SystemFunctionCreatorParam struct {
+}
+
+type SystemFunctionCreator struct {
+	Seeds map[string]func(string, *SystemFunction) string
+	param *SystemFunctionCreatorParam
+}
+
+func (s *SystemFunctionCreator) New(
 	name concept.String,
 	funcs func(concept.Param, concept.Object) (concept.Param, concept.Exception),
 	paramNames []concept.String,
@@ -78,5 +84,25 @@ func NewSystemFunction(
 		funcs:           funcs,
 		paramNames:      paramNames,
 		returnNames:     returnNames,
+		seed:            s,
+	}
+}
+
+func (s *SystemFunctionCreator) ToLanguage(language string, instance *SystemFunction) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *SystemFunctionCreator) Type() string {
+	return VariableSystemFunctionType
+}
+
+func NewSystemFunctionCreator(param *SystemFunctionCreatorParam) *SystemFunctionCreator {
+	return &SystemFunctionCreator{
+		Seeds: map[string]func(string, *SystemFunction) string{},
+		param: param,
 	}
 }

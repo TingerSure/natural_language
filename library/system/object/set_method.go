@@ -12,15 +12,15 @@ var (
 	SetMethodKeyName      = "key"
 	SetMethodFunctionName = "function"
 
-	SetMethodObjectErrorExceptionTemplate   = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetMethodObjectErrorException"))
-	SetMethodKeyErrorExceptionTemplate      = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetMethodKeyErrorException"))
-	SetMethodFunctionErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetMethodFunctionErrorException"))
+	SetMethodObjectErrorExceptionTemplate   = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("SetMethodObjectErrorException"))
+	SetMethodKeyErrorExceptionTemplate      = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("SetMethodKeyErrorException"))
+	SetMethodFunctionErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("SetMethodFunctionErrorException"))
 )
 
 func initSetMethod(instance *Object) {
-	SetMethodContent := variable.NewString(SetMethodContentName)
-	SetMethodKey := variable.NewString(SetMethodKeyName)
-	SetMethodFunction := variable.NewString(SetMethodFunctionName)
+	SetMethodContent := libs.Sandbox.Variable.String.New(SetMethodContentName)
+	SetMethodKey := libs.Sandbox.Variable.String.New(SetMethodKeyName)
+	SetMethodFunction := libs.Sandbox.Variable.String.New(SetMethodFunctionName)
 
 	SetMethodObjectErrorException := SetMethodObjectErrorExceptionTemplate.Copy()
 	SetMethodKeyErrorException := SetMethodKeyErrorExceptionTemplate.Copy()
@@ -28,8 +28,8 @@ func initSetMethod(instance *Object) {
 
 	var SetMethod concept.Function
 
-	SetMethod = variable.NewSystemFunction(
-		variable.NewString("SetMethod"),
+	SetMethod = libs.Sandbox.Variable.SystemFunction.New(
+		libs.Sandbox.Variable.String.New("SetMethod"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(SetMethodContent))
 			if !ok {
@@ -51,7 +51,7 @@ func initSetMethod(instance *Object) {
 				return nil, suspend.AddStack(SetMethod)
 			}
 
-			return variable.NewParam().Set(SetMethodContent, object), nil
+			return libs.Sandbox.Variable.Param.New().Set(SetMethodContent, object), nil
 		},
 		[]concept.String{
 			SetMethodContent,
@@ -63,14 +63,14 @@ func initSetMethod(instance *Object) {
 		},
 	)
 
-	instance.SetException(variable.NewString("SetMethodObjectErrorException"), SetMethodObjectErrorException)
-	instance.SetException(variable.NewString("SetMethodKeyErrorException"), SetMethodKeyErrorException)
-	instance.SetException(variable.NewString("SetMethodFunctionErrorException"), SetMethodFunctionErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("SetMethodObjectErrorException"), SetMethodObjectErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("SetMethodKeyErrorException"), SetMethodKeyErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("SetMethodFunctionErrorException"), SetMethodFunctionErrorException)
 
-	instance.SetConst(variable.NewString("SetMethodContent"), SetMethodContent)
-	instance.SetConst(variable.NewString("SetMethodKey"), SetMethodKey)
-	instance.SetConst(variable.NewString("SetMethodFunction"), SetMethodFunction)
+	instance.SetConst(libs.Sandbox.Variable.String.New("SetMethodContent"), SetMethodContent)
+	instance.SetConst(libs.Sandbox.Variable.String.New("SetMethodKey"), SetMethodKey)
+	instance.SetConst(libs.Sandbox.Variable.String.New("SetMethodFunction"), SetMethodFunction)
 
-	instance.SetFunction(variable.NewString("SetMethod"), SetMethod)
+	instance.SetFunction(libs.Sandbox.Variable.String.New("SetMethod"), SetMethod)
 
 }

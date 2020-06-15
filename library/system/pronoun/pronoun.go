@@ -17,21 +17,21 @@ type Pronoun struct {
 
 func NewPronoun(libs *runtime.LibraryManager) *Pronoun {
 	instance := &Pronoun{
-		Page: tree.NewPageAdaptor(),
-		It: index.NewSearchIndex([]concept.Matcher{
+		Page: tree.NewPageAdaptor(libs.Sandbox),
+		It: libs.Sandbox.Index.SearchIndex.New([]concept.Matcher{
 			matcher.NewSystemMatcher(func(concept.Variable) bool {
 				return true
 			}),
 		}),
-		Result: index.NewResaultIndex([]concept.Matcher{
+		Result: libs.Sandbox.Index.ResaultIndex.New([]concept.Matcher{
 			matcher.NewSystemMatcher(func(concept.Variable) bool {
 				return true
 			}),
 		}),
 	}
 
-	instance.SetIndex(variable.NewString("It"), instance.It)
-	instance.SetIndex(variable.NewString("Result"), instance.Result)
+	instance.SetIndex(libs.Sandbox.Variable.String.New("It"), instance.It)
+	instance.SetIndex(libs.Sandbox.Variable.String.New("Result"), instance.Result)
 
 	return instance
 }

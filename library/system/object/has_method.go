@@ -11,21 +11,21 @@ var (
 	HasMethodKeyName     = "key"
 	HasMethodExistName   = "exist"
 
-	HasMethodObjectErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasMethodObjectErrorException"))
-	HasMethodKeyErrorExceptionTemplate    = interrupt.NewException(variable.NewString("type error"), variable.NewString("HasMethodKeyErrorException"))
+	HasMethodObjectErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("HasMethodObjectErrorException"))
+	HasMethodKeyErrorExceptionTemplate    = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("HasMethodKeyErrorException"))
 )
 
 func initHasMethod(instance *Object) {
-	HasMethodContent := variable.NewString(HasMethodContentName)
-	HasMethodKey := variable.NewString(HasMethodKeyName)
-	HasMethodExist := variable.NewString(HasMethodExistName)
+	HasMethodContent := libs.Sandbox.Variable.String.New(HasMethodContentName)
+	HasMethodKey := libs.Sandbox.Variable.String.New(HasMethodKeyName)
+	HasMethodExist := libs.Sandbox.Variable.String.New(HasMethodExistName)
 
 	HasMethodObjectErrorException := HasMethodObjectErrorExceptionTemplate.Copy()
 	HasMethodKeyErrorException := HasMethodKeyErrorExceptionTemplate.Copy()
 
 	var HasMethod concept.Function
-	HasMethod = variable.NewSystemFunction(
-		variable.NewString("HasMethod"),
+	HasMethod = libs.Sandbox.Variable.SystemFunction.New(
+		libs.Sandbox.Variable.String.New("HasMethod"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(HasMethodContent))
 			if !ok {
@@ -37,7 +37,7 @@ func initHasMethod(instance *Object) {
 				return nil, HasMethodKeyErrorException.Copy().AddStack(HasMethod)
 			}
 
-			return variable.NewParam().Set(HasMethodExist, variable.NewBool(object.HasMethod(key))), nil
+			return libs.Sandbox.Variable.Param.New().Set(HasMethodExist, variable.NewBool(object.HasMethod(key))), nil
 		},
 		[]concept.String{
 			HasMethodContent,
@@ -48,13 +48,13 @@ func initHasMethod(instance *Object) {
 		},
 	)
 
-	instance.SetException(variable.NewString("HasMethodObjectErrorException"), HasMethodObjectErrorException)
-	instance.SetException(variable.NewString("HasMethodKeyErrorException"), HasMethodKeyErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("HasMethodObjectErrorException"), HasMethodObjectErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("HasMethodKeyErrorException"), HasMethodKeyErrorException)
 
-	instance.SetConst(variable.NewString("HasMethodContent"), HasMethodContent)
-	instance.SetConst(variable.NewString("HasMethodKey"), HasMethodKey)
-	instance.SetConst(variable.NewString("HasMethodExist"), HasMethodExist)
+	instance.SetConst(libs.Sandbox.Variable.String.New("HasMethodContent"), HasMethodContent)
+	instance.SetConst(libs.Sandbox.Variable.String.New("HasMethodKey"), HasMethodKey)
+	instance.SetConst(libs.Sandbox.Variable.String.New("HasMethodExist"), HasMethodExist)
 
-	instance.SetFunction(variable.NewString("HasMethod"), HasMethod)
+	instance.SetFunction(libs.Sandbox.Variable.String.New("HasMethod"), HasMethod)
 
 }

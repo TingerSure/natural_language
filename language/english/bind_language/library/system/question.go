@@ -10,9 +10,9 @@ import (
 func QuestionBindLanguage(libs *runtime.LibraryManager, language string) {
 	instance := libs.GetLibraryPage("system", "question")
 
-	HowManyParam := instance.GetConst(variable.NewString("HowManyParam"))
-	HowManyResult := instance.GetConst(variable.NewString("HowManyResult"))
-	HowMany := instance.GetFunction(variable.NewString("HowMany"))
+	HowManyParam := instance.GetConst(libs.Sandbox.Variable.String.New("HowManyParam"))
+	HowManyResult := instance.GetConst(libs.Sandbox.Variable.String.New("HowManyResult"))
+	HowMany := instance.GetFunction(libs.Sandbox.Variable.String.New("HowMany"))
 
 	HowManyParam.SetLanguage(language, "content")
 	HowManyResult.SetLanguage(language, "result")
@@ -23,9 +23,9 @@ func QuestionBindLanguage(libs *runtime.LibraryManager, language string) {
 
 	})
 
-	WhatParam := instance.GetConst(variable.NewString("WhatParam"))
-	WhatResult := instance.GetConst(variable.NewString("WhatResult"))
-	What := instance.GetFunction(variable.NewString("What"))
+	WhatParam := instance.GetConst(libs.Sandbox.Variable.String.New("WhatParam"))
+	WhatResult := instance.GetConst(libs.Sandbox.Variable.String.New("WhatResult"))
+	What := instance.GetFunction(libs.Sandbox.Variable.String.New("What"))
 
 	WhatParam.SetLanguage(language, "content")
 	WhatResult.SetLanguage(language, "result")

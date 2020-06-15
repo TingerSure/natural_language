@@ -12,23 +12,23 @@ var (
 	InitFieldKeyName          = "key"
 	InitFieldDefaultValueName = "default_value"
 
-	InitFieldObjectErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("InitFieldObjectErrorException"))
-	InitFieldKeyErrorExceptionTemplate    = interrupt.NewException(variable.NewString("type error"), variable.NewString("InitFieldKeyErrorException"))
-	InitFieldKeyExistExceptionTemplate    = interrupt.NewException(variable.NewString("type error"), variable.NewString("InitFieldKeyExistException"))
+	InitFieldObjectErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("InitFieldObjectErrorException"))
+	InitFieldKeyErrorExceptionTemplate    = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("InitFieldKeyErrorException"))
+	InitFieldKeyExistExceptionTemplate    = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("InitFieldKeyExistException"))
 )
 
 func initInitField(instance *Object) {
-	InitFieldContent := variable.NewString(InitFieldContentName)
-	InitFieldKey := variable.NewString(InitFieldKeyName)
-	InitFieldDefaultValue := variable.NewString(InitFieldDefaultValueName)
+	InitFieldContent := libs.Sandbox.Variable.String.New(InitFieldContentName)
+	InitFieldKey := libs.Sandbox.Variable.String.New(InitFieldKeyName)
+	InitFieldDefaultValue := libs.Sandbox.Variable.String.New(InitFieldDefaultValueName)
 
 	InitFieldObjectErrorException := InitFieldObjectErrorExceptionTemplate.Copy()
 	InitFieldKeyErrorException := InitFieldKeyErrorExceptionTemplate.Copy()
 	InitFieldKeyExistException := InitFieldKeyExistExceptionTemplate.Copy()
 
 	var InitField concept.Function
-	InitField = variable.NewSystemFunction(
-		variable.NewString("InitField"),
+	InitField = libs.Sandbox.Variable.SystemFunction.New(
+		libs.Sandbox.Variable.String.New("InitField"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(InitFieldContent))
 			if !ok {
@@ -45,7 +45,7 @@ func initInitField(instance *Object) {
 
 			defaultValue := input.Get(InitFieldDefaultValue)
 			if nl_interface.IsNil(defaultValue) {
-				defaultValue = variable.NewNull()
+				defaultValue = libs.Sandbox.Variable.Null.New()
 			}
 
 			suspend := object.InitField(key, defaultValue)
@@ -53,7 +53,7 @@ func initInitField(instance *Object) {
 				return nil, suspend.AddStack(InitField)
 			}
 
-			return variable.NewParam().Set(InitFieldContent, object), nil
+			return libs.Sandbox.Variable.Param.New().Set(InitFieldContent, object), nil
 		},
 		[]concept.String{
 			InitFieldContent,
@@ -65,14 +65,14 @@ func initInitField(instance *Object) {
 		},
 	)
 
-	instance.SetException(variable.NewString("InitFieldObjectErrorException"), InitFieldObjectErrorException)
-	instance.SetException(variable.NewString("InitFieldKeyErrorException"), InitFieldKeyErrorException)
-	instance.SetException(variable.NewString("InitFieldKeyExistException"), InitFieldKeyExistException)
+	instance.SetException(libs.Sandbox.Variable.String.New("InitFieldObjectErrorException"), InitFieldObjectErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("InitFieldKeyErrorException"), InitFieldKeyErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("InitFieldKeyExistException"), InitFieldKeyExistException)
 
-	instance.SetConst(variable.NewString("InitFieldContent"), InitFieldContent)
-	instance.SetConst(variable.NewString("InitFieldKey"), InitFieldKey)
-	instance.SetConst(variable.NewString("InitFieldDefaultValue"), InitFieldDefaultValue)
+	instance.SetConst(libs.Sandbox.Variable.String.New("InitFieldContent"), InitFieldContent)
+	instance.SetConst(libs.Sandbox.Variable.String.New("InitFieldKey"), InitFieldKey)
+	instance.SetConst(libs.Sandbox.Variable.String.New("InitFieldDefaultValue"), InitFieldDefaultValue)
 
-	instance.SetFunction(variable.NewString("InitField"), InitField)
+	instance.SetFunction(libs.Sandbox.Variable.String.New("InitField"), InitField)
 
 }

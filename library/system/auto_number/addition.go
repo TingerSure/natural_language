@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	AdditionTargetNotExistExceptionTemplate           = interrupt.NewException(variable.NewString("type error"), variable.NewString("AdditionTargetNotExistException"))
-	AdditionAutoObjectValueTypeErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("AdditionAutoObjectValueTypeErrorException"))
+	AdditionTargetNotExistExceptionTemplate           = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("AdditionTargetNotExistException"))
+	AdditionAutoObjectValueTypeErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("AdditionAutoObjectValueTypeErrorException"))
 
 	AdditionTargetName = "target"
 	AdditionResultName = "result"
@@ -18,15 +18,15 @@ var (
 
 func initAddition(instance *AutoNumber) {
 
-	AdditionTarget := variable.NewString(AdditionTargetName)
-	AdditionResult := variable.NewString(AdditionResultName)
-	AdditionKey := variable.NewString(AdditionKeyName)
+	AdditionTarget := libs.Sandbox.Variable.String.New(AdditionTargetName)
+	AdditionResult := libs.Sandbox.Variable.String.New(AdditionResultName)
+	AdditionKey := libs.Sandbox.Variable.String.New(AdditionKeyName)
 	AdditionTargetNotExistException := AdditionTargetNotExistExceptionTemplate.Copy()
 	AdditionAutoObjectValueTypeErrorException := AdditionAutoObjectValueTypeErrorExceptionTemplate.Copy()
 
 	var Addition concept.Function = nil
 
-	Addition = variable.NewSystemFunction(
+	Addition = libs.Sandbox.Variable.SystemFunction.New(
 		AdditionKey.Clone(),
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 			preLeft, suspend := object.GetField(instance.AutoNumberClassValue)
@@ -44,7 +44,7 @@ func initAddition(instance *AutoNumber) {
 				return nil, AdditionTargetNotExistException.Copy().AddStack(Addition)
 			}
 
-			return variable.NewParam().Set(AdditionResult, variable.NewNumber(left.Value()+right.Value())), nil
+			return libs.Sandbox.Variable.Param.New().Set(AdditionResult, libs.Sandbox.Variable.Number.New(left.Value()+right.Value())), nil
 		},
 		[]concept.String{
 			AdditionTarget,
@@ -56,10 +56,10 @@ func initAddition(instance *AutoNumber) {
 
 	instance.AutoNumberClass.SetMethod(AdditionKey, Addition)
 
-	instance.SetException(variable.NewString("AdditionTargetNotExistException"), AdditionTargetNotExistException)
-	instance.SetException(variable.NewString("AdditionAutoObjectValueTypeErrorException"), AdditionAutoObjectValueTypeErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("AdditionTargetNotExistException"), AdditionTargetNotExistException)
+	instance.SetException(libs.Sandbox.Variable.String.New("AdditionAutoObjectValueTypeErrorException"), AdditionAutoObjectValueTypeErrorException)
 
-	instance.SetConst(variable.NewString("AdditionTarget"), AdditionTarget)
-	instance.SetConst(variable.NewString("AdditionResult"), AdditionResult)
-	instance.SetConst(variable.NewString("AdditionKey"), AdditionKey)
+	instance.SetConst(libs.Sandbox.Variable.String.New("AdditionTarget"), AdditionTarget)
+	instance.SetConst(libs.Sandbox.Variable.String.New("AdditionResult"), AdditionResult)
+	instance.SetConst(libs.Sandbox.Variable.String.New("AdditionKey"), AdditionKey)
 }

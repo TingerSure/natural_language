@@ -45,7 +45,7 @@ func (p *Subtraction) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(p.operator)
+						return libs.Sandbox.Index.ConstIndex.New(p.operator)
 					},
 					Content: treasure,
 					Types:   phrase_type.Operator,
@@ -60,6 +60,6 @@ func NewSubtraction(param *adaptor.SourceAdaptorParam) *Subtraction {
 	instance := (&Subtraction{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
-	instance.operator = instance.Libs.GetLibraryPage("system", "operator").GetFunction(variable.NewString("SubtractionFunc"))
+	instance.operator = instance.Libs.GetLibraryPage("system", "operator").GetFunction(libs.Sandbox.Variable.String.New("SubtractionFunc"))
 	return instance
 }

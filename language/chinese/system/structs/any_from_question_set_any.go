@@ -37,14 +37,14 @@ func (p *AnyFromQuestionSetAny) GetStructRules() []*tree.StructRule {
 			Create: func() tree.Phrase {
 				return tree.NewPhraseStructAdaptor(&tree.PhraseStructAdaptorParam{
 					Index: func(phrase []tree.Phrase) concept.Index {
-						return expression.NewParamGet(
-							expression.NewCall(
+						return libs.Sandbox.Expression.ParamGet.New(
+							libs.Sandbox.Expression.Call.New(
 								phrase[0].Index(),
-								expression.NewNewParamWithInit(map[concept.String]concept.Index{
-									variable.NewString(QuestionParam): phrase[2].Index(),
+								libs.Sandbox.Expression.NewParam.New().Init(map[concept.String]concept.Index{
+									libs.Sandbox.Variable.String.New(QuestionParam): phrase[2].Index(),
 								}),
 							),
-							variable.NewString(QuestionResult),
+							libs.Sandbox.Variable.String.New(QuestionResult),
 						)
 					},
 					Size: len(anyFromQuestionSetAnyList),

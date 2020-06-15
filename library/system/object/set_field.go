@@ -12,15 +12,15 @@ var (
 	SetFieldKeyName     = "key"
 	SetFieldValueName   = "value"
 
-	SetFieldObjectErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetFieldObjectErrorException"))
-	SetFieldKeyErrorExceptionTemplate    = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetFieldKeyErrorException"))
-	SetFieldKeyNotExistExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("SetFieldKeyNotExistException"))
+	SetFieldObjectErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("SetFieldObjectErrorException"))
+	SetFieldKeyErrorExceptionTemplate    = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("SetFieldKeyErrorException"))
+	SetFieldKeyNotExistExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("SetFieldKeyNotExistException"))
 )
 
 func initSetField(instance *Object) {
-	SetFieldContent := variable.NewString(SetFieldContentName)
-	SetFieldKey := variable.NewString(SetFieldKeyName)
-	SetFieldValue := variable.NewString(SetFieldValueName)
+	SetFieldContent := libs.Sandbox.Variable.String.New(SetFieldContentName)
+	SetFieldKey := libs.Sandbox.Variable.String.New(SetFieldKeyName)
+	SetFieldValue := libs.Sandbox.Variable.String.New(SetFieldValueName)
 
 	SetFieldObjectErrorException := SetFieldObjectErrorExceptionTemplate.Copy()
 	SetFieldKeyErrorException := SetFieldKeyErrorExceptionTemplate.Copy()
@@ -28,8 +28,8 @@ func initSetField(instance *Object) {
 
 	var SetField concept.Function
 
-	SetField = variable.NewSystemFunction(
-		variable.NewString("SetField"),
+	SetField = libs.Sandbox.Variable.SystemFunction.New(
+		libs.Sandbox.Variable.String.New("SetField"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(SetFieldContent))
 			if !ok {
@@ -46,7 +46,7 @@ func initSetField(instance *Object) {
 
 			value := input.Get(SetFieldValue)
 			if nl_interface.IsNil(value) {
-				value = variable.NewNull()
+				value = libs.Sandbox.Variable.Null.New()
 			}
 
 			suspend := object.SetField(key, value)
@@ -54,7 +54,7 @@ func initSetField(instance *Object) {
 				return nil, suspend.AddStack(SetField)
 			}
 
-			return variable.NewParam().Set(SetFieldContent, object), nil
+			return libs.Sandbox.Variable.Param.New().Set(SetFieldContent, object), nil
 		},
 		[]concept.String{
 			SetFieldContent,
@@ -66,14 +66,14 @@ func initSetField(instance *Object) {
 		},
 	)
 
-	instance.SetException(variable.NewString("SetFieldObjectErrorException"), SetFieldObjectErrorException)
-	instance.SetException(variable.NewString("SetFieldKeyErrorException"), SetFieldKeyErrorException)
-	instance.SetException(variable.NewString("SetFieldKeyNotExistException"), SetFieldKeyNotExistException)
+	instance.SetException(libs.Sandbox.Variable.String.New("SetFieldObjectErrorException"), SetFieldObjectErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("SetFieldKeyErrorException"), SetFieldKeyErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("SetFieldKeyNotExistException"), SetFieldKeyNotExistException)
 
-	instance.SetConst(variable.NewString("SetFieldContent"), SetFieldContent)
-	instance.SetConst(variable.NewString("SetFieldKey"), SetFieldKey)
-	instance.SetConst(variable.NewString("SetFieldValue"), SetFieldValue)
+	instance.SetConst(libs.Sandbox.Variable.String.New("SetFieldContent"), SetFieldContent)
+	instance.SetConst(libs.Sandbox.Variable.String.New("SetFieldKey"), SetFieldKey)
+	instance.SetConst(libs.Sandbox.Variable.String.New("SetFieldValue"), SetFieldValue)
 
-	instance.SetFunction(variable.NewString("SetField"), SetField)
+	instance.SetFunction(libs.Sandbox.Variable.String.New("SetField"), SetField)
 
 }

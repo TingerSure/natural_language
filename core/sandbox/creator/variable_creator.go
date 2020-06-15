@@ -7,15 +7,17 @@ import (
 )
 
 type VariableCreator struct {
-	String        *variable.StringCreator
-	Number        *variable.NumberCreator
-	Null          *variable.NullCreator
-	Bool          *variable.BoolCreator
-	Class         *variable.ClassCreator
-	Function      *variable.FunctionCreator
-	Object        *variable.ObjectCreator
-	MappingObject *variable.MappingObjectCreator
-	Param         *variable.ParamCreator
+	String            *variable.StringCreator
+	Number            *variable.NumberCreator
+	Null              *variable.NullCreator
+	Bool              *variable.BoolCreator
+	Class             *variable.ClassCreator
+	Function          *variable.FunctionCreator
+	Object            *variable.ObjectCreator
+	MappingObject     *variable.MappingObjectCreator
+	Param             *variable.ParamCreator
+	SystemFunction    *variable.SystemFunctionCreator
+	PreObjectFunction *variable.PreObjectFunctionCreator
 }
 
 type VariableCreatorParam struct {
@@ -25,7 +27,8 @@ type VariableCreatorParam struct {
 
 func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 	instance := &VariableCreator{}
-
+	instance.PreObjectFunction = variable.NewPreObjectFunctionCreator(&variable.PreObjectFunctionCreatorParam{})
+	instance.SystemFunction = variable.NewSystemFunctionCreator(&variable.SystemFunctionCreatorParam{})
 	instance.Bool = variable.NewBoolCreator()
 	instance.Null = variable.NewNullCreator()
 	instance.String = variable.NewStringCreator()

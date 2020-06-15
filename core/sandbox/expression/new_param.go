@@ -73,6 +73,11 @@ func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interr
 	return param, nil
 }
 
+func (a *NewParam) Init(values map[concept.String]concept.Index) *NewParam {
+	a.values = values
+	return a
+}
+
 type NewParamCreatorParam struct {
 	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
 	ParamCreator           func() concept.Param
@@ -88,12 +93,6 @@ func (s *NewParamCreator) New() *NewParam {
 		seed: s,
 	}
 	back.ExpressionIndex = s.param.ExpressionIndexCreator(back.Exec)
-	return back
-}
-
-func (s *NewParamCreator) NewWithInit(values map[concept.String]concept.Index) *NewParam {
-	back := s.New()
-	back.values = values
 	return back
 }
 

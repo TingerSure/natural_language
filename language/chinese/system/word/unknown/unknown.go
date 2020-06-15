@@ -31,7 +31,7 @@ func (p *Unknown) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(variable.NewString(treasure.GetWord().GetContext()))
+						return libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.String.New(treasure.GetWord().GetContext()))
 					},
 					Content: treasure,
 					Types:   phrase_type.Unknown,

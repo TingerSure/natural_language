@@ -12,23 +12,23 @@ var (
 	GetFieldKeyName     = "key"
 	GetFieldValueName   = "value"
 
-	GetFieldObjectErrorExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetFieldObjectErrorException"))
-	GetFieldKeyErrorExceptionTemplate    = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetFieldKeyErrorException"))
-	GetFieldKeyNotExistExceptionTemplate = interrupt.NewException(variable.NewString("type error"), variable.NewString("GetFieldKeyNotExistException"))
+	GetFieldObjectErrorExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("GetFieldObjectErrorException"))
+	GetFieldKeyErrorExceptionTemplate    = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("GetFieldKeyErrorException"))
+	GetFieldKeyNotExistExceptionTemplate = libs.Sandbox.Interrupt.Exception.New(libs.Sandbox.Variable.String.New("type error"), libs.Sandbox.Variable.String.New("GetFieldKeyNotExistException"))
 )
 
 func initGetField(instance *Object) {
-	GetFieldContent := variable.NewString(GetFieldContentName)
-	GetFieldKey := variable.NewString(GetFieldKeyName)
-	GetFieldValue := variable.NewString(GetFieldValueName)
+	GetFieldContent := libs.Sandbox.Variable.String.New(GetFieldContentName)
+	GetFieldKey := libs.Sandbox.Variable.String.New(GetFieldKeyName)
+	GetFieldValue := libs.Sandbox.Variable.String.New(GetFieldValueName)
 
 	GetFieldObjectErrorException := GetFieldObjectErrorExceptionTemplate.Copy()
 	GetFieldKeyErrorException := GetFieldKeyErrorExceptionTemplate.Copy()
 	GetFieldKeyNotExistException := GetFieldKeyNotExistExceptionTemplate.Copy()
 
 	var GetField concept.Function
-	GetField = variable.NewSystemFunction(
-		variable.NewString("GetField"),
+	GetField = libs.Sandbox.Variable.SystemFunction.New(
+		libs.Sandbox.Variable.String.New("GetField"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			content := input.Get(GetFieldContent)
 			var object concept.Object
@@ -53,7 +53,7 @@ func initGetField(instance *Object) {
 				return nil, suspend.AddStack(GetField)
 			}
 
-			return variable.NewParam().Set(GetFieldValue, value), nil
+			return libs.Sandbox.Variable.Param.New().Set(GetFieldValue, value), nil
 		},
 		[]concept.String{
 			GetFieldContent,
@@ -64,13 +64,13 @@ func initGetField(instance *Object) {
 		},
 	)
 
-	instance.SetException(variable.NewString("GetFieldObjectErrorException"), GetFieldObjectErrorException)
-	instance.SetException(variable.NewString("GetFieldKeyErrorException"), GetFieldKeyErrorException)
-	instance.SetException(variable.NewString("GetFieldKeyNotExistException"), GetFieldKeyNotExistException)
+	instance.SetException(libs.Sandbox.Variable.String.New("GetFieldObjectErrorException"), GetFieldObjectErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("GetFieldKeyErrorException"), GetFieldKeyErrorException)
+	instance.SetException(libs.Sandbox.Variable.String.New("GetFieldKeyNotExistException"), GetFieldKeyNotExistException)
 
-	instance.SetConst(variable.NewString("GetFieldContent"), GetFieldContent)
-	instance.SetConst(variable.NewString("GetFieldKey"), GetFieldKey)
-	instance.SetConst(variable.NewString("GetFieldValue"), GetFieldValue)
+	instance.SetConst(libs.Sandbox.Variable.String.New("GetFieldContent"), GetFieldContent)
+	instance.SetConst(libs.Sandbox.Variable.String.New("GetFieldKey"), GetFieldKey)
+	instance.SetConst(libs.Sandbox.Variable.String.New("GetFieldValue"), GetFieldValue)
 
-	instance.SetFunction(variable.NewString("GetField"), GetField)
+	instance.SetFunction(libs.Sandbox.Variable.String.New("GetField"), GetField)
 }

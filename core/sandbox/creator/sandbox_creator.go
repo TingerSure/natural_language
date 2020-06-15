@@ -52,6 +52,9 @@ func NewSandboxCreator() *SandboxCreator {
 		StringCreator: func(value string) concept.String {
 			return instance.Variable.String.New(value)
 		},
+		PreObjectFunctionCreator: func(function concept.Function, object concept.Object) *variable.PreObjectFunction {
+			return instance.Variable.PreObjectFunction.New(function, object)
+		},
 	})
 
 	instance.Variable = NewVariableCreator(&VariableCreatorParam{

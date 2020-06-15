@@ -40,7 +40,7 @@ func (p *Belong) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						return index.NewConstIndex(variable.NewString(BelongTo))
+						return libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.String.New(BelongTo))
 					},
 					Content: treasure,
 					Types:   phrase_type.AuxiliaryBelong,
