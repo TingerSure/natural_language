@@ -10,6 +10,7 @@ import (
 type FunctionEndSeed interface {
 	ToLanguage(string, *FunctionEnd) string
 	NewEnd() *interrupt.End
+	NewNull() concept.Null
 }
 
 type FunctionEnd struct {
@@ -25,12 +26,17 @@ func (a *FunctionEnd) ToString(prefix string) string {
 	return fmt.Sprintf("end")
 }
 
+func (e *FunctionEnd) Anticipate(space concept.Closure) concept.Variable {
+	return e.seed.NewNull()
+}
+
 func (a *FunctionEnd) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
-	return nil, a.seed.NewEnd()
+	return a.seed.NewNull(), a.seed.NewEnd()
 }
 
 type FunctionEndCreatorParam struct {
 	EndCreator             func() *interrupt.End
+	NullCreator            func() concept.Null
 	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
 }
 
@@ -54,6 +60,10 @@ func (s *FunctionEndCreator) ToLanguage(language string, instance *FunctionEnd) 
 		return instance.ToString("")
 	}
 	return seed(language, instance)
+}
+
+func (s *FunctionEndCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
 }
 
 func (s *FunctionEndCreator) NewEnd() *interrupt.End {

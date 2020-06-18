@@ -43,6 +43,11 @@ func (s *BubbleIndex) Get(space concept.Closure) (concept.Variable, concept.Inte
 	return space.GetBubble(s.key)
 }
 
+func (s *BubbleIndex) Anticipate(space concept.Closure) concept.Variable {
+	value, _ := space.PeekBubble(s.key)
+	return value
+}
+
 func (s *BubbleIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
 	return space.SetBubble(s.key, value)
 }

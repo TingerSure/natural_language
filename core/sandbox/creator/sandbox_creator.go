@@ -73,6 +73,9 @@ func NewSandboxCreator() *SandboxCreator {
 		ExceptionCreator: func(name string, message string) concept.Exception {
 			return instance.Interrupt.Exception.NewOriginal(name, message)
 		},
+		NullCreator: func() concept.Null {
+			return instance.Variable.Null.New()
+		},
 		ParamCreator: func() concept.Param {
 			return instance.Variable.Param.New()
 		},

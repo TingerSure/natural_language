@@ -33,6 +33,7 @@ type ExpressionCreatorParam struct {
 	ParamCreator      func() concept.Param
 	ConstIndexCreator func(concept.Variable) *index.ConstIndex
 	ClosureCreator    func(concept.Closure) concept.Closure
+	NullCreator       func() concept.Null
 }
 
 func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
@@ -44,12 +45,15 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance.ParamGet = expression.NewParamGetCreator(&expression.ParamGetCreatorParam{
 		ExceptionCreator:       param.ExceptionCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
+		NullCreator:            param.NullCreator,
 	})
 	instance.ParamSet = expression.NewParamSetCreator(&expression.ParamSetCreatorParam{
 		ExceptionCreator:       param.ExceptionCreator,
+		NullCreator:            param.NullCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 	})
 	instance.Return = expression.NewReturnCreator(&expression.ReturnCreatorParam{
+		NullCreator:            param.NullCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 	})
 	instance.ExpressionIndex = adaptor.NewExpressionIndexCreator(&adaptor.ExpressionIndexCreatorParam{
@@ -58,11 +62,13 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance.FunctionEnd = expression.NewFunctionEndCreator(&expression.FunctionEndCreatorParam{
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 		EndCreator:             param.EndCreator,
+		NullCreator:            param.NullCreator,
 	})
 	instance.If = expression.NewIfCreator(&expression.IfCreatorParam{
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 		CodeBlockCreator:       param.CodeBlockCreator,
 		ExceptionCreator:       param.ExceptionCreator,
+		NullCreator:            param.NullCreator,
 		ClosureCreator:         param.ClosureCreator,
 	})
 	instance.For = expression.NewForCreator(&expression.ForCreatorParam{
@@ -72,6 +78,7 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 		CodeBlockCreator:       param.CodeBlockCreator,
 		ExceptionCreator:       param.ExceptionCreator,
 		ConstIndexCreator:      param.ConstIndexCreator,
+		NullCreator:            param.NullCreator,
 	})
 	instance.ClassRegister = expression.NewClassRegisterCreator(&expression.ClassRegisterCreatorParam{
 		ExpressionIndexCreator: instance.ExpressionIndex.New,

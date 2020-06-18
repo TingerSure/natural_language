@@ -39,6 +39,11 @@ func (s *SelfIndex) ToString(prefix string) string {
 	return selfIndexKey
 }
 
+func (s *SelfIndex) Anticipate(space concept.Closure) concept.Variable {
+	value, _ := space.PeekBubble(s.seed.NewString(selfIndexKey))
+	return value
+}
+
 func (s *SelfIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	return space.GetBubble(s.seed.NewString(selfIndexKey))
 }

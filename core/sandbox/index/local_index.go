@@ -38,6 +38,11 @@ func (s *LocalIndex) Key() concept.String {
 	return s.key
 }
 
+func (s *LocalIndex) Anticipate(space concept.Closure) concept.Variable {
+	value, _ := space.PeekLocal(s.key)
+	return value
+}
+
 func (s *LocalIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	return space.GetLocal(s.key)
 }

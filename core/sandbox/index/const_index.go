@@ -43,6 +43,10 @@ func (s *ConstIndex) Get(space concept.Closure) (concept.Variable, concept.Inter
 	return s.value, nil
 }
 
+func (s *ConstIndex) Anticipate(space concept.Closure) concept.Variable {
+	return s.value
+}
+
 func (s *ConstIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
 	return s.seed.NewException("read only", "Constants cannot be changed.")
 }

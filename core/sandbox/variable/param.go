@@ -14,7 +14,7 @@ const (
 type ParamSeed interface {
 	ToLanguage(string, *Param) string
 	Type() string
-	NewEmpty() concept.Null
+	NewNull() concept.Null
 	New() *Param
 }
 
@@ -91,7 +91,7 @@ func (s *ParamCreator) New() *Param {
 	return &Param{
 		values: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: s.NewEmpty(),
+			EmptyValue: s.NewNull(),
 		}),
 		seed: s,
 	}
@@ -109,7 +109,7 @@ func (s *ParamCreator) Type() string {
 	return VariableParamType
 }
 
-func (s *ParamCreator) NewEmpty() concept.Null {
+func (s *ParamCreator) NewNull() concept.Null {
 	return s.param.NullCreator()
 }
 

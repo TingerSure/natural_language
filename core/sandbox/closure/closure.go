@@ -13,7 +13,7 @@ const (
 
 type ClosureSeed interface {
 	NewException(string, string) concept.Exception
-	NewEmpty() concept.Null
+	NewNull() concept.Null
 }
 
 type Closure struct {
@@ -108,10 +108,18 @@ func (c *Closure) InitLocal(key concept.String, defaultValue concept.Variable) {
 	c.local.Init(key, defaultValue)
 }
 
+func (c *Closure) PeekLocal(key concept.String) (concept.Variable, concept.Interrupt) {
+	value := c.local.Get(key)
+	if nl_interface.IsNil(value) {
+		return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
+	}
+	return value.(concept.Variable), nil
+}
+
 func (c *Closure) GetLocal(key concept.String) (concept.Variable, concept.Interrupt) {
 	value := c.local.Get(key)
 	if nl_interface.IsNil(value) {
-		return nil, c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
+		return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 	}
 	c.history.Set(key, historyTypeLocal)
 	return value.(concept.Variable), nil
@@ -123,6 +131,17 @@ func (c *Closure) SetLocal(key concept.String, value concept.Variable) concept.I
 	}
 	c.history.Set(key, historyTypeLocal)
 	return nil
+}
+
+func (c *Closure) PeekBubble(key concept.String) (concept.Variable, concept.Interrupt) {
+	value, suspend := c.PeekLocal(key)
+	if nl_interface.IsNil(suspend) {
+		return value, nil
+	}
+	if c.parent != nil {
+		return c.parent.PeekBubble(key)
+	}
+	return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 }
 
 func (c *Closure) GetBubble(key concept.String) (concept.Variable, concept.Interrupt) {
@@ -138,7 +157,7 @@ func (c *Closure) GetBubble(key concept.String) (concept.Variable, concept.Inter
 		}
 		return value, suspend
 	}
-	return nil, c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
+	return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 }
 
 func (c *Closure) SetBubble(key concept.String, value concept.Variable) concept.Interrupt {
@@ -172,7 +191,7 @@ func (s *ClosureCreator) NewException(name string, message string) concept.Excep
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *ClosureCreator) NewEmpty() concept.Null {
+func (s *ClosureCreator) NewNull() concept.Null {
 	return s.param.EmptyCreator()
 }
 
@@ -183,11 +202,11 @@ func (s *ClosureCreator) New(parent concept.Closure) *Closure {
 		extempore: NewExtempore(),
 		returns: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: s.NewEmpty(),
+			EmptyValue: s.NewNull(),
 		}),
 		local: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   false,
-			EmptyValue: s.NewEmpty(),
+			EmptyValue: s.NewNull(),
 		}),
 		seed: s,
 	}

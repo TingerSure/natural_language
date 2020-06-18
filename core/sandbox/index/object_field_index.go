@@ -11,6 +11,7 @@ type ObjectFieldIndexSeed interface {
 	ToLanguage(string, *ObjectFieldIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
+	NewNull() concept.Null
 }
 
 type ObjectFieldIndex struct {
@@ -42,13 +43,18 @@ func (s *ObjectFieldIndex) ToString(prefix string) string {
 func (s *ObjectFieldIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	preObject, suspend := s.object.Get(space)
 	if !nl_interface.IsNil(suspend) {
-		return nil, suspend
+		return s.seed.NewNull(), suspend
 	}
 	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
 	if !ok {
-		return nil, s.seed.NewException("type error", "There is not an effective object When system call the ObjectFieldIndex.Get")
+		return s.seed.NewNull(), s.seed.NewException("type error", "There is not an effective object When system call the ObjectFieldIndex.Get")
 	}
 	return object.GetField(s.key)
+}
+
+func (s *ObjectFieldIndex) Anticipate(space concept.Closure) concept.Variable {
+	value, _ := s.Get(space)
+	return value
 }
 
 func (s *ObjectFieldIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
@@ -65,6 +71,7 @@ func (s *ObjectFieldIndex) Set(space concept.Closure, value concept.Variable) co
 
 type ObjectFieldIndexCreatorParam struct {
 	ExceptionCreator func(string, string) concept.Exception
+	NullCreator      func() concept.Null
 }
 
 type ObjectFieldIndexCreator struct {
@@ -89,6 +96,10 @@ func (s *ObjectFieldIndexCreator) ToLanguage(language string, instance *ObjectFi
 
 func (s *ObjectFieldIndexCreator) Type() string {
 	return IndexObjectFieldType
+}
+
+func (s *ObjectFieldIndexCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
 }
 
 func (s *ObjectFieldIndexCreator) NewException(name string, message string) concept.Exception {

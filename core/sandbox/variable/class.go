@@ -13,7 +13,7 @@ const (
 type ClassSeed interface {
 	ToLanguage(string, *Class) string
 	Type() string
-	NewEmpty() concept.Null
+	NewNull() concept.Null
 }
 
 type Class struct {
@@ -164,19 +164,19 @@ func (s *ClassCreator) New(name string) *Class {
 		name: name,
 		methods: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: s.NewEmpty(),
+			EmptyValue: s.NewNull(),
 		}),
 		fields: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: s.NewEmpty(),
+			EmptyValue: s.NewNull(),
 		}),
 		staticMethods: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: s.NewEmpty(),
+			EmptyValue: s.NewNull(),
 		}),
 		staticFields: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: s.NewEmpty(),
+			EmptyValue: s.NewNull(),
 		}),
 		seed: s,
 	}
@@ -194,7 +194,7 @@ func (s *ClassCreator) Type() string {
 	return VariableClassType
 }
 
-func (s *ClassCreator) NewEmpty() concept.Null {
+func (s *ClassCreator) NewNull() concept.Null {
 	return s.param.NullCreator()
 }
 

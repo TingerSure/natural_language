@@ -2,7 +2,6 @@ package index
 
 import (
 	"fmt"
-	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"strings"
 )
@@ -44,8 +43,13 @@ func (s *SearchIndex) ToString(prefix string) string {
 	return fmt.Sprintf("search<%v>", strings.Join(subs, ", "))
 }
 
+func (s *SearchIndex) Anticipate(space concept.Closure) concept.Variable {
+	value, _ := s.Get(space)
+	return value
+}
+
 func (s *SearchIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
-	var selected concept.Variable = nil
+	var selected concept.Variable = s.seed.NewNull()
 	space.IterateHistory(func(_ concept.String, value concept.Variable) bool {
 		for _, item := range s.items {
 			if !item.Match(value) {
@@ -55,9 +59,6 @@ func (s *SearchIndex) Get(space concept.Closure) (concept.Variable, concept.Inte
 		selected = value
 		return true
 	})
-	if nl_interface.IsNil(selected) {
-		selected = s.seed.NewNull()
-	}
 	return selected, nil
 }
 

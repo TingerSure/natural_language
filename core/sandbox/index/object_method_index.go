@@ -12,6 +12,7 @@ type ObjectMethodIndexSeed interface {
 	Type() string
 	NewException(string, string) concept.Exception
 	NewPreObjectFunction(concept.Function, concept.Object) *variable.PreObjectFunction
+	NewNull() concept.Null
 }
 
 type ObjectMethodIndex struct {
@@ -40,23 +41,28 @@ func (s *ObjectMethodIndex) ToString(prefix string) string {
 	return fmt.Sprintf("%s.%s", s.object.ToString(prefix), s.key.ToString(prefix))
 }
 
+func (s *ObjectMethodIndex) Anticipate(space concept.Closure) concept.Variable {
+	value, _ := s.Get(space)
+	return value
+}
+
 func (s *ObjectMethodIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	preObject, suspend := s.object.Get(space)
 	if !nl_interface.IsNil(suspend) {
-		return nil, suspend
+		return s.seed.NewNull(), suspend
 	}
 
 	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
 	if !ok {
-		return nil, s.seed.NewException("type error", "There is not an effective object When system call the ObjectMethodIndex.Get")
+		return s.seed.NewNull(), s.seed.NewException("type error", "There is not an effective object When system call the ObjectMethodIndex.Get")
 	}
 
 	function, suspend := object.GetMethod(s.key)
 	if !nl_interface.IsNil(suspend) {
-		return nil, suspend
+		return s.seed.NewNull(), suspend
 	}
 	if nl_interface.IsNil(function) {
-		return nil, s.seed.NewException("runtime error", fmt.Sprintf("Object don't have a method named %s.", s.key))
+		return s.seed.NewNull(), s.seed.NewException("runtime error", fmt.Sprintf("Object don't have a method named %s.", s.key))
 	}
 
 	return s.seed.NewPreObjectFunction(function, object), nil
@@ -83,6 +89,7 @@ func (s *ObjectMethodIndex) Set(space concept.Closure, preFunction concept.Varia
 type ObjectMethodIndexCreatorParam struct {
 	ExceptionCreator         func(string, string) concept.Exception
 	PreObjectFunctionCreator func(concept.Function, concept.Object) *variable.PreObjectFunction
+	NullCreator              func() concept.Null
 }
 
 type ObjectMethodIndexCreator struct {
@@ -107,6 +114,10 @@ func (s *ObjectMethodIndexCreator) ToLanguage(language string, instance *ObjectM
 
 func (s *ObjectMethodIndexCreator) Type() string {
 	return IndexObjectMethodType
+}
+
+func (s *ObjectMethodIndexCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
 }
 
 func (s *ObjectMethodIndexCreator) NewException(name string, message string) concept.Exception {

@@ -10,6 +10,7 @@ import (
 
 type ParamSetSeed interface {
 	ToLanguage(string, *ParamSet) string
+	NewNull() concept.Null
 	NewException(string, string) concept.Exception
 }
 
@@ -29,20 +30,24 @@ func (a *ParamSet) ToString(prefix string) string {
 	return fmt.Sprintf("%v[%v] = %v", a.param.ToString(prefix), a.key.ToString(prefix), a.value.ToString(prefix))
 }
 
+func (a *ParamSet) Anticipate(space concept.Closure) concept.Variable {
+	return a.value.Anticipate(space)
+}
+
 func (a *ParamSet) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
 
 	preParam, suspend := a.param.Get(space)
 	if !nl_interface.IsNil(suspend) {
-		return nil, suspend
+		return a.seed.NewNull(), suspend
 	}
 	param, yesParam := variable.VariableFamilyInstance.IsParam(preParam)
 	if !yesParam {
-		return nil, a.seed.NewException("type error", "Only Param can be set in ParamSet")
+		return a.seed.NewNull(), a.seed.NewException("type error", "Only Param can be set in ParamSet")
 	}
 
 	preValue, suspend := a.value.Get(space)
 	if !nl_interface.IsNil(suspend) {
-		return nil, suspend
+		return a.seed.NewNull(), suspend
 	}
 
 	param.Set(a.key, preValue)
@@ -51,6 +56,7 @@ func (a *ParamSet) Exec(space concept.Closure) (concept.Variable, concept.Interr
 
 type ParamSetCreatorParam struct {
 	ExceptionCreator       func(string, string) concept.Exception
+	NullCreator            func() concept.Null
 	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
 }
 
@@ -77,9 +83,15 @@ func (s *ParamSetCreator) ToLanguage(language string, instance *ParamSet) string
 	}
 	return seed(language, instance)
 }
+
+func (s *ParamSetCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
+}
+
 func (s *ParamSetCreator) NewException(name string, message string) concept.Exception {
 	return s.param.ExceptionCreator(name, message)
 }
+
 func NewParamSetCreator(param *ParamSetCreatorParam) *ParamSetCreator {
 	return &ParamSetCreator{
 		Seeds: map[string]func(string, *ParamSet) string{},

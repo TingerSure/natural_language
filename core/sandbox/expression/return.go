@@ -8,6 +8,7 @@ import (
 )
 
 type ReturnSeed interface {
+	NewNull() concept.Null
 	ToLanguage(string, *Return) string
 }
 
@@ -31,17 +32,22 @@ func (a *Return) ToString(prefix string) string {
 	return fmt.Sprintf("return[%v] %v", a.key.ToString(prefix), a.result.ToString(prefix))
 }
 
+func (a *Return) Anticipate(space concept.Closure) concept.Variable {
+	return a.result.Anticipate(space)
+}
+
 func (a *Return) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	result, suspend := a.result.Get(space)
 
 	if !nl_interface.IsNil(suspend) {
-		return nil, suspend
+		return a.seed.NewNull(), suspend
 	}
 	space.SetReturn(a.key, result)
 	return result, nil
 }
 
 type ReturnCreatorParam struct {
+	NullCreator            func() concept.Null
 	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
 }
 
@@ -58,6 +64,10 @@ func (s *ReturnCreator) New(key concept.String, result concept.Index) *Return {
 	}
 	back.ExpressionIndex = s.param.ExpressionIndexCreator(back.Exec)
 	return back
+}
+
+func (s *ReturnCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
 }
 
 func (s *ReturnCreator) ToLanguage(language string, instance *Return) string {

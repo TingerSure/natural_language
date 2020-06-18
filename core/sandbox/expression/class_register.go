@@ -42,6 +42,10 @@ func (a *ClassRegister) ToString(prefix string) string {
 	)
 }
 
+func (e *ClassRegister) Anticipate(space concept.Closure) concept.Variable {
+	return e.object.Anticipate(space)
+}
+
 func (a *ClassRegister) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	preObject, suspend := a.object.Get(space)
 	if !nl_interface.IsNil(suspend) {

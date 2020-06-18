@@ -14,7 +14,7 @@ const (
 type ObjectSeed interface {
 	ToLanguage(string, *Object) string
 	Type() string
-	NewEmpty() concept.Null
+	NewNull() concept.Null
 	NewException(string, string) concept.Exception
 }
 
@@ -219,11 +219,11 @@ func (s *ObjectCreator) New() *Object {
 	return &Object{
 		fields: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   false,
-			EmptyValue: s.NewEmpty(),
+			EmptyValue: s.NewNull(),
 		}),
 		methods: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: s.NewEmpty(),
+			EmptyValue: s.NewNull(),
 		}),
 		reflections: make([]*concept.ClassReflection, 0),
 		seed:        s,
@@ -242,7 +242,7 @@ func (s *ObjectCreator) Type() string {
 	return VariableObjectType
 }
 
-func (s *ObjectCreator) NewEmpty() concept.Null {
+func (s *ObjectCreator) NewNull() concept.Null {
 	return s.param.NullCreator()
 }
 func (s *ObjectCreator) NewException(name string, message string) concept.Exception {

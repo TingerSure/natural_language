@@ -3,17 +3,16 @@ package expression
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	// "github.com/TingerSure/natural_language/core/sandbox/closure"
 	"github.com/TingerSure/natural_language/core/sandbox/code_block"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/expression/adaptor"
-	// "github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type IfSeed interface {
 	ToLanguage(string, *If) string
 	NewException(string, string) concept.Exception
+	NewNull() concept.Null
 	NewClosure(concept.Closure) concept.Closure
 }
 
@@ -40,11 +39,13 @@ func (f *If) ToString(prefix string) string {
 	}
 	return fmt.Sprintf("%v else %v", primaryToString, f.secondary.ToString(prefix))
 }
-
+func (e *If) Anticipate(space concept.Closure) concept.Variable {
+	return e.seed.NewNull()
+}
 func (f *If) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) {
 
 	if nl_interface.IsNil(f.condition) {
-		return nil, f.seed.NewException("system error", "No condition for judgment.")
+		return f.seed.NewNull(), f.seed.NewException("system error", "No condition for judgment.")
 	}
 	initSpace := f.seed.NewClosure(parent)
 	defer initSpace.Clear()
@@ -52,12 +53,12 @@ func (f *If) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) 
 
 	preCondition, suspend := f.condition.Get(initSpace)
 	if !nl_interface.IsNil(suspend) {
-		return nil, suspend
+		return f.seed.NewNull(), suspend
 	}
 
 	condition, yes := variable.VariableFamilyInstance.IsBool(preCondition)
 	if !yes {
-		return nil, f.seed.NewException("type error", "Only bool can be judged.")
+		return f.seed.NewNull(), f.seed.NewException("type error", "Only bool can be judged.")
 	}
 
 	var active *code_block.CodeBlock
@@ -69,7 +70,7 @@ func (f *If) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) 
 
 	space, suspend := active.Exec(initSpace, true, nil)
 	defer space.Clear()
-	return nil, suspend
+	return f.seed.NewNull(), suspend
 }
 
 func (f *If) SetCondition(condition concept.Index) {
@@ -89,6 +90,7 @@ type IfCreatorParam struct {
 	CodeBlockCreator       func() *code_block.CodeBlock
 	ClosureCreator         func(concept.Closure) concept.Closure
 	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
+	NullCreator            func() concept.Null
 }
 
 type IfCreator struct {
@@ -118,6 +120,10 @@ func (s *IfCreator) ToLanguage(language string, instance *If) string {
 
 func (s *IfCreator) NewClosure(parent concept.Closure) concept.Closure {
 	return s.param.ClosureCreator(parent)
+}
+
+func (s *IfCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
 }
 
 func (s *IfCreator) NewException(name string, message string) concept.Exception {

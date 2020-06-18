@@ -16,6 +16,7 @@ type ForSeed interface {
 	GetDefaultCondition() concept.Index
 	GetDefaultTag() concept.String
 	NewException(string, string) concept.Exception
+	NewNull() concept.Null
 }
 
 type For struct {
@@ -40,6 +41,10 @@ func (f *For) ToString(prefix string) string {
 	return fmt.Sprintf("for (%v; %v; %v) %v", f.init.ToStringSimplify(prefix), f.condition.ToString(prefix), f.end.ToStringSimplify(prefix), f.body.ToString(prefix))
 }
 
+func (e *For) Anticipate(space concept.Closure) concept.Variable {
+	return e.seed.NewNull()
+}
+
 func (f *For) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) {
 
 	if nl_interface.IsNil(f.condition) {
@@ -50,19 +55,19 @@ func (f *For) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt)
 	defer initSpace.Clear()
 	defer parent.MergeReturn(initSpace)
 	if !nl_interface.IsNil(suspend) {
-		return nil, suspend
+		return f.seed.NewNull(), suspend
 	}
 
 body:
 	for {
 		preCondition, suspend := f.condition.Get(initSpace)
 		if !nl_interface.IsNil(suspend) {
-			return nil, suspend
+			return f.seed.NewNull(), suspend
 		}
 
 		condition, yes := variable.VariableFamilyInstance.IsBool(preCondition)
 		if !yes {
-			return nil, f.seed.NewException("type error", "Only bool can be judged.")
+			return f.seed.NewNull(), f.seed.NewException("type error", "Only bool can be judged.")
 		}
 
 		if !condition.Value() {
@@ -76,32 +81,32 @@ body:
 			case interrupt.BreakInterruptType:
 				breaks, yes := interrupt.InterruptFamilyInstance.IsBreak(suspend)
 				if !yes {
-					return nil, f.seed.NewException("system panic", fmt.Sprintf("BreakInterruptType does not mean a Break anymore.\n%+v", suspend))
+					return f.seed.NewNull(), f.seed.NewException("system panic", fmt.Sprintf("BreakInterruptType does not mean a Break anymore.\n%+v", suspend))
 				}
 				if !f.IsMyTag(breaks.Tag()) {
-					return nil, suspend
+					return f.seed.NewNull(), suspend
 				}
 				break body
 			case interrupt.ContinueInterruptType:
 				continues, yes := interrupt.InterruptFamilyInstance.IsContinue(suspend)
 				if !yes {
-					return nil, f.seed.NewException("system panic", fmt.Sprintf("ContinueInterruptType does not mean a Continue anymore.\n%+v", suspend))
+					return f.seed.NewNull(), f.seed.NewException("system panic", fmt.Sprintf("ContinueInterruptType does not mean a Continue anymore.\n%+v", suspend))
 				}
 				if !f.IsMyTag(continues.Tag()) {
-					return nil, suspend
+					return f.seed.NewNull(), suspend
 				}
 			default:
-				return nil, suspend
+				return f.seed.NewNull(), suspend
 			}
 		}
 		endSpace, suspend := f.end.Exec(initSpace, true, nil)
 		defer endSpace.Clear()
 		if !nl_interface.IsNil(suspend) {
-			return nil, suspend
+			return f.seed.NewNull(), suspend
 		}
 	}
 
-	return nil, nil
+	return f.seed.NewNull(), nil
 }
 
 func (f *For) SetTag(tag concept.String) {
@@ -139,6 +144,7 @@ type ForCreatorParam struct {
 	CodeBlockCreator       func() *code_block.CodeBlock
 	ConstIndexCreator      func(concept.Variable) *index.ConstIndex
 	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
+	NullCreator            func() concept.Null
 }
 
 type ForCreator struct {
@@ -175,6 +181,11 @@ func (s *ForCreator) GetDefaultCondition() concept.Index {
 func (s *ForCreator) GetDefaultTag() concept.String {
 	return s.defaultTag
 }
+
+func (s *ForCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
+}
+
 func (s *ForCreator) NewException(name string, message string) concept.Exception {
 	return s.param.ExceptionCreator(name, message)
 }

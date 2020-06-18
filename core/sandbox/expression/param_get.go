@@ -10,6 +10,7 @@ import (
 
 type ParamGetSeed interface {
 	ToLanguage(string, *ParamGet) string
+	NewNull() concept.Null
 	NewException(string, string) concept.Exception
 }
 
@@ -37,15 +38,24 @@ func (a *ParamGet) ToString(prefix string) string {
 	return fmt.Sprintf("%v[%v]", a.param.ToString(prefix), a.key.ToString(prefix))
 }
 
+func (a *ParamGet) Anticipate(space concept.Closure) concept.Variable {
+	preParam := a.param.Anticipate(space)
+	param, yesParam := variable.VariableFamilyInstance.IsParam(preParam)
+	if !yesParam {
+		return a.seed.NewNull()
+	}
+	return param.Get(a.key)
+}
+
 func (a *ParamGet) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
 
 	preParam, suspend := a.param.Get(space)
 	if !nl_interface.IsNil(suspend) {
-		return nil, suspend
+		return a.seed.NewNull(), suspend
 	}
 	param, yesParam := variable.VariableFamilyInstance.IsParam(preParam)
 	if !yesParam {
-		return nil, a.seed.NewException("type error", "Only Param can be get in ParamGet")
+		return a.seed.NewNull(), a.seed.NewException("type error", "Only Param can be get in ParamGet")
 	}
 
 	return param.Get(a.key), nil
@@ -53,6 +63,7 @@ func (a *ParamGet) Exec(space concept.Closure) (concept.Variable, concept.Interr
 
 type ParamGetCreatorParam struct {
 	ExceptionCreator       func(string, string) concept.Exception
+	NullCreator            func() concept.Null
 	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
 }
 
@@ -78,6 +89,11 @@ func (s *ParamGetCreator) ToLanguage(language string, instance *ParamGet) string
 	}
 	return seed(language, instance)
 }
+
+func (s *ParamGetCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
+}
+
 func (s *ParamGetCreator) NewException(name string, message string) concept.Exception {
 	return s.param.ExceptionCreator(name, message)
 }

@@ -48,9 +48,11 @@ func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
 	instance.ObjectMethodIndex = index.NewObjectMethodIndexCreator(&index.ObjectMethodIndexCreatorParam{
 		ExceptionCreator:         param.ExceptionCreator,
 		PreObjectFunctionCreator: param.PreObjectFunctionCreator,
+		NullCreator:              param.NullCreator,
 	})
 	instance.ObjectFieldIndex = index.NewObjectFieldIndexCreator(&index.ObjectFieldIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
+		NullCreator:      param.NullCreator,
 	})
 	instance.ConstIndex = index.NewConstIndexCreator(&index.ConstIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,

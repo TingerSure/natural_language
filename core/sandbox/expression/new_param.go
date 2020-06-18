@@ -46,6 +46,21 @@ func (a *NewParam) ToString(prefix string) string {
 	return fmt.Sprintf("{\n%v\n%v}", strings.Join(paramsToString, ",\n"), prefix)
 }
 
+func (a *NewParam) Anticipate(space concept.Closure) concept.Variable {
+	if len(a.values) == 0 {
+		return a.seed.NewParam()
+	}
+	param := a.seed.NewParam().Init(func(on func(concept.String, concept.Variable) bool) bool {
+		for key, index := range a.values {
+			if on(key, index.Anticipate(space)) {
+				return true
+			}
+		}
+		return false
+	})
+	return param
+}
+
 func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	if len(a.values) == 0 {
 		return a.seed.NewParam(), nil
@@ -64,7 +79,6 @@ func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interr
 			}
 		}
 		return false
-
 	})
 
 	if !nl_interface.IsNil(suspend) {

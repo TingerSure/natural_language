@@ -26,6 +26,11 @@ func (e *ExpressionIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 	return false
 }
 
+func (e *ExpressionIndex) Anticipate(space concept.Closure) concept.Variable {
+	return nil
+	//TODO
+}
+
 func (e *ExpressionIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	return e.exec(space)
 }
