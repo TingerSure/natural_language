@@ -42,8 +42,22 @@ func (s *ObjectMethodIndex) ToString(prefix string) string {
 }
 
 func (s *ObjectMethodIndex) Anticipate(space concept.Closure) concept.Variable {
-	value, _ := s.Get(space)
-	return value
+	preObject := s.object.Anticipate(space)
+
+	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
+	if !ok {
+		return s.seed.NewNull()
+	}
+
+	function, suspend := object.GetMethod(s.key)
+	if !nl_interface.IsNil(suspend) {
+		return s.seed.NewNull()
+	}
+	if nl_interface.IsNil(function) {
+		return s.seed.NewNull()
+	}
+
+	return s.seed.NewPreObjectFunction(function, object)
 }
 
 func (s *ObjectMethodIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {

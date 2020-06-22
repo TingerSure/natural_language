@@ -53,7 +53,13 @@ func (s *ObjectFieldIndex) Get(space concept.Closure) (concept.Variable, concept
 }
 
 func (s *ObjectFieldIndex) Anticipate(space concept.Closure) concept.Variable {
-	value, _ := s.Get(space)
+	preObject := s.object.Anticipate(space)
+
+	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
+	if !ok {
+		return s.seed.NewNull()
+	}
+	value, _ := object.GetField(s.key)
 	return value
 }
 

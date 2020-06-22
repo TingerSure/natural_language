@@ -37,6 +37,11 @@ func (a *Call) ToString(prefix string) string {
 	return fmt.Sprintf("%v(%v)", a.funcs.ToString(prefix), a.param.ToString(prefix))
 }
 
+func (a *Call) Anticipate(space concept.Closure) concept.Variable {
+	return nil
+	//TODO
+}
+
 func (a *Call) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	preFuncs, suspend := a.funcs.Get(space)
 	if !nl_interface.IsNil(suspend) {
