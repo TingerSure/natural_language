@@ -37,7 +37,7 @@ func (k *Mapping) Init(specimen String, defaultValue interface{}) bool {
 	})
 	if !exist {
 		k.values = append(k.values, &MappingItem{
-			key:   specimen.Clone(),
+			key:   specimen,
 			value: defaultValue,
 		})
 	}
@@ -58,7 +58,7 @@ func (k *Mapping) Set(specimen String, value interface{}) bool {
 
 	if !exist && k.param.AutoInit {
 		k.values = append(k.values, &MappingItem{
-			key:   specimen.Clone(),
+			key:   specimen,
 			value: value,
 		})
 	}

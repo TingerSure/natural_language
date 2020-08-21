@@ -58,6 +58,25 @@ func (n *String) EqualLanguage(other concept.String) bool {
 	if n.Equal(other) {
 		return true
 	}
+
+	if other.IterateLanguages(func(otherLanguage string, otherValue string) bool {
+		if n.value == otherValue {
+			return true
+		}
+		return false
+	}) {
+		return true
+	}
+
+	if n.IterateLanguages(func(language string, value string) bool {
+		if other.Value() == value {
+			return true
+		}
+		return false
+	}) {
+		return true
+	}
+
 	hit := false
 	return !n.IterateLanguages(func(language string, value string) bool {
 		return other.IterateLanguages(func(otherLanguage string, otherValue string) bool {
