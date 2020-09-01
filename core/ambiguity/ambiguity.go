@@ -88,25 +88,40 @@ func (a *Ambiguity) Check(left, right tree.Phrase) int {
 	return 0
 }
 
-func (a *Ambiguity) Filter(phrases []tree.Phrase) tree.Phrase {
+func (a *Ambiguity) Filter(phrases []tree.Phrase) []tree.Phrase {
 	a.Sort(phrases)
-	var base tree.Phrase = nil
-	for _, now := range phrases {
-		if nl_interface.IsNil(base) {
-			base = now
+	var obsolete []bool = make([]bool, len(phrases), len(phrases))
+	result := []tree.Phrase{}
+	for leftIndex, left := range phrases {
+		if obsolete[leftIndex] {
 			continue
 		}
-		diffBase, diffNow := a.Diff(base, now)
-		if nl_interface.IsNil(diffBase) && nl_interface.IsNil(diffNow) {
-			continue
+	rightLoop:
+		for rightIndex := leftIndex + 1; rightIndex < len(phrases); rightIndex++ {
+			if obsolete[rightIndex] {
+				continue
+			}
+			right := phrases[rightIndex]
+			diffLeft, diffRight := a.Diff(left, right)
+			if nl_interface.IsNil(diffLeft) && nl_interface.IsNil(diffRight) {
+				continue
+			}
+			switch a.Check(diffLeft, diffRight) {
+			case 0:
+				continue rightLoop
+			case -1:
+				obsolete[rightIndex] = true
+				continue rightLoop
+			case 1:
+				obsolete[leftIndex] = true
+				break rightLoop
+			}
 		}
-		switch a.Check(diffBase, diffNow) {
-		case 0, -1:
-		case 1:
-			base = now
+		if !obsolete[leftIndex] {
+			result = append(result, phrases[leftIndex])
 		}
 	}
-	return base
+	return result
 }
 
 func NewAmbiguity() *Ambiguity {

@@ -60,12 +60,16 @@ func (r *Runtime) Deal(sentence string) (concept.Index, error) {
 		for _, river := range rivers {
 			candidates = append(candidates, river.GetWait().Peek())
 		}
-		selecteds = append(selecteds, r.ambiguity.Filter(candidates))
+		selecteds = append(selecteds, r.ambiguity.Filter(candidates)...)
 	}
 	if 0 == len(selecteds) {
-		return nil, errors.New("No rules available to match this sentence.")
+		return nil, errors.New("No struct rules available to match this sentence.")
 	}
-	return r.ambiguity.Filter(selecteds).Index(), nil
+	results := r.ambiguity.Filter(selecteds)
+	if 1 != len(results) {
+		return nil, errors.New("No priority rules available to match this sentence.")
+	}
+	return results[0].Index(), nil
 }
 
 func (r *Runtime) Read(stream *os.File) error {
