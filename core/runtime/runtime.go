@@ -12,20 +12,46 @@ import (
 	"os"
 )
 
+var (
+	runtimeStructErrorFormatDefault = func() string {
+		return "No struct rules available to match this sentence."
+	}
+
+	runtimePriorityErrorFormatDefault = func() string {
+		return "No priority rules available to match this sentence."
+	}
+)
+
 type Runtime struct {
-	lexer           *lexer.Lexer
-	grammar         *grammar.Grammar
-	ambiguity       *ambiguity.Ambiguity
-	libs            *LibraryManager
-	box             *sandbox.Sandbox
-	rootSpace       *closure.Closure
-	defaultLanguage string
+	lexer               *lexer.Lexer
+	grammar             *grammar.Grammar
+	ambiguity           *ambiguity.Ambiguity
+	libs                *LibraryManager
+	box                 *sandbox.Sandbox
+	rootSpace           *closure.Closure
+	defaultLanguage     string
+	structErrorFormat   func() string
+	priorityErrorFormat func() string
+}
+
+func (r *Runtime) SetStructErrorFormat(format func() string) {
+	if format == nil {
+		r.structErrorFormat = runtimeStructErrorFormatDefault
+	}
+	r.structErrorFormat = format
+}
+
+func (r *Runtime) SetPriorityErrorFormat(format func() string) {
+	if format == nil {
+		r.priorityErrorFormat = runtimePriorityErrorFormatDefault
+	}
+	r.priorityErrorFormat = format
 }
 
 func (r *Runtime) SetDefaultLanguage(name string) {
 	r.defaultLanguage = name
-
 }
+
 func (r *Runtime) GetDefaultLanguage() string {
 	return r.defaultLanguage
 }
@@ -63,11 +89,11 @@ func (r *Runtime) Deal(sentence string) (concept.Index, error) {
 		selecteds = append(selecteds, r.ambiguity.Filter(candidates)...)
 	}
 	if 0 == len(selecteds) {
-		return nil, errors.New("No struct rules available to match this sentence.")
+		return nil, errors.New(r.structErrorFormat())
 	}
 	results := r.ambiguity.Filter(selecteds)
 	if 1 != len(results) {
-		return nil, errors.New("No priority rules available to match this sentence.")
+		return nil, errors.New(r.priorityErrorFormat())
 	}
 	return results[0].Index(), nil
 }
@@ -111,10 +137,12 @@ type RuntimeParam struct {
 
 func NewRuntime(param *RuntimeParam) *Runtime {
 	runtime := &Runtime{
-		lexer:     lexer.NewLexer(),
-		grammar:   grammar.NewGrammar(),
-		ambiguity: ambiguity.NewAmbiguity(),
-		libs:      NewLibraryManager(),
+		lexer:               lexer.NewLexer(),
+		grammar:             grammar.NewGrammar(),
+		ambiguity:           ambiguity.NewAmbiguity(),
+		libs:                NewLibraryManager(),
+		structErrorFormat:   runtimeStructErrorFormatDefault,
+		priorityErrorFormat: runtimePriorityErrorFormatDefault,
 	}
 	runtime.rootSpace = runtime.libs.Sandbox.Closure.New(nil)
 	runtime.box = sandbox.NewSandbox(&sandbox.SandboxParam{
