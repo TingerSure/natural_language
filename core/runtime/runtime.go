@@ -77,15 +77,18 @@ func (r *Runtime) Deal(sentence string) (concept.Index, error) {
 	var group *lexer.FlowGroup = r.lexer.Instances(sentence)
 	selecteds := []tree.Phrase{}
 	for _, flow := range group.GetInstances() {
-		rivers, err := r.grammar.Instances(flow)
+		valley, err := r.grammar.Instances(flow)
 
 		if err != nil {
 			continue
 		}
 		candidates := []tree.Phrase{}
-		for _, river := range rivers {
+
+		valley.Iterate(func(river *grammar.River) bool {
 			candidates = append(candidates, river.GetWait().Peek())
-		}
+			return false
+		})
+
 		selecteds = append(selecteds, r.ambiguity.Filter(candidates)...)
 	}
 	if 0 == len(selecteds) {

@@ -1,8 +1,6 @@
 package grammar
 
 import (
-	"errors"
-	"fmt"
 	"github.com/TingerSure/natural_language/core/lexer"
 	"github.com/TingerSure/natural_language/core/tree"
 )
@@ -44,43 +42,18 @@ func (g *Grammar) RemoveVocabularyRule(need func(rule *tree.VocabularyRule) bool
 	}
 }
 
-func (l *Grammar) Instances(flow *lexer.Flow) ([]*River, error) {
+func (l *Grammar) Instances(flow *lexer.Flow) (*Valley, error) {
 	flow.Reset()
-	wait := NewCollector()
-	river := NewRiver(wait, flow)
-	bases, err := river.Step(l.vocabularies, l.structs)
+	valley := NewValley()
+	err := valley.Step(flow, l.vocabularies, l.structs)
 	if err != nil {
 		return nil, err
 	}
-	bases, err = l.riversfilter(bases)
+	valley, err = valley.Filter()
 	if err != nil {
 		return nil, err
 	}
-	return bases, nil
-}
-
-func (l *Grammar) riversfilter(inputs []*River) ([]*River, error) {
-	if len(inputs) == 0 {
-		return nil, errors.New("This is an empty sentence!")
-	}
-	actives := []*River{}
-	var min *River = nil
-	for _, input := range inputs {
-		if input.IsActive() {
-			actives = append(actives, input)
-			continue
-		}
-		if min == nil {
-			min = input
-		}
-		if input.GetWait().Len() < min.GetWait().Len() {
-			min = input
-		}
-	}
-	if len(actives) == 0 {
-		return nil, errors.New(fmt.Sprintf("There is an unknown rule in this sentence!\n%v", min.ToString()))
-	}
-	return actives, nil
+	return valley, nil
 }
 
 func (l *Grammar) init() *Grammar {
