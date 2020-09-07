@@ -27,8 +27,12 @@ var (
 		return fmt.Sprintf("%v \nNo struct rule can match ( %v ).", strings.Join(phraseString, ""), strings.Join(phraseType, ", "))
 	}
 
-	runtimePriorityErrorFormatDefault = func() string {
-		return "No priority rules available to match this sentence."
+	runtimePriorityErrorFormatDefault = func(phrases []tree.Phrase) string {
+		phraseString := []string{}
+		for _, phrase := range phrases {
+			phraseString = append(phraseString, phrase.ToString())
+		}
+		return fmt.Sprintf("%v \nNo priority rule can distinguish the above meanings.", strings.Join(phraseString, "\n"))
 	}
 )
 
@@ -41,7 +45,7 @@ type Runtime struct {
 	rootSpace           *closure.Closure
 	defaultLanguage     string
 	structErrorFormat   func(*grammar.River) string
-	priorityErrorFormat func() string
+	priorityErrorFormat func([]tree.Phrase) string
 }
 
 func (r *Runtime) SetStructErrorFormat(format func(*grammar.River) string) {
@@ -51,7 +55,7 @@ func (r *Runtime) SetStructErrorFormat(format func(*grammar.River) string) {
 	r.structErrorFormat = format
 }
 
-func (r *Runtime) SetPriorityErrorFormat(format func() string) {
+func (r *Runtime) SetPriorityErrorFormat(format func([]tree.Phrase) string) {
 	if format == nil {
 		r.priorityErrorFormat = runtimePriorityErrorFormatDefault
 	}
@@ -130,7 +134,7 @@ func (r *Runtime) Deal(sentence string) (concept.Index, error) {
 	}
 	results := r.ambiguity.Filter(selecteds)
 	if 1 != len(results) {
-		return nil, errors.New(r.priorityErrorFormat())
+		return nil, errors.New(r.priorityErrorFormat(results))
 	}
 	return results[0].Index(), nil
 }
