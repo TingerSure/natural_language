@@ -41,9 +41,9 @@ func (v *Valley) Iterate(onRiver func(river *River) bool) bool {
 	return false
 }
 
-func (v *Valley) Filter() (*Valley, error) {
+func (v *Valley) Filter() (*Valley, *River, error) {
 	if v.Size() == 0 {
-		return nil, errors.New("This is an empty sentence!")
+		return nil, nil, errors.New("This is an empty sentence!")
 	}
 	actives := NewValley()
 	var min *River = nil
@@ -62,9 +62,9 @@ func (v *Valley) Filter() (*Valley, error) {
 		return false
 	})
 	if actives.Size() == 0 {
-		return nil, errors.New(fmt.Sprintf("There is an unknown rule in this sentence!\n%v", min.ToString()))
+		return nil, min, errors.New(fmt.Sprintf("There is an unknown rule in this sentence!\n%v", min.ToString()))
 	}
-	return actives, nil
+	return actives, min, nil
 }
 
 func NewValley() *Valley {

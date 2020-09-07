@@ -49,10 +49,7 @@ func (l *Grammar) Instances(flow *lexer.Flow) (*Valley, error) {
 	if err != nil {
 		return nil, err
 	}
-	valley, err = valley.Filter()
-	if err != nil {
-		return nil, err
-	}
+
 	return valley, nil
 }
 

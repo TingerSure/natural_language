@@ -2,6 +2,8 @@ package runtime
 
 import (
 	"errors"
+	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/ambiguity"
 	"github.com/TingerSure/natural_language/core/grammar"
 	"github.com/TingerSure/natural_language/core/lexer"
@@ -10,11 +12,19 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
 	"os"
+	"strings"
 )
 
 var (
-	runtimeStructErrorFormatDefault = func() string {
-		return "No struct rules available to match this sentence."
+	runtimeStructErrorFormatDefault = func(river *grammar.River) string {
+		phrases := river.GetWait().PeekAll()
+		phraseString := []string{}
+		phraseType := []string{}
+		for _, phrase := range phrases {
+			phraseString = append(phraseString, phrase.ToString())
+			phraseType = append(phraseType, phrase.Types().Name())
+		}
+		return fmt.Sprintf("%v \nNo struct rule can match ( %v ).", strings.Join(phraseString, ""), strings.Join(phraseType, ", "))
 	}
 
 	runtimePriorityErrorFormatDefault = func() string {
@@ -30,11 +40,11 @@ type Runtime struct {
 	box                 *sandbox.Sandbox
 	rootSpace           *closure.Closure
 	defaultLanguage     string
-	structErrorFormat   func() string
+	structErrorFormat   func(*grammar.River) string
 	priorityErrorFormat func() string
 }
 
-func (r *Runtime) SetStructErrorFormat(format func() string) {
+func (r *Runtime) SetStructErrorFormat(format func(*grammar.River) string) {
 	if format == nil {
 		r.structErrorFormat = runtimeStructErrorFormatDefault
 	}
@@ -76,12 +86,21 @@ func (r *Runtime) Bind() {
 func (r *Runtime) Deal(sentence string) (concept.Index, error) {
 	var group *lexer.FlowGroup = r.lexer.Instances(sentence)
 	selecteds := []tree.Phrase{}
+	mostMatch := []*grammar.River{}
 	for _, flow := range group.GetInstances() {
-		valley, err := r.grammar.Instances(flow)
-
+		sourceValley, err := r.grammar.Instances(flow)
 		if err != nil {
 			continue
 		}
+
+		valley, min, err := sourceValley.Filter()
+		if err != nil {
+			if !nl_interface.IsNil(min) {
+				mostMatch = append(mostMatch, min)
+			}
+			continue
+		}
+
 		candidates := []tree.Phrase{}
 
 		valley.Iterate(func(river *grammar.River) bool {
@@ -92,7 +111,22 @@ func (r *Runtime) Deal(sentence string) (concept.Index, error) {
 		selecteds = append(selecteds, r.ambiguity.Filter(candidates)...)
 	}
 	if 0 == len(selecteds) {
-		return nil, errors.New(r.structErrorFormat())
+
+		if 0 == len(mostMatch) {
+			return nil, errors.New("Empty sentence.")
+		}
+
+		var min *grammar.River
+		for _, river := range mostMatch {
+			if nl_interface.IsNil(min) {
+				min = river
+				continue
+			}
+			if river.GetWait().Len() < min.GetWait().Len() {
+				min = river
+			}
+		}
+		return nil, errors.New(r.structErrorFormat(min))
 	}
 	results := r.ambiguity.Filter(selecteds)
 	if 1 != len(results) {
