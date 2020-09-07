@@ -8,7 +8,7 @@ import (
 )
 
 type River struct {
-	wait *Collector
+	wait *Lake
 	flow *lexer.Flow
 }
 
@@ -24,7 +24,7 @@ func (r *River) IsActive() bool {
 	return r.wait.IsSingle() && r.flow.IsEnd()
 }
 
-func (r *River) GetWait() *Collector {
+func (r *River) GetWait() *Lake {
 	return r.wait
 }
 
@@ -109,7 +109,7 @@ func (r *River) Copy() *River {
 	return NewRiver(r.wait.Copy(), r.flow.Copy())
 }
 
-func NewRiver(wait *Collector, flow *lexer.Flow) *River {
+func NewRiver(wait *Lake, flow *lexer.Flow) *River {
 	return &River{
 		wait: wait,
 		flow: flow,

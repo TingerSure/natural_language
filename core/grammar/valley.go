@@ -16,7 +16,7 @@ func (v *Valley) Size() int {
 }
 
 func (v *Valley) Step(flow *lexer.Flow, leaves []*tree.VocabularyRule, twigs []*tree.StructRule) error {
-	wait := NewCollector()
+	wait := NewLake()
 	river := NewRiver(wait, flow)
 	bases, err := river.Step(leaves, twigs)
 	if err != nil {

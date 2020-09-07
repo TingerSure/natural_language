@@ -4,25 +4,25 @@ import (
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
-type Collector struct {
+type Lake struct {
 	phrases []tree.Phrase
 	length  int
 }
 
-func (c *Collector) Copy() *Collector {
-	substitute := NewCollector()
+func (c *Lake) Copy() *Lake {
+	substitute := NewLake()
 	for _, treasure := range c.phrases {
 		substitute.Push(treasure.Copy())
 	}
 	return substitute
 }
 
-func (c *Collector) Push(treasure tree.Phrase) {
+func (c *Lake) Push(treasure tree.Phrase) {
 	c.phrases = append(c.phrases, treasure)
 	c.length++
 }
 
-func (c *Collector) Pop() tree.Phrase {
+func (c *Lake) Pop() tree.Phrase {
 	if c.length <= 0 {
 		return nil
 	}
@@ -31,7 +31,7 @@ func (c *Collector) Pop() tree.Phrase {
 	c.phrases = c.phrases[:c.length]
 	return peek
 }
-func (c *Collector) PopMultiple(size int) []tree.Phrase {
+func (c *Lake) PopMultiple(size int) []tree.Phrase {
 	if c.length < size {
 		return nil
 	}
@@ -40,38 +40,38 @@ func (c *Collector) PopMultiple(size int) []tree.Phrase {
 	c.phrases = c.phrases[:c.length]
 	return peek
 }
-func (c *Collector) Peek() tree.Phrase {
+func (c *Lake) Peek() tree.Phrase {
 	if c.length <= 0 {
 		return nil
 	}
 	return c.phrases[c.length-1]
 }
 
-func (c *Collector) PeekAll() []tree.Phrase {
+func (c *Lake) PeekAll() []tree.Phrase {
 	return c.phrases
 }
 
-func (c *Collector) PeekMultiple(size int) []tree.Phrase {
+func (c *Lake) PeekMultiple(size int) []tree.Phrase {
 	if c.length < size {
 		return nil
 	}
 	return c.phrases[c.length-size:]
 }
 
-func (c *Collector) Len() int {
+func (c *Lake) Len() int {
 	return c.length
 }
-func (c *Collector) IsEmpty() bool {
+func (c *Lake) IsEmpty() bool {
 	return c.length == 0
 }
-func (c *Collector) IsSingle() bool {
+func (c *Lake) IsSingle() bool {
 	return c.length == 1
 }
 
-func (c *Collector) init() *Collector {
+func (c *Lake) init() *Lake {
 	return c
 }
 
-func NewCollector() *Collector {
-	return (&Collector{}).init()
+func NewLake() *Lake {
+	return (&Lake{}).init()
 }
