@@ -11,20 +11,22 @@ type Valley struct {
 	values []*River
 }
 
+func (v *Valley) AllRivers() []*River {
+	return v.values
+}
+
 func (v *Valley) Size() int {
 	return len(v.values)
 }
 
-func (v *Valley) Step(flow *lexer.Flow, leaves []*tree.VocabularyRule, twigs []*tree.StructRule) error {
+func (v *Valley) Step(flow *lexer.Flow, leaves []*tree.VocabularyRule, twigs []*tree.StructRule, gardener *Ambiguity) error {
 	wait := NewLake()
 	river := NewRiver(wait, flow)
-	bases, err := river.Step(leaves, twigs)
+	bases, err := river.Step(leaves, twigs, gardener)
 	if err != nil {
 		return err
 	}
-	for _, base := range bases {
-		v.AddRiver(base)
-	}
+	v.values = gardener.Filter(bases)
 	return nil
 }
 

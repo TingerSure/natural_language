@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/ambiguity"
 	"github.com/TingerSure/natural_language/core/grammar"
 	"github.com/TingerSure/natural_language/core/lexer"
 	"github.com/TingerSure/natural_language/core/sandbox"
@@ -27,25 +26,24 @@ var (
 		return fmt.Sprintf("%v \nNo struct rule can match ( %v ).", strings.Join(phraseString, ""), strings.Join(phraseType, ", "))
 	}
 
-	runtimePriorityErrorFormatDefault = func(phrases []tree.Phrase) string {
-		phraseString := []string{}
-		for _, phrase := range phrases {
-			phraseString = append(phraseString, phrase.ToString())
+	runtimePriorityErrorFormatDefault = func(rivers []*grammar.River) string {
+		riverString := []string{}
+		for _, river := range rivers {
+			riverString = append(riverString, river.GetWait().Peek().ToString())
 		}
-		return fmt.Sprintf("%v \nNo priority rule can distinguish the above meanings.", strings.Join(phraseString, "\n"))
+		return fmt.Sprintf("%v \nNo priority rule can distinguish the above meanings.", strings.Join(riverString, "\n"))
 	}
 )
 
 type Runtime struct {
 	lexer               *lexer.Lexer
 	grammar             *grammar.Grammar
-	ambiguity           *ambiguity.Ambiguity
 	libs                *LibraryManager
 	box                 *sandbox.Sandbox
 	rootSpace           *closure.Closure
 	defaultLanguage     string
 	structErrorFormat   func(*grammar.River) string
-	priorityErrorFormat func([]tree.Phrase) string
+	priorityErrorFormat func([]*grammar.River) string
 }
 
 func (r *Runtime) SetStructErrorFormat(format func(*grammar.River) string) {
@@ -55,7 +53,7 @@ func (r *Runtime) SetStructErrorFormat(format func(*grammar.River) string) {
 	r.structErrorFormat = format
 }
 
-func (r *Runtime) SetPriorityErrorFormat(format func([]tree.Phrase) string) {
+func (r *Runtime) SetPriorityErrorFormat(format func([]*grammar.River) string) {
 	if format == nil {
 		r.priorityErrorFormat = runtimePriorityErrorFormatDefault
 	}
@@ -80,7 +78,7 @@ func (r *Runtime) Bind() {
 			r.lexer.AddNaturalSource(source)
 			r.grammar.AddStructRule(source.GetStructRules())
 			r.grammar.AddVocabularyRule(source.GetVocabularyRules())
-			r.ambiguity.AddRule(source.GetPriorityRules())
+			r.grammar.AddPriorityRule(source.GetPriorityRules())
 		}
 		return false
 	})
@@ -89,7 +87,7 @@ func (r *Runtime) Bind() {
 
 func (r *Runtime) Deal(sentence string) (concept.Index, error) {
 	var group *lexer.FlowGroup = r.lexer.Instances(sentence)
-	selecteds := []tree.Phrase{}
+	selecteds := []*grammar.River{}
 	mostMatch := []*grammar.River{}
 	for _, flow := range group.GetInstances() {
 		sourceValley, err := r.grammar.Instances(flow)
@@ -104,15 +102,7 @@ func (r *Runtime) Deal(sentence string) (concept.Index, error) {
 			}
 			continue
 		}
-
-		candidates := []tree.Phrase{}
-
-		valley.Iterate(func(river *grammar.River) bool {
-			candidates = append(candidates, river.GetWait().Peek())
-			return false
-		})
-
-		selecteds = append(selecteds, r.ambiguity.Filter(candidates)...)
+		selecteds = append(selecteds, valley.AllRivers()...)
 	}
 	if 0 == len(selecteds) {
 
@@ -132,11 +122,12 @@ func (r *Runtime) Deal(sentence string) (concept.Index, error) {
 		}
 		return nil, errors.New(r.structErrorFormat(min))
 	}
-	results := r.ambiguity.Filter(selecteds)
+	results := r.grammar.GetGardener().Filter(selecteds)
 	if 1 != len(results) {
 		return nil, errors.New(r.priorityErrorFormat(results))
 	}
-	return results[0].Index(), nil
+
+	return results[0].GetWait().Peek().Index(), nil
 }
 
 func (r *Runtime) Read(stream *os.File) error {
@@ -180,7 +171,6 @@ func NewRuntime(param *RuntimeParam) *Runtime {
 	runtime := &Runtime{
 		lexer:               lexer.NewLexer(),
 		grammar:             grammar.NewGrammar(),
-		ambiguity:           ambiguity.NewAmbiguity(),
 		libs:                NewLibraryManager(),
 		structErrorFormat:   runtimeStructErrorFormatDefault,
 		priorityErrorFormat: runtimePriorityErrorFormatDefault,

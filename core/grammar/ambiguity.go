@@ -1,4 +1,4 @@
-package ambiguity
+package grammar
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
@@ -6,19 +6,19 @@ import (
 	"sort"
 )
 
-type sortPhrase struct {
-	phrases []tree.Phrase
+type sortRiver struct {
+	rivers []*River
 }
 
-func (s *sortPhrase) Len() int {
-	return len(s.phrases)
+func (s *sortRiver) Len() int {
+	return len(s.rivers)
 }
 
-func (s *sortPhrase) Swap(left, right int) {
-	s.phrases[left], s.phrases[right] = s.phrases[right], s.phrases[left]
+func (s *sortRiver) Swap(left, right int) {
+	s.rivers[left], s.rivers[right] = s.rivers[right], s.rivers[left]
 }
 
-func (s *sortPhrase) Compare(left, right tree.Phrase) int {
+func (s *sortRiver) Compare(left, right tree.Phrase) int {
 	if left.From() < right.From() {
 		return -1
 	}
@@ -37,17 +37,17 @@ func (s *sortPhrase) Compare(left, right tree.Phrase) int {
 	return 0
 }
 
-func (s *sortPhrase) Less(left, right int) bool {
-	return s.Compare(s.phrases[left], s.phrases[right]) < 0
+func (s *sortRiver) Less(left, right int) bool {
+	return s.Compare(s.rivers[left].GetWait().Peek(), s.rivers[right].GetWait().Peek()) < 0
 }
 
 type Ambiguity struct {
 	rules []*tree.PriorityRule
 }
 
-func (a *Ambiguity) Sort(phrases []tree.Phrase) {
-	sort.Sort(&sortPhrase{
-		phrases: phrases,
+func (a *Ambiguity) Sort(rivers []*River) {
+	sort.Sort(&sortRiver{
+		rivers: rivers,
 	})
 }
 
@@ -88,21 +88,21 @@ func (a *Ambiguity) Check(left, right tree.Phrase) int {
 	return 0
 }
 
-func (a *Ambiguity) Filter(phrases []tree.Phrase) []tree.Phrase {
-	a.Sort(phrases)
-	var obsolete []bool = make([]bool, len(phrases), len(phrases))
-	result := []tree.Phrase{}
-	for leftIndex, left := range phrases {
+func (a *Ambiguity) Filter(rivers []*River) []*River {
+	a.Sort(rivers)
+	var obsolete []bool = make([]bool, len(rivers), len(rivers))
+	result := []*River{}
+	for leftIndex, left := range rivers {
 		if obsolete[leftIndex] {
 			continue
 		}
 	rightLoop:
-		for rightIndex := leftIndex + 1; rightIndex < len(phrases); rightIndex++ {
+		for rightIndex := leftIndex + 1; rightIndex < len(rivers); rightIndex++ {
 			if obsolete[rightIndex] {
 				continue
 			}
-			right := phrases[rightIndex]
-			diffLeft, diffRight := a.Diff(left, right)
+			right := rivers[rightIndex]
+			diffLeft, diffRight := a.Diff(left.GetWait().Peek(), right.GetWait().Peek())
 			if nl_interface.IsNil(diffLeft) && nl_interface.IsNil(diffRight) {
 				continue
 			}
@@ -118,7 +118,7 @@ func (a *Ambiguity) Filter(phrases []tree.Phrase) []tree.Phrase {
 			}
 		}
 		if !obsolete[leftIndex] {
-			result = append(result, phrases[leftIndex])
+			result = append(result, rivers[leftIndex])
 		}
 	}
 	return result
@@ -126,4 +126,10 @@ func (a *Ambiguity) Filter(phrases []tree.Phrase) []tree.Phrase {
 
 func NewAmbiguity() *Ambiguity {
 	return &Ambiguity{}
+}
+
+func NewAmbiguityWithRules(rules []*tree.PriorityRule) *Ambiguity {
+	return &Ambiguity{
+		rules: rules,
+	}
 }

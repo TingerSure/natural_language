@@ -64,7 +64,7 @@ func (r *River) vocabularyCheck(leaves []*tree.VocabularyRule, onVocabulary func
 	return nil
 }
 
-func (r *River) Step(leaves []*tree.VocabularyRule, twigs []*tree.StructRule) ([]*River, error) {
+func (r *River) Step(leaves []*tree.VocabularyRule, twigs []*tree.StructRule, gardener *Ambiguity) ([]*River, error) {
 	var err error
 	tributaries := []*River{}
 	subStructs := []*River{}
@@ -89,14 +89,16 @@ func (r *River) Step(leaves []*tree.VocabularyRule, twigs []*tree.StructRule) ([
 		return tributaries, nil
 	}
 	for _, subStruct := range subStructs {
-		subs, err := subStruct.Step(leaves, twigs)
+		subs, err := subStruct.Step(leaves, twigs, gardener)
 		if err != nil {
 			return nil, err
 		}
+		subs = gardener.Filter(subs)
 		tributaries = append(tributaries, subs...)
 	}
+
 	for _, subVocabulary := range subVocabularies {
-		subs, err := subVocabulary.Step(leaves, twigs)
+		subs, err := subVocabulary.Step(leaves, twigs, gardener)
 		if err != nil {
 			return nil, err
 		}
