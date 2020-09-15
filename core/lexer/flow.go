@@ -105,7 +105,7 @@ func (l *Flow) AddVocabulary(vocabulary *tree.Vocabulary) {
 	if len(l.vocabularies) != 0 {
 		var last *tree.Vocabulary = l.vocabularies[len(l.vocabularies)-1]
 		if last.GetSource() == nil && vocabulary.GetSource() == nil {
-			l.vocabularies[len(l.vocabularies)-1] = tree.NewVocabulary(tree.NewUnknownWord(last.GetWord().GetContext()+vocabulary.GetWord().GetContext()), nil)
+			l.vocabularies[len(l.vocabularies)-1] = tree.NewVocabulary(tree.NewWord(last.GetWord().GetContext()+vocabulary.GetWord().GetContext()), nil)
 			return
 		}
 	}

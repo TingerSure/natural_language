@@ -52,7 +52,7 @@ func (l *Lexer) instanceStep(sentence string, index int, now *Flow, group *FlowG
 		count++
 	}
 	if count == 0 {
-		var vocabulary *tree.Vocabulary = tree.NewVocabulary(tree.NewUnknownWord(nl_string.SubString(indexSentence, 0, 1)), nil)
+		var vocabulary *tree.Vocabulary = tree.NewVocabulary(tree.NewWord(nl_string.SubString(indexSentence, 0, 1)), nil)
 		now.AddVocabulary(vocabulary)
 		l.instanceStep(sentence, index+vocabulary.GetWord().Len(), now, group)
 	}

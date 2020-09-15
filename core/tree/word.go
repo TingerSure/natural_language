@@ -32,10 +32,6 @@ func NewWord(context string) *Word {
 
 }
 
-func NewUnknownWord(context string) *Word {
-	return NewWord(context)
-}
-
 func WordsFilter(words []*Word, sentence string) []*Word {
 	var targets []*Word
 
