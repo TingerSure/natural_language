@@ -8,31 +8,25 @@ import (
 )
 
 const (
-	Is    = "是"
-	Equal = "等于"
+	IsCharactor    = "是"
+	EqualCharactor = "等于"
 
 	SetName string = "word.verb.set"
 )
 
-var (
-	SetCharactors = []*tree.Word{
-		tree.NewWord(Is),
-		tree.NewWord(Equal),
-	}
-)
-
 type Set struct {
 	*adaptor.SourceAdaptor
-	Is    concept.String
-	Equal concept.String
+	Is        concept.String
+	Equal     concept.String
+	instances []*tree.Vocabulary
 }
 
 func (s *Set) GetName() string {
 	return SetName
 }
 
-func (s *Set) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(SetCharactors, sentence)
+func (s *Set) GetWords(sentence string) []*tree.Vocabulary {
+	return tree.VocabularysFilter(s.instances, sentence)
 }
 func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
@@ -42,7 +36,7 @@ func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 			},
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				set := s.Is
-				if treasure.GetWord().GetContext() == Equal {
+				if treasure.GetContext() == EqualCharactor {
 					set = s.Equal
 				}
 
@@ -68,7 +62,11 @@ func NewSet(param *adaptor.SourceAdaptorParam) *Set {
 
 	set.Is = setPage.GetConst(set.Libs.Sandbox.Variable.String.New("Is"))
 	set.Equal = setPage.GetConst(set.Libs.Sandbox.Variable.String.New("Equal"))
-	set.Is.SetLanguage(param.Language, Is)
-	set.Equal.SetLanguage(param.Language, Equal)
+	set.Is.SetLanguage(param.Language, IsCharactor)
+	set.Equal.SetLanguage(param.Language, EqualCharactor)
+	set.instances = []*tree.Vocabulary{
+		tree.NewVocabulary(EqualCharactor, set),
+		tree.NewVocabulary(IsCharactor, set),
+	}
 	return set
 }

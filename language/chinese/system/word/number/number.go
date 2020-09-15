@@ -25,10 +25,10 @@ func (p *Number) GetName() string {
 	return NumberName
 }
 
-func (p *Number) GetWords(sentence string) []*tree.Word {
+func (p *Number) GetWords(sentence string) []*tree.Vocabulary {
 	value := numberTemplate.FindString(sentence)
 	if value != "" {
-		return []*tree.Word{tree.NewWord(value)}
+		return []*tree.Vocabulary{tree.NewVocabulary(value, p)}
 	}
 	return nil
 }
@@ -42,7 +42,7 @@ func (p *Number) GetVocabularyRules() []*tree.VocabularyRule {
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
 					Index: func() concept.Index {
-						value, err := strconv.ParseFloat(treasure.GetWord().GetContext(), 64)
+						value, err := strconv.ParseFloat(treasure.GetContext(), 64)
 						if err != nil {
 							panic(err)
 						}

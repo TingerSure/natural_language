@@ -22,7 +22,7 @@ func NewSourceAdaptor(param *SourceAdaptorParam) *SourceAdaptor {
 	}
 }
 
-func (*SourceAdaptor) GetWords(string) []*tree.Word {
+func (*SourceAdaptor) GetWords(string) []*tree.Vocabulary {
 	return nil
 }
 

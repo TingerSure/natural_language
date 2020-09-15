@@ -21,7 +21,7 @@ func (l *Flow) ValidLength() int {
 		if nl_interface.IsNil(vocabulary.GetSource()) {
 			return valid
 		}
-		valid += vocabulary.GetWord().Len()
+		valid += vocabulary.Len()
 	}
 	return valid
 }
@@ -39,7 +39,7 @@ func (l *Flow) ToString() string {
 	var toString string = ""
 	l.Reset()
 	for vocabulary := l.Next(); vocabulary != nil; vocabulary = l.Next() {
-		toString += vocabulary.GetWord().GetContext()
+		toString += vocabulary.GetContext()
 		toString += "("
 		if vocabulary.GetSource() != nil {
 			toString += vocabulary.GetSource().GetName()
@@ -105,7 +105,7 @@ func (l *Flow) AddVocabulary(vocabulary *tree.Vocabulary) {
 	if len(l.vocabularies) != 0 {
 		var last *tree.Vocabulary = l.vocabularies[len(l.vocabularies)-1]
 		if last.GetSource() == nil && vocabulary.GetSource() == nil {
-			l.vocabularies[len(l.vocabularies)-1] = tree.NewVocabulary(tree.NewWord(last.GetWord().GetContext()+vocabulary.GetWord().GetContext()), nil)
+			l.vocabularies[len(l.vocabularies)-1] = tree.NewVocabulary(last.GetContext()+vocabulary.GetContext(), nil)
 			return
 		}
 	}

@@ -13,21 +13,18 @@ const (
 	additionCharactor = "+"
 )
 
-var (
-	additionWords []*tree.Word = []*tree.Word{tree.NewWord(additionCharactor)}
-)
-
 type Addition struct {
 	*adaptor.SourceAdaptor
-	operator concept.Function
+	operator  concept.Function
+	instances []*tree.Vocabulary
 }
 
 func (p *Addition) GetName() string {
 	return AdditionName
 }
 
-func (p *Addition) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(additionWords, sentence)
+func (p *Addition) GetWords(sentence string) []*tree.Vocabulary {
+	return tree.VocabularysFilter(p.instances, sentence)
 }
 
 func (p *Addition) GetVocabularyRules() []*tree.VocabularyRule {
@@ -55,5 +52,8 @@ func NewAddition(param *adaptor.SourceAdaptorParam) *Addition {
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 	instance.operator = instance.Libs.GetLibraryPage("system", "operator").GetFunction(instance.Libs.Sandbox.Variable.String.New("AdditionFunc"))
+	instance.instances = []*tree.Vocabulary{
+		tree.NewVocabulary(additionCharactor, instance),
+	}
 	return instance
 }

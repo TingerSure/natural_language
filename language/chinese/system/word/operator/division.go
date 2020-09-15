@@ -13,21 +13,18 @@ const (
 	divisionCharactor = "/"
 )
 
-var (
-	divisionWords []*tree.Word = []*tree.Word{tree.NewWord(divisionCharactor)}
-)
-
 type Division struct {
 	*adaptor.SourceAdaptor
-	operator concept.Function
+	operator  concept.Function
+	instances []*tree.Vocabulary
 }
 
 func (p *Division) GetName() string {
 	return DivisionName
 }
 
-func (p *Division) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(divisionWords, sentence)
+func (p *Division) GetWords(sentence string) []*tree.Vocabulary {
+	return tree.VocabularysFilter(p.instances, sentence)
 }
 
 func (p *Division) GetVocabularyRules() []*tree.VocabularyRule {
@@ -55,5 +52,8 @@ func NewDivision(param *adaptor.SourceAdaptorParam) *Division {
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 	instance.operator = instance.Libs.GetLibraryPage("system", "operator").GetFunction(instance.Libs.Sandbox.Variable.String.New("DivisionFunc"))
+	instance.instances = []*tree.Vocabulary{
+		tree.NewVocabulary(divisionCharactor, instance),
+	}
 	return instance
 }

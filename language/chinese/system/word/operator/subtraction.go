@@ -13,25 +13,18 @@ const (
 	subtractionCharactor = "-"
 )
 
-var (
-	subtractionWords []*tree.Word = []*tree.Word{tree.NewWord(subtractionCharactor)}
-)
-
-func init() {
-
-}
-
 type Subtraction struct {
 	*adaptor.SourceAdaptor
-	operator concept.Function
+	operator  concept.Function
+	instances []*tree.Vocabulary
 }
 
 func (p *Subtraction) GetName() string {
 	return SubtractionName
 }
 
-func (p *Subtraction) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(subtractionWords, sentence)
+func (p *Subtraction) GetWords(sentence string) []*tree.Vocabulary {
+	return tree.VocabularysFilter(p.instances, sentence)
 }
 
 func (p *Subtraction) GetVocabularyRules() []*tree.VocabularyRule {
@@ -59,5 +52,8 @@ func NewSubtraction(param *adaptor.SourceAdaptorParam) *Subtraction {
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 	instance.operator = instance.Libs.GetLibraryPage("system", "operator").GetFunction(instance.Libs.Sandbox.Variable.String.New("SubtractionFunc"))
+	instance.instances = []*tree.Vocabulary{
+		tree.NewVocabulary(subtractionCharactor, instance),
+	}
 	return instance
 }

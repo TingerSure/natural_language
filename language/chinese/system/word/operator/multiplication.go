@@ -13,21 +13,18 @@ const (
 	multiplicationCharactor = "*"
 )
 
-var (
-	multiplicationWords []*tree.Word = []*tree.Word{tree.NewWord(multiplicationCharactor)}
-)
-
 type Multiplication struct {
 	*adaptor.SourceAdaptor
-	operator concept.Function
+	operator  concept.Function
+	instances []*tree.Vocabulary
 }
 
 func (p *Multiplication) GetName() string {
 	return MultiplicationName
 }
 
-func (p *Multiplication) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(multiplicationWords, sentence)
+func (p *Multiplication) GetWords(sentence string) []*tree.Vocabulary {
+	return tree.VocabularysFilter(p.instances, sentence)
 }
 
 func (p *Multiplication) GetVocabularyRules() []*tree.VocabularyRule {
@@ -55,5 +52,8 @@ func NewMultiplication(param *adaptor.SourceAdaptorParam) *Multiplication {
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 	instance.operator = instance.Libs.GetLibraryPage("system", "operator").GetFunction(instance.Libs.Sandbox.Variable.String.New("MultiplicationFunc"))
+	instance.instances = []*tree.Vocabulary{
+		tree.NewVocabulary(multiplicationCharactor, instance),
+	}
 	return instance
 }

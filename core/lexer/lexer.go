@@ -3,6 +3,7 @@ package lexer
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_string"
 	"github.com/TingerSure/natural_language/core/tree"
+	"unicode/utf8"
 )
 
 type Lexer struct {
@@ -12,13 +13,11 @@ type Lexer struct {
 
 func (l *Lexer) getVocabulariesBySources(sentence string, sources map[string]tree.Source, vocabularies []*tree.Vocabulary) []*tree.Vocabulary {
 	for _, source := range sources {
-		var words []*tree.Word = source.GetWords(sentence)
+		var words []*tree.Vocabulary = source.GetWords(sentence)
 		if words == nil {
 			continue
 		}
-		for _, word := range words {
-			vocabularies = append(vocabularies, tree.NewVocabulary(word, source))
-		}
+		vocabularies = append(vocabularies, words...)
 	}
 	return vocabularies
 }
@@ -31,7 +30,7 @@ func (l *Lexer) getVocabulary(sentence string) []*tree.Vocabulary {
 }
 
 func (l *Lexer) instanceStep(sentence string, index int, now *Flow, group *FlowGroup) {
-	if index >= nl_string.Len(sentence) {
+	if index >= utf8.RuneCountInString(sentence) {
 		return
 	}
 	var indexSentence string = nl_string.SubStringFrom(sentence, index)
@@ -42,19 +41,19 @@ func (l *Lexer) instanceStep(sentence string, index int, now *Flow, group *FlowG
 	for _, vocabulary := range vocabularies {
 		if count == 0 {
 			now.AddVocabulary(vocabulary)
-			l.instanceStep(sentence, index+vocabulary.GetWord().Len(), now, group)
+			l.instanceStep(sentence, index+vocabulary.Len(), now, group)
 		} else {
 			var new *Flow = base.Copy()
 			group.AddInstance(new)
 			new.AddVocabulary(vocabulary)
-			l.instanceStep(sentence, index+vocabulary.GetWord().Len(), new, group)
+			l.instanceStep(sentence, index+vocabulary.Len(), new, group)
 		}
 		count++
 	}
 	if count == 0 {
-		var vocabulary *tree.Vocabulary = tree.NewVocabulary(tree.NewWord(nl_string.SubString(indexSentence, 0, 1)), nil)
+		var vocabulary *tree.Vocabulary = tree.NewVocabulary(nl_string.SubString(indexSentence, 0, 1), nil)
 		now.AddVocabulary(vocabulary)
-		l.instanceStep(sentence, index+vocabulary.GetWord().Len(), now, group)
+		l.instanceStep(sentence, index+vocabulary.Len(), now, group)
 	}
 }
 

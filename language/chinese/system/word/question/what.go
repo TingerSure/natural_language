@@ -14,17 +14,16 @@ const (
 
 type What struct {
 	*adaptor.SourceAdaptor
-	WhatFunc concept.Function
+	WhatFunc  concept.Function
+	instances []*tree.Vocabulary
 }
 
 func (p *What) GetName() string {
 	return WhatName
 }
 
-func (p *What) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter([]*tree.Word{
-		tree.NewWord(WhatCharactor),
-	}, sentence)
+func (p *What) GetWords(sentence string) []*tree.Vocabulary {
+	return tree.VocabularysFilter(p.instances, sentence)
 }
 
 func (p *What) GetVocabularyRules() []*tree.VocabularyRule {
@@ -53,6 +52,8 @@ func NewWhat(param *adaptor.SourceAdaptorParam) *What {
 	})
 	page := instance.Libs.GetLibraryPage("system", "question")
 	instance.WhatFunc = page.GetFunction(instance.Libs.Sandbox.Variable.String.New("What"))
-
+	instance.instances = []*tree.Vocabulary{
+		tree.NewVocabulary(WhatCharactor, instance),
+	}
 	return instance
 }

@@ -12,21 +12,18 @@ const (
 	RightName      string = "word.brackets.right"
 )
 
-var (
-	RightWord []*tree.Word = []*tree.Word{tree.NewWord(RightCharactor)}
-)
-
 type BracketsRight struct {
 	*adaptor.SourceAdaptor
 	RightIndex concept.String
+	instances  []*tree.Vocabulary
 }
 
 func (s *BracketsRight) GetName() string {
 	return RightName
 }
 
-func (s *BracketsRight) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(RightWord, sentence)
+func (s *BracketsRight) GetWords(sentence string) []*tree.Vocabulary {
+	return tree.VocabularysFilter(s.instances, sentence)
 }
 func (s *BracketsRight) GetVocabularyRules() []*tree.VocabularyRule {
 	return []*tree.VocabularyRule{
@@ -49,8 +46,13 @@ func (s *BracketsRight) GetVocabularyRules() []*tree.VocabularyRule {
 }
 
 func NewBracketsRight(param *adaptor.SourceAdaptorParam) *BracketsRight {
-	return (&BracketsRight{
+	right := (&BracketsRight{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 		RightIndex:    param.Libs.Sandbox.Variable.String.New(RightCharactor),
 	})
+
+	right.instances = []*tree.Vocabulary{
+		tree.NewVocabulary(RightCharactor, right),
+	}
+	return right
 }

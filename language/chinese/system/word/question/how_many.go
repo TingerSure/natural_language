@@ -15,16 +15,15 @@ const (
 type HowMany struct {
 	*adaptor.SourceAdaptor
 	HowManyFunc concept.Function
+	instances   []*tree.Vocabulary
 }
 
 func (p *HowMany) GetName() string {
 	return HowManyName
 }
 
-func (p *HowMany) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter([]*tree.Word{
-		tree.NewWord(HowManyCharactor),
-	}, sentence)
+func (p *HowMany) GetWords(sentence string) []*tree.Vocabulary {
+	return tree.VocabularysFilter(p.instances, sentence)
 }
 
 func (p *HowMany) GetVocabularyRules() []*tree.VocabularyRule {
@@ -53,6 +52,8 @@ func NewHowMany(param *adaptor.SourceAdaptorParam) *HowMany {
 	})
 	page := instance.Libs.GetLibraryPage("system", "question")
 	instance.HowManyFunc = page.GetFunction(instance.Libs.Sandbox.Variable.String.New("HowMany"))
-
+	instance.instances = []*tree.Vocabulary{
+		tree.NewVocabulary(HowManyCharactor, instance),
+	}
 	return instance
 }

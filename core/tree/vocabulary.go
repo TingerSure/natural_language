@@ -2,23 +2,25 @@ package tree
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_string"
+	"unicode/utf8"
 )
 
 type Vocabulary struct {
-	word   *Word
-	source Source
+	context string
+	source  Source
 }
 
-func (l *Vocabulary) GetWord() *Word {
-	return l.word
+func (w *Vocabulary) GetContext() string {
+	return w.context
 }
 
 func (l *Vocabulary) GetSource() Source {
 	return l.source
 }
 
-func (l *Vocabulary) init(word *Word, source Source) *Vocabulary {
-	l.word = word
+func (l *Vocabulary) init(context string, source Source) *Vocabulary {
+	l.context = context
 	l.source = source
 	return l
 }
@@ -29,9 +31,36 @@ func (l *Vocabulary) ToString() string {
 		sourceName = l.source.GetName()
 
 	}
-	return fmt.Sprintf("%v (%v)", l.word.GetContext(), sourceName)
+	return fmt.Sprintf("%v (%v)", l.context, sourceName)
 }
 
-func NewVocabulary(word *Word, source Source) *Vocabulary {
-	return (&Vocabulary{}).init(word, source)
+func (w *Vocabulary) StartFor(sentence string) bool {
+	return 0 == nl_string.Index(sentence, w.context)
+}
+
+func (w *Vocabulary) StartWith(first string) bool {
+	return 0 == nl_string.Index(w.context, first)
+
+}
+
+func (w *Vocabulary) Len() int {
+	return utf8.RuneCountInString(w.context)
+}
+
+func NewVocabulary(context string, source Source) *Vocabulary {
+	return (&Vocabulary{
+		context: context,
+		source:  source,
+	})
+}
+
+func VocabularysFilter(words []*Vocabulary, sentence string) []*Vocabulary {
+	var targets []*Vocabulary
+
+	for _, word := range words {
+		if word.StartFor(sentence) {
+			targets = append(targets, word)
+		}
+	}
+	return targets
 }

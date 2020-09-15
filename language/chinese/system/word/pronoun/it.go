@@ -13,23 +13,18 @@ const (
 	ItCharactor string = "它"
 )
 
-var (
-	itPronounWords []*tree.Word = []*tree.Word{
-		tree.NewWord(ItCharactor),
-	}
-)
-
 type It struct {
 	*adaptor.SourceAdaptor
-	ItIndex concept.Index
+	ItIndex   concept.Index
+	instances []*tree.Vocabulary
 }
 
 func (p *It) GetName() string {
 	return ItName
 }
 
-func (p *It) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(itPronounWords, sentence)
+func (p *It) GetWords(sentence string) []*tree.Vocabulary {
+	return tree.VocabularysFilter(p.instances, sentence)
 }
 
 func (p *It) GetVocabularyRules() []*tree.VocabularyRule {
@@ -58,5 +53,8 @@ func NewIt(param *adaptor.SourceAdaptorParam) *It {
 	})
 	page := instance.Libs.GetLibraryPage("system", "pronoun")
 	instance.ItIndex = page.GetIndex(instance.Libs.Sandbox.Variable.String.New("It"))
+	instance.instances = []*tree.Vocabulary{
+		tree.NewVocabulary(ItCharactor, instance),
+	}
 	return instance
 }

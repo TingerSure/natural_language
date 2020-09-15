@@ -2,10 +2,11 @@ package nl_string
 
 import (
 	"strings"
+	"unicode/utf8"
 )
 
 func Len(info string) int {
-	return len([]rune(info))
+	return utf8.RuneCountInString(info)
 }
 
 func SubString(info string, from, to int) string {

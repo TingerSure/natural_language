@@ -13,23 +13,18 @@ const (
 	ResultCharactor string = "结果"
 )
 
-var (
-	resultPronounWords []*tree.Word = []*tree.Word{
-		tree.NewWord(ResultCharactor),
-	}
-)
-
 type Result struct {
 	*adaptor.SourceAdaptor
 	ResultIndex concept.Index
+	instances   []*tree.Vocabulary
 }
 
 func (p *Result) GetName() string {
 	return ResultName
 }
 
-func (p *Result) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter(resultPronounWords, sentence)
+func (p *Result) GetWords(sentence string) []*tree.Vocabulary {
+	return tree.VocabularysFilter(p.instances, sentence)
 }
 
 func (p *Result) GetVocabularyRules() []*tree.VocabularyRule {
@@ -58,5 +53,8 @@ func NewResult(param *adaptor.SourceAdaptorParam) *Result {
 	})
 	page := instance.Libs.GetLibraryPage("system", "pronoun")
 	instance.ResultIndex = page.GetIndex(instance.Libs.Sandbox.Variable.String.New("Result"))
+	instance.instances = []*tree.Vocabulary{
+		tree.NewVocabulary(ResultCharactor, instance),
+	}
 	return instance
 }

@@ -17,16 +17,15 @@ const (
 
 type Belong struct {
 	*adaptor.SourceAdaptor
+	instances []*tree.Vocabulary
 }
 
 func (p *Belong) GetName() string {
 	return belongAuxiliaryName
 }
 
-func (p *Belong) GetWords(sentence string) []*tree.Word {
-	return tree.WordsFilter([]*tree.Word{
-		tree.NewWord(BelongTo),
-	}, sentence)
+func (p *Belong) GetWords(sentence string) []*tree.Vocabulary {
+	return tree.VocabularysFilter(p.instances, sentence)
 }
 
 func (p *Belong) GetVocabularyRules() []*tree.VocabularyRule {
@@ -50,7 +49,13 @@ func (p *Belong) GetVocabularyRules() []*tree.VocabularyRule {
 }
 
 func NewBelong(param *adaptor.SourceAdaptorParam) *Belong {
-	return (&Belong{
+	belong := (&Belong{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
+
+	belong.instances = []*tree.Vocabulary{
+		tree.NewVocabulary(BelongTo, belong),
+	}
+
+	return belong
 }
