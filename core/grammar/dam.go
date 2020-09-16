@@ -41,17 +41,17 @@ func (s *sortRiver) Less(left, right int) bool {
 	return s.Compare(s.rivers[left].GetWait().Peek(), s.rivers[right].GetWait().Peek()) < 0
 }
 
-type Ambiguity struct {
+type Dam struct {
 	rules []*tree.PriorityRule
 }
 
-func (a *Ambiguity) Sort(rivers []*River) {
+func (a *Dam) Sort(rivers []*River) {
 	sort.Sort(&sortRiver{
 		rivers: rivers,
 	})
 }
 
-func (a *Ambiguity) Diff(left tree.Phrase, right tree.Phrase) (tree.Phrase, tree.Phrase) {
+func (a *Dam) Diff(left tree.Phrase, right tree.Phrase) (tree.Phrase, tree.Phrase) {
 	if left.From() != right.From() {
 		return left, right
 	}
@@ -72,14 +72,14 @@ func (a *Ambiguity) Diff(left tree.Phrase, right tree.Phrase) (tree.Phrase, tree
 	return diffLeft, diffRight
 }
 
-func (a *Ambiguity) AddRule(rules []*tree.PriorityRule) {
+func (a *Dam) AddRule(rules []*tree.PriorityRule) {
 	if rules == nil {
 		return
 	}
 	a.rules = append(a.rules, rules...)
 }
 
-func (a *Ambiguity) Check(left, right tree.Phrase) int {
+func (a *Dam) Check(left, right tree.Phrase) int {
 	for _, rule := range a.rules {
 		if rule.Match(left, right) {
 			return rule.Choose(left, right)
@@ -88,7 +88,7 @@ func (a *Ambiguity) Check(left, right tree.Phrase) int {
 	return 0
 }
 
-func (a *Ambiguity) Filter(rivers []*River) []*River {
+func (a *Dam) Filter(rivers []*River) []*River {
 	a.Sort(rivers)
 	var obsolete []bool = make([]bool, len(rivers), len(rivers))
 	result := []*River{}
@@ -124,12 +124,12 @@ func (a *Ambiguity) Filter(rivers []*River) []*River {
 	return result
 }
 
-func NewAmbiguity() *Ambiguity {
-	return &Ambiguity{}
+func NewDam() *Dam {
+	return &Dam{}
 }
 
-func NewAmbiguityWithRules(rules []*tree.PriorityRule) *Ambiguity {
-	return &Ambiguity{
+func NewDamWithRules(rules []*tree.PriorityRule) *Dam {
+	return &Dam{
 		rules: rules,
 	}
 }

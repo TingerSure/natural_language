@@ -8,10 +8,10 @@ import (
 type Grammar struct {
 	structs      []*tree.StructRule
 	vocabularies []*tree.VocabularyRule
-	gardener     *Ambiguity
+	gardener     *Dam
 }
 
-func (g *Grammar) GetGardener() *Ambiguity {
+func (g *Grammar) GetGardener() *Dam {
 	return g.gardener
 }
 
@@ -68,6 +68,6 @@ func (l *Grammar) init() *Grammar {
 
 func NewGrammar() *Grammar {
 	return (&Grammar{
-		gardener: NewAmbiguity(),
+		gardener: NewDam(),
 	}).init()
 }

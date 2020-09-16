@@ -19,7 +19,7 @@ func (v *Valley) Size() int {
 	return len(v.values)
 }
 
-func (v *Valley) Step(flow *lexer.Flow, leaves []*tree.VocabularyRule, twigs []*tree.StructRule, gardener *Ambiguity) error {
+func (v *Valley) Step(flow *lexer.Flow, leaves []*tree.VocabularyRule, twigs []*tree.StructRule, gardener *Dam) error {
 	wait := NewLake()
 	river := NewRiver(wait, flow)
 	bases, err := river.Step(leaves, twigs, gardener)
