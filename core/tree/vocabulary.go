@@ -55,6 +55,10 @@ func NewVocabulary(context string, source Source) *Vocabulary {
 }
 
 func VocabularysFilter(words []*Vocabulary, sentence string) []*Vocabulary {
+	if len(words) == 1 && words[0].StartFor(sentence) {
+		return words
+	}
+
 	var targets []*Vocabulary
 
 	for _, word := range words {
