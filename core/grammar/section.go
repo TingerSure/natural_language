@@ -7,15 +7,15 @@ import (
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
-type Reach struct {
+type Section struct {
 	vocabularies []*tree.VocabularyRule
 }
 
-func NewReach() *Reach {
-	return &Reach{}
+func NewSection() *Section {
+	return &Section{}
 }
 
-func (r *Reach) Check(flow *lexer.Flow, onVocabulary func(*tree.VocabularyRule)) error {
+func (r *Section) Check(flow *lexer.Flow, onVocabulary func(*tree.VocabularyRule)) error {
 	if flow.IsEnd() {
 		return nil
 	}
@@ -33,14 +33,14 @@ func (r *Reach) Check(flow *lexer.Flow, onVocabulary func(*tree.VocabularyRule))
 	return nil
 }
 
-func (g *Reach) AddRule(rules []*tree.VocabularyRule) {
+func (g *Section) AddRule(rules []*tree.VocabularyRule) {
 	if rules == nil {
 		return
 	}
 	g.vocabularies = append(g.vocabularies, rules...)
 }
 
-func (g *Reach) RemoveRule(need func(rule *tree.VocabularyRule) bool) {
+func (g *Section) RemoveRule(need func(rule *tree.VocabularyRule) bool) {
 	for index := 0; index < len(g.vocabularies); index++ {
 		rule := g.vocabularies[index]
 		if need(rule) {

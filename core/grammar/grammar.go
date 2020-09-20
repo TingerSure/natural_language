@@ -7,7 +7,7 @@ import (
 
 type Grammar struct {
 	structs []*tree.StructRule
-	reach   *Reach
+	section *Section
 	dam     *Dam
 }
 
@@ -36,17 +36,17 @@ func (g *Grammar) RemoveStructRule(need func(rule *tree.StructRule) bool) {
 }
 
 func (g *Grammar) AddVocabularyRule(rules []*tree.VocabularyRule) {
-	g.reach.AddRule(rules)
+	g.section.AddRule(rules)
 }
 
 func (g *Grammar) RemoveVocabularyRule(need func(rule *tree.VocabularyRule) bool) {
-	g.reach.RemoveRule(need)
+	g.section.RemoveRule(need)
 }
 
 func (l *Grammar) Instances(flow *lexer.Flow) (*Valley, error) {
 	flow.Reset()
 	valley := NewValley()
-	err := valley.Step(flow, l.reach, l.structs, l.dam)
+	err := valley.Step(flow, l.section, l.structs, l.dam)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (l *Grammar) init() *Grammar {
 
 func NewGrammar() *Grammar {
 	return (&Grammar{
-		dam:   NewDam(),
-		reach: NewReach(),
+		dam:     NewDam(),
+		section: NewSection(),
 	}).init()
 }

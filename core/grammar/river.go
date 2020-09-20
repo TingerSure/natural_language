@@ -44,7 +44,7 @@ func (r *River) structCheck(twigs []*tree.StructRule, onStruct func(*tree.Struct
 	}
 }
 
-func (r *River) Step(reach *Reach, twigs []*tree.StructRule, dam *Dam) ([]*River, error) {
+func (r *River) Step(section *Section, twigs []*tree.StructRule, dam *Dam) ([]*River, error) {
 	var err error
 	tributaries := []*River{}
 	subStructs := []*River{}
@@ -56,7 +56,7 @@ func (r *River) Step(reach *Reach, twigs []*tree.StructRule, dam *Dam) ([]*River
 		tributary.lake.Push(phrase)
 		subStructs = append(subStructs, tributary)
 	})
-	err = reach.Check(r.flow, func(rule *tree.VocabularyRule) {
+	err = section.Check(r.flow, func(rule *tree.VocabularyRule) {
 		tributary := r.Copy()
 		tributary.lake.Push(rule.Create(tributary.flow.Next()))
 		subVocabularies = append(subVocabularies, tributary)
@@ -69,7 +69,7 @@ func (r *River) Step(reach *Reach, twigs []*tree.StructRule, dam *Dam) ([]*River
 		return tributaries, nil
 	}
 	for _, subStruct := range subStructs {
-		subs, err := subStruct.Step(reach, twigs, dam)
+		subs, err := subStruct.Step(section, twigs, dam)
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +78,7 @@ func (r *River) Step(reach *Reach, twigs []*tree.StructRule, dam *Dam) ([]*River
 	}
 
 	for _, subVocabulary := range subVocabularies {
-		subs, err := subVocabulary.Step(reach, twigs, dam)
+		subs, err := subVocabulary.Step(section, twigs, dam)
 		if err != nil {
 			return nil, err
 		}
