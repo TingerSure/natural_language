@@ -1,8 +1,6 @@
 package grammar
 
 import (
-	"errors"
-	"fmt"
 	"github.com/TingerSure/natural_language/core/lexer"
 	"github.com/TingerSure/natural_language/core/tree"
 )
@@ -46,25 +44,7 @@ func (r *River) structCheck(twigs []*tree.StructRule, onStruct func(*tree.Struct
 	}
 }
 
-func (r *River) vocabularyCheck(leaves []*tree.VocabularyRule, onVocabulary func(*tree.VocabularyRule)) error {
-	if r.flow.IsEnd() {
-		return nil
-	}
-	word := r.flow.Peek()
-	count := 0
-	for _, leaf := range leaves {
-		if leaf.Match(word) {
-			onVocabulary(leaf)
-			count++
-		}
-	}
-	if count == 0 {
-		return errors.New(fmt.Sprintf("This vocabulary has no rules to parse! ( %v )", word.ToString()))
-	}
-	return nil
-}
-
-func (r *River) Step(leaves []*tree.VocabularyRule, twigs []*tree.StructRule, dam *Dam) ([]*River, error) {
+func (r *River) Step(reach *Reach, twigs []*tree.StructRule, dam *Dam) ([]*River, error) {
 	var err error
 	tributaries := []*River{}
 	subStructs := []*River{}
@@ -76,9 +56,9 @@ func (r *River) Step(leaves []*tree.VocabularyRule, twigs []*tree.StructRule, da
 		tributary.lake.Push(phrase)
 		subStructs = append(subStructs, tributary)
 	})
-	err = r.vocabularyCheck(leaves, func(leaf *tree.VocabularyRule) {
+	err = reach.Check(r.flow, func(rule *tree.VocabularyRule) {
 		tributary := r.Copy()
-		tributary.lake.Push(leaf.Create(tributary.flow.Next()))
+		tributary.lake.Push(rule.Create(tributary.flow.Next()))
 		subVocabularies = append(subVocabularies, tributary)
 	})
 	if err != nil {
@@ -89,7 +69,7 @@ func (r *River) Step(leaves []*tree.VocabularyRule, twigs []*tree.StructRule, da
 		return tributaries, nil
 	}
 	for _, subStruct := range subStructs {
-		subs, err := subStruct.Step(leaves, twigs, dam)
+		subs, err := subStruct.Step(reach, twigs, dam)
 		if err != nil {
 			return nil, err
 		}
@@ -98,7 +78,7 @@ func (r *River) Step(leaves []*tree.VocabularyRule, twigs []*tree.StructRule, da
 	}
 
 	for _, subVocabulary := range subVocabularies {
-		subs, err := subVocabulary.Step(leaves, twigs, dam)
+		subs, err := subVocabulary.Step(reach, twigs, dam)
 		if err != nil {
 			return nil, err
 		}

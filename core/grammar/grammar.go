@@ -6,9 +6,9 @@ import (
 )
 
 type Grammar struct {
-	structs      []*tree.StructRule
-	vocabularies []*tree.VocabularyRule
-	dam          *Dam
+	structs []*tree.StructRule
+	reach   *Reach
+	dam     *Dam
 }
 
 func (g *Grammar) GetDam() *Dam {
@@ -36,25 +36,17 @@ func (g *Grammar) RemoveStructRule(need func(rule *tree.StructRule) bool) {
 }
 
 func (g *Grammar) AddVocabularyRule(rules []*tree.VocabularyRule) {
-	if rules == nil {
-		return
-	}
-	g.vocabularies = append(g.vocabularies, rules...)
+	g.reach.AddRule(rules)
 }
 
 func (g *Grammar) RemoveVocabularyRule(need func(rule *tree.VocabularyRule) bool) {
-	for index := 0; index < len(g.vocabularies); index++ {
-		rule := g.vocabularies[index]
-		if need(rule) {
-			g.vocabularies = append(g.vocabularies[:index], g.vocabularies[index+1:]...)
-		}
-	}
+	g.reach.RemoveRule(need)
 }
 
 func (l *Grammar) Instances(flow *lexer.Flow) (*Valley, error) {
 	flow.Reset()
 	valley := NewValley()
-	err := valley.Step(flow, l.vocabularies, l.structs, l.dam)
+	err := valley.Step(flow, l.reach, l.structs, l.dam)
 	if err != nil {
 		return nil, err
 	}
@@ -68,6 +60,7 @@ func (l *Grammar) init() *Grammar {
 
 func NewGrammar() *Grammar {
 	return (&Grammar{
-		dam: NewDam(),
+		dam:   NewDam(),
+		reach: NewReach(),
 	}).init()
 }
