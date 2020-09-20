@@ -8,15 +8,15 @@ import (
 type Grammar struct {
 	structs      []*tree.StructRule
 	vocabularies []*tree.VocabularyRule
-	gardener     *Dam
+	dam          *Dam
 }
 
-func (g *Grammar) GetGardener() *Dam {
-	return g.gardener
+func (g *Grammar) GetDam() *Dam {
+	return g.dam
 }
 
 func (g *Grammar) AddPriorityRule(rules []*tree.PriorityRule) {
-	g.gardener.AddRule(rules)
+	g.dam.AddRule(rules)
 }
 
 func (g *Grammar) AddStructRule(rules []*tree.StructRule) {
@@ -54,7 +54,7 @@ func (g *Grammar) RemoveVocabularyRule(need func(rule *tree.VocabularyRule) bool
 func (l *Grammar) Instances(flow *lexer.Flow) (*Valley, error) {
 	flow.Reset()
 	valley := NewValley()
-	err := valley.Step(flow, l.vocabularies, l.structs, l.gardener)
+	err := valley.Step(flow, l.vocabularies, l.structs, l.dam)
 	if err != nil {
 		return nil, err
 	}
@@ -68,6 +68,6 @@ func (l *Grammar) init() *Grammar {
 
 func NewGrammar() *Grammar {
 	return (&Grammar{
-		gardener: NewDam(),
+		dam: NewDam(),
 	}).init()
 }

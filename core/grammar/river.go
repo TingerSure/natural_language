@@ -8,24 +8,24 @@ import (
 )
 
 type River struct {
-	wait *Lake
+	lake *Lake
 	flow *lexer.Flow
 }
 
 func (r *River) ToString() string {
 	space := ""
-	for _, phrase := range r.wait.PeekAll() {
+	for _, phrase := range r.lake.PeekAll() {
 		space += phrase.ToString()
 	}
 	return space
 }
 
 func (r *River) IsActive() bool {
-	return r.wait.IsSingle() && r.flow.IsEnd()
+	return r.lake.IsSingle() && r.flow.IsEnd()
 }
 
-func (r *River) GetWait() *Lake {
-	return r.wait
+func (r *River) GetLake() *Lake {
+	return r.lake
 }
 
 func (r *River) GetFlow() *lexer.Flow {
@@ -33,14 +33,14 @@ func (r *River) GetFlow() *lexer.Flow {
 }
 
 func (r *River) structCheck(twigs []*tree.StructRule, onStruct func(*tree.StructRule)) {
-	if r.wait.IsEmpty() {
+	if r.lake.IsEmpty() {
 		return
 	}
 	for _, twig := range twigs {
-		if r.wait.Len() < twig.Size() {
+		if r.lake.Len() < twig.Size() {
 			continue
 		}
-		if twig.Match(r.wait.PeekAll()) {
+		if twig.Match(r.lake.PeekAll()) {
 			onStruct(twig)
 		}
 	}
@@ -64,21 +64,21 @@ func (r *River) vocabularyCheck(leaves []*tree.VocabularyRule, onVocabulary func
 	return nil
 }
 
-func (r *River) Step(leaves []*tree.VocabularyRule, twigs []*tree.StructRule, gardener *Dam) ([]*River, error) {
+func (r *River) Step(leaves []*tree.VocabularyRule, twigs []*tree.StructRule, dam *Dam) ([]*River, error) {
 	var err error
 	tributaries := []*River{}
 	subStructs := []*River{}
 	subVocabularies := []*River{}
 	r.structCheck(twigs, func(twig *tree.StructRule) {
 		tributary := r.Copy()
-		phrase := twig.Create(tributary.wait.PeekAll())
-		tributary.wait.PopMultiple(twig.Size())
-		tributary.wait.Push(phrase)
+		phrase := twig.Create(tributary.lake.PeekAll())
+		tributary.lake.PopMultiple(twig.Size())
+		tributary.lake.Push(phrase)
 		subStructs = append(subStructs, tributary)
 	})
 	err = r.vocabularyCheck(leaves, func(leaf *tree.VocabularyRule) {
 		tributary := r.Copy()
-		tributary.wait.Push(leaf.Create(tributary.flow.Next()))
+		tributary.lake.Push(leaf.Create(tributary.flow.Next()))
 		subVocabularies = append(subVocabularies, tributary)
 	})
 	if err != nil {
@@ -89,16 +89,16 @@ func (r *River) Step(leaves []*tree.VocabularyRule, twigs []*tree.StructRule, ga
 		return tributaries, nil
 	}
 	for _, subStruct := range subStructs {
-		subs, err := subStruct.Step(leaves, twigs, gardener)
+		subs, err := subStruct.Step(leaves, twigs, dam)
 		if err != nil {
 			return nil, err
 		}
-		subs = gardener.Filter(subs)
+		subs = dam.Filter(subs)
 		tributaries = append(tributaries, subs...)
 	}
 
 	for _, subVocabulary := range subVocabularies {
-		subs, err := subVocabulary.Step(leaves, twigs, gardener)
+		subs, err := subVocabulary.Step(leaves, twigs, dam)
 		if err != nil {
 			return nil, err
 		}
@@ -108,12 +108,12 @@ func (r *River) Step(leaves []*tree.VocabularyRule, twigs []*tree.StructRule, ga
 }
 
 func (r *River) Copy() *River {
-	return NewRiver(r.wait.Copy(), r.flow.Copy())
+	return NewRiver(r.lake.Copy(), r.flow.Copy())
 }
 
-func NewRiver(wait *Lake, flow *lexer.Flow) *River {
+func NewRiver(lake *Lake, flow *lexer.Flow) *River {
 	return &River{
-		wait: wait,
+		lake: lake,
 		flow: flow,
 	}
 }

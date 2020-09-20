@@ -16,7 +16,7 @@ import (
 
 var (
 	runtimeStructErrorFormatDefault = func(river *grammar.River) string {
-		phrases := river.GetWait().PeekAll()
+		phrases := river.GetLake().PeekAll()
 		phraseString := []string{}
 		phraseType := []string{}
 		for _, phrase := range phrases {
@@ -29,7 +29,7 @@ var (
 	runtimePriorityErrorFormatDefault = func(rivers []*grammar.River) string {
 		riverString := []string{}
 		for _, river := range rivers {
-			riverString = append(riverString, river.GetWait().Peek().ToString())
+			riverString = append(riverString, river.GetLake().Peek().ToString())
 		}
 		return fmt.Sprintf("%v \nNo priority rule can distinguish the above meanings.", strings.Join(riverString, "\n"))
 	}
@@ -116,18 +116,18 @@ func (r *Runtime) Deal(sentence string) (concept.Index, error) {
 				min = river
 				continue
 			}
-			if river.GetWait().Len() < min.GetWait().Len() {
+			if river.GetLake().Len() < min.GetLake().Len() {
 				min = river
 			}
 		}
 		return nil, errors.New(r.structErrorFormat(min))
 	}
-	results := r.grammar.GetGardener().Filter(selecteds)
+	results := r.grammar.GetDam().Filter(selecteds)
 	if 1 != len(results) {
 		return nil, errors.New(r.priorityErrorFormat(results))
 	}
 
-	return results[0].GetWait().Peek().Index(), nil
+	return results[0].GetLake().Peek().Index(), nil
 }
 
 func (r *Runtime) Read(stream *os.File) error {

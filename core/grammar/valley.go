@@ -19,14 +19,14 @@ func (v *Valley) Size() int {
 	return len(v.values)
 }
 
-func (v *Valley) Step(flow *lexer.Flow, leaves []*tree.VocabularyRule, twigs []*tree.StructRule, gardener *Dam) error {
+func (v *Valley) Step(flow *lexer.Flow, leaves []*tree.VocabularyRule, twigs []*tree.StructRule, dam *Dam) error {
 	wait := NewLake()
 	river := NewRiver(wait, flow)
-	bases, err := river.Step(leaves, twigs, gardener)
+	bases, err := river.Step(leaves, twigs, dam)
 	if err != nil {
 		return err
 	}
-	v.values = gardener.Filter(bases)
+	v.values = dam.Filter(bases)
 	return nil
 }
 
@@ -58,7 +58,7 @@ func (v *Valley) Filter() (*Valley, *River, error) {
 		if min == nil {
 			min = input
 		}
-		if input.GetWait().Len() < min.GetWait().Len() {
+		if input.GetLake().Len() < min.GetLake().Len() {
 			min = input
 		}
 		return false

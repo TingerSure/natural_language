@@ -38,7 +38,7 @@ func (s *sortRiver) Compare(left, right tree.Phrase) int {
 }
 
 func (s *sortRiver) Less(left, right int) bool {
-	return s.Compare(s.rivers[left].GetWait().Peek(), s.rivers[right].GetWait().Peek()) < 0
+	return s.Compare(s.rivers[left].GetLake().Peek(), s.rivers[right].GetLake().Peek()) < 0
 }
 
 type Dam struct {
@@ -102,7 +102,7 @@ func (a *Dam) Filter(rivers []*River) []*River {
 				continue
 			}
 			right := rivers[rightIndex]
-			diffLeft, diffRight := a.Diff(left.GetWait().Peek(), right.GetWait().Peek())
+			diffLeft, diffRight := a.Diff(left.GetLake().Peek(), right.GetLake().Peek())
 			if nl_interface.IsNil(diffLeft) && nl_interface.IsNil(diffRight) {
 				continue
 			}
