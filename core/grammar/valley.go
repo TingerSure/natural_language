@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/lexer"
-	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type Valley struct {
@@ -19,10 +18,10 @@ func (v *Valley) Size() int {
 	return len(v.values)
 }
 
-func (v *Valley) Step(flow *lexer.Flow, section *Section, twigs []*tree.StructRule, dam *Dam) error {
-	wait := NewLake()
-	river := NewRiver(wait, flow)
-	bases, err := river.Step(section, twigs, dam)
+func (v *Valley) Step(flow *lexer.Flow, section *Section, reach *Reach, dam *Dam) error {
+	lake := NewLake()
+	river := NewRiver(lake, flow)
+	bases, err := river.Step(section, reach, dam)
 	if err != nil {
 		return err
 	}

@@ -30,26 +30,12 @@ func (r *River) GetFlow() *lexer.Flow {
 	return r.flow
 }
 
-func (r *River) structCheck(twigs []*tree.StructRule, onStruct func(*tree.StructRule)) {
-	if r.lake.IsEmpty() {
-		return
-	}
-	for _, twig := range twigs {
-		if r.lake.Len() < twig.Size() {
-			continue
-		}
-		if twig.Match(r.lake.PeekAll()) {
-			onStruct(twig)
-		}
-	}
-}
-
-func (r *River) Step(section *Section, twigs []*tree.StructRule, dam *Dam) ([]*River, error) {
+func (r *River) Step(section *Section, reach *Reach, dam *Dam) ([]*River, error) {
 	var err error
 	tributaries := []*River{}
 	subStructs := []*River{}
 	subVocabularies := []*River{}
-	r.structCheck(twigs, func(twig *tree.StructRule) {
+	reach.Check(r.lake, func(twig *tree.StructRule) {
 		tributary := r.Copy()
 		phrase := twig.Create(tributary.lake.PeekAll())
 		tributary.lake.PopMultiple(twig.Size())
@@ -69,7 +55,7 @@ func (r *River) Step(section *Section, twigs []*tree.StructRule, dam *Dam) ([]*R
 		return tributaries, nil
 	}
 	for _, subStruct := range subStructs {
-		subs, err := subStruct.Step(section, twigs, dam)
+		subs, err := subStruct.Step(section, reach, dam)
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +64,7 @@ func (r *River) Step(section *Section, twigs []*tree.StructRule, dam *Dam) ([]*R
 	}
 
 	for _, subVocabulary := range subVocabularies {
-		subs, err := subVocabulary.Step(section, twigs, dam)
+		subs, err := subVocabulary.Step(section, reach, dam)
 		if err != nil {
 			return nil, err
 		}
