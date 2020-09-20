@@ -3,6 +3,7 @@ package grammar
 import (
 	"errors"
 	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/lexer"
 	"github.com/TingerSure/natural_language/core/tree"
 )
@@ -21,6 +22,21 @@ func (r *Section) Check(flow *lexer.Flow, onVocabulary func(*tree.VocabularyRule
 	}
 	word := flow.Peek()
 	count := 0
+
+	source := word.GetSource()
+	if !nl_interface.IsNil(source) {
+		rules := source.GetVocabularyRules()
+		for _, leaf := range rules {
+			if leaf.Match(word) {
+				onVocabulary(leaf)
+				count++
+			}
+		}
+		if count != 0 {
+			return nil
+		}
+	}
+
 	for _, leaf := range r.vocabularies {
 		if leaf.Match(word) {
 			onVocabulary(leaf)
