@@ -27,9 +27,15 @@ func (p *PhraseVocabularyAdaptor) Types() *PhraseType {
 func (p *PhraseVocabularyAdaptor) Copy() Phrase {
 	return NewPhraseVocabularyAdaptor(p.param)
 }
+
 func (p *PhraseVocabularyAdaptor) Size() int {
 	return 0
 }
+
+func (p *PhraseVocabularyAdaptor) ContentSize() int {
+	return p.param.Content.Len()
+}
+
 func (p *PhraseVocabularyAdaptor) GetContent() *Vocabulary {
 	return p.param.Content
 }

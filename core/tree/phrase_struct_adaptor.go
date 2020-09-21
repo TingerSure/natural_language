@@ -2,6 +2,7 @@ package tree
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 )
 
@@ -31,6 +32,16 @@ func (p *PhraseStructAdaptor) Types() *PhraseType {
 
 func (p *PhraseStructAdaptor) Size() int {
 	return p.param.Size
+}
+
+func (p *PhraseStructAdaptor) ContentSize() int {
+	size := 0
+	for _, child := range p.children {
+		if !nl_interface.IsNil(child) {
+			size += child.ContentSize()
+		}
+	}
+	return size
 }
 
 func (p *PhraseStructAdaptor) Copy() Phrase {

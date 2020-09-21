@@ -18,16 +18,16 @@ func (o *Belong) GetPriorityRules() []*tree.PriorityRule {
 	return []*tree.PriorityRule{
 		tree.NewPriorityRule(&tree.PriorityRuleParam{
 			Match: func(left tree.Phrase, right tree.Phrase) bool {
-				return left.From() == structs.AnyFromAnyBelongAnyName ||
+				return left.From() == structs.AnyFromAnyBelongAnyName &&
 					right.From() == structs.AnyFromAnyBelongAnyName
-				return false
 			},
 			Chooser: func(left tree.Phrase, right tree.Phrase) int {
-				if left.From() == structs.AnyFromAnyBelongAnyName {
+				indexLeft := left.GetChild(0).ContentSize()
+				indexRight := right.GetChild(0).ContentSize()
+				if indexLeft < indexRight {
 					return 1
 				}
-
-				if right.From() == structs.AnyFromAnyBelongAnyName {
+				if indexLeft > indexRight {
 					return -1
 				}
 

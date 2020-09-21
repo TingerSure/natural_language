@@ -25,17 +25,6 @@ func (o *OperatorLevel) getLevel(key string) int {
 	return 0
 }
 
-func (o *OperatorLevel) getIndex(phrase tree.Phrase) int {
-	if phrase.Size() == 0 {
-		return 1
-	}
-	count := 0
-	for index := 0; index < phrase.Size(); index++ {
-		count += o.getIndex(phrase.GetChild(index))
-	}
-	return count
-}
-
 func (o *OperatorLevel) GetPriorityRules() []*tree.PriorityRule {
 	return []*tree.PriorityRule{
 		tree.NewPriorityRule(&tree.PriorityRuleParam{
@@ -54,8 +43,8 @@ func (o *OperatorLevel) GetPriorityRules() []*tree.PriorityRule {
 					return -1
 				}
 
-				indexLeft := o.getIndex(left.GetChild(0))
-				indexRight := o.getIndex(right.GetChild(0))
+				indexLeft := left.GetChild(0).ContentSize()
+				indexRight := right.GetChild(0).ContentSize()
 				if indexLeft < indexRight {
 					return 1
 				}
