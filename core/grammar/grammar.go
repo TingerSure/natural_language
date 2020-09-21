@@ -2,7 +2,6 @@ package grammar
 
 import (
 	"github.com/TingerSure/natural_language/core/lexer"
-	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type Grammar struct {
@@ -15,24 +14,12 @@ func (g *Grammar) GetDam() *Dam {
 	return g.dam
 }
 
-func (g *Grammar) AddPriorityRule(rules []*tree.PriorityRule) {
-	g.dam.AddRule(rules)
+func (g *Grammar) GetSection() *Section {
+	return g.section
 }
 
-func (g *Grammar) AddStructRule(rules []*tree.StructRule) {
-	g.reach.AddRule(rules)
-}
-
-func (g *Grammar) RemoveStructRule(need func(rule *tree.StructRule) bool) {
-	g.reach.RemoveRule(need)
-}
-
-func (g *Grammar) AddVocabularyRule(rules []*tree.VocabularyRule) {
-	g.section.AddRule(rules)
-}
-
-func (g *Grammar) RemoveVocabularyRule(need func(rule *tree.VocabularyRule) bool) {
-	g.section.RemoveRule(need)
+func (g *Grammar) GetReach() *Reach {
+	return g.reach
 }
 
 func (l *Grammar) Instances(flow *lexer.Flow) (*Valley, error) {

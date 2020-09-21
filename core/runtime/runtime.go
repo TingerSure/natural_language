@@ -76,13 +76,12 @@ func (r *Runtime) Bind() {
 	r.libs.PageIterate(func(instance tree.Page) bool {
 		for _, source := range instance.GetSources() {
 			r.lexer.AddNaturalSource(source)
-			r.grammar.AddStructRule(source.GetStructRules())
-			r.grammar.AddVocabularyRule(source.GetVocabularyRules())
-			r.grammar.AddPriorityRule(source.GetPriorityRules())
+			r.grammar.GetReach().AddRule(source.GetStructRules())
+			r.grammar.GetSection().AddRule(source.GetVocabularyRules())
+			r.grammar.GetDam().AddRule(source.GetPriorityRules())
 		}
 		return false
 	})
-
 }
 
 func (r *Runtime) Deal(sentence string) (concept.Index, error) {
