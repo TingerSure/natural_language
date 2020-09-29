@@ -86,9 +86,8 @@ func (l *Flow) GetSentence() string {
 func (l *Flow) Copy() *Flow {
 	newInstance := NewFlow()
 	newInstance.sentence = l.sentence
-	for i := 0; i < len(l.vocabularies); i++ {
-		newInstance.vocabularies = append(newInstance.vocabularies, l.vocabularies[i])
-	}
+	newInstance.vocabularies = make([]*tree.Vocabulary, len(l.vocabularies))
+	copy(newInstance.vocabularies, l.vocabularies)
 	newInstance.index = l.index
 	return newInstance
 }

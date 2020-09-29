@@ -11,9 +11,9 @@ type Lake struct {
 
 func (c *Lake) Copy() *Lake {
 	substitute := NewLake()
-	for _, treasure := range c.phrases {
-		substitute.Push(treasure.Copy())
-	}
+	substitute.phrases = make([]tree.Phrase, len(c.phrases))
+	copy(substitute.phrases, c.phrases)
+	substitute.length = c.length
 	return substitute
 }
 
