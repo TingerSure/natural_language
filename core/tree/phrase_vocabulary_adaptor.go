@@ -65,6 +65,10 @@ func (p *PhraseVocabularyAdaptor) From() string {
 	return p.param.From
 }
 
+func (p *PhraseVocabularyAdaptor) HasPriority() bool {
+	return false
+}
+
 func NewPhraseVocabularyAdaptor(param *PhraseVocabularyAdaptorParam) *PhraseVocabularyAdaptor {
 	return &PhraseVocabularyAdaptor{
 		param: param,

@@ -15,8 +15,9 @@ type PhraseStructAdaptorParam struct {
 }
 
 type PhraseStructAdaptor struct {
-	children []Phrase
-	param    *PhraseStructAdaptorParam
+	contentSize int
+	children    []Phrase
+	param       *PhraseStructAdaptorParam
 }
 
 func (p *PhraseStructAdaptor) Index() concept.Index {
@@ -34,14 +35,18 @@ func (p *PhraseStructAdaptor) Size() int {
 	return p.param.Size
 }
 
-func (p *PhraseStructAdaptor) ContentSize() int {
+func (p *PhraseStructAdaptor) updateContentSize() {
 	size := 0
 	for _, child := range p.children {
 		if !nl_interface.IsNil(child) {
 			size += child.ContentSize()
 		}
 	}
-	return size
+	p.contentSize = size
+}
+
+func (p *PhraseStructAdaptor) ContentSize() int {
+	return p.contentSize
 }
 
 func (p *PhraseStructAdaptor) Copy() Phrase {
@@ -68,6 +73,7 @@ func (p *PhraseStructAdaptor) SetChild(index int, child Phrase) Phrase {
 		panic("error index when set child")
 	}
 	p.children[index] = child
+	p.updateContentSize()
 	return p
 }
 
@@ -92,9 +98,19 @@ func (p *PhraseStructAdaptor) From() string {
 	return p.param.From
 }
 
+func (p *PhraseStructAdaptor) HasPriority() bool {
+	for _, child := range p.children {
+		if child.HasPriority() {
+			return true
+		}
+	}
+	return false
+}
+
 func NewPhraseStructAdaptor(param *PhraseStructAdaptorParam) *PhraseStructAdaptor {
 	return &PhraseStructAdaptor{
-		param:    param,
-		children: make([]Phrase, param.Size),
+		param:       param,
+		contentSize: 0,
+		children:    make([]Phrase, param.Size),
 	}
 }

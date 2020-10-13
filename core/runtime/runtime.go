@@ -81,6 +81,10 @@ func (r *Runtime) Deal(sentence string) (concept.Index, error) {
 	if len(roots) != 1 {
 		return nil, errors.New(r.priorityErrorFormat(road))
 	}
+	if roots[0].HasPriority() {
+		return nil, errors.New(r.priorityErrorFormat(road))
+	}
+
 	return roots[0].Index(), nil
 }
 

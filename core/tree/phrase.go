@@ -16,4 +16,5 @@ type Phrase interface {
 	ToStringOffset(index int) string
 	Index() concept.Index
 	From() string
+	HasPriority() bool
 }

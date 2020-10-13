@@ -89,6 +89,10 @@ func (p *PhrasePriority) RemoveValue(index int) {
 	p.values = append(p.values[:index], p.values[index+1:]...)
 }
 
+func (p *PhrasePriority) HasPriority() bool {
+	return true
+}
+
 func NewPhrasePriority(values []Phrase) *PhrasePriority {
 	instance := &PhrasePriority{
 		values: make([]Phrase, len(values)),
