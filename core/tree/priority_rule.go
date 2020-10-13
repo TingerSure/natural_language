@@ -3,24 +3,33 @@ package tree
 type PriorityRuleParam struct {
 	Match   func(Phrase, Phrase) bool
 	Chooser func(Phrase, Phrase) int
+	From    string
 }
 
 type PriorityRule struct {
-	match   func(Phrase, Phrase) bool
-	chooser func(Phrase, Phrase) int
+	param *PriorityRuleParam
+}
+
+func (r *PriorityRule) GetFrom() string {
+	return r.param.From
 }
 
 func (p *PriorityRule) Match(left, right Phrase) bool {
-	return p.match(left, right)
+	return p.param.Match(left, right)
 }
 
 func (p *PriorityRule) Choose(left, right Phrase) int {
-	return p.chooser(left, right)
+	return p.param.Chooser(left, right)
 }
 
 func NewPriorityRule(param *PriorityRuleParam) *PriorityRule {
+	if param.Match == nil {
+		panic("no match function in this priority rule!")
+	}
+	if param.Chooser == nil {
+		panic("no chooser function in this priority rule!")
+	}
 	return &PriorityRule{
-		match:   param.Match,
-		chooser: param.Chooser,
+		param: param,
 	}
 }

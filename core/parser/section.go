@@ -1,10 +1,9 @@
-package grammar
+package parser
 
 import (
 	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/lexer"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
@@ -16,11 +15,8 @@ func NewSection() *Section {
 	return &Section{}
 }
 
-func (r *Section) Check(flow *lexer.Flow, onVocabulary func(*tree.VocabularyRule)) error {
-	if flow.IsEnd() {
-		return nil
-	}
-	word := flow.Peek()
+func (r *Section) Check(word *tree.Vocabulary) ([]*tree.VocabularyRule, error) {
+	var backs []*tree.VocabularyRule
 	count := 0
 
 	source := word.GetSource()
@@ -28,25 +24,26 @@ func (r *Section) Check(flow *lexer.Flow, onVocabulary func(*tree.VocabularyRule
 		rules := source.GetVocabularyRules()
 		for _, leaf := range rules {
 			if leaf.Match(word) {
-				onVocabulary(leaf)
+				backs = append(backs, leaf)
 				count++
 			}
 		}
 		if count != 0 {
-			return nil
+			return backs, nil
 		}
 	}
 
 	for _, leaf := range r.vocabularies {
 		if leaf.Match(word) {
-			onVocabulary(leaf)
+			backs = append(backs, leaf)
 			count++
 		}
 	}
+
 	if count == 0 {
-		return errors.New(fmt.Sprintf("This vocabulary has no rules to parse! ( %v )", word.ToString()))
+		return nil, errors.New(fmt.Sprintf("This vocabulary has no rules to parse! ( %v )", word.ToString()))
 	}
-	return nil
+	return backs, nil
 }
 
 func (g *Section) AddRule(rules []*tree.VocabularyRule) {

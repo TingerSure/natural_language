@@ -6,12 +6,17 @@ type StructRuleParam struct {
 	From   string
 	Types  []*PhraseType
 }
+
 type StructRule struct {
 	param *StructRuleParam
 }
 
 func (r *StructRule) Size() int {
 	return r.param.Size
+}
+
+func (r *StructRule) Types() []*PhraseType {
+	return r.param.Types
 }
 
 func (r *StructRule) GetFrom() string {

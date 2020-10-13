@@ -2,58 +2,43 @@ package runtime
 
 import (
 	"errors"
-	"fmt"
-	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/grammar"
-	"github.com/TingerSure/natural_language/core/lexer"
+	"github.com/TingerSure/natural_language/core/parser"
 	"github.com/TingerSure/natural_language/core/sandbox"
 	"github.com/TingerSure/natural_language/core/sandbox/closure"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
 	"os"
-	"strings"
 )
 
 var (
-	runtimeStructErrorFormatDefault = func(river *grammar.River) string {
-		phrases := river.GetLake().PeekAll()
-		phraseString := []string{}
-		phraseType := []string{}
-		for _, phrase := range phrases {
-			phraseString = append(phraseString, phrase.ToString())
-			phraseType = append(phraseType, phrase.Types().Name())
-		}
-		return fmt.Sprintf("%v \nNo struct rule can match ( %v ).", strings.Join(phraseString, ""), strings.Join(phraseType, ", "))
+	runtimeStructErrorFormatDefault = func(road *parser.Road) string {
+		return "No struct rule can match this sentence."
 	}
 
-	runtimePriorityErrorFormatDefault = func(rivers []*grammar.River) string {
-		riverString := []string{}
-		for _, river := range rivers {
-			riverString = append(riverString, river.GetLake().Peek().ToString())
-		}
-		return fmt.Sprintf("%v \nNo priority rule can distinguish the above meanings.", strings.Join(riverString, "\n"))
+	runtimePriorityErrorFormatDefault = func(road *parser.Road) string {
+
+		return "No priority rule can distinguish all meanings"
 	}
 )
 
 type Runtime struct {
-	lexer               *lexer.Lexer
-	grammar             *grammar.Grammar
+	parser              *parser.Parser
 	libs                *LibraryManager
 	box                 *sandbox.Sandbox
 	rootSpace           *closure.Closure
 	defaultLanguage     string
-	structErrorFormat   func(*grammar.River) string
-	priorityErrorFormat func([]*grammar.River) string
+	structErrorFormat   func(*parser.Road) string
+	priorityErrorFormat func(*parser.Road) string
 }
 
-func (r *Runtime) SetStructErrorFormat(format func(*grammar.River) string) {
+func (r *Runtime) SetStructErrorFormat(format func(*parser.Road) string) {
 	if format == nil {
 		r.structErrorFormat = runtimeStructErrorFormatDefault
 	}
 	r.structErrorFormat = format
 }
 
-func (r *Runtime) SetPriorityErrorFormat(format func([]*grammar.River) string) {
+func (r *Runtime) SetPriorityErrorFormat(format func(*parser.Road) string) {
 	if format == nil {
 		r.priorityErrorFormat = runtimePriorityErrorFormatDefault
 	}
@@ -75,58 +60,28 @@ func (r *Runtime) GetLibraryManager() *LibraryManager {
 func (r *Runtime) Bind() {
 	r.libs.PageIterate(func(instance tree.Page) bool {
 		for _, source := range instance.GetSources() {
-			r.lexer.AddNaturalSource(source)
-			r.grammar.GetReach().AddRule(source.GetStructRules())
-			r.grammar.GetSection().AddRule(source.GetVocabularyRules())
-			r.grammar.GetDam().AddRule(source.GetPriorityRules())
+			r.parser.AddSource(source)
 		}
 		return false
 	})
 }
 
 func (r *Runtime) Deal(sentence string) (concept.Index, error) {
-	var group *lexer.FlowGroup = r.lexer.Instances(sentence)
-	selecteds := []*grammar.River{}
-	mostMatch := []*grammar.River{}
-	for _, flow := range group.GetInstances() {
-		sourceValley, err := r.grammar.Instances(flow)
-		if err != nil {
-			continue
-		}
+	road, err := r.parser.Instance(sentence)
 
-		valley, min, err := sourceValley.Filter()
-		if err != nil {
-			if !nl_interface.IsNil(min) {
-				mostMatch = append(mostMatch, min)
-			}
-			continue
-		}
-		selecteds = append(selecteds, valley.AllRivers()...)
-	}
-	if 0 == len(selecteds) {
-
-		if 0 == len(mostMatch) {
-			return nil, errors.New("Empty sentence.")
-		}
-
-		var min *grammar.River
-		for _, river := range mostMatch {
-			if nl_interface.IsNil(min) {
-				min = river
-				continue
-			}
-			if river.GetLake().Len() < min.GetLake().Len() {
-				min = river
-			}
-		}
-		return nil, errors.New(r.structErrorFormat(min))
-	}
-	results := r.grammar.GetDam().Filter(selecteds)
-	if 1 != len(results) {
-		return nil, errors.New(r.priorityErrorFormat(results))
+	if err != nil {
+		return nil, err
 	}
 
-	return results[0].GetLake().Peek().Index(), nil
+	roots := road.GetActiveSection()
+
+	if len(roots) == 0 {
+		return nil, errors.New(r.structErrorFormat(road))
+	}
+	if len(roots) != 1 {
+		return nil, errors.New(r.priorityErrorFormat(road))
+	}
+	return roots[0].Index(), nil
 }
 
 func (r *Runtime) Read(stream *os.File) error {
@@ -168,8 +123,7 @@ type RuntimeParam struct {
 
 func NewRuntime(param *RuntimeParam) *Runtime {
 	runtime := &Runtime{
-		lexer:               lexer.NewLexer(),
-		grammar:             grammar.NewGrammar(),
+		parser:              parser.NewParser(),
 		libs:                NewLibraryManager(),
 		structErrorFormat:   runtimeStructErrorFormatDefault,
 		priorityErrorFormat: runtimePriorityErrorFormatDefault,
