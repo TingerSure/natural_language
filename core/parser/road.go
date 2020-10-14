@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
@@ -11,17 +10,21 @@ type roadNode struct {
 }
 
 type Road struct {
-	sentence []rune
-	left     []*roadNode
-	right    []*roadNode
+	sentence       []rune
+	left           []*roadNode
+	right          []*roadNode
+	size           int
+	rightTypeIndex *TypeIndex
 }
 
 func NewRoad(sentence string) *Road {
 	road := &Road{
 		sentence: []rune(sentence),
 	}
-	road.left = make([]*roadNode, road.SentenceSize())
-	road.right = make([]*roadNode, road.SentenceSize())
+	road.size = len(road.sentence)
+	road.left = make([]*roadNode, road.size)
+	road.right = make([]*roadNode, road.size)
+	road.rightTypeIndex = NewTypeIndex(road.size)
 	return road
 }
 
@@ -66,17 +69,17 @@ func (r *Road) Iterate(onPhrase func(tree.Phrase) bool) bool {
 }
 
 func (r *Road) CleanSection() {
-	for index := 0; index < r.SentenceSize()-1; index++ {
+	for index := 0; index < r.size-1; index++ {
 		r.left[index+1] = nil
 		r.right[index] = nil
 	}
 
 	removeCondition := func(phrase tree.Phrase) bool {
-		return phrase.ContentSize() != r.SentenceSize()
+		return phrase.ContentSize() != r.size
 	}
 
 	r.left[0] = r.removeSectionOnly(r.left[0], removeCondition)
-	r.right[r.SentenceSize()-1] = r.removeSectionOnly(r.right[r.SentenceSize()-1], removeCondition)
+	r.right[r.size-1] = r.removeSectionOnly(r.right[r.size-1], removeCondition)
 }
 
 func (r *Road) AddLeftSection(index int, section tree.Phrase) {
@@ -95,6 +98,7 @@ func (r *Road) addLeftSectionOnly(index int, section tree.Phrase) {
 
 func (r *Road) addRightSectionOnly(index int, section tree.Phrase) {
 	r.right[index] = r.addSectionOnly(r.right[index], section)
+	r.rightTypeIndex.Add(index, section)
 }
 
 func (r *Road) addSectionOnly(node *roadNode, section tree.Phrase) *roadNode {
@@ -146,7 +150,13 @@ func (r *Road) removeLeftSectionOnly(index int, condition func(tree.Phrase) bool
 }
 
 func (r *Road) removeRightSectionOnly(index int, condition func(tree.Phrase) bool) {
-	r.right[index] = r.removeSectionOnly(r.right[index], condition)
+	r.right[index] = r.removeSectionOnly(r.right[index], func(section tree.Phrase) bool {
+		yes := condition(section)
+		if yes {
+			r.rightTypeIndex.Remove(index, section)
+		}
+		return yes
+	})
 }
 
 func (r *Road) removeSectionOnly(root *roadNode, condition func(tree.Phrase) bool) *roadNode {
@@ -174,25 +184,22 @@ func (r *Road) GetActiveSection() []tree.Phrase {
 }
 
 func (r *Road) GetRightSectionByTypesAndSize(index int, types *tree.PhraseType, size int) tree.Phrase {
-	results := r.GetRightSection(index, func(phrase tree.Phrase) bool {
-		return size == phrase.ContentSize() && types.Equal(phrase.Types())
-	})
-	if len(results) == 0 {
-		return nil
+	for cursor := r.right[index]; cursor != nil; cursor = cursor.next {
+		if cursor.value.ContentSize() > size {
+			continue
+		}
+		if cursor.value.ContentSize() < size {
+			return nil
+		}
+		if types.Equal(cursor.value.Types()) {
+			return cursor.value
+		}
 	}
-
-	if len(results) > 1 {
-		panic(fmt.Sprintf("Too much right section when Types = %v and Size = %v", types.Name(), size))
-	}
-
-	return results[0]
+	return nil
 }
 
-func (r *Road) GetRightSectionByTypes(index int, types *tree.PhraseType) []tree.Phrase {
-	return r.GetRightSection(index, func(phrase tree.Phrase) bool {
-		return types.Match(phrase.Types())
-	})
-	//TODO reImplement
+func (r *Road) GetRightSectionByTypes(index int, types *tree.PhraseType) map[tree.Phrase]bool {
+	return r.rightTypeIndex.Get(index, types)
 }
 
 func (r *Road) GetLeftSection(index int, condition func(tree.Phrase) bool) []tree.Phrase {
@@ -233,5 +240,5 @@ func (r *Road) SubSentence(from, to int) string {
 }
 
 func (r *Road) SentenceSize() int {
-	return len(r.sentence)
+	return r.size
 }

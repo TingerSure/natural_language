@@ -39,6 +39,28 @@ func (p *PhraseType) Parents() []*PhraseType {
 	return p.parents
 }
 
+func (p *PhraseType) IterateParentsDistinct(onParent func(*PhraseType) bool) bool {
+	record := map[*PhraseType]bool{}
+	for _, parent := range p.parents {
+		if !record[parent] {
+			if parent.IterateParentsDistinct(func(grandParent *PhraseType) bool {
+				if !record[grandParent] {
+					record[grandParent] = true
+					return onParent(grandParent)
+				}
+				return false
+			}) {
+				return true
+			}
+			record[parent] = true
+			if onParent(parent) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func NewPhraseType(name string, parents []*PhraseType) *PhraseType {
 	if parents == nil {
 		parents = []*PhraseType{}

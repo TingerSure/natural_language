@@ -83,7 +83,7 @@ func (g *Grammar) matchStep(road *Road, index int, cursor int, treasures []tree.
 		return back
 	}
 	phrases := road.GetRightSectionByTypes(cursor, rule.Types()[index])
-	for _, phrase := range phrases {
+	for phrase, _ := range phrases {
 		treasures[index] = phrase
 		if index == 0 {
 			back = append(back, rule.Create(treasures))
