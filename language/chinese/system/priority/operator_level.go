@@ -32,27 +32,51 @@ func (o *OperatorLevel) GetPriorityRules() []*tree.PriorityRule {
 				return left.From() == structs.NumberFromNumberOperatorNumberName &&
 					right.From() == structs.NumberFromNumberOperatorNumberName
 			},
-			Chooser: func(left tree.Phrase, right tree.Phrase) int {
+			Chooser: func(left tree.Phrase, right tree.Phrase) (int, *tree.AbandonGroup) {
 
-				operatorLeft := o.getLevel(left.GetChild(1).From())
-				operatorRight := o.getLevel(right.GetChild(1).From())
-				if operatorLeft > operatorRight {
-					return 1
+				levelLeft := o.getLevel(left.GetChild(1).From())
+				levelRight := o.getLevel(right.GetChild(1).From())
+				indexLeft := left.GetChild(0)
+				indexRight := right.GetChild(0)
+
+				if levelLeft > levelRight {
+					if indexLeft.ContentSize() < indexRight.ContentSize() {
+						return 1, tree.NewAbandonGroup().Add(&tree.Abandon{
+							Offset: 0,
+							Value:  left.GetChild(2),
+						})
+					}
+					return 1, tree.NewAbandonGroup().Add(&tree.Abandon{
+						Offset: indexLeft.ContentSize() - left.ContentSize(),
+						Value:  indexLeft,
+					})
 				}
-				if operatorLeft < operatorRight {
-					return -1
+				if levelLeft < levelRight {
+					if indexLeft.ContentSize() > indexRight.ContentSize() {
+						return -1, tree.NewAbandonGroup().Add(&tree.Abandon{
+							Offset: 0,
+							Value:  right.GetChild(2),
+						})
+					}
+					return -1, tree.NewAbandonGroup().Add(&tree.Abandon{
+						Offset: indexRight.ContentSize() - right.ContentSize(),
+						Value:  indexRight,
+					})
 				}
 
-				indexLeft := left.GetChild(0).ContentSize()
-				indexRight := right.GetChild(0).ContentSize()
-				if indexLeft < indexRight {
-					return 1
+				if indexLeft.ContentSize() < indexRight.ContentSize() {
+					return 1, tree.NewAbandonGroup().Add(&tree.Abandon{
+						Offset: 0,
+						Value:  left.GetChild(2),
+					})
 				}
-				if indexLeft > indexRight {
-					return -1
+				if indexLeft.ContentSize() > indexRight.ContentSize() {
+					return -1, tree.NewAbandonGroup().Add(&tree.Abandon{
+						Offset: 0,
+						Value:  right.GetChild(2),
+					})
 				}
-
-				return 0
+				return 0, nil
 			},
 		}),
 	}

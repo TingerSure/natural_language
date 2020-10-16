@@ -29,7 +29,7 @@ func (g *Grammar) ParseStruct(road *Road) error {
 			for _, phrase := range phrases {
 				rules := g.reach.GetRulesByLastType(phrase.Types())
 				for _, rule := range rules {
-					targetPhrases = g.Match(road, index, phrase, rule, targetPhrases)
+					targetPhrases = g.match(road, index, phrase, rule, targetPhrases)
 				}
 			}
 			for _, phrase := range targetPhrases {
@@ -39,7 +39,8 @@ func (g *Grammar) ParseStruct(road *Road) error {
 					continue
 				}
 				if priority, ok := old.(*tree.PhrasePriority); ok {
-					results := g.barricade.TargetFilter(priority.AllValues(), phrase)
+					results, abandons := g.barricade.TargetFilter(priority.AllValues(), phrase)
+					g.cut(road, index, abandons)
 					if 1 == len(results) {
 						road.ReplaceRight(index, old, results[0])
 					} else {
@@ -47,7 +48,9 @@ func (g *Grammar) ParseStruct(road *Road) error {
 					}
 					continue
 				}
-				switch g.barricade.Check(old, phrase) {
+				results, abandons := g.barricade.Check(old, phrase)
+				g.cut(road, index, abandons)
+				switch results {
 				case 0:
 					road.ReplaceRight(index, old, tree.NewPhrasePriority([]tree.Phrase{
 						old,
@@ -71,7 +74,18 @@ func (g *Grammar) ParseStruct(road *Road) error {
 	return nil
 }
 
-func (g *Grammar) Match(road *Road, roadIndex int, last tree.Phrase, rule *tree.StructRule, back []tree.Phrase) []tree.Phrase {
+func (g *Grammar) cut(road *Road, index int, abandons *tree.AbandonGroup) {
+	if abandons == nil {
+		return
+	}
+	for _, abandon := range abandons.Values() {
+		road.RemoveRightSection(index+abandon.Offset, func(phrase tree.Phrase) bool {
+			return phrase == abandon.Value
+		})
+	}
+}
+
+func (g *Grammar) match(road *Road, roadIndex int, last tree.Phrase, rule *tree.StructRule, back []tree.Phrase) []tree.Phrase {
 	size := rule.Size()
 	treasures := make([]tree.Phrase, size, size)
 	treasures[size-1] = last

@@ -21,17 +21,17 @@ func (o *Belong) GetPriorityRules() []*tree.PriorityRule {
 				return left.From() == structs.AnyFromAnyBelongAnyName &&
 					right.From() == structs.AnyFromAnyBelongAnyName
 			},
-			Chooser: func(left tree.Phrase, right tree.Phrase) int {
+			Chooser: func(left tree.Phrase, right tree.Phrase) (int, *tree.AbandonGroup) {
 				indexLeft := left.GetChild(0).ContentSize()
 				indexRight := right.GetChild(0).ContentSize()
 				if indexLeft < indexRight {
-					return 1
+					return 1, nil
 				}
 				if indexLeft > indexRight {
-					return -1
+					return -1, nil
 				}
 
-				return 0
+				return 0, nil
 			},
 		}),
 	}

@@ -2,7 +2,7 @@ package tree
 
 type PriorityRuleParam struct {
 	Match   func(Phrase, Phrase) bool
-	Chooser func(Phrase, Phrase) int
+	Chooser func(Phrase, Phrase) (int, *AbandonGroup)
 	From    string
 }
 
@@ -18,7 +18,7 @@ func (p *PriorityRule) Match(left, right Phrase) bool {
 	return p.param.Match(left, right)
 }
 
-func (p *PriorityRule) Choose(left, right Phrase) int {
+func (p *PriorityRule) Choose(left, right Phrase) (int, *AbandonGroup) {
 	return p.param.Chooser(left, right)
 }
 

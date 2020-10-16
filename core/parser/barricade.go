@@ -34,105 +34,40 @@ func (a *Barricade) Diff(left tree.Phrase, right tree.Phrase) (tree.Phrase, tree
 	return diffLeft, diffRight
 }
 
-func (a *Barricade) Check(left, right tree.Phrase) int {
+func (a *Barricade) Check(left, right tree.Phrase) (int, *tree.AbandonGroup) {
 	for _, rule := range a.rules {
 		if rule.Match(left, right) {
 			return rule.Choose(left, right)
 		}
 	}
-	return 0
+	return 0, nil
 }
 
-func (a *Barricade) TargetFilter(phrases []tree.Phrase, target tree.Phrase) []tree.Phrase {
+func (a *Barricade) TargetFilter(phrases []tree.Phrase, target tree.Phrase) ([]tree.Phrase, *tree.AbandonGroup) {
 	result := []tree.Phrase{}
+	abandons := tree.NewAbandonGroup()
 	obsolete := false
 leftLoop:
 	for _, left := range phrases {
-		switch a.Check(left, target) {
+		choose, abandon := a.Check(left, target)
+		switch choose {
 		case 0:
 			result = append(result, left)
 			continue leftLoop
 		case -1:
 			result = append(result, left)
 			obsolete = true
+			abandons.Merge(abandon)
 			continue leftLoop
 		case 1:
+			abandons.Merge(abandon)
 			continue leftLoop
 		}
 	}
 	if !obsolete {
 		result = append(result, target)
 	}
-	return result
-}
-
-func (a *Barricade) Filter(phrases []tree.Phrase) []tree.Phrase {
-	var obsolete []bool = make([]bool, len(phrases), len(phrases))
-	result := []tree.Phrase{}
-	for leftIndex, left := range phrases {
-		if obsolete[leftIndex] {
-			continue
-		}
-	rightLoop:
-		for rightIndex := leftIndex + 1; rightIndex < len(phrases); rightIndex++ {
-			if obsolete[rightIndex] {
-				continue
-			}
-			right := phrases[rightIndex]
-			if nl_interface.IsNil(left) && nl_interface.IsNil(right) {
-				continue
-			}
-			switch a.Check(left, right) {
-			case 0:
-				continue rightLoop
-			case -1:
-				obsolete[rightIndex] = true
-				continue rightLoop
-			case 1:
-				obsolete[leftIndex] = true
-				break rightLoop
-			}
-		}
-		if !obsolete[leftIndex] {
-			result = append(result, phrases[leftIndex])
-		}
-	}
-	return result
-}
-
-func (a *Barricade) DeepFilter(phrases []tree.Phrase) []tree.Phrase {
-	var obsolete []bool = make([]bool, len(phrases), len(phrases))
-	result := []tree.Phrase{}
-	for leftIndex, left := range phrases {
-		if obsolete[leftIndex] {
-			continue
-		}
-	rightLoop:
-		for rightIndex := leftIndex + 1; rightIndex < len(phrases); rightIndex++ {
-			if obsolete[rightIndex] {
-				continue
-			}
-			right := phrases[rightIndex]
-			diffLeft, diffRight := a.Diff(left, right)
-			if nl_interface.IsNil(diffLeft) && nl_interface.IsNil(diffRight) {
-				continue
-			}
-			switch a.Check(diffLeft, diffRight) {
-			case 0:
-				continue rightLoop
-			case -1:
-				obsolete[rightIndex] = true
-				continue rightLoop
-			case 1:
-				obsolete[leftIndex] = true
-				break rightLoop
-			}
-		}
-		if !obsolete[leftIndex] {
-			result = append(result, phrases[leftIndex])
-		}
-	}
-	return result
+	return result, abandons
 }
 
 func (a *Barricade) AddRule(rules []*tree.PriorityRule) {
