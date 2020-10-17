@@ -2,6 +2,7 @@ package parser
 
 import (
 	"github.com/TingerSure/natural_language/core/tree"
+	"strings"
 )
 
 type roadNode struct {
@@ -15,6 +16,18 @@ type Road struct {
 	right          []*roadNode
 	size           int
 	rightTypeIndex *TypeIndex
+}
+
+func (r *Road) ToString() string {
+	back := r.GetSentence() + "\n"
+	for index := r.size - 1; index >= 0; index-- {
+		right := r.right[index]
+
+		for cursor := right; cursor != nil; cursor = cursor.next {
+			back += strings.Repeat(" ", index) + cursor.value.ToContent() + "\n"
+		}
+	}
+	return back
 }
 
 func NewRoad(sentence string) *Road {
@@ -200,6 +213,13 @@ func (r *Road) GetRightSectionByTypesAndSize(index int, types *tree.PhraseType, 
 
 func (r *Road) GetRightSectionByTypes(index int, types *tree.PhraseType) map[tree.Phrase]bool {
 	return r.rightTypeIndex.Get(index, types)
+}
+
+func (r *Road) GetLeftSectionMax(index int) tree.Phrase {
+	if r.left[index] == nil {
+		return nil
+	}
+	return r.left[index].value
 }
 
 func (r *Road) GetLeftSection(index int, condition func(tree.Phrase) bool) []tree.Phrase {

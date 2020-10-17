@@ -23,23 +23,25 @@ func (g *Grammar) ParseStruct(road *Road) error {
 			continue
 		}
 
-		phrases := road.GetRightSection(index, nil)
-		targetPhrases := []tree.Phrase{}
-		for len(phrases) > 0 {
-			for _, phrase := range phrases {
-				rules := g.reach.GetRulesByLastType(phrase.Types())
+		origins := road.GetRightSection(index, nil)
+		targets := []tree.Phrase{}
+		for len(origins) > 0 {
+			for _, origin := range origins {
+				rules := g.reach.GetRulesByLastType(origin.Types())
 				for _, rule := range rules {
-					targetPhrases = g.match(road, index, phrase, rule, targetPhrases)
+					targets = g.match(road, index, origin, rule, targets)
 				}
 			}
-			for _, phrase := range targetPhrases {
-				old := road.GetRightSectionByTypesAndSize(index, phrase.Types(), phrase.ContentSize())
+			activeTargets := []tree.Phrase{}
+			for _, target := range targets {
+				old := road.GetRightSectionByTypesAndSize(index, target.Types(), target.ContentSize())
 				if nl_interface.IsNil(old) {
-					road.AddRightSection(index, phrase)
+					road.AddRightSection(index, target)
+					activeTargets = append(activeTargets, target)
 					continue
 				}
 				if priority, ok := old.(*tree.PhrasePriority); ok {
-					results, abandons := g.barricade.TargetFilter(priority.AllValues(), phrase)
+					results, abandons := g.barricade.TargetFilter(priority.AllValues(), target)
 					g.cut(road, index, abandons)
 					if 1 == len(results) {
 						road.ReplaceRight(index, old, results[0])
@@ -48,28 +50,27 @@ func (g *Grammar) ParseStruct(road *Road) error {
 					}
 					continue
 				}
-				results, abandons := g.barricade.Check(old, phrase)
+				results, abandons := g.barricade.Check(old, target)
 				g.cut(road, index, abandons)
 				switch results {
 				case 0:
 					road.ReplaceRight(index, old, tree.NewPhrasePriority([]tree.Phrase{
 						old,
-						phrase,
+						target,
 					}))
 					break
 				case -1:
 					// Do Nothing
 					break
 				case 1:
-					road.ReplaceRight(index, old, phrase)
+					road.ReplaceRight(index, old, target)
 					break
 				}
-
 			}
-			phrases = targetPhrases
-			targetPhrases = []tree.Phrase{}
+			origins = activeTargets
+			targets = []tree.Phrase{}
+			activeTargets = []tree.Phrase{}
 		}
-
 	}
 	return nil
 }

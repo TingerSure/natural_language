@@ -13,6 +13,7 @@ type Phrase interface {
 	GetChild(index int) Phrase
 	SetChild(index int, child Phrase) Phrase
 	ToString() string
+	ToContent() string
 	ToStringOffset(index int) string
 	Index() concept.Index
 	From() string

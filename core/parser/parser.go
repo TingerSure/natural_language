@@ -38,8 +38,6 @@ func (p *Parser) Instance(sentence string) (*Road, error) {
 		return nil, err
 	}
 
-	road.CleanSection()
-
 	return road, nil
 }
 

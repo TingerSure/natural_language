@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"strings"
 )
 
 type PhraseStructAdaptorParam struct {
@@ -77,15 +78,25 @@ func (p *PhraseStructAdaptor) SetChild(index int, child Phrase) Phrase {
 	return p
 }
 
+func (p *PhraseStructAdaptor) ToContent() string {
+	subContents := []string{}
+	for _, child := range p.children {
+		if nl_interface.IsNil(child) {
+			subContents = append(subContents, "null")
+			continue
+		}
+		subContents = append(subContents, child.ToContent())
+	}
+
+	return fmt.Sprintf("(%v)", strings.Join(subContents, " "))
+}
+
 func (p *PhraseStructAdaptor) ToString() string {
 	return p.ToStringOffset(0)
 }
 
 func (p *PhraseStructAdaptor) ToStringOffset(index int) string {
-	var space = ""
-	for i := 0; i < index; i++ {
-		space += "\t"
-	}
+	var space = strings.Repeat("\t", index)
 	info := fmt.Sprintf("%v%v (\n", space, p.Types().Name())
 	for i := 0; i < len(p.children); i++ {
 		info += p.GetChild(i).ToStringOffset(index + 1)

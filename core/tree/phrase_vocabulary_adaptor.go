@@ -3,6 +3,7 @@ package tree
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"strings"
 )
 
 type PhraseVocabularyAdaptorParam struct {
@@ -53,12 +54,19 @@ func (p *PhraseVocabularyAdaptor) ToString() string {
 	return p.ToStringOffset(0)
 }
 
+func (p *PhraseVocabularyAdaptor) ToContent() string {
+	content := p.param.Content.GetContext()
+	content = strings.Replace(content, "\\", "\\\\", -1)
+	content = strings.Replace(content, ",", "\\,", -1)
+	content = strings.Replace(content, "(", "\\(", -1)
+	content = strings.Replace(content, ")", "\\)", -1)
+	content = strings.Replace(content, "[", "\\[", -1)
+	content = strings.Replace(content, "]", "\\]", -1)
+	return content
+}
+
 func (p *PhraseVocabularyAdaptor) ToStringOffset(index int) string {
-	var space = ""
-	for i := 0; i < index; i++ {
-		space += "\t"
-	}
-	return fmt.Sprintf("%v%v ( %v )\n", space, p.param.Types.Name(), p.param.Content.ToString())
+	return fmt.Sprintf("%v%v ( %v )\n", strings.Repeat("\t", index), p.param.Types.Name(), p.param.Content.ToString())
 }
 
 func (p *PhraseVocabularyAdaptor) From() string {

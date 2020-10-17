@@ -55,6 +55,9 @@ func test() {
 		OnReader: func(input string) bool {
 			startTime := time.Now().Unix()
 			index, err := VM.Deal(input)
+
+			fmt.Printf("\033[1;32m[TIME]:\033[00m %vs\n", time.Now().Unix()-startTime)
+
 			if err != nil {
 				fmt.Printf("\033[1;32m[ERROR]:\033[00m %v\n", err.Error())
 				return true
@@ -62,8 +65,6 @@ func test() {
 
 			fmt.Printf("\033[1;32m[LOG]:\033[00m %v\n", index.ToString(""))
 			VM.Exec(index)
-
-			fmt.Printf("\033[1;32m[TIME]:\033[00m %vs\n", time.Now().Unix()-startTime)
 			return true
 		},
 		BeforeReader: func() {

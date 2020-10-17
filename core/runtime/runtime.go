@@ -2,22 +2,33 @@ package runtime
 
 import (
 	"errors"
+	"fmt"
 	"github.com/TingerSure/natural_language/core/parser"
 	"github.com/TingerSure/natural_language/core/sandbox"
 	"github.com/TingerSure/natural_language/core/sandbox/closure"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
 	"os"
+	"strings"
 )
 
 var (
 	runtimeStructErrorFormatDefault = func(road *parser.Road) string {
-		return "No struct rule can match this sentence."
+		maxMatch := []string{}
+		for index := 0; index < road.SentenceSize(); {
+			section := road.GetLeftSectionMax(index)
+			maxMatch = append(maxMatch, section.ToString())
+			index += section.ContentSize()
+		}
+		return fmt.Sprintf("%v\nNo struct rule can match this sentence.", strings.Join(maxMatch, ""))
 	}
 
 	runtimePriorityErrorFormatDefault = func(road *parser.Road) string {
-
-		return "No priority rule can distinguish all meanings"
+		roots := road.GetActiveSection()
+		if len(roots) == 1 {
+			return fmt.Sprintf("%v \nNo priority rule can distinguish all meanings.", roots[0].ToString())
+		}
+		return fmt.Sprintf("%v \nNo priority rule can distinguish all meanings.", tree.NewPhrasePriority(roots).ToString())
 	}
 )
 

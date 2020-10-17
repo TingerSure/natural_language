@@ -3,6 +3,7 @@ package tree
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"strings"
 )
 
 type PhrasePriority struct {
@@ -41,15 +42,20 @@ func (p *PhrasePriority) SetChild(index int, child Phrase) Phrase {
 	return p.values[0].SetChild(index, child)
 }
 
+func (p *PhrasePriority) ToContent() string {
+	subContents := []string{}
+	for _, value := range p.values {
+		subContents = append(subContents, value.ToContent())
+	}
+	return fmt.Sprintf("[%v]", strings.Join(subContents, " , "))
+}
+
 func (p *PhrasePriority) ToString() string {
 	return p.ToStringOffset(0)
 }
 
 func (p *PhrasePriority) ToStringOffset(index int) string {
-	var space = ""
-	for i := 0; i < index; i++ {
-		space += "\t"
-	}
+	var space = strings.Repeat("\t", index)
 	info := fmt.Sprintf("%v%v [\n", space, p.Types().Name())
 	for i := 0; i < p.ValueSize(); i++ {
 		info += p.GetValue(i).ToStringOffset(index + 1)
