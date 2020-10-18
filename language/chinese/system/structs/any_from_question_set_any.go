@@ -18,7 +18,7 @@ const (
 
 var (
 	anyFromQuestionSetAnyList []*tree.PhraseType = []*tree.PhraseType{
-		phrase_type.Question,
+		phrase_type.PronounInterrogative,
 		phrase_type.Set,
 		phrase_type.Any,
 	}
@@ -45,11 +45,9 @@ func (p *AnyFromQuestionSetAny) GetStructRules() []*tree.StructRule {
 							p.Libs.Sandbox.Variable.String.New(QuestionResult),
 						)
 					},
-					Size: len(anyFromQuestionSetAnyList),
-					DynamicTypes: func(phrase []tree.Phrase) *tree.PhraseType {
-						return phrase[2].Types()
-					},
-					From: p.GetName(),
+					Size:  len(anyFromQuestionSetAnyList),
+					Types: phrase_type.Question,
+					From:  p.GetName(),
 				})
 			},
 			Types: anyFromQuestionSetAnyList,
