@@ -5,7 +5,5 @@ import (
 )
 
 var (
-	Operator = tree.NewPhraseType("operator", []*tree.PhraseType{
-		Any,
-	})
+	OperatorRelational = tree.NewPhraseType("operator.relational", nil)
 )

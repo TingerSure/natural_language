@@ -8,28 +8,22 @@ import (
 )
 
 const (
-	NumberFromNumberOperatorNumberName string = "structs.number.number_operator_number"
-)
-
-const (
-	ItemLeft   = "left"
-	ItemRight  = "right"
-	ItemResult = "result"
+	BoolFromNumberRelationalNumberName string = "structs.bool.number_relational_number"
 )
 
 var (
-	NumberFromNumberOperatorNumberList []*tree.PhraseType = []*tree.PhraseType{
+	BoolFromNumberRelationalNumberList []*tree.PhraseType = []*tree.PhraseType{
 		phrase_type.Number,
-		phrase_type.Operator,
+		phrase_type.OperatorRelational,
 		phrase_type.Number,
 	}
 )
 
-type NumberFromNumberOperatorNumber struct {
+type BoolFromNumberRelationalNumber struct {
 	*adaptor.SourceAdaptor
 }
 
-func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
+func (p *BoolFromNumberRelationalNumber) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
 		tree.NewStructRule(&tree.StructRuleParam{
@@ -47,23 +41,23 @@ func (p *NumberFromNumberOperatorNumber) GetStructRules() []*tree.StructRule {
 							p.Libs.Sandbox.Variable.String.New(ItemResult),
 						)
 					},
-					Size:  len(NumberFromNumberOperatorNumberList),
-					Types: phrase_type.Number,
+					Size:  len(BoolFromNumberRelationalNumberList),
+					Types: phrase_type.Bool,
 					From:  p.GetName(),
 				})
 			},
-			Types: NumberFromNumberOperatorNumberList,
+			Types: BoolFromNumberRelationalNumberList,
 			From:  p.GetName(),
 		}),
 	}
 }
 
-func (p *NumberFromNumberOperatorNumber) GetName() string {
-	return NumberFromNumberOperatorNumberName
+func (p *BoolFromNumberRelationalNumber) GetName() string {
+	return BoolFromNumberRelationalNumberName
 }
 
-func NewNumberFromNumberOperatorNumber(param *adaptor.SourceAdaptorParam) *NumberFromNumberOperatorNumber {
-	return (&NumberFromNumberOperatorNumber{
+func NewBoolFromNumberRelationalNumber(param *adaptor.SourceAdaptorParam) *BoolFromNumberRelationalNumber {
+	return (&BoolFromNumberRelationalNumber{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 }

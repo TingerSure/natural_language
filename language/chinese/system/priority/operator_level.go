@@ -29,8 +29,8 @@ func (o *OperatorLevel) GetPriorityRules() []*tree.PriorityRule {
 	return []*tree.PriorityRule{
 		tree.NewPriorityRule(&tree.PriorityRuleParam{
 			Match: func(left tree.Phrase, right tree.Phrase) bool {
-				return left.From() == structs.NumberFromNumberOperatorNumberName &&
-					right.From() == structs.NumberFromNumberOperatorNumberName
+				return left.From() == structs.NumberFromNumberArithmeticNumberName &&
+					right.From() == structs.NumberFromNumberArithmeticNumberName
 			},
 			Chooser: func(left tree.Phrase, right tree.Phrase) (int, *tree.AbandonGroup) {
 

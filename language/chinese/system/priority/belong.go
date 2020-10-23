@@ -18,8 +18,8 @@ func (o *Belong) GetPriorityRules() []*tree.PriorityRule {
 	return []*tree.PriorityRule{
 		tree.NewPriorityRule(&tree.PriorityRuleParam{
 			Match: func(left tree.Phrase, right tree.Phrase) bool {
-				return left.From() == structs.AnyFromAnyBelongAnyName &&
-					right.From() == structs.AnyFromAnyBelongAnyName
+				return left.From() == structs.NounFromNounBelongNounName &&
+					right.From() == structs.NounFromNounBelongNounName
 			},
 			Chooser: func(left tree.Phrase, right tree.Phrase) (int, *tree.AbandonGroup) {
 				indexLeft := left.GetChild(0).ContentSize()

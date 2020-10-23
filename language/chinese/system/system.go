@@ -18,6 +18,14 @@ import (
 func NewSystem(param *adaptor.SourceAdaptorParam) tree.Page {
 
 	system := tree.NewPageAdaptor(param.Libs.Sandbox)
+	addWords(system, param)
+	addStructs(system, param)
+	addPrioritys(system, param)
+	return system
+}
+
+func addWords(system tree.Page, param *adaptor.SourceAdaptorParam) {
+
 	system.AddSource(pronoun.NewIt(param))
 
 	system.AddSource(pronoun.NewResult(param))
@@ -40,14 +48,22 @@ func NewSystem(param *adaptor.SourceAdaptorParam) tree.Page {
 
 	system.AddSource(brackets.NewBracketsLeft(param))
 	system.AddSource(brackets.NewBracketsRight(param))
+}
 
-	system.AddSource(structs.NewAnyFromAnyBelongAny(param))
-	system.AddSource(structs.NewNumberFromNumberOperatorNumber(param))
+func addStructs(system tree.Page, param *adaptor.SourceAdaptorParam) {
+	system.AddSource(structs.NewNounFromNounBelongNoun(param))
+	system.AddSource(structs.NewNumberFromNumberArithmeticNumber(param))
+	system.AddSource(structs.NewBoolFromLogicalBool(param))
+	system.AddSource(structs.NewBoolFromBoolLogicalBool(param))
+	system.AddSource(structs.NewBoolFromNumberRelationalNumber(param))
 	system.AddSource(structs.NewAnyFromBracketAnyBracket(param))
-	system.AddSource(structs.NewAnyFromQuestionSetAny(param))
-	system.AddSource(structs.NewAnyFromAnySetQuestion(param))
+	system.AddSource(structs.NewQuestionFromInterrogativeSetNoun(param))
+	system.AddSource(structs.NewQuestionFromInterrogativeSetNumber(param))
+	system.AddSource(structs.NewQuestionFromNounSetInterrogative(param))
+	system.AddSource(structs.NewQuestionFromNumberSetInterrogative(param))
+}
 
+func addPrioritys(system tree.Page, param *adaptor.SourceAdaptorParam) {
 	system.AddSource(priority.NewOperatorLevel(param))
 	system.AddSource(priority.NewBelong(param))
-	return system
 }

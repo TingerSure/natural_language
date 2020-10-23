@@ -22,6 +22,13 @@ type OperatorItem struct {
 	Result concept.String
 }
 
+type OperatorUnaryItem struct {
+	Name   string
+	Func   *variable.SystemFunction
+	Right  concept.String
+	Result concept.String
+}
+
 func (o *Operator) NewNumberOperatorNumberItem(name string, exec func(*variable.Number, *variable.Number) (concept.Variable, concept.Exception)) *OperatorItem {
 	instance := &OperatorItem{
 		Left:   o.Libs.Sandbox.Variable.String.New(OperatorLeft),
@@ -84,6 +91,34 @@ func (o *Operator) NewBoolOperatorBoolItem(name string, exec func(*variable.Bool
 	return instance
 }
 
+func (o *Operator) NewOperatorBoolItem(name string, exec func(*variable.Bool) (concept.Variable, concept.Exception)) *OperatorUnaryItem {
+	instance := &OperatorUnaryItem{
+		Right:  o.Libs.Sandbox.Variable.String.New(OperatorRight),
+		Result: o.Libs.Sandbox.Variable.String.New(OperatorResult),
+	}
+	instance.Func = o.Libs.Sandbox.Variable.SystemFunction.New(
+		o.Libs.Sandbox.Variable.String.New(name),
+		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+			right, yesRight := variable.VariableFamilyInstance.IsBool(input.Get(instance.Right))
+			if !yesRight {
+				return nil, o.OperatorTypeErrorExceptionTemplate.Copy().AddStack(instance.Func)
+			}
+			result, exception := exec(right)
+			if !nl_interface.IsNil(exception) {
+				return nil, exception.Copy().AddStack(instance.Func)
+			}
+			return o.Libs.Sandbox.Variable.Param.New().Set(instance.Result, result), nil
+		},
+		[]concept.String{
+			instance.Right,
+		},
+		[]concept.String{
+			instance.Result,
+		},
+	)
+	return instance
+}
+
 const (
 	AdditionName             = "Addition"
 	DivisionName             = "Division"
@@ -97,6 +132,7 @@ const (
 	LessThanOrEqualToName    = "LessThanOrEqualTo"
 	OrName                   = "Or"
 	AndName                  = "And"
+	NotName                  = "Not"
 )
 
 const (
@@ -109,6 +145,7 @@ const (
 type Operator struct {
 	tree.Page
 	Items                                map[string]*OperatorItem
+	UnaryItems                           map[string]*OperatorUnaryItem
 	Libs                                 *runtime.LibraryManager
 	OperatorTypeErrorExceptionTemplate   concept.Exception
 	OperatorDivisorZeroExceptionTemplate concept.Exception
@@ -164,9 +201,21 @@ func NewOperator(libs *runtime.LibraryManager) *Operator {
 		}),
 	}
 
+	instance.UnaryItems = map[string]*OperatorUnaryItem{
+		NotName: instance.NewOperatorBoolItem(NotName, func(right *variable.Bool) (concept.Variable, concept.Exception) {
+			return libs.Sandbox.Variable.Bool.New(!right.Value()), nil
+		}),
+	}
+
 	for name, item := range instance.Items {
 		instance.SetFunction(libs.Sandbox.Variable.String.New(name+FuncName), item.Func)
 		instance.SetConst(libs.Sandbox.Variable.String.New(name+LeftName), item.Left)
+		instance.SetConst(libs.Sandbox.Variable.String.New(name+RightName), item.Right)
+		instance.SetConst(libs.Sandbox.Variable.String.New(name+ResultName), item.Result)
+	}
+
+	for name, item := range instance.UnaryItems {
+		instance.SetFunction(libs.Sandbox.Variable.String.New(name+FuncName), item.Func)
 		instance.SetConst(libs.Sandbox.Variable.String.New(name+RightName), item.Right)
 		instance.SetConst(libs.Sandbox.Variable.String.New(name+ResultName), item.Result)
 	}

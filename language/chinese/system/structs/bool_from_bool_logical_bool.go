@@ -8,22 +8,22 @@ import (
 )
 
 const (
-	AnyFromAnySetQuestionName string = "structs.any.any_set_question"
+	BoolFromBoolLogicalBoolName string = "structs.bool.bool_logical_bool"
 )
 
 var (
-	anyFromAnySetQuestionList []*tree.PhraseType = []*tree.PhraseType{
-		phrase_type.Any,
-		phrase_type.Set,
-		phrase_type.PronounInterrogative,
+	BoolFromBoolLogicalBoolList []*tree.PhraseType = []*tree.PhraseType{
+		phrase_type.Bool,
+		phrase_type.OperatorLogical,
+		phrase_type.Bool,
 	}
 )
 
-type AnyFromAnySetQuestion struct {
+type BoolFromBoolLogicalBool struct {
 	*adaptor.SourceAdaptor
 }
 
-func (p *AnyFromAnySetQuestion) GetStructRules() []*tree.StructRule {
+func (p *BoolFromBoolLogicalBool) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
 		tree.NewStructRule(&tree.StructRuleParam{
@@ -32,31 +32,32 @@ func (p *AnyFromAnySetQuestion) GetStructRules() []*tree.StructRule {
 					Index: func(phrase []tree.Phrase) concept.Index {
 						return p.Libs.Sandbox.Expression.ParamGet.New(
 							p.Libs.Sandbox.Expression.Call.New(
-								phrase[2].Index(),
+								phrase[1].Index(),
 								p.Libs.Sandbox.Expression.NewParam.New().Init(map[concept.String]concept.Index{
-									p.Libs.Sandbox.Variable.String.New(QuestionParam): phrase[0].Index(),
+									p.Libs.Sandbox.Variable.String.New(ItemLeft):  phrase[0].Index(),
+									p.Libs.Sandbox.Variable.String.New(ItemRight): phrase[2].Index(),
 								}),
 							),
-							p.Libs.Sandbox.Variable.String.New(QuestionResult),
+							p.Libs.Sandbox.Variable.String.New(ItemResult),
 						)
 					},
-					Size:  len(anyFromAnySetQuestionList),
-					Types: phrase_type.Question,
+					Size:  len(BoolFromBoolLogicalBoolList),
+					Types: phrase_type.Bool,
 					From:  p.GetName(),
 				})
 			},
-			Types: anyFromAnySetQuestionList,
+			Types: BoolFromBoolLogicalBoolList,
 			From:  p.GetName(),
 		}),
 	}
 }
 
-func (p *AnyFromAnySetQuestion) GetName() string {
-	return AnyFromAnySetQuestionName
+func (p *BoolFromBoolLogicalBool) GetName() string {
+	return BoolFromBoolLogicalBoolName
 }
 
-func NewAnyFromAnySetQuestion(param *adaptor.SourceAdaptorParam) *AnyFromAnySetQuestion {
-	return (&AnyFromAnySetQuestion{
+func NewBoolFromBoolLogicalBool(param *adaptor.SourceAdaptorParam) *BoolFromBoolLogicalBool {
+	return (&BoolFromBoolLogicalBool{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 }

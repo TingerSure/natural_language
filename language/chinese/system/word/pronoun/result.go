@@ -39,7 +39,7 @@ func (p *Result) GetVocabularyRules() []*tree.VocabularyRule {
 						return p.ResultIndex
 					},
 					Content: treasure,
-					Types:   phrase_type.Any,
+					Types:   phrase_type.Noun,
 					From:    p.GetName(),
 				})
 			}, From: p.GetName(),

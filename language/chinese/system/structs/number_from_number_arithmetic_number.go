@@ -1,0 +1,69 @@
+package structs
+
+import (
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/tree"
+	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
+	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
+)
+
+const (
+	NumberFromNumberArithmeticNumberName string = "structs.number.number_arithmetic_number"
+)
+
+const (
+	ItemLeft   = "left"
+	ItemRight  = "right"
+	ItemResult = "result"
+)
+
+var (
+	NumberFromNumberArithmeticNumberList []*tree.PhraseType = []*tree.PhraseType{
+		phrase_type.Number,
+		phrase_type.OperatorArithmetic,
+		phrase_type.Number,
+	}
+)
+
+type NumberFromNumberArithmeticNumber struct {
+	*adaptor.SourceAdaptor
+}
+
+func (p *NumberFromNumberArithmeticNumber) GetStructRules() []*tree.StructRule {
+	return []*tree.StructRule{
+
+		tree.NewStructRule(&tree.StructRuleParam{
+			Create: func() tree.Phrase {
+				return tree.NewPhraseStructAdaptor(&tree.PhraseStructAdaptorParam{
+					Index: func(phrase []tree.Phrase) concept.Index {
+						return p.Libs.Sandbox.Expression.ParamGet.New(
+							p.Libs.Sandbox.Expression.Call.New(
+								phrase[1].Index(),
+								p.Libs.Sandbox.Expression.NewParam.New().Init(map[concept.String]concept.Index{
+									p.Libs.Sandbox.Variable.String.New(ItemLeft):  phrase[0].Index(),
+									p.Libs.Sandbox.Variable.String.New(ItemRight): phrase[2].Index(),
+								}),
+							),
+							p.Libs.Sandbox.Variable.String.New(ItemResult),
+						)
+					},
+					Size:  len(NumberFromNumberArithmeticNumberList),
+					Types: phrase_type.Number,
+					From:  p.GetName(),
+				})
+			},
+			Types: NumberFromNumberArithmeticNumberList,
+			From:  p.GetName(),
+		}),
+	}
+}
+
+func (p *NumberFromNumberArithmeticNumber) GetName() string {
+	return NumberFromNumberArithmeticNumberName
+}
+
+func NewNumberFromNumberArithmeticNumber(param *adaptor.SourceAdaptorParam) *NumberFromNumberArithmeticNumber {
+	return (&NumberFromNumberArithmeticNumber{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
+	})
+}

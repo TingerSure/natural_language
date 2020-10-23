@@ -1,0 +1,61 @@
+package structs
+
+import (
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/tree"
+	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
+	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
+)
+
+const (
+	BoolFromLogicalBoolName string = "structs.bool.bool_logical_bool"
+)
+
+var (
+	BoolFromLogicalBoolList []*tree.PhraseType = []*tree.PhraseType{
+		phrase_type.OperatorLogicalUnary,
+		phrase_type.Bool,
+	}
+)
+
+type BoolFromLogicalBool struct {
+	*adaptor.SourceAdaptor
+}
+
+func (p *BoolFromLogicalBool) GetStructRules() []*tree.StructRule {
+	return []*tree.StructRule{
+
+		tree.NewStructRule(&tree.StructRuleParam{
+			Create: func() tree.Phrase {
+				return tree.NewPhraseStructAdaptor(&tree.PhraseStructAdaptorParam{
+					Index: func(phrase []tree.Phrase) concept.Index {
+						return p.Libs.Sandbox.Expression.ParamGet.New(
+							p.Libs.Sandbox.Expression.Call.New(
+								phrase[0].Index(),
+								p.Libs.Sandbox.Expression.NewParam.New().Init(map[concept.String]concept.Index{
+									p.Libs.Sandbox.Variable.String.New(ItemRight): phrase[1].Index(),
+								}),
+							),
+							p.Libs.Sandbox.Variable.String.New(ItemResult),
+						)
+					},
+					Size:  len(BoolFromLogicalBoolList),
+					Types: phrase_type.Bool,
+					From:  p.GetName(),
+				})
+			},
+			Types: BoolFromLogicalBoolList,
+			From:  p.GetName(),
+		}),
+	}
+}
+
+func (p *BoolFromLogicalBool) GetName() string {
+	return BoolFromLogicalBoolName
+}
+
+func NewBoolFromLogicalBool(param *adaptor.SourceAdaptorParam) *BoolFromLogicalBool {
+	return (&BoolFromLogicalBool{
+		SourceAdaptor: adaptor.NewSourceAdaptor(param),
+	})
+}

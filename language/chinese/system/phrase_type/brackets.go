@@ -5,11 +5,7 @@ import (
 )
 
 var (
-	BracketsLeft = tree.NewPhraseType("brackets.left", []*tree.PhraseType{
-		Any,
-	})
+	BracketsLeft = tree.NewPhraseType("brackets.left", nil)
 
-	BracketsRight = tree.NewPhraseType("brackets.right", []*tree.PhraseType{
-		Any,
-	})
+	BracketsRight = tree.NewPhraseType("brackets.right", nil)
 )

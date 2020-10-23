@@ -5,5 +5,5 @@ import (
 )
 
 var (
-	Unknown = tree.NewPhraseType("unknown", nil)
+	OperatorLogical = tree.NewPhraseType("operator.logical", nil)
 )

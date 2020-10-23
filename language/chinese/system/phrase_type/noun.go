@@ -5,5 +5,7 @@ import (
 )
 
 var (
-	Unknown = tree.NewPhraseType("unknown", nil)
+	Noun = tree.NewPhraseType("noun", []*tree.PhraseType{
+		Any,
+	})
 )

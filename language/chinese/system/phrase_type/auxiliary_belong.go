@@ -5,7 +5,5 @@ import (
 )
 
 var (
-	AuxiliaryBelong = tree.NewPhraseType("auxiliary.belong", []*tree.PhraseType{
-		Any,
-	})
+	AuxiliaryBelong = tree.NewPhraseType("auxiliary.belong", nil)
 )

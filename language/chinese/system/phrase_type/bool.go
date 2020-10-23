@@ -5,5 +5,7 @@ import (
 )
 
 var (
-	Unknown = tree.NewPhraseType("unknown", nil)
+	Bool = tree.NewPhraseType("bool", []*tree.PhraseType{
+		Any,
+	})
 )
