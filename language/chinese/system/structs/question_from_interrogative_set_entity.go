@@ -8,22 +8,27 @@ import (
 )
 
 const (
-	QuestionFromInterrogativeSetNumberName string = "structs.question.interrogative_set_number"
+	QuestionFromInterrogativeSetEntityName string = "structs.question.interrogative_set_entity"
+)
+
+const (
+	QuestionParam  = "param"
+	QuestionResult = "result"
 )
 
 var (
-	QuestionFromInterrogativeSetNumberList []*tree.PhraseType = []*tree.PhraseType{
+	QuestionFromInterrogativeSetEntityList []*tree.PhraseType = []*tree.PhraseType{
 		phrase_type.PronounInterrogative,
 		phrase_type.Set,
-		phrase_type.Number,
+		phrase_type.Entity,
 	}
 )
 
-type QuestionFromInterrogativeSetNumber struct {
+type QuestionFromInterrogativeSetEntity struct {
 	*adaptor.SourceAdaptor
 }
 
-func (p *QuestionFromInterrogativeSetNumber) GetStructRules() []*tree.StructRule {
+func (p *QuestionFromInterrogativeSetEntity) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
 		tree.NewStructRule(&tree.StructRuleParam{
@@ -40,23 +45,23 @@ func (p *QuestionFromInterrogativeSetNumber) GetStructRules() []*tree.StructRule
 							p.Libs.Sandbox.Variable.String.New(QuestionResult),
 						)
 					},
-					Size:  len(QuestionFromInterrogativeSetNumberList),
+					Size:  len(QuestionFromInterrogativeSetEntityList),
 					Types: phrase_type.Question,
 					From:  p.GetName(),
 				})
 			},
-			Types: QuestionFromInterrogativeSetNumberList,
+			Types: QuestionFromInterrogativeSetEntityList,
 			From:  p.GetName(),
 		}),
 	}
 }
 
-func (p *QuestionFromInterrogativeSetNumber) GetName() string {
-	return QuestionFromInterrogativeSetNumberName
+func (p *QuestionFromInterrogativeSetEntity) GetName() string {
+	return QuestionFromInterrogativeSetEntityName
 }
 
-func NewQuestionFromInterrogativeSetNumber(param *adaptor.SourceAdaptorParam) *QuestionFromInterrogativeSetNumber {
-	return (&QuestionFromInterrogativeSetNumber{
+func NewQuestionFromInterrogativeSetEntity(param *adaptor.SourceAdaptorParam) *QuestionFromInterrogativeSetEntity {
+	return (&QuestionFromInterrogativeSetEntity{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 }

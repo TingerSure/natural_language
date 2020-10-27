@@ -90,6 +90,9 @@ func (g *Grammar) match(road *Road, roadIndex int, last tree.Phrase, rule *tree.
 	size := rule.Size()
 	treasures := make([]tree.Phrase, size, size)
 	treasures[size-1] = last
+	if size == 1 {
+		return append(back, rule.Create(treasures))
+	}
 	return g.matchStep(road, size-2, roadIndex-last.ContentSize(), treasures, rule, back)
 }
 

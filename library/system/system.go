@@ -28,10 +28,9 @@ func NewSystemLibrary(libs *runtime.LibraryManager, param *SystemLibraryParam) t
 
 	system.SetPage("operator", operator.NewOperator(libs))
 
-	autoNumber := auto_number.NewAutoNumber(libs)
-	system.SetPage("auto_number", autoNumber)
+	system.SetPage("auto_number", auto_number.NewAutoNumber(libs))
 
-	system.SetPage("object", object.NewObject(libs, autoNumber))
+	system.SetPage("object", object.NewObject(libs))
 
 	system.SetPage("pronoun", pronoun.NewPronoun(libs))
 

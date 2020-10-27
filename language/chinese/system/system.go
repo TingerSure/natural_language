@@ -51,16 +51,16 @@ func addWords(system tree.Page, param *adaptor.SourceAdaptorParam) {
 }
 
 func addStructs(system tree.Page, param *adaptor.SourceAdaptorParam) {
-	system.AddSource(structs.NewNounFromNounBelongNoun(param))
+	system.AddSource(structs.NewEntityFromEntityBelongNoun(param))
 	system.AddSource(structs.NewNumberFromNumberArithmeticNumber(param))
 	system.AddSource(structs.NewBoolFromLogicalBool(param))
 	system.AddSource(structs.NewBoolFromBoolLogicalBool(param))
 	system.AddSource(structs.NewBoolFromNumberRelationalNumber(param))
 	system.AddSource(structs.NewAnyFromBracketAnyBracket(param))
-	system.AddSource(structs.NewQuestionFromInterrogativeSetNoun(param))
-	system.AddSource(structs.NewQuestionFromInterrogativeSetNumber(param))
-	system.AddSource(structs.NewQuestionFromNounSetInterrogative(param))
-	system.AddSource(structs.NewQuestionFromNumberSetInterrogative(param))
+	system.AddSource(structs.NewEntityFromNoun(param))
+	system.AddSource(structs.NewEntityFromNumber(param))
+	system.AddSource(structs.NewQuestionFromInterrogativeSetEntity(param))
+	system.AddSource(structs.NewQuestionFromEntitySetInterrogative(param))
 }
 
 func addPrioritys(system tree.Page, param *adaptor.SourceAdaptorParam) {

@@ -27,12 +27,8 @@ func initGetField(libs *runtime.LibraryManager, instance *Object) {
 		libs.Sandbox.Variable.String.New("GetField"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
 			content := input.Get(GetFieldContent)
-			var object concept.Object
-			if objectHome, ok := variable.VariableFamilyInstance.IsObjectHome(content); ok {
-				object = objectHome
-			} else if number, ok := variable.VariableFamilyInstance.IsNumber(content); ok {
-				object = instance.AutoNumber.NewAutoNumberObject(number)
-			} else {
+			object, ok := variable.VariableFamilyInstance.IsObjectHome(content)
+			if !ok {
 				return nil, GetFieldObjectErrorException.Copy().AddStack(GetField)
 			}
 

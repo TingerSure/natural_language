@@ -8,18 +8,18 @@ import (
 )
 
 const (
-	NounFromNounBelongNounName string = "structs.noun.noun_belong_noun"
+	EntityFromEntityBelongNounName string = "structs.entity.entity_belong_noun"
 )
 
 var (
-	NounFromNounBelongNounList []*tree.PhraseType = []*tree.PhraseType{
-		phrase_type.Noun,
+	EntityFromEntityBelongNounList []*tree.PhraseType = []*tree.PhraseType{
+		phrase_type.Entity,
 		phrase_type.AuxiliaryBelong,
 		phrase_type.Noun,
 	}
 )
 
-type NounFromNounBelongNoun struct {
+type EntityFromEntityBelongNoun struct {
 	*adaptor.SourceAdaptor
 	GetFieldValue   concept.String
 	GetFieldKey     concept.String
@@ -27,7 +27,7 @@ type NounFromNounBelongNoun struct {
 	GetField        concept.Function
 }
 
-func (p *NounFromNounBelongNoun) GetStructRules() []*tree.StructRule {
+func (p *EntityFromEntityBelongNoun) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 		tree.NewStructRule(&tree.StructRuleParam{
 			Create: func() tree.Phrase {
@@ -44,23 +44,23 @@ func (p *NounFromNounBelongNoun) GetStructRules() []*tree.StructRule {
 							p.GetFieldValue,
 						)
 					},
-					Size:  len(NounFromNounBelongNounList),
-					Types: phrase_type.Noun,
+					Size:  len(EntityFromEntityBelongNounList),
+					Types: phrase_type.Entity,
 					From:  p.GetName(),
 				})
 			},
-			Types: NounFromNounBelongNounList,
+			Types: EntityFromEntityBelongNounList,
 			From:  p.GetName(),
 		}),
 	}
 }
 
-func (p *NounFromNounBelongNoun) GetName() string {
-	return NounFromNounBelongNounName
+func (p *EntityFromEntityBelongNoun) GetName() string {
+	return EntityFromEntityBelongNounName
 }
 
-func NewNounFromNounBelongNoun(param *adaptor.SourceAdaptorParam) *NounFromNounBelongNoun {
-	instance := (&NounFromNounBelongNoun{
+func NewEntityFromEntityBelongNoun(param *adaptor.SourceAdaptorParam) *EntityFromEntityBelongNoun {
+	instance := (&EntityFromEntityBelongNoun{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 	libObject := instance.Libs.GetLibraryPage("system", "object")

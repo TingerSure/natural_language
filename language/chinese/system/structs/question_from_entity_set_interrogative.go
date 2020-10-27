@@ -8,22 +8,22 @@ import (
 )
 
 const (
-	QuestionFromNounSetInterrogativeName string = "structs.question.noun_set_interrogative"
+	QuestionFromEntitySetInterrogativeName string = "structs.question.entity_set_interrogative"
 )
 
 var (
-	QuestionFromNounSetInterrogativeList []*tree.PhraseType = []*tree.PhraseType{
-		phrase_type.Noun,
+	QuestionFromEntitySetInterrogativeList []*tree.PhraseType = []*tree.PhraseType{
+		phrase_type.Entity,
 		phrase_type.Set,
 		phrase_type.PronounInterrogative,
 	}
 )
 
-type QuestionFromNounSetInterrogative struct {
+type QuestionFromEntitySetInterrogative struct {
 	*adaptor.SourceAdaptor
 }
 
-func (p *QuestionFromNounSetInterrogative) GetStructRules() []*tree.StructRule {
+func (p *QuestionFromEntitySetInterrogative) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
 		tree.NewStructRule(&tree.StructRuleParam{
@@ -40,23 +40,23 @@ func (p *QuestionFromNounSetInterrogative) GetStructRules() []*tree.StructRule {
 							p.Libs.Sandbox.Variable.String.New(QuestionResult),
 						)
 					},
-					Size:  len(QuestionFromNounSetInterrogativeList),
+					Size:  len(QuestionFromEntitySetInterrogativeList),
 					Types: phrase_type.Question,
 					From:  p.GetName(),
 				})
 			},
-			Types: QuestionFromNounSetInterrogativeList,
+			Types: QuestionFromEntitySetInterrogativeList,
 			From:  p.GetName(),
 		}),
 	}
 }
 
-func (p *QuestionFromNounSetInterrogative) GetName() string {
-	return QuestionFromNounSetInterrogativeName
+func (p *QuestionFromEntitySetInterrogative) GetName() string {
+	return QuestionFromEntitySetInterrogativeName
 }
 
-func NewQuestionFromNounSetInterrogative(param *adaptor.SourceAdaptorParam) *QuestionFromNounSetInterrogative {
-	return (&QuestionFromNounSetInterrogative{
+func NewQuestionFromEntitySetInterrogative(param *adaptor.SourceAdaptorParam) *QuestionFromEntitySetInterrogative {
+	return (&QuestionFromEntitySetInterrogative{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 }
