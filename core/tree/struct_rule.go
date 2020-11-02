@@ -4,7 +4,7 @@ type StructRuleParam struct {
 	Size   int
 	Create func() Phrase
 	From   string
-	Types  []*PhraseType
+	Types  []string
 }
 
 type StructRule struct {
@@ -15,23 +15,12 @@ func (r *StructRule) Size() int {
 	return r.param.Size
 }
 
-func (r *StructRule) Types() []*PhraseType {
+func (r *StructRule) Types() []string {
 	return r.param.Types
 }
 
 func (r *StructRule) GetFrom() string {
 	return r.param.From
-}
-
-func (r *StructRule) Match(treasures []Phrase) bool {
-	if len(treasures) < r.param.Size {
-		return false
-	}
-	match := true
-	for index, treasure := range treasures[len(treasures)-r.param.Size:] {
-		match = match && r.param.Types[index].Match(treasure.Types())
-	}
-	return match
 }
 
 func (r *StructRule) Create(treasures []Phrase) Phrase {

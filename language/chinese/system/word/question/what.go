@@ -38,7 +38,7 @@ func (p *What) GetVocabularyRules() []*tree.VocabularyRule {
 						return p.Libs.Sandbox.Index.ConstIndex.New(p.WhatFunc)
 					},
 					Content: treasure,
-					Types:   phrase_type.PronounInterrogative,
+					Types:   phrase_type.PronounInterrogativeName,
 					From:    p.GetName(),
 				})
 			}, From: p.GetName(),

@@ -6,17 +6,20 @@ import (
 
 type Reach struct {
 	structs []*tree.StructRule
+	types   *Types
 }
 
-func NewReach() *Reach {
-	return &Reach{}
+func NewReach(types *Types) *Reach {
+	return &Reach{
+		types: types,
+	}
 }
 
-func (g *Reach) GetRulesByLastType(given *tree.PhraseType) []*tree.StructRule {
+func (g *Reach) GetRulesByLastType(given string) []*tree.StructRule {
 	back := []*tree.StructRule{}
 	for _, rule := range g.structs {
-		types := rule.Types()
-		if types[len(types)-1].Match(given) {
+		wanteds := rule.Types()
+		if g.types.Match(wanteds[len(wanteds)-1], given) {
 			back = append(back, rule)
 		}
 	}

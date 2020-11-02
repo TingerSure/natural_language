@@ -37,7 +37,7 @@ func (s *BracketsRight) GetVocabularyRules() []*tree.VocabularyRule {
 						return s.Libs.Sandbox.Index.ConstIndex.New(s.RightIndex.Clone())
 					},
 					Content: treasure,
-					Types:   phrase_type.BracketsRight,
+					Types:   phrase_type.BracketsRightName,
 					From:    s.GetName(),
 				})
 			}, From: s.GetName(),

@@ -17,10 +17,10 @@ const (
 )
 
 var (
-	QuestionFromInterrogativeSetEntityList []*tree.PhraseType = []*tree.PhraseType{
-		phrase_type.PronounInterrogative,
-		phrase_type.Set,
-		phrase_type.Entity,
+	QuestionFromInterrogativeSetEntityList []string = []string{
+		phrase_type.PronounInterrogativeName,
+		phrase_type.SetName,
+		phrase_type.EntityName,
 	}
 )
 
@@ -46,7 +46,7 @@ func (p *QuestionFromInterrogativeSetEntity) GetStructRules() []*tree.StructRule
 						)
 					},
 					Size:  len(QuestionFromInterrogativeSetEntityList),
-					Types: phrase_type.Question,
+					Types: phrase_type.QuestionName,
 					From:  p.GetName(),
 				})
 			},

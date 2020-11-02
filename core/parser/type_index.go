@@ -5,30 +5,32 @@ import (
 )
 
 type TypeIndex struct {
-	values []map[*tree.PhraseType]map[tree.Phrase]bool
+	values []map[string]map[tree.Phrase]bool
 	size   int
+	types  *Types
 }
 
-func NewTypeIndex(size int) *TypeIndex {
+func NewTypeIndex(size int, types *Types) *TypeIndex {
 	return &TypeIndex{
+		types:  types,
 		size:   size,
-		values: make([]map[*tree.PhraseType]map[tree.Phrase]bool, size),
+		values: make([]map[string]map[tree.Phrase]bool, size),
 	}
 }
 
-func (t *TypeIndex) Get(index int, types *tree.PhraseType) map[tree.Phrase]bool {
+func (t *TypeIndex) Get(index int, types string) map[tree.Phrase]bool {
 	return t.values[index][types]
 }
 
 func (t *TypeIndex) Add(index int, section tree.Phrase) {
 
 	if t.values[index] == nil {
-		t.values[index] = make(map[*tree.PhraseType]map[tree.Phrase]bool)
+		t.values[index] = make(map[string]map[tree.Phrase]bool)
 	}
 
 	types := section.Types()
 
-	types.IterateParentsDistinct(func(parent *tree.PhraseType) bool {
+	t.types.IterateParentsDistinct(types, func(parent string) bool {
 		if t.values[index][parent] == nil {
 			t.values[index][parent] = make(map[tree.Phrase]bool)
 		}
@@ -48,7 +50,7 @@ func (t *TypeIndex) Remove(index int, section tree.Phrase) {
 
 	types := section.Types()
 
-	types.IterateParentsDistinct(func(parent *tree.PhraseType) bool {
+	t.types.IterateParentsDistinct(types, func(parent string) bool {
 		delete(t.values[index][parent], section)
 		return false
 	})

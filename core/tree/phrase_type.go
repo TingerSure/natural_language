@@ -1,72 +1,33 @@
 package tree
 
-import (
-	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-)
-
-type PhraseType struct {
-	parents []*PhraseType
-	name    string
+type PhraseTypeParam struct {
+	Parents []*PhraseTypeParent
+	Name    string
+	From    string
 }
 
-func (wanted *PhraseType) Match(given *PhraseType) bool {
-	if nl_interface.IsNil(given) {
-		return false
-	}
-
-	if wanted.Equal(given) {
-		return true
-	}
-
-	for _, givenParent := range given.parents {
-		if wanted.Match(givenParent) {
-			return true
-		}
-	}
-
-	return false
+type PhraseType struct {
+	param *PhraseTypeParam
 }
 
 func (wanted *PhraseType) Equal(given *PhraseType) bool {
-	return wanted == given
+	return wanted.param.Name == given.param.Name
 }
 
 func (p *PhraseType) Name() string {
-	return p.name
+	return p.param.Name
 }
 
-func (p *PhraseType) Parents() []*PhraseType {
-	return p.parents
+func (p *PhraseType) GetFrom() string {
+	return p.param.From
 }
 
-func (p *PhraseType) IterateParentsDistinct(onParent func(*PhraseType) bool) bool {
-	record := map[*PhraseType]bool{}
-	for _, parent := range p.parents {
-		if !record[parent] {
-			if parent.IterateParentsDistinct(func(grandParent *PhraseType) bool {
-				if !record[grandParent] {
-					record[grandParent] = true
-					return onParent(grandParent)
-				}
-				return false
-			}) {
-				return true
-			}
-			record[parent] = true
-			if onParent(parent) {
-				return true
-			}
-		}
-	}
-	return false
+func (p *PhraseType) Parents() []*PhraseTypeParent {
+	return p.param.Parents
 }
 
-func NewPhraseType(name string, parents []*PhraseType) *PhraseType {
-	if parents == nil {
-		parents = []*PhraseType{}
-	}
+func NewPhraseType(param *PhraseTypeParam) *PhraseType {
 	return &PhraseType{
-		parents: parents,
-		name:    name,
+		param: param,
 	}
 }

@@ -14,7 +14,7 @@ func (p *PhrasePriority) Index() concept.Index {
 	return p.values[0].Index()
 }
 
-func (p *PhrasePriority) Types() *PhraseType {
+func (p *PhrasePriority) Types() string {
 	return p.values[0].Types()
 }
 
@@ -56,7 +56,7 @@ func (p *PhrasePriority) ToString() string {
 
 func (p *PhrasePriority) ToStringOffset(index int) string {
 	var space = strings.Repeat("\t", index)
-	info := fmt.Sprintf("%v%v [\n", space, p.Types().Name())
+	info := fmt.Sprintf("%v%v [\n", space, p.Types())
 	for i := 0; i < p.ValueSize(); i++ {
 		info += p.GetValue(i).ToStringOffset(index + 1)
 	}

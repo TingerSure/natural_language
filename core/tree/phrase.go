@@ -8,7 +8,7 @@ type Phrase interface {
 	Copy() Phrase
 	Size() int
 	ContentSize() int
-	Types() *PhraseType
+	Types() string
 	GetContent() *Vocabulary
 	GetChild(index int) Phrase
 	SetChild(index int, child Phrase) Phrase

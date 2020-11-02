@@ -12,10 +12,10 @@ const (
 )
 
 var (
-	EntityFromEntityBelongNounList []*tree.PhraseType = []*tree.PhraseType{
-		phrase_type.Entity,
-		phrase_type.AuxiliaryBelong,
-		phrase_type.Noun,
+	EntityFromEntityBelongNounList []string = []string{
+		phrase_type.EntityName,
+		phrase_type.AuxiliaryBelongName,
+		phrase_type.NounName,
 	}
 )
 
@@ -45,7 +45,7 @@ func (p *EntityFromEntityBelongNoun) GetStructRules() []*tree.StructRule {
 						)
 					},
 					Size:  len(EntityFromEntityBelongNounList),
-					Types: phrase_type.Entity,
+					Types: phrase_type.EntityName,
 					From:  p.GetName(),
 				})
 			},

@@ -12,9 +12,9 @@ const (
 )
 
 var (
-	BoolFromLogicalBoolList []*tree.PhraseType = []*tree.PhraseType{
-		phrase_type.OperatorLogicalUnary,
-		phrase_type.Bool,
+	BoolFromLogicalBoolList []string = []string{
+		phrase_type.OperatorLogicalUnaryName,
+		phrase_type.BoolName,
 	}
 )
 
@@ -40,7 +40,7 @@ func (p *BoolFromLogicalBool) GetStructRules() []*tree.StructRule {
 						)
 					},
 					Size:  len(BoolFromLogicalBoolList),
-					Types: phrase_type.Bool,
+					Types: phrase_type.BoolName,
 					From:  p.GetName(),
 				})
 			},

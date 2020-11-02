@@ -12,10 +12,10 @@ const (
 )
 
 var (
-	BoolFromNumberRelationalNumberList []*tree.PhraseType = []*tree.PhraseType{
-		phrase_type.Number,
-		phrase_type.OperatorRelational,
-		phrase_type.Number,
+	BoolFromNumberRelationalNumberList []string = []string{
+		phrase_type.NumberName,
+		phrase_type.OperatorRelationalName,
+		phrase_type.NumberName,
 	}
 )
 
@@ -42,7 +42,7 @@ func (p *BoolFromNumberRelationalNumber) GetStructRules() []*tree.StructRule {
 						)
 					},
 					Size:  len(BoolFromNumberRelationalNumberList),
-					Types: phrase_type.Bool,
+					Types: phrase_type.BoolName,
 					From:  p.GetName(),
 				})
 			},

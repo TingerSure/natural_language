@@ -12,10 +12,10 @@ const (
 )
 
 var (
-	AnyFromBracketAnyBracketList []*tree.PhraseType = []*tree.PhraseType{
-		phrase_type.BracketsLeft,
-		phrase_type.Any,
-		phrase_type.BracketsRight,
+	AnyFromBracketAnyBracketList []string = []string{
+		phrase_type.BracketsLeftName,
+		phrase_type.AnyName,
+		phrase_type.BracketsRightName,
 	}
 )
 
@@ -33,7 +33,7 @@ func (p *AnyFromBracketAnyBracket) GetStructRules() []*tree.StructRule {
 						return phrase[1].Index()
 					},
 					Size: len(AnyFromBracketAnyBracketList),
-					DynamicTypes: func(phrase []tree.Phrase) *tree.PhraseType {
+					DynamicTypes: func(phrase []tree.Phrase) string {
 						return phrase[1].Types()
 					},
 					From: p.GetName(),

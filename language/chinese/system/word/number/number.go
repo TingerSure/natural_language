@@ -49,7 +49,7 @@ func (p *Number) GetVocabularyRules() []*tree.VocabularyRule {
 						return p.Libs.Sandbox.Index.ConstIndex.New(p.Libs.Sandbox.Variable.Number.New(value))
 					},
 					Content: treasure,
-					Types:   phrase_type.Number,
+					Types:   phrase_type.NumberName,
 					From:    p.GetName(),
 				})
 			}, From: p.GetName(),

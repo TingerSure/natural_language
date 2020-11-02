@@ -40,7 +40,7 @@ func (p *Belong) GetVocabularyRules() []*tree.VocabularyRule {
 						return p.Libs.Sandbox.Index.ConstIndex.New(p.Libs.Sandbox.Variable.String.New(BelongTo))
 					},
 					Content: treasure,
-					Types:   phrase_type.AuxiliaryBelong,
+					Types:   phrase_type.AuxiliaryBelongName,
 					From:    p.GetName(),
 				})
 			}, From: p.GetName(),

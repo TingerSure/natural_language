@@ -22,6 +22,10 @@ func NewSourceAdaptor(param *SourceAdaptorParam) *SourceAdaptor {
 	}
 }
 
+func (*SourceAdaptor) GetPhraseTypes() []*tree.PhraseType {
+	return nil
+}
+
 func (*SourceAdaptor) GetWords(string) []*tree.Vocabulary {
 	return nil
 }

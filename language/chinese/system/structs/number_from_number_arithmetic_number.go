@@ -18,10 +18,10 @@ const (
 )
 
 var (
-	NumberFromNumberArithmeticNumberList []*tree.PhraseType = []*tree.PhraseType{
-		phrase_type.Number,
-		phrase_type.OperatorArithmetic,
-		phrase_type.Number,
+	NumberFromNumberArithmeticNumberList []string = []string{
+		phrase_type.NumberName,
+		phrase_type.OperatorArithmeticName,
+		phrase_type.NumberName,
 	}
 )
 
@@ -48,7 +48,7 @@ func (p *NumberFromNumberArithmeticNumber) GetStructRules() []*tree.StructRule {
 						)
 					},
 					Size:  len(NumberFromNumberArithmeticNumberList),
-					Types: phrase_type.Number,
+					Types: phrase_type.NumberName,
 					From:  p.GetName(),
 				})
 			},

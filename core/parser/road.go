@@ -16,6 +16,7 @@ type Road struct {
 	right          []*roadNode
 	size           int
 	rightTypeIndex *TypeIndex
+	types          *Types
 }
 
 func (r *Road) ToString() string {
@@ -30,14 +31,15 @@ func (r *Road) ToString() string {
 	return back
 }
 
-func NewRoad(sentence string) *Road {
+func NewRoad(sentence string, types *Types) *Road {
 	road := &Road{
 		sentence: []rune(sentence),
+		types:    types,
 	}
 	road.size = len(road.sentence)
 	road.left = make([]*roadNode, road.size)
 	road.right = make([]*roadNode, road.size)
-	road.rightTypeIndex = NewTypeIndex(road.size)
+	road.rightTypeIndex = NewTypeIndex(road.size, types)
 	return road
 }
 
@@ -196,7 +198,7 @@ func (r *Road) GetActiveSection() []tree.Phrase {
 	})
 }
 
-func (r *Road) GetRightSectionByTypesAndSize(index int, types *tree.PhraseType, size int) tree.Phrase {
+func (r *Road) GetRightSectionByTypesAndSize(index int, types string, size int) tree.Phrase {
 	for cursor := r.right[index]; cursor != nil; cursor = cursor.next {
 		if cursor.value.ContentSize() > size {
 			continue
@@ -204,14 +206,14 @@ func (r *Road) GetRightSectionByTypesAndSize(index int, types *tree.PhraseType, 
 		if cursor.value.ContentSize() < size {
 			return nil
 		}
-		if types.Equal(cursor.value.Types()) {
+		if types == cursor.value.Types() {
 			return cursor.value
 		}
 	}
 	return nil
 }
 
-func (r *Road) GetRightSectionByTypes(index int, types *tree.PhraseType) map[tree.Phrase]bool {
+func (r *Road) GetRightSectionByTypes(index int, types string) map[tree.Phrase]bool {
 	return r.rightTypeIndex.Get(index, types)
 }
 

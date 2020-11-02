@@ -10,13 +10,16 @@ type Parser struct {
 	reach     *Reach
 	lexer     *Lexer
 	grammar   *Grammar
+	types     *Types
 }
 
 func NewParser() *Parser {
+	types := NewTypes()
 	section := NewSection()
 	barricade := NewBarricade()
-	reach := NewReach()
+	reach := NewReach(types)
 	return &Parser{
+		types:     types,
 		section:   section,
 		barricade: barricade,
 		reach:     reach,
@@ -26,7 +29,7 @@ func NewParser() *Parser {
 }
 
 func (p *Parser) Instance(sentence string) (*Road, error) {
-	road := NewRoad(sentence)
+	road := NewRoad(sentence, p.types)
 
 	err := p.lexer.ParseVocabulary(road)
 	if err != nil {
@@ -54,6 +57,7 @@ func (p *Parser) AddSource(source tree.Source) {
 	p.section.AddRule(source.GetVocabularyRules())
 	p.barricade.AddRule(source.GetPriorityRules())
 	p.reach.AddRule(source.GetStructRules())
+	p.types.AddTypes(source.GetPhraseTypes())
 }
 
 func (p *Parser) RemoveSource(name string) {
@@ -66,5 +70,9 @@ func (p *Parser) RemoveSource(name string) {
 	})
 	p.reach.RemoveRule(func(rule *tree.StructRule) bool {
 		return rule.GetFrom() == name
+	})
+
+	p.types.RemoveTypes(func(value *tree.PhraseType) bool {
+		return value.GetFrom() == name
 	})
 }

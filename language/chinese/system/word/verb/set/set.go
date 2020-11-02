@@ -45,7 +45,7 @@ func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 						return s.Libs.Sandbox.Index.ConstIndex.New(set)
 					},
 					Content: treasure,
-					Types:   phrase_type.Set,
+					Types:   phrase_type.SetName,
 					From:    s.GetName(),
 				})
 			}, From: s.GetName(),

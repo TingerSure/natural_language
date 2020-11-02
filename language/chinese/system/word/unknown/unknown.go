@@ -32,7 +32,7 @@ func (p *Unknown) GetVocabularyRules() []*tree.VocabularyRule {
 						return p.Libs.Sandbox.Index.ConstIndex.New(p.Libs.Sandbox.Variable.String.New(treasure.GetContext()))
 					},
 					Content: treasure,
-					Types:   phrase_type.Unknown,
+					Types:   phrase_type.UnknownName,
 					From:    p.GetName(),
 				})
 			}, From: p.GetName(),

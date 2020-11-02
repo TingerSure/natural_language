@@ -39,7 +39,7 @@ func (p *Division) GetVocabularyRules() []*tree.VocabularyRule {
 						return p.Libs.Sandbox.Index.ConstIndex.New(p.operator)
 					},
 					Content: treasure,
-					Types:   phrase_type.OperatorArithmetic,
+					Types:   phrase_type.OperatorArithmeticName,
 					From:    p.GetName(),
 				})
 			}, From: p.GetName(),
