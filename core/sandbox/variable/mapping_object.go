@@ -149,7 +149,7 @@ func (s *MappingObjectCreator) ToLanguage(language string, instance *MappingObje
 }
 
 func (s *MappingObjectCreator) Type() string {
-	return VariableObjectType
+	return VariableMappingObjectType
 }
 
 func (s *MappingObjectCreator) NewException(name string, message string) concept.Exception {
