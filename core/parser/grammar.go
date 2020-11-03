@@ -8,10 +8,12 @@ import (
 type Grammar struct {
 	reach     *Reach
 	barricade *Barricade
+	types     *Types
 }
 
-func NewGrammar(reach *Reach, barricade *Barricade) *Grammar {
+func NewGrammar(types *Types, reach *Reach, barricade *Barricade) *Grammar {
 	return &Grammar{
+		types:     types,
 		reach:     reach,
 		barricade: barricade,
 	}
@@ -118,7 +120,7 @@ func (g *Grammar) cut(road *Road, index int, abandons *tree.AbandonGroup) {
 func (g *Grammar) match(road *Road, roadIndex int, last tree.Phrase, rule *tree.StructRule, back map[tree.Phrase]bool) {
 	size := rule.Size()
 	treasures := make([]tree.Phrase, size, size)
-	treasures[size-1] = last
+	treasures[size-1] = g.types.Package(rule.Types()[size-1], last.Types(), last)
 	if size == 1 {
 		back[rule.Create(treasures)] = true
 		return
@@ -132,7 +134,7 @@ func (g *Grammar) matchStep(road *Road, index int, cursor int, treasures []tree.
 	}
 	phrases := road.GetRightSectionByTypes(cursor, rule.Types()[index])
 	for phrase, _ := range phrases {
-		treasures[index] = phrase
+		treasures[index] = g.types.Package(rule.Types()[index], phrase.Types(), phrase)
 		if index == 0 {
 			back[rule.Create(treasures)] = true
 		} else {

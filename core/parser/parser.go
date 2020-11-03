@@ -24,7 +24,7 @@ func NewParser() *Parser {
 		barricade: barricade,
 		reach:     reach,
 		lexer:     NewLexer(section),
-		grammar:   NewGrammar(reach, barricade),
+		grammar:   NewGrammar(types, reach, barricade),
 	}
 }
 
