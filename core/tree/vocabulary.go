@@ -2,7 +2,7 @@ package tree
 
 import (
 	"fmt"
-	"github.com/TingerSure/natural_language/core/adaptor/nl_string"
+	"strings"
 	"unicode/utf8"
 )
 
@@ -35,12 +35,7 @@ func (l *Vocabulary) ToString() string {
 }
 
 func (w *Vocabulary) StartFor(sentence string) bool {
-	return 0 == nl_string.Index(sentence, w.context)
-}
-
-func (w *Vocabulary) StartWith(first string) bool {
-	return 0 == nl_string.Index(w.context, first)
-
+	return 0 == strings.Index(sentence, w.context)
 }
 
 func (w *Vocabulary) Len() int {
