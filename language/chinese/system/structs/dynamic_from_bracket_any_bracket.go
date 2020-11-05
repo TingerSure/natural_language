@@ -8,22 +8,22 @@ import (
 )
 
 const (
-	AnyFromBracketAnyBracketName string = "structs.any.bracket_any_bracket"
+	DynamicFromBracketAnyBracketName string = "structs.dynamic.bracket_any_bracket"
 )
 
 var (
-	AnyFromBracketAnyBracketList []string = []string{
+	DynamicFromBracketAnyBracketList []string = []string{
 		phrase_type.BracketsLeftName,
 		phrase_type.AnyName,
 		phrase_type.BracketsRightName,
 	}
 )
 
-type AnyFromBracketAnyBracket struct {
+type DynamicFromBracketAnyBracket struct {
 	*adaptor.SourceAdaptor
 }
 
-func (p *AnyFromBracketAnyBracket) GetStructRules() []*tree.StructRule {
+func (p *DynamicFromBracketAnyBracket) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 
 		tree.NewStructRule(&tree.StructRuleParam{
@@ -32,25 +32,25 @@ func (p *AnyFromBracketAnyBracket) GetStructRules() []*tree.StructRule {
 					Index: func(phrase []tree.Phrase) concept.Index {
 						return phrase[1].Index()
 					},
-					Size: len(AnyFromBracketAnyBracketList),
+					Size: len(DynamicFromBracketAnyBracketList),
 					DynamicTypes: func(phrase []tree.Phrase) string {
 						return phrase[1].Types()
 					},
 					From: p.GetName(),
 				})
 			},
-			Types: AnyFromBracketAnyBracketList,
+			Types: DynamicFromBracketAnyBracketList,
 			From:  p.GetName(),
 		}),
 	}
 }
 
-func (p *AnyFromBracketAnyBracket) GetName() string {
-	return AnyFromBracketAnyBracketName
+func (p *DynamicFromBracketAnyBracket) GetName() string {
+	return DynamicFromBracketAnyBracketName
 }
 
-func NewAnyFromBracketAnyBracket(param *adaptor.SourceAdaptorParam) *AnyFromBracketAnyBracket {
-	return (&AnyFromBracketAnyBracket{
+func NewDynamicFromBracketAnyBracket(param *adaptor.SourceAdaptorParam) *DynamicFromBracketAnyBracket {
+	return (&DynamicFromBracketAnyBracket{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 }

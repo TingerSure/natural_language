@@ -72,13 +72,13 @@ func addWords(system tree.Page, param *adaptor.SourceAdaptorParam) {
 }
 
 func addStructs(system tree.Page, param *adaptor.SourceAdaptorParam) {
-	system.AddSource(structs.NewEntityFromEntityBelongNoun(param))
-	system.AddSource(structs.NewEntityFromEntityBelongUnknown(param))
+	system.AddSource(structs.NewDynamicFromEntityBelongNoun(param))
+	system.AddSource(structs.NewDynamicFromEntityBelongUnknown(param))
 	system.AddSource(structs.NewNumberFromNumberArithmeticNumber(param))
 	system.AddSource(structs.NewBoolFromLogicalBool(param))
 	system.AddSource(structs.NewBoolFromBoolLogicalBool(param))
 	system.AddSource(structs.NewBoolFromNumberRelationalNumber(param))
-	system.AddSource(structs.NewAnyFromBracketAnyBracket(param))
+	system.AddSource(structs.NewDynamicFromBracketAnyBracket(param))
 	system.AddSource(structs.NewQuestionFromInterrogativeSetEntity(param))
 	system.AddSource(structs.NewQuestionFromEntitySetInterrogative(param))
 }

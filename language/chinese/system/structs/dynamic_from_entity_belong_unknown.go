@@ -8,18 +8,18 @@ import (
 )
 
 const (
-	EntityFromEntityBelongNounName string = "structs.entity.entity_belong_noun"
+	DynamicFromEntityBelongUnknownName string = "structs.dynamic.entity_belong_unknown"
 )
 
 var (
-	EntityFromEntityBelongNounList []string = []string{
+	DynamicFromEntityBelongUnknownList []string = []string{
 		phrase_type.EntityName,
 		phrase_type.AuxiliaryBelongName,
-		phrase_type.NounName,
+		phrase_type.UnknownName,
 	}
 )
 
-type EntityFromEntityBelongNoun struct {
+type DynamicFromEntityBelongUnknown struct {
 	*adaptor.SourceAdaptor
 	GetFieldValue   concept.String
 	GetFieldKey     concept.String
@@ -27,7 +27,7 @@ type EntityFromEntityBelongNoun struct {
 	GetField        concept.Function
 }
 
-func (p *EntityFromEntityBelongNoun) GetStructRules() []*tree.StructRule {
+func (p *DynamicFromEntityBelongUnknown) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 		tree.NewStructRule(&tree.StructRuleParam{
 			Create: func() tree.Phrase {
@@ -44,23 +44,26 @@ func (p *EntityFromEntityBelongNoun) GetStructRules() []*tree.StructRule {
 							p.GetFieldValue,
 						)
 					},
-					Size:  len(EntityFromEntityBelongNounList),
-					Types: phrase_type.EntityName,
-					From:  p.GetName(),
+					Size: len(DynamicFromEntityBelongUnknownList),
+					DynamicTypes: func(phrase []tree.Phrase) string {
+						//TODO
+						return phrase_type.EntityName
+					},
+					From: p.GetName(),
 				})
 			},
-			Types: EntityFromEntityBelongNounList,
+			Types: DynamicFromEntityBelongUnknownList,
 			From:  p.GetName(),
 		}),
 	}
 }
 
-func (p *EntityFromEntityBelongNoun) GetName() string {
-	return EntityFromEntityBelongNounName
+func (p *DynamicFromEntityBelongUnknown) GetName() string {
+	return DynamicFromEntityBelongUnknownName
 }
 
-func NewEntityFromEntityBelongNoun(param *adaptor.SourceAdaptorParam) *EntityFromEntityBelongNoun {
-	instance := (&EntityFromEntityBelongNoun{
+func NewDynamicFromEntityBelongUnknown(param *adaptor.SourceAdaptorParam) *DynamicFromEntityBelongUnknown {
+	instance := (&DynamicFromEntityBelongUnknown{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 	libObject := instance.Libs.GetLibraryPage("system", "object")
