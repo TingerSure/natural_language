@@ -49,6 +49,9 @@ func initSetMethod(libs *runtime.LibraryManager, instance *Object) {
 
 			return libs.Sandbox.Variable.Param.New().Set(SetMethodContent, object), nil
 		},
+		func(input concept.Param, _ concept.Object) concept.Param {
+			return libs.Sandbox.Variable.Param.New().Set(SetMethodContent, input.Get(SetMethodContent))
+		},
 		[]concept.String{
 			SetMethodContent,
 			SetMethodKey,

@@ -88,6 +88,7 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 	})
 	instance.Call = expression.NewCallCreator(&expression.CallCreatorParam{
+		NullCreator:            param.NullCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 		ExceptionCreator:       param.ExceptionCreator,
 		ParamCreator:           param.ParamCreator,

@@ -26,11 +26,12 @@ type FunctionSeed interface {
 
 type Function struct {
 	*adaptor.AdaptorFunction
-	name       concept.String
-	body       *code_block.CodeBlock
-	paramNames []concept.String
-	parent     concept.Closure
-	seed       FunctionSeed
+	name           concept.String
+	body           *code_block.CodeBlock
+	anticipateBody *code_block.CodeBlock
+	paramNames     []concept.String
+	parent         concept.Closure
+	seed           FunctionSeed
 }
 
 func (f *Function) ParamFormat(params *concept.Mapping) *concept.Mapping {
@@ -71,6 +72,35 @@ func (f *Function) ToString(prefix string) string {
 
 func (f *Function) AddParamName(paramName concept.String) {
 	f.paramNames = append(f.paramNames, paramName)
+}
+
+func (f *Function) AnticipateBody() *code_block.CodeBlock {
+	return f.anticipateBody
+}
+
+func (f *Function) Anticipate(params concept.Param, object concept.Object) concept.Param {
+	space, suspend := f.anticipateBody.Exec(f.parent, false, func(space concept.Closure) concept.Interrupt {
+		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
+		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
+		for _, name := range f.paramNames {
+			space.InitLocal(name, params.Get(name))
+		}
+		return nil
+	})
+	defer space.Clear()
+
+	if !nl_interface.IsNil(suspend) {
+		switch suspend.InterruptType() {
+		case interrupt.ExceptionInterruptType:
+			return f.seed.NewParam()
+		case interrupt.EndInterruptType:
+			return f.seed.NewParam().Init(space.IterateReturn)
+		default:
+			return f.seed.NewParam()
+		}
+	}
+
+	return f.seed.NewParam().Init(space.IterateReturn)
 }
 
 func (f *Function) Body() *code_block.CodeBlock {
@@ -133,6 +163,7 @@ func (s *FunctionCreator) New(name concept.String, parent concept.Closure) *Func
 		name:            name,
 		parent:          parent,
 		body:            s.param.CodeBlockCreator(),
+		anticipateBody:  s.param.CodeBlockCreator(),
 		seed:            s,
 	}
 }

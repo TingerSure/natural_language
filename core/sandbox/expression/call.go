@@ -12,6 +12,7 @@ import (
 type CallSeed interface {
 	ToLanguage(string, *Call) string
 	NewException(string, string) concept.Exception
+	NewNull() concept.Null
 }
 
 type Call struct {
@@ -38,8 +39,19 @@ func (a *Call) ToString(prefix string) string {
 }
 
 func (a *Call) Anticipate(space concept.Closure) concept.Variable {
-	return nil
-	//TODO
+	preFuncs := a.funcs.Anticipate(space)
+	funcs, yesFuncs := variable.VariableFamilyInstance.IsFunctionHome(preFuncs)
+	if !yesFuncs {
+		return a.seed.NewNull()
+	}
+
+	preParam := a.param.Anticipate(space)
+	param, yesParam := variable.VariableFamilyInstance.IsParam(preParam)
+	if !yesParam {
+		return a.seed.NewNull()
+	}
+
+	return funcs.Anticipate(param, nil)
 }
 
 func (a *Call) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
@@ -56,7 +68,6 @@ func (a *Call) Exec(space concept.Closure) (concept.Variable, concept.Interrupt)
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
 	}
-	yesParam := false
 	param, yesParam := variable.VariableFamilyInstance.IsParam(preParam)
 	if !yesParam {
 		return nil, a.seed.NewException("type error", "Only Param can are passed to a Function")
@@ -69,6 +80,7 @@ type CallCreatorParam struct {
 	ExceptionCreator       func(string, string) concept.Exception
 	ParamCreator           func() concept.Param
 	ConstIndexCreator      func(concept.Variable) *index.ConstIndex
+	NullCreator            func() concept.Null
 	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
 }
 
@@ -97,6 +109,10 @@ func (s *CallCreator) ToLanguage(language string, instance *Call) string {
 		return instance.ToString("")
 	}
 	return seed(language, instance)
+}
+
+func (s *CallCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
 }
 
 func (s *CallCreator) NewException(name string, message string) concept.Exception {

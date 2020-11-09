@@ -5,6 +5,7 @@ type Function interface {
 	ExceptionStack
 	Name() String
 	Exec(Param, Object) (Param, Exception)
+	Anticipate(Param, Object) Param
 	FunctionType() string
 	ParamNames() []String
 	ReturnNames() []String

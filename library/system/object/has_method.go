@@ -36,6 +36,9 @@ func initHasMethod(libs *runtime.LibraryManager, instance *Object) {
 
 			return libs.Sandbox.Variable.Param.New().Set(HasMethodExist, libs.Sandbox.Variable.Bool.New(object.HasMethod(key))), nil
 		},
+		func(_ concept.Param, _ concept.Object) concept.Param {
+			return libs.Sandbox.Variable.Param.New().Set(HasMethodExist, libs.Sandbox.Variable.Bool.New(false))
+		},
 		[]concept.String{
 			HasMethodContent,
 			HasMethodKey,

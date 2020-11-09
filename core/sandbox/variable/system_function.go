@@ -17,11 +17,12 @@ type SystemFunctionSeed interface {
 
 type SystemFunction struct {
 	*adaptor.AdaptorFunction
-	name        concept.String
-	paramNames  []concept.String
-	returnNames []concept.String
-	funcs       func(concept.Param, concept.Object) (concept.Param, concept.Exception)
-	seed        SystemFunctionSeed
+	name            concept.String
+	paramNames      []concept.String
+	returnNames     []concept.String
+	funcs           func(concept.Param, concept.Object) (concept.Param, concept.Exception)
+	anticipateFuncs func(concept.Param, concept.Object) concept.Param
+	seed            SystemFunctionSeed
 }
 
 func (f *SystemFunction) ParamFormat(params *concept.Mapping) *concept.Mapping {
@@ -52,6 +53,10 @@ func (f *SystemFunction) ToString(prefix string) string {
 	return f.name.ToString(prefix)
 }
 
+func (f *SystemFunction) Anticipate(params concept.Param, object concept.Object) concept.Param {
+	return f.anticipateFuncs(params, object)
+}
+
 func (f *SystemFunction) Exec(params concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 	return f.funcs(params, object)
 }
@@ -75,6 +80,7 @@ type SystemFunctionCreator struct {
 func (s *SystemFunctionCreator) New(
 	name concept.String,
 	funcs func(concept.Param, concept.Object) (concept.Param, concept.Exception),
+	anticipateFuncs func(concept.Param, concept.Object) concept.Param,
 	paramNames []concept.String,
 	returnNames []concept.String,
 ) *SystemFunction {
@@ -82,6 +88,7 @@ func (s *SystemFunctionCreator) New(
 		AdaptorFunction: adaptor.NewAdaptorFunction(),
 		name:            name,
 		funcs:           funcs,
+		anticipateFuncs: anticipateFuncs,
 		paramNames:      paramNames,
 		returnNames:     returnNames,
 		seed:            s,

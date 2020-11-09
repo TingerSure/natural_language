@@ -47,6 +47,29 @@ func initGetField(libs *runtime.LibraryManager, instance *Object) {
 
 			return libs.Sandbox.Variable.Param.New().Set(GetFieldValue, value), nil
 		},
+		func(input concept.Param, _ concept.Object) concept.Param {
+			null := libs.Sandbox.Variable.Null.New()
+			content := input.Get(GetFieldContent)
+			object, ok := variable.VariableFamilyInstance.IsObjectHome(content)
+			if !ok {
+				return libs.Sandbox.Variable.Param.New().Set(GetFieldValue, null)
+			}
+
+			key, ok := variable.VariableFamilyInstance.IsString(input.Get(GetFieldKey))
+			if !ok {
+				return libs.Sandbox.Variable.Param.New().Set(GetFieldValue, null)
+			}
+			if !object.HasField(key) {
+				return libs.Sandbox.Variable.Param.New().Set(GetFieldValue, null)
+			}
+
+			value, suspend := object.GetField(key)
+			if !nl_interface.IsNil(suspend) {
+				return libs.Sandbox.Variable.Param.New().Set(GetFieldValue, null)
+			}
+
+			return libs.Sandbox.Variable.Param.New().Set(GetFieldValue, value)
+		},
 		[]concept.String{
 			GetFieldContent,
 			GetFieldKey,

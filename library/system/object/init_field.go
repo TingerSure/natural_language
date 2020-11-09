@@ -51,6 +51,9 @@ func initInitField(libs *runtime.LibraryManager, instance *Object) {
 
 			return libs.Sandbox.Variable.Param.New().Set(InitFieldContent, object), nil
 		},
+		func(input concept.Param, _ concept.Object) concept.Param {
+			return libs.Sandbox.Variable.Param.New().Set(InitFieldContent, input.Get(InitFieldContent))
+		},
 		[]concept.String{
 			InitFieldContent,
 			InitFieldKey,

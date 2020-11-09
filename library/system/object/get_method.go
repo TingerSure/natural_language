@@ -46,6 +46,28 @@ func initGetMethod(libs *runtime.LibraryManager, instance *Object) {
 
 			return libs.Sandbox.Variable.Param.New().Set(GetMethodFunction, function), nil
 		},
+		func(input concept.Param, _ concept.Object) concept.Param {
+			null := libs.Sandbox.Variable.Null.New()
+			object, ok := variable.VariableFamilyInstance.IsObjectHome(input.Get(GetMethodContent))
+			if !ok {
+				return libs.Sandbox.Variable.Param.New().Set(GetMethodFunction, null)
+			}
+
+			key, ok := variable.VariableFamilyInstance.IsString(input.Get(GetMethodKey))
+			if !ok {
+				return libs.Sandbox.Variable.Param.New().Set(GetMethodFunction, null)
+			}
+			if !object.HasMethod(key) {
+				return libs.Sandbox.Variable.Param.New().Set(GetMethodFunction, null)
+			}
+
+			function, suspend := object.GetMethod(key)
+			if !nl_interface.IsNil(suspend) {
+				return libs.Sandbox.Variable.Param.New().Set(GetMethodFunction, null)
+			}
+
+			return libs.Sandbox.Variable.Param.New().Set(GetMethodFunction, function)
+		},
 		[]concept.String{
 			GetMethodContent,
 			GetMethodKey,

@@ -52,6 +52,9 @@ func initSetField(libs *runtime.LibraryManager, instance *Object) {
 
 			return libs.Sandbox.Variable.Param.New().Set(SetFieldContent, object), nil
 		},
+		func(input concept.Param, _ concept.Object) concept.Param {
+			return libs.Sandbox.Variable.Param.New().Set(SetFieldContent, input.Get(SetFieldContent))
+		},
 		[]concept.String{
 			SetFieldContent,
 			SetFieldKey,

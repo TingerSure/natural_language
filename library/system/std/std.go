@@ -48,6 +48,9 @@ func NewStd(libs *runtime.LibraryManager, param *StdParam) *Std {
 	instance.SetFunction(libs.Sandbox.Variable.String.New("Print"), libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("Print"),
 		instance.Print,
+		func(input concept.Param, _ concept.Object) concept.Param {
+			return input
+		},
 		[]concept.String{
 			instance.PrintContent,
 		},
@@ -58,6 +61,9 @@ func NewStd(libs *runtime.LibraryManager, param *StdParam) *Std {
 	instance.SetFunction(libs.Sandbox.Variable.String.New("Error"), libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("Error"),
 		instance.Error,
+		func(input concept.Param, _ concept.Object) concept.Param {
+			return input
+		},
 		[]concept.String{
 			instance.ErrorContent,
 		},

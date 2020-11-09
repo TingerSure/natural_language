@@ -37,6 +37,9 @@ func initHasField(libs *runtime.LibraryManager, instance *Object) {
 
 			return libs.Sandbox.Variable.Param.New().Set(HasFieldExist, libs.Sandbox.Variable.Bool.New(object.HasField(key))), nil
 		},
+		func(_ concept.Param, _ concept.Object) concept.Param {
+			return libs.Sandbox.Variable.Param.New().Set(HasFieldExist, libs.Sandbox.Variable.Bool.New(false))
+		},
 		[]concept.String{
 			HasFieldContent,
 			HasFieldKey,

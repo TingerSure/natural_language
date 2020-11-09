@@ -23,6 +23,8 @@ func initAddition(libs *runtime.LibraryManager, instance *AutoNumber) {
 
 	var Addition concept.Function = nil
 
+	anticipateNumber := instance.New(libs.Sandbox.Variable.Number.New(0))
+
 	Addition = libs.Sandbox.Variable.SystemFunction.New(
 		AdditionKey.Clone(),
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
@@ -42,6 +44,10 @@ func initAddition(libs *runtime.LibraryManager, instance *AutoNumber) {
 			}
 
 			return libs.Sandbox.Variable.Param.New().Set(AdditionResult, libs.Sandbox.Variable.Number.New(left.Value()+right.Value())), nil
+		},
+		func(_ concept.Param, _ concept.Object) concept.Param {
+
+			return libs.Sandbox.Variable.Param.New().Set(AdditionResult, anticipateNumber)
 		},
 		[]concept.String{
 			AdditionTarget,

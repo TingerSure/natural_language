@@ -37,6 +37,9 @@ func NewQuestion(libs *runtime.LibraryManager, output *std.Std) *Question {
 			outParam, suspend := instance.output.Print(libs.Sandbox.Variable.Param.New().Set(instance.output.PrintContent, input.Get(instance.HowManyParam)), object)
 			return libs.Sandbox.Variable.Param.New().Set(instance.HowManyResult, outParam.Get(instance.output.PrintContent)), suspend
 		},
+		func(input concept.Param, _ concept.Object) concept.Param {
+			return libs.Sandbox.Variable.Param.New().Set(instance.HowManyResult, input.Get(instance.output.PrintContent))
+		},
 		[]concept.String{
 			instance.HowManyParam,
 		},
@@ -50,6 +53,9 @@ func NewQuestion(libs *runtime.LibraryManager, output *std.Std) *Question {
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 			outParam, suspend := instance.output.Print(libs.Sandbox.Variable.Param.New().Set(instance.output.PrintContent, input.Get(instance.WhatParam)), object)
 			return libs.Sandbox.Variable.Param.New().Set(instance.WhatResult, outParam.Get(instance.output.PrintContent)), suspend
+		},
+		func(input concept.Param, _ concept.Object) concept.Param {
+			return libs.Sandbox.Variable.Param.New().Set(instance.WhatResult, input.Get(instance.output.PrintContent))
 		},
 		[]concept.String{
 			instance.WhatParam,

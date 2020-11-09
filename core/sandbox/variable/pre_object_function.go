@@ -48,6 +48,13 @@ func (f *PreObjectFunction) ToString(prefix string) string {
 	return fmt.Sprintf("%s.%s", f.object.ToString(prefix), f.function.ToString(prefix))
 }
 
+func (f *PreObjectFunction) Anticipate(params concept.Param, object concept.Object) concept.Param {
+	if nl_interface.IsNil(object) {
+		object = f.object
+	}
+	return f.function.Anticipate(params, object)
+}
+
 func (f *PreObjectFunction) Exec(params concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 	if nl_interface.IsNil(object) {
 		object = f.object

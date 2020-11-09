@@ -55,6 +55,8 @@ func NewAutoNumber(libs *runtime.LibraryManager) *AutoNumber {
 	}
 	instance.NewAutoNumberNotNumberException = libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "NewAutoNumberNotNumberException")
 
+	anticipateNumber := instance.New(libs.Sandbox.Variable.Number.New(0))
+
 	instance.NewAutoNumber = libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("NewAutoNumber"),
 		func(input concept.Param, _ concept.Object) (concept.Param, concept.Exception) {
@@ -66,6 +68,9 @@ func NewAutoNumber(libs *runtime.LibraryManager) *AutoNumber {
 			}
 
 			return libs.Sandbox.Variable.Param.New().Set(instance.NewAutoNumberObject, instance.New(number)), nil
+		},
+		func(_ concept.Param, _ concept.Object) concept.Param {
+			return libs.Sandbox.Variable.Param.New().Set(instance.NewAutoNumberObject, anticipateNumber)
 		},
 		[]concept.String{
 			instance.NewAutoNumberContent,

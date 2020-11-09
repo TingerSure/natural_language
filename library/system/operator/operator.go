@@ -29,7 +29,7 @@ type OperatorUnaryItem struct {
 	Result concept.String
 }
 
-func (o *Operator) NewNumberOperatorNumberItem(name string, exec func(*variable.Number, *variable.Number) (concept.Variable, concept.Exception)) *OperatorItem {
+func (o *Operator) NewNumberOperatorNumberItem(name string, exec func(*variable.Number, *variable.Number) (concept.Variable, concept.Exception), anticipateValue concept.Variable) *OperatorItem {
 	instance := &OperatorItem{
 		Left:   o.Libs.Sandbox.Variable.String.New(OperatorLeft),
 		Right:  o.Libs.Sandbox.Variable.String.New(OperatorRight),
@@ -49,6 +49,9 @@ func (o *Operator) NewNumberOperatorNumberItem(name string, exec func(*variable.
 			}
 			return o.Libs.Sandbox.Variable.Param.New().Set(instance.Result, result), nil
 		},
+		func(input concept.Param, object concept.Object) concept.Param {
+			return o.Libs.Sandbox.Variable.Param.New().Set(instance.Result, anticipateValue)
+		},
 		[]concept.String{
 			instance.Left,
 			instance.Right,
@@ -60,7 +63,7 @@ func (o *Operator) NewNumberOperatorNumberItem(name string, exec func(*variable.
 	return instance
 }
 
-func (o *Operator) NewBoolOperatorBoolItem(name string, exec func(*variable.Bool, *variable.Bool) (concept.Variable, concept.Exception)) *OperatorItem {
+func (o *Operator) NewBoolOperatorBoolItem(name string, exec func(*variable.Bool, *variable.Bool) (concept.Variable, concept.Exception), anticipateValue concept.Variable) *OperatorItem {
 	instance := &OperatorItem{
 		Left:   o.Libs.Sandbox.Variable.String.New(OperatorLeft),
 		Right:  o.Libs.Sandbox.Variable.String.New(OperatorRight),
@@ -80,6 +83,9 @@ func (o *Operator) NewBoolOperatorBoolItem(name string, exec func(*variable.Bool
 			}
 			return o.Libs.Sandbox.Variable.Param.New().Set(instance.Result, result), nil
 		},
+		func(input concept.Param, object concept.Object) concept.Param {
+			return o.Libs.Sandbox.Variable.Param.New().Set(instance.Result, anticipateValue)
+		},
 		[]concept.String{
 			instance.Left,
 			instance.Right,
@@ -91,7 +97,7 @@ func (o *Operator) NewBoolOperatorBoolItem(name string, exec func(*variable.Bool
 	return instance
 }
 
-func (o *Operator) NewOperatorBoolItem(name string, exec func(*variable.Bool) (concept.Variable, concept.Exception)) *OperatorUnaryItem {
+func (o *Operator) NewOperatorBoolItem(name string, exec func(*variable.Bool) (concept.Variable, concept.Exception), anticipateValue concept.Variable) *OperatorUnaryItem {
 	instance := &OperatorUnaryItem{
 		Right:  o.Libs.Sandbox.Variable.String.New(OperatorRight),
 		Result: o.Libs.Sandbox.Variable.String.New(OperatorResult),
@@ -108,6 +114,9 @@ func (o *Operator) NewOperatorBoolItem(name string, exec func(*variable.Bool) (c
 				return nil, exception.Copy().AddStack(instance.Func)
 			}
 			return o.Libs.Sandbox.Variable.Param.New().Set(instance.Result, result), nil
+		},
+		func(input concept.Param, object concept.Object) concept.Param {
+			return o.Libs.Sandbox.Variable.Param.New().Set(instance.Result, anticipateValue)
 		},
 		[]concept.String{
 			instance.Right,
@@ -158,53 +167,57 @@ func NewOperator(libs *runtime.LibraryManager) *Operator {
 		OperatorDivisorZeroExceptionTemplate: libs.Sandbox.Interrupt.Exception.NewOriginal("param error", "OperatorDivisorZeroException"),
 		Libs:                                 libs,
 	}
+
+	anticipateNumber := libs.Sandbox.Variable.Number.New(0)
+	anticipateBool := libs.Sandbox.Variable.Bool.New(false)
+
 	instance.Items = map[string]*OperatorItem{
 
 		AdditionName: instance.NewNumberOperatorNumberItem(AdditionName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Number.New(left.Value() + right.Value()), nil
-		}),
+		}, anticipateNumber),
 		DivisionName: instance.NewNumberOperatorNumberItem(DivisionName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 			if right.Value() == 0 {
 				return nil, instance.OperatorDivisorZeroExceptionTemplate.Copy()
 			}
 			return libs.Sandbox.Variable.Number.New(left.Value() / right.Value()), nil
-		}),
+		}, anticipateNumber),
 		MultiplicationName: instance.NewNumberOperatorNumberItem(MultiplicationName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Number.New(left.Value() * right.Value()), nil
-		}),
+		}, anticipateNumber),
 		SubtractionName: instance.NewNumberOperatorNumberItem(SubtractionName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Number.New(left.Value() - right.Value()), nil
-		}),
+		}, anticipateNumber),
 		EqualToName: instance.NewNumberOperatorNumberItem(EqualToName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Bool.New(left.Value() == right.Value()), nil
-		}),
+		}, anticipateBool),
 		NotEqualToName: instance.NewNumberOperatorNumberItem(NotEqualToName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Bool.New(left.Value() != right.Value()), nil
-		}),
+		}, anticipateBool),
 		GreaterThanName: instance.NewNumberOperatorNumberItem(GreaterThanName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Bool.New(left.Value() > right.Value()), nil
-		}),
+		}, anticipateBool),
 		LessThanName: instance.NewNumberOperatorNumberItem(LessThanName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Bool.New(left.Value() < right.Value()), nil
-		}),
+		}, anticipateBool),
 		GreaterThanOrEqualToName: instance.NewNumberOperatorNumberItem(GreaterThanOrEqualToName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Bool.New(left.Value() >= right.Value()), nil
-		}),
+		}, anticipateBool),
 		LessThanOrEqualToName: instance.NewNumberOperatorNumberItem(LessThanOrEqualToName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Bool.New(left.Value() <= right.Value()), nil
-		}),
+		}, anticipateBool),
 		OrName: instance.NewBoolOperatorBoolItem(OrName, func(left *variable.Bool, right *variable.Bool) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Bool.New(left.Value() || right.Value()), nil
-		}),
+		}, anticipateBool),
 		AndName: instance.NewBoolOperatorBoolItem(AndName, func(left *variable.Bool, right *variable.Bool) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Bool.New(left.Value() && right.Value()), nil
-		}),
+		}, anticipateBool),
 	}
 
 	instance.UnaryItems = map[string]*OperatorUnaryItem{
 		NotName: instance.NewOperatorBoolItem(NotName, func(right *variable.Bool) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Bool.New(!right.Value()), nil
-		}),
+		}, anticipateBool),
 	}
 
 	for name, item := range instance.Items {
