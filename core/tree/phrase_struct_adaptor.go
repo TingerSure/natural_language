@@ -19,6 +19,7 @@ type PhraseStructAdaptor struct {
 	contentSize int
 	children    []Phrase
 	param       *PhraseStructAdaptorParam
+	types       string
 }
 
 func (p *PhraseStructAdaptor) Index() concept.Index {
@@ -26,8 +27,12 @@ func (p *PhraseStructAdaptor) Index() concept.Index {
 }
 
 func (p *PhraseStructAdaptor) Types() string {
+	if p.types != "" {
+		return p.types
+	}
 	if p.param.DynamicTypes != nil {
-		return p.param.DynamicTypes(p.children)
+		p.types = p.param.DynamicTypes(p.children)
+		return p.types
 	}
 	return p.param.Types
 }
