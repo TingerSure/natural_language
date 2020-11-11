@@ -27,7 +27,7 @@ func (p *Unknown) GetVocabularyRules() []*tree.VocabularyRule {
 				return nl_interface.IsNil(treasure.GetSource())
 			},
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
-				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
+				return tree.NewPhraseVocabulary(&tree.PhraseVocabularyParam{
 					Index: func() concept.Index {
 						return p.Libs.Sandbox.Index.ConstIndex.New(p.Libs.Sandbox.Variable.String.New(treasure.GetContext()))
 					},

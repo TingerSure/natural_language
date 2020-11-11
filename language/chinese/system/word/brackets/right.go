@@ -32,7 +32,7 @@ func (s *BracketsRight) GetVocabularyRules() []*tree.VocabularyRule {
 				return treasure.GetSource() == s
 			},
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
-				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
+				return tree.NewPhraseVocabulary(&tree.PhraseVocabularyParam{
 					Index: func() concept.Index {
 						return s.Libs.Sandbox.Index.ConstIndex.New(s.RightIndex.Clone())
 					},

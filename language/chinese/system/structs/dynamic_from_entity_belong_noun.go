@@ -31,7 +31,7 @@ func (p *DynamicFromEntityBelongNoun) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 		tree.NewStructRule(&tree.StructRuleParam{
 			Create: func() tree.Phrase {
-				return tree.NewPhraseStructAdaptor(&tree.PhraseStructAdaptorParam{
+				return tree.NewPhraseStruct(&tree.PhraseStructParam{
 					Index: func(phrase []tree.Phrase) concept.Index {
 						return p.Libs.Sandbox.Expression.ParamGet.New(
 							p.Libs.Sandbox.Expression.Call.New(

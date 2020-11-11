@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-type PhraseStructAdaptorParam struct {
+type PhraseStructParam struct {
 	Index        func([]Phrase) concept.Index
 	Size         int
 	Types        string
@@ -15,18 +15,18 @@ type PhraseStructAdaptorParam struct {
 	From         string
 }
 
-type PhraseStructAdaptor struct {
+type PhraseStruct struct {
 	contentSize int
 	children    []Phrase
-	param       *PhraseStructAdaptorParam
+	param       *PhraseStructParam
 	types       string
 }
 
-func (p *PhraseStructAdaptor) Index() concept.Index {
+func (p *PhraseStruct) Index() concept.Index {
 	return p.param.Index(p.children)
 }
 
-func (p *PhraseStructAdaptor) Types() string {
+func (p *PhraseStruct) Types() string {
 	if p.types != "" {
 		return p.types
 	}
@@ -37,15 +37,15 @@ func (p *PhraseStructAdaptor) Types() string {
 	return p.param.Types
 }
 
-func (p *PhraseStructAdaptor) SetTypes(types string) {
+func (p *PhraseStruct) SetTypes(types string) {
 	p.types = types
 }
 
-func (p *PhraseStructAdaptor) Size() int {
+func (p *PhraseStruct) Size() int {
 	return p.param.Size
 }
 
-func (p *PhraseStructAdaptor) updateContentSize() {
+func (p *PhraseStruct) updateContentSize() {
 	size := 0
 	for _, child := range p.children {
 		if !nl_interface.IsNil(child) {
@@ -55,30 +55,30 @@ func (p *PhraseStructAdaptor) updateContentSize() {
 	p.contentSize = size
 }
 
-func (p *PhraseStructAdaptor) ContentSize() int {
+func (p *PhraseStruct) ContentSize() int {
 	return p.contentSize
 }
 
-func (p *PhraseStructAdaptor) Copy() Phrase {
-	substitute := NewPhraseStructAdaptor(p.param)
+func (p *PhraseStruct) Copy() Phrase {
+	substitute := NewPhraseStruct(p.param)
 	for index, child := range p.children {
 		substitute.SetChild(index, child.Copy())
 	}
 	return substitute
 }
 
-func (p *PhraseStructAdaptor) GetContent() *Vocabulary {
+func (p *PhraseStruct) GetContent() *Vocabulary {
 	return nil
 }
 
-func (p *PhraseStructAdaptor) GetChild(index int) Phrase {
+func (p *PhraseStruct) GetChild(index int) Phrase {
 	if index < 0 || index >= p.param.Size {
 		return nil
 	}
 	return p.children[index]
 }
 
-func (p *PhraseStructAdaptor) SetChild(index int, child Phrase) Phrase {
+func (p *PhraseStruct) SetChild(index int, child Phrase) Phrase {
 	if index < 0 || index >= p.param.Size {
 		panic("error index when set child")
 	}
@@ -87,7 +87,7 @@ func (p *PhraseStructAdaptor) SetChild(index int, child Phrase) Phrase {
 	return p
 }
 
-func (p *PhraseStructAdaptor) ToContent() string {
+func (p *PhraseStruct) ToContent() string {
 	subContents := []string{}
 	for _, child := range p.children {
 		if nl_interface.IsNil(child) {
@@ -100,11 +100,11 @@ func (p *PhraseStructAdaptor) ToContent() string {
 	return fmt.Sprintf("(%v)", strings.Join(subContents, " "))
 }
 
-func (p *PhraseStructAdaptor) ToString() string {
+func (p *PhraseStruct) ToString() string {
 	return p.ToStringOffset(0)
 }
 
-func (p *PhraseStructAdaptor) ToStringOffset(index int) string {
+func (p *PhraseStruct) ToStringOffset(index int) string {
 	var space = strings.Repeat("\t", index)
 	info := fmt.Sprintf("%v%v (\n", space, p.Types())
 	for i := 0; i < len(p.children); i++ {
@@ -114,11 +114,11 @@ func (p *PhraseStructAdaptor) ToStringOffset(index int) string {
 	return info
 }
 
-func (p *PhraseStructAdaptor) From() string {
+func (p *PhraseStruct) From() string {
 	return p.param.From
 }
 
-func (p *PhraseStructAdaptor) HasPriority() bool {
+func (p *PhraseStruct) HasPriority() bool {
 	for _, child := range p.children {
 		if child.HasPriority() {
 			return true
@@ -127,8 +127,8 @@ func (p *PhraseStructAdaptor) HasPriority() bool {
 	return false
 }
 
-func NewPhraseStructAdaptor(param *PhraseStructAdaptorParam) *PhraseStructAdaptor {
-	return &PhraseStructAdaptor{
+func NewPhraseStruct(param *PhraseStructParam) *PhraseStruct {
+	return &PhraseStruct{
 		param:       param,
 		contentSize: 0,
 		children:    make([]Phrase, param.Size),

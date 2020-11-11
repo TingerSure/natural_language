@@ -28,7 +28,7 @@ func (p *DynamicFromBracketAnyBracket) GetStructRules() []*tree.StructRule {
 
 		tree.NewStructRule(&tree.StructRuleParam{
 			Create: func() tree.Phrase {
-				return tree.NewPhraseStructAdaptor(&tree.PhraseStructAdaptorParam{
+				return tree.NewPhraseStruct(&tree.PhraseStructParam{
 					Index: func(phrase []tree.Phrase) concept.Index {
 						return phrase[1].Index()
 					},

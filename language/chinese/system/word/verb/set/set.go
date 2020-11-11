@@ -40,7 +40,7 @@ func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 					set = s.Equal
 				}
 
-				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
+				return tree.NewPhraseVocabulary(&tree.PhraseVocabularyParam{
 					Index: func() concept.Index {
 						return s.Libs.Sandbox.Index.ConstIndex.New(set)
 					},

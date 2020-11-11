@@ -34,7 +34,7 @@ func (p *It) GetVocabularyRules() []*tree.VocabularyRule {
 				return treasure.GetSource() == p
 			},
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
-				return tree.NewPhraseVocabularyAdaptor(&tree.PhraseVocabularyAdaptorParam{
+				return tree.NewPhraseVocabulary(&tree.PhraseVocabularyParam{
 					Index: func() concept.Index {
 						return p.ItIndex
 					},
