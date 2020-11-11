@@ -8,18 +8,18 @@ import (
 )
 
 const (
-	DynamicFromEntityBelongNounName string = "structs.dynamic.entity_belong_noun"
+	AnticipateFromEntityBelongNounName string = "structs.anticipate.entity_belong_noun"
 )
 
 var (
-	DynamicFromEntityBelongNounList []string = []string{
+	AnticipateFromEntityBelongNounList []string = []string{
 		phrase_type.EntityName,
 		phrase_type.AuxiliaryBelongName,
 		phrase_type.NounName,
 	}
 )
 
-type DynamicFromEntityBelongNoun struct {
+type AnticipateFromEntityBelongNoun struct {
 	*adaptor.SourceAdaptor
 	GetFieldValue   concept.String
 	GetFieldKey     concept.String
@@ -27,7 +27,7 @@ type DynamicFromEntityBelongNoun struct {
 	GetField        concept.Function
 }
 
-func (p *DynamicFromEntityBelongNoun) GetStructRules() []*tree.StructRule {
+func (p *AnticipateFromEntityBelongNoun) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 		tree.NewStructRule(&tree.StructRuleParam{
 			Create: func() tree.Phrase {
@@ -44,22 +44,22 @@ func (p *DynamicFromEntityBelongNoun) GetStructRules() []*tree.StructRule {
 							p.GetFieldValue,
 						)
 					},
-					Size: len(DynamicFromEntityBelongNounList),
+					Size: len(AnticipateFromEntityBelongNounList),
 					From: p.GetName(),
 				})
 			},
-			Types: DynamicFromEntityBelongNounList,
+			Types: AnticipateFromEntityBelongNounList,
 			From:  p.GetName(),
 		}),
 	}
 }
 
-func (p *DynamicFromEntityBelongNoun) GetName() string {
-	return DynamicFromEntityBelongNounName
+func (p *AnticipateFromEntityBelongNoun) GetName() string {
+	return AnticipateFromEntityBelongNounName
 }
 
-func NewDynamicFromEntityBelongNoun(param *adaptor.SourceAdaptorParam) *DynamicFromEntityBelongNoun {
-	instance := (&DynamicFromEntityBelongNoun{
+func NewAnticipateFromEntityBelongNoun(param *adaptor.SourceAdaptorParam) *AnticipateFromEntityBelongNoun {
+	instance := (&AnticipateFromEntityBelongNoun{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 	libObject := instance.Libs.GetLibraryPage("system", "object")

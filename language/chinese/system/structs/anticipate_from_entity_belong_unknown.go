@@ -8,18 +8,18 @@ import (
 )
 
 const (
-	DynamicFromEntityBelongUnknownName string = "structs.dynamic.entity_belong_unknown"
+	AnticipateFromEntityBelongUnknownName string = "structs.anticipate.entity_belong_unknown"
 )
 
 var (
-	DynamicFromEntityBelongUnknownList []string = []string{
+	AnticipateFromEntityBelongUnknownList []string = []string{
 		phrase_type.EntityName,
 		phrase_type.AuxiliaryBelongName,
 		phrase_type.UnknownName,
 	}
 )
 
-type DynamicFromEntityBelongUnknown struct {
+type AnticipateFromEntityBelongUnknown struct {
 	*adaptor.SourceAdaptor
 	GetFieldValue   concept.String
 	GetFieldKey     concept.String
@@ -27,7 +27,7 @@ type DynamicFromEntityBelongUnknown struct {
 	GetField        concept.Function
 }
 
-func (p *DynamicFromEntityBelongUnknown) GetStructRules() []*tree.StructRule {
+func (p *AnticipateFromEntityBelongUnknown) GetStructRules() []*tree.StructRule {
 	return []*tree.StructRule{
 		tree.NewStructRule(&tree.StructRuleParam{
 			Create: func() tree.Phrase {
@@ -44,22 +44,22 @@ func (p *DynamicFromEntityBelongUnknown) GetStructRules() []*tree.StructRule {
 							p.GetFieldValue,
 						)
 					},
-					Size: len(DynamicFromEntityBelongUnknownList),
+					Size: len(AnticipateFromEntityBelongUnknownList),
 					From: p.GetName(),
 				})
 			},
-			Types: DynamicFromEntityBelongUnknownList,
+			Types: AnticipateFromEntityBelongUnknownList,
 			From:  p.GetName(),
 		}),
 	}
 }
 
-func (p *DynamicFromEntityBelongUnknown) GetName() string {
-	return DynamicFromEntityBelongUnknownName
+func (p *AnticipateFromEntityBelongUnknown) GetName() string {
+	return AnticipateFromEntityBelongUnknownName
 }
 
-func NewDynamicFromEntityBelongUnknown(param *adaptor.SourceAdaptorParam) *DynamicFromEntityBelongUnknown {
-	instance := (&DynamicFromEntityBelongUnknown{
+func NewAnticipateFromEntityBelongUnknown(param *adaptor.SourceAdaptorParam) *AnticipateFromEntityBelongUnknown {
+	instance := (&AnticipateFromEntityBelongUnknown{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
 	libObject := instance.Libs.GetLibraryPage("system", "object")
