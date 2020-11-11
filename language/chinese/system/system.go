@@ -3,6 +3,7 @@ package system
 import (
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
+	"github.com/TingerSure/natural_language/language/chinese/system/duty"
 	"github.com/TingerSure/natural_language/language/chinese/system/phrase_type"
 	"github.com/TingerSure/natural_language/language/chinese/system/priority"
 	"github.com/TingerSure/natural_language/language/chinese/system/structs"
@@ -22,8 +23,13 @@ func NewSystem(param *adaptor.SourceAdaptorParam) tree.Page {
 	addPhraseTypes(system, param)
 	addWords(system, param)
 	addStructs(system, param)
+	addDuties(system, param)
 	addPrioritys(system, param)
 	return system
+}
+
+func addDuties(system tree.Page, param *adaptor.SourceAdaptorParam) {
+	system.AddSource(duty.NewNumber(param))
 }
 
 func addPhraseTypes(system tree.Page, param *adaptor.SourceAdaptorParam) {

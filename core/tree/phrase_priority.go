@@ -18,6 +18,10 @@ func (p *PhrasePriority) Types() string {
 	return p.values[0].Types()
 }
 
+func (p *PhrasePriority) SetTypes(types string) {
+	p.values[0].SetTypes(types)
+}
+
 func (p *PhrasePriority) Copy() Phrase {
 	return NewPhrasePriority(p.values)
 }

@@ -9,6 +9,7 @@ type Phrase interface {
 	Size() int
 	ContentSize() int
 	Types() string
+	SetTypes(types string)
 	GetContent() *Vocabulary
 	GetChild(index int) Phrase
 	SetChild(index int, child Phrase) Phrase

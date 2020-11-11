@@ -14,6 +14,7 @@ type PhrasePackageParam struct {
 
 type PhrasePackage struct {
 	value Phrase
+	types string
 	param *PhrasePackageParam
 }
 
@@ -22,7 +23,14 @@ func (p *PhrasePackage) Index() concept.Index {
 }
 
 func (p *PhrasePackage) Types() string {
+	if p.types != "" {
+		return p.types
+	}
 	return p.param.Types
+}
+
+func (p *PhrasePackage) SetTypes(types string) {
+	p.types = types
 }
 
 func (p *PhrasePackage) Size() int {

@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"github.com/TingerSure/natural_language/core/sandbox/closure"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
@@ -11,20 +12,25 @@ type Parser struct {
 	lexer     *Lexer
 	grammar   *Grammar
 	types     *Types
+	diversion *Diversion
+	rootSpace *closure.Closure
 }
 
-func NewParser() *Parser {
+func NewParser(rootSpace *closure.Closure) *Parser {
 	types := NewTypes()
 	section := NewSection()
 	barricade := NewBarricade()
+	diversion := NewDiversion(rootSpace)
 	reach := NewReach(types)
 	return &Parser{
+		rootSpace: rootSpace,
 		types:     types,
 		section:   section,
 		barricade: barricade,
 		reach:     reach,
+		diversion: diversion,
 		lexer:     NewLexer(section),
-		grammar:   NewGrammar(types, reach, barricade),
+		grammar:   NewGrammar(types, reach, barricade, diversion),
 	}
 }
 
@@ -57,6 +63,7 @@ func (p *Parser) AddSource(source tree.Source) {
 	p.section.AddRule(source.GetVocabularyRules())
 	p.barricade.AddRule(source.GetPriorityRules())
 	p.reach.AddRule(source.GetStructRules())
+	p.diversion.AddRule(source.GetDutyRules())
 	p.types.AddTypes(source.GetPhraseTypes())
 }
 
@@ -71,7 +78,9 @@ func (p *Parser) RemoveSource(name string) {
 	p.reach.RemoveRule(func(rule *tree.StructRule) bool {
 		return rule.GetFrom() == name
 	})
-
+	p.diversion.RemoveRule(func(rule *tree.DutyRule) bool {
+		return rule.GetFrom() == name
+	})
 	p.types.RemoveTypes(func(value *tree.PhraseType) bool {
 		return value.GetFrom() == name
 	})

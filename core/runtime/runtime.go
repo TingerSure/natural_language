@@ -138,12 +138,12 @@ type RuntimeParam struct {
 
 func NewRuntime(param *RuntimeParam) *Runtime {
 	runtime := &Runtime{
-		parser:              parser.NewParser(),
 		libs:                NewLibraryManager(),
 		structErrorFormat:   runtimeStructErrorFormatDefault,
 		priorityErrorFormat: runtimePriorityErrorFormatDefault,
 	}
 	runtime.rootSpace = runtime.libs.Sandbox.Closure.New(nil)
+	runtime.parser = parser.NewParser(runtime.rootSpace)
 	runtime.box = sandbox.NewSandbox(&sandbox.SandboxParam{
 		Root:      runtime.rootSpace,
 		OnError:   param.OnError,

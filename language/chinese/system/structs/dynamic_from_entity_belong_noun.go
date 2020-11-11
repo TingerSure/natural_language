@@ -45,10 +45,6 @@ func (p *DynamicFromEntityBelongNoun) GetStructRules() []*tree.StructRule {
 						)
 					},
 					Size: len(DynamicFromEntityBelongNounList),
-					DynamicTypes: func(phrase []tree.Phrase) string {
-						//TODO
-						return phrase_type.EntityName
-					},
 					From: p.GetName(),
 				})
 			},

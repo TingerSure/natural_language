@@ -41,3 +41,7 @@ func (*SourceAdaptor) GetStructRules() []*tree.StructRule {
 func (*SourceAdaptor) GetPriorityRules() []*tree.PriorityRule {
 	return nil
 }
+
+func (*SourceAdaptor) GetDutyRules() []*tree.DutyRule {
+	return nil
+}

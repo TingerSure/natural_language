@@ -8,14 +8,16 @@ import (
 type Grammar struct {
 	reach     *Reach
 	barricade *Barricade
+	diversion *Diversion
 	types     *Types
 }
 
-func NewGrammar(types *Types, reach *Reach, barricade *Barricade) *Grammar {
+func NewGrammar(types *Types, reach *Reach, barricade *Barricade, diversion *Diversion) *Grammar {
 	return &Grammar{
 		types:     types,
 		reach:     reach,
 		barricade: barricade,
+		diversion: diversion,
 	}
 }
 
@@ -36,7 +38,10 @@ func (g *Grammar) ParseStruct(road *Road) error {
 			for origin, _ := range origins {
 				rules := g.reach.GetRulesByLastType(origin.Types())
 				for _, rule := range rules {
-					g.match(road, index, origin, rule, targets)
+					err := g.match(road, index, origin, rule, targets)
+					if err != nil {
+						return err
+					}
 				}
 			}
 			for target, _ := range targets {
@@ -117,28 +122,48 @@ func (g *Grammar) cut(road *Road, index int, abandons *tree.AbandonGroup) {
 	}
 }
 
-func (g *Grammar) match(road *Road, roadIndex int, last tree.Phrase, rule *tree.StructRule, back map[tree.Phrase]bool) {
+func (g *Grammar) match(road *Road, roadIndex int, last tree.Phrase, rule *tree.StructRule, back map[tree.Phrase]bool) error {
 	size := rule.Size()
 	treasures := make([]tree.Phrase, size, size)
 	treasures[size-1] = g.types.Package(rule.Types()[size-1], last.Types(), last)
 	if size == 1 {
-		back[rule.Create(treasures)] = true
-		return
+		section := rule.Create(treasures)
+		if section.Types() == "" {
+			sectionTypes, err := g.diversion.Match(section)
+			if err != nil {
+				return err
+			}
+			section.SetTypes(sectionTypes)
+		}
+		back[section] = true
+		return nil
 	}
-	g.matchStep(road, size-2, roadIndex-last.ContentSize(), treasures, rule, back)
+	return g.matchStep(road, size-2, roadIndex-last.ContentSize(), treasures, rule, back)
 }
 
-func (g *Grammar) matchStep(road *Road, index int, cursor int, treasures []tree.Phrase, rule *tree.StructRule, back map[tree.Phrase]bool) {
+func (g *Grammar) matchStep(road *Road, index int, cursor int, treasures []tree.Phrase, rule *tree.StructRule, back map[tree.Phrase]bool) error {
 	if cursor < 0 {
-		return
+		return nil
 	}
 	phrases := road.GetRightSectionByTypes(cursor, rule.Types()[index])
 	for phrase, _ := range phrases {
 		treasures[index] = g.types.Package(rule.Types()[index], phrase.Types(), phrase)
 		if index == 0 {
-			back[rule.Create(treasures)] = true
+			section := rule.Create(treasures)
+			if section.Types() == "" {
+				sectionTypes, err := g.diversion.Match(section)
+				if err != nil {
+					return err
+				}
+				section.SetTypes(sectionTypes)
+			}
+			back[section] = true
 		} else {
-			g.matchStep(road, index-1, cursor-phrase.ContentSize(), treasures, rule, back)
+			err := g.matchStep(road, index-1, cursor-phrase.ContentSize(), treasures, rule, back)
+			if err != nil {
+				return err
+			}
 		}
 	}
+	return nil
 }

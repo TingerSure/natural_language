@@ -37,6 +37,10 @@ func (p *PhraseStructAdaptor) Types() string {
 	return p.param.Types
 }
 
+func (p *PhraseStructAdaptor) SetTypes(types string) {
+	p.types = types
+}
+
 func (p *PhraseStructAdaptor) Size() int {
 	return p.param.Size
 }

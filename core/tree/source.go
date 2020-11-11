@@ -6,5 +6,6 @@ type Source interface {
 	GetVocabularyRules() []*VocabularyRule
 	GetStructRules() []*StructRule
 	GetPriorityRules() []*PriorityRule
+	GetDutyRules() []*DutyRule
 	GetPhraseTypes() []*PhraseType
 }

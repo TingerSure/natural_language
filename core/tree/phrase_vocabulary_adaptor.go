@@ -15,6 +15,7 @@ type PhraseVocabularyAdaptorParam struct {
 
 type PhraseVocabularyAdaptor struct {
 	param *PhraseVocabularyAdaptorParam
+	types string
 }
 
 func (p *PhraseVocabularyAdaptor) Index() concept.Index {
@@ -22,7 +23,14 @@ func (p *PhraseVocabularyAdaptor) Index() concept.Index {
 }
 
 func (p *PhraseVocabularyAdaptor) Types() string {
+	if p.types != "" {
+		return p.types
+	}
 	return p.param.Types
+}
+
+func (p *PhraseVocabularyAdaptor) SetTypes(types string) {
+	p.types = types
 }
 
 func (p *PhraseVocabularyAdaptor) Copy() Phrase {
