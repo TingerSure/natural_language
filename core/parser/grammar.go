@@ -27,7 +27,7 @@ func (g *Grammar) ParseStruct(road *Road) error {
 			continue
 		}
 
-		originSources := road.GetRightSection(index, nil)
+		originSources := road.GetRightSections(index)
 		origins := map[tree.Phrase]bool{}
 		for _, origin := range originSources {
 			origins[origin] = true
@@ -116,9 +116,7 @@ func (g *Grammar) cut(road *Road, index int, abandons *tree.AbandonGroup) {
 		return
 	}
 	for _, abandon := range abandons.Values() {
-		road.RemoveRightSection(index+abandon.Offset, func(phrase tree.Phrase) bool {
-			return phrase == abandon.Value
-		})
+		road.RemoveRightSection(index+abandon.Offset, abandon.Value)
 	}
 }
 

@@ -4,25 +4,25 @@ import (
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
-type TypeIndex struct {
+type IndexType struct {
 	values []map[string]map[tree.Phrase]bool
 	size   int
 	types  *Types
 }
 
-func NewTypeIndex(size int, types *Types) *TypeIndex {
-	return &TypeIndex{
+func NewIndexType(size int, types *Types) *IndexType {
+	return &IndexType{
 		types:  types,
 		size:   size,
 		values: make([]map[string]map[tree.Phrase]bool, size),
 	}
 }
 
-func (t *TypeIndex) Get(index int, types string) map[tree.Phrase]bool {
+func (t *IndexType) Get(index int, types string) map[tree.Phrase]bool {
 	return t.values[index][types]
 }
 
-func (t *TypeIndex) Add(index int, section tree.Phrase) {
+func (t *IndexType) Add(index int, section tree.Phrase) {
 
 	if t.values[index] == nil {
 		t.values[index] = make(map[string]map[tree.Phrase]bool)
@@ -43,7 +43,7 @@ func (t *TypeIndex) Add(index int, section tree.Phrase) {
 	t.values[index][types][section] = true
 }
 
-func (t *TypeIndex) Remove(index int, section tree.Phrase) {
+func (t *IndexType) Remove(index int, section tree.Phrase) {
 	if t.values[index] == nil {
 		return
 	}
