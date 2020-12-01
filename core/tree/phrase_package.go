@@ -81,6 +81,10 @@ func (p *PhrasePackage) HasPriority() bool {
 	return p.value.HasPriority()
 }
 
+func (p *PhrasePackage) DependencyCheckValue() Phrase {
+	return p.value
+}
+
 func (p *PhrasePackage) SetValue(value Phrase) *PhrasePackage {
 	p.value = value
 	return p

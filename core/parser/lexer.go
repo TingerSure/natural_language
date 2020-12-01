@@ -42,7 +42,7 @@ func (p *Lexer) parseVocabularyStep(road *Road, index int) error {
 		}
 		for _, rule := range rules {
 			phrase := rule.Create(unknown)
-			road.AddLeftSection(index, phrase)
+			road.AddSection(index+phrase.ContentSize()-1, phrase)
 		}
 		if end == road.SentenceSize() {
 			return nil
@@ -57,7 +57,7 @@ func (p *Lexer) parseVocabularyStep(road *Road, index int) error {
 		}
 		for _, rule := range rules {
 			phrase := rule.Create(vocabulary)
-			road.AddLeftSection(index, phrase)
+			road.AddSection(index+phrase.ContentSize()-1, phrase)
 			err = p.parseVocabularyStep(road, index+phrase.ContentSize())
 			if err != nil {
 				return err

@@ -19,4 +19,5 @@ type Phrase interface {
 	Index() concept.Index
 	From() string
 	HasPriority() bool
+	DependencyCheckValue() Phrase
 }

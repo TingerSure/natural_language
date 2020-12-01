@@ -42,19 +42,20 @@ func (r *IndexList) GetBySize(index int, size int) []tree.Phrase {
 	return back
 }
 
-func (r *IndexList) GetByTypesAndSize(index int, types string, size int) tree.Phrase {
+func (r *IndexList) GetByTypesAndSize(index int, types string, size int) []tree.Phrase {
+	values := []tree.Phrase{}
 	for cursor := r.values[index]; cursor != nil; cursor = cursor.next {
 		if cursor.value.ContentSize() > size {
 			continue
 		}
 		if cursor.value.ContentSize() < size {
-			return nil
+			break
 		}
 		if types == cursor.value.Types() {
-			return cursor.value
+			values = append(values, cursor.value)
 		}
 	}
-	return nil
+	return values
 }
 
 func (r *IndexList) GetMaxBySize(index int) tree.Phrase {

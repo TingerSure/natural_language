@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
@@ -27,7 +26,7 @@ func (g *Grammar) ParseStruct(road *Road) error {
 			continue
 		}
 
-		originSources := road.GetRightSections(index)
+		originSources := road.GetSections(index)
 		origins := map[tree.Phrase]bool{}
 		for _, origin := range originSources {
 			origins[origin] = true
@@ -45,41 +44,34 @@ func (g *Grammar) ParseStruct(road *Road) error {
 				}
 			}
 			for target, _ := range targets {
-				old := road.GetRightSectionByTypesAndSize(index, target.Types(), target.ContentSize())
-				if nl_interface.IsNil(old) {
-					road.AddRightSection(index, target)
+				if !road.DependencyCheck(target) {
+					continue
+				}
+				olds := road.GetSectionByTypesAndSize(index, target.Types(), target.ContentSize())
+				if len(olds) == 0 {
+					road.AddSection(index, target)
 					activeTargets[target] = true
 					continue
 				}
-				if priority, ok := old.(*tree.PhrasePriority); ok {
-					results, abandons := g.barricade.TargetFilter(priority.AllValues(), target)
+
+				targetNeed := true
+				for _, old := range olds {
+					results, abandons := g.barricade.Check(old, target)
 					g.cut(road, index, abandons)
-					if 1 == len(results) {
-						g.replace(targets, old, results[0])
-						road.ReplaceRight(index, old, results[0])
-					} else {
-						priority.SetValues(results)
+					switch results {
+					case 0:
+						break
+					case -1:
+						targetNeed = false
+						break
+					case 1:
+						road.RemoveSection(index, old)
+						break
 					}
-					continue
 				}
-				results, abandons := g.barricade.Check(old, target)
-				g.cut(road, index, abandons)
-				switch results {
-				case 0:
-					multiple := tree.NewPhrasePriority([]tree.Phrase{
-						old,
-						target,
-					})
-					g.replace(targets, old, multiple)
-					road.ReplaceRight(index, old, multiple)
-					break
-				case -1:
-					// Do Nothing
-					break
-				case 1:
-					g.replace(targets, old, target)
-					road.ReplaceRight(index, old, target)
-					break
+				if targetNeed {
+					road.AddSection(index, target)
+					activeTargets[target] = true
 				}
 			}
 			origins = activeTargets
@@ -90,33 +82,12 @@ func (g *Grammar) ParseStruct(road *Road) error {
 	return nil
 }
 
-func (g *Grammar) replace(targets map[tree.Phrase]bool, from, to tree.Phrase) {
-	replace := func(target tree.Phrase) {
-		if target == nil {
-			return
-		}
-		for index := 0; index < target.Size(); index++ {
-			if target.GetChild(index) == from {
-				target.SetChild(index, to)
-			}
-		}
-	}
-	for target, _ := range targets {
-		if priority, ok := target.(*tree.PhrasePriority); ok {
-			for index := 0; index < priority.ValueSize(); index++ {
-				replace(priority)
-			}
-		}
-		replace(target)
-	}
-}
-
 func (g *Grammar) cut(road *Road, index int, abandons *tree.AbandonGroup) {
 	if abandons == nil {
 		return
 	}
 	for _, abandon := range abandons.Values() {
-		road.RemoveRightSection(index+abandon.Offset, abandon.Value)
+		road.RemoveSection(index+abandon.Offset, abandon.Value)
 	}
 }
 
@@ -143,7 +114,7 @@ func (g *Grammar) matchStep(road *Road, index int, cursor int, treasures []tree.
 	if cursor < 0 {
 		return nil
 	}
-	phrases := road.GetRightSectionByTypes(cursor, rule.Types()[index])
+	phrases := road.GetSectionByTypes(cursor, rule.Types()[index])
 	for phrase, _ := range phrases {
 		treasures[index] = g.types.Package(rule.Types()[index], phrase.Types(), phrase)
 		if index == 0 {

@@ -85,6 +85,10 @@ func (p *PhraseVocabulary) HasPriority() bool {
 	return false
 }
 
+func (p *PhraseVocabulary) DependencyCheckValue() Phrase {
+	return p
+}
+
 func NewPhraseVocabulary(param *PhraseVocabularyParam) *PhraseVocabulary {
 	return &PhraseVocabulary{
 		param: param,

@@ -127,6 +127,10 @@ func (p *PhraseStruct) HasPriority() bool {
 	return false
 }
 
+func (p *PhraseStruct) DependencyCheckValue() Phrase {
+	return p
+}
+
 func NewPhraseStruct(param *PhraseStructParam) *PhraseStruct {
 	return &PhraseStruct{
 		param:       param,

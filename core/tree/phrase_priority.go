@@ -103,6 +103,10 @@ func (p *PhrasePriority) HasPriority() bool {
 	return true
 }
 
+func (p *PhrasePriority) DependencyCheckValue() Phrase {
+	return p
+}
+
 func NewPhrasePriority(values []Phrase) *PhrasePriority {
 	instance := &PhrasePriority{
 		values: make([]Phrase, len(values)),
