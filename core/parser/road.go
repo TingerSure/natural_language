@@ -5,11 +5,6 @@ import (
 	"strings"
 )
 
-type roadNode struct {
-	next  *roadNode
-	value tree.Phrase
-}
-
 type Road struct {
 	sentence  []rune
 	left      *IndexList
