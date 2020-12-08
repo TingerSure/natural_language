@@ -7,7 +7,7 @@ import (
 
 type Road struct {
 	sentence  []rune
-	left      *IndexList
+	leftCount *IndexCount
 	right     *IndexList
 	rightMap  *IndexMap
 	rightType *IndexType
@@ -32,29 +32,25 @@ func NewRoad(sentence string, types *Types) *Road {
 		types:    types,
 	}
 	road.size = len(road.sentence)
-	road.left = NewIndexList(road.size)
+	road.leftCount = NewIndexCount(road.size)
 	road.right = NewIndexList(road.size)
 	road.rightType = NewIndexType(road.size, types)
 	road.rightMap = NewIndexMap()
 	return road
 }
 
-func (r *Road) Iterate(onPhrase func(tree.Phrase) bool) bool {
-	return r.left.Iterate(onPhrase)
-}
-
 func (r *Road) AddSection(index int, section tree.Phrase) {
-	r.left.Add(index-section.ContentSize()+1, section)
+	r.leftCount.Add(index - section.ContentSize() + 1)
 	r.right.Add(index, section)
 	r.rightType.Add(index, section)
 	r.rightMap.Add(index, section)
 }
 
 func (r *Road) removeSection(index int, value tree.Phrase) {
+	r.leftCount.Remove(index - value.ContentSize() + 1)
 	r.right.Remove(index, value)
 	r.rightType.Remove(index, value)
 	r.rightMap.Remove(value)
-	r.left.Remove(index-value.ContentSize()+1, value)
 }
 
 func (r *Road) RemoveSection(index int, value tree.Phrase) {
@@ -83,8 +79,8 @@ func (r *Road) GetSectionByTypes(index int, types string) map[tree.Phrase]bool {
 	return r.rightType.Get(index, types)
 }
 
-func (r *Road) GetLeftSectionMax(index int) tree.Phrase {
-	return r.left.GetMaxBySize(index)
+func (r *Road) GetSectionMax(index int) tree.Phrase {
+	return r.right.GetMaxBySize(index)
 }
 
 func (r *Road) GetSections(index int) []tree.Phrase {
@@ -92,7 +88,7 @@ func (r *Road) GetSections(index int) []tree.Phrase {
 }
 
 func (r *Road) HasLeftSection(index int) bool {
-	return r.left.Has(index)
+	return r.leftCount.Get(index) != 0
 }
 
 func (r *Road) HasRightSection(index int) bool {

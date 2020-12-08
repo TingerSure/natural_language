@@ -9,18 +9,17 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
 	"os"
-	"strings"
 )
 
 var (
 	runtimeStructErrorFormatDefault = func(road *parser.Road) string {
-		maxMatch := []string{}
-		for index := 0; index < road.SentenceSize(); {
-			section := road.GetLeftSectionMax(index)
-			maxMatch = append(maxMatch, section.ToString())
-			index += section.ContentSize()
+		maxMatch := ""
+		for index := road.SentenceSize() - 1; index >= 0; {
+			section := road.GetSectionMax(index)
+			maxMatch = section.ToString() + maxMatch
+			index -= section.ContentSize()
 		}
-		return fmt.Sprintf("%v\nNo struct rule can match this sentence.", strings.Join(maxMatch, ""))
+		return fmt.Sprintf("%v\nNo struct rule can match this sentence.", maxMatch)
 	}
 
 	runtimePriorityErrorFormatDefault = func(road *parser.Road) string {
