@@ -3,6 +3,7 @@ package variable
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/variable/adaptor"
 	"strings"
 )
 
@@ -17,6 +18,7 @@ type StringSeed interface {
 }
 
 type String struct {
+	*adaptor.AdaptorVariable
 	value   string
 	mapping map[string]string
 	seed    StringSeed
@@ -130,12 +132,22 @@ func (s *String) CloneTo(instance concept.String) {
 	}
 }
 
+type StringCreatorParam struct {
+	NullCreator      func() concept.Null
+	ExceptionCreator func(string, string) concept.Exception
+}
+
 type StringCreator struct {
 	Seeds map[string]func(string, *String) string
+	param *StringCreatorParam
 }
 
 func (s *StringCreator) New(value string) *String {
 	return &String{
+		AdaptorVariable: adaptor.NewAdaptorVariable(&adaptor.AdaptorVariableParam{
+			NullCreator:      s.param.NullCreator,
+			ExceptionCreator: s.param.ExceptionCreator,
+		}),
 		value:   value,
 		mapping: make(map[string]string),
 		seed:    s,
@@ -154,9 +166,10 @@ func (s *StringCreator) Type() string {
 	return VariableStringType
 }
 
-func NewStringCreator() *StringCreator {
+func NewStringCreator(param *StringCreatorParam) *StringCreator {
 	return &StringCreator{
 		Seeds: map[string]func(string, *String) string{},
+		param: param,
 	}
 }
 

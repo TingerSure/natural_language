@@ -84,7 +84,7 @@ func (m *MappingObject) Type() string {
 
 func (m *MappingObject) specimenClassToObject(specimen concept.String) concept.String {
 	var objectSpecimen concept.String = nil
-	m.class.IterateFields(func(key concept.String, _ concept.Variable) bool {
+	m.class.IterateFieldMoulds(func(key concept.String, _ concept.Variable) bool {
 		if key.EqualLanguage(specimen) {
 			for target, source := range m.mapping {
 				if key.EqualLanguage(target) {
@@ -116,7 +116,7 @@ func (m *MappingObject) HasField(specimen concept.String) bool {
 }
 
 func (m *MappingObject) HasMethod(specimen concept.String) bool {
-	return m.class.HasMethod(specimen)
+	return m.class.HasMethodMould(specimen)
 }
 
 func (m *MappingObject) SetMethod(specimen concept.String, value concept.Function) concept.Exception {
@@ -124,7 +124,7 @@ func (m *MappingObject) SetMethod(specimen concept.String, value concept.Functio
 }
 
 func (m *MappingObject) GetMethod(specimen concept.String) (concept.Function, concept.Exception) {
-	value := m.class.GetMethod(specimen)
+	value := m.class.GetMethodMould(specimen)
 	if nl_interface.IsNil(value) {
 		return nil, m.seed.NewException("system error", fmt.Sprintf("no method called %v", specimen.ToString("")))
 	}

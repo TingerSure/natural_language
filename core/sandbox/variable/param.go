@@ -3,6 +3,7 @@ package variable
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/variable/adaptor"
 	"strings"
 )
 
@@ -19,6 +20,7 @@ type ParamSeed interface {
 }
 
 type Param struct {
+	*adaptor.AdaptorVariable
 	values *concept.Mapping
 	seed   ParamSeed
 }
@@ -79,7 +81,8 @@ func (o *Param) Init(iterator func(func(concept.String, concept.Variable) bool) 
 }
 
 type ParamCreatorParam struct {
-	NullCreator func() concept.Null
+	NullCreator      func() concept.Null
+	ExceptionCreator func(string, string) concept.Exception
 }
 
 type ParamCreator struct {
@@ -89,6 +92,10 @@ type ParamCreator struct {
 
 func (s *ParamCreator) New() *Param {
 	return &Param{
+		AdaptorVariable: adaptor.NewAdaptorVariable(&adaptor.AdaptorVariableParam{
+			NullCreator:      s.param.NullCreator,
+			ExceptionCreator: s.param.ExceptionCreator,
+		}),
 		values: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: s.NewNull(),

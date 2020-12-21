@@ -2,6 +2,8 @@ package variable
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/variable/adaptor"
 )
 
 const (
@@ -14,6 +16,7 @@ type BoolSeed interface {
 }
 
 type Bool struct {
+	*adaptor.AdaptorVariable
 	value bool
 	seed  BoolSeed
 }
@@ -34,12 +37,22 @@ func (n *Bool) Type() string {
 	return n.seed.Type()
 }
 
+type BoolCreatorParam struct {
+	NullCreator      func() concept.Null
+	ExceptionCreator func(string, string) concept.Exception
+}
+
 type BoolCreator struct {
+	param *BoolCreatorParam
 	Seeds map[string]func(string, *Bool) string
 }
 
 func (s *BoolCreator) New(value bool) *Bool {
 	return &Bool{
+		AdaptorVariable: adaptor.NewAdaptorVariable(&adaptor.AdaptorVariableParam{
+			NullCreator:      s.param.NullCreator,
+			ExceptionCreator: s.param.ExceptionCreator,
+		}),
 		value: value,
 		seed:  s,
 	}
@@ -57,8 +70,9 @@ func (s *BoolCreator) Type() string {
 	return VariableBoolType
 }
 
-func NewBoolCreator() *BoolCreator {
+func NewBoolCreator(param *BoolCreatorParam) *BoolCreator {
 	return &BoolCreator{
+		param: param,
 		Seeds: map[string]func(string, *Bool) string{},
 	}
 }

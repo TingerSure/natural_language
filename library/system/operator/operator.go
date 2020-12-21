@@ -153,8 +153,9 @@ const (
 
 type Operator struct {
 	tree.Page
-	Items                                map[string]*OperatorItem
-	UnaryItems                           map[string]*OperatorUnaryItem
+	NumberItems                          map[string]*OperatorItem
+	BoolItems                            map[string]*OperatorItem
+	BoolUnaryItems                       map[string]*OperatorUnaryItem
 	Libs                                 *runtime.LibraryManager
 	OperatorTypeErrorExceptionTemplate   concept.Exception
 	OperatorDivisorZeroExceptionTemplate concept.Exception
@@ -171,7 +172,7 @@ func NewOperator(libs *runtime.LibraryManager) *Operator {
 	anticipateNumber := libs.Sandbox.Variable.Number.New(0)
 	anticipateBool := libs.Sandbox.Variable.Bool.New(false)
 
-	instance.Items = map[string]*OperatorItem{
+	instance.NumberItems = map[string]*OperatorItem{
 
 		AdditionName: instance.NewNumberOperatorNumberItem(AdditionName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Number.New(left.Value() + right.Value()), nil
@@ -206,6 +207,9 @@ func NewOperator(libs *runtime.LibraryManager) *Operator {
 		LessThanOrEqualToName: instance.NewNumberOperatorNumberItem(LessThanOrEqualToName, func(left *variable.Number, right *variable.Number) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Bool.New(left.Value() <= right.Value()), nil
 		}, anticipateBool),
+	}
+
+	instance.BoolItems = map[string]*OperatorItem{
 		OrName: instance.NewBoolOperatorBoolItem(OrName, func(left *variable.Bool, right *variable.Bool) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Bool.New(left.Value() || right.Value()), nil
 		}, anticipateBool),
@@ -214,20 +218,27 @@ func NewOperator(libs *runtime.LibraryManager) *Operator {
 		}, anticipateBool),
 	}
 
-	instance.UnaryItems = map[string]*OperatorUnaryItem{
+	instance.BoolUnaryItems = map[string]*OperatorUnaryItem{
 		NotName: instance.NewOperatorBoolItem(NotName, func(right *variable.Bool) (concept.Variable, concept.Exception) {
 			return libs.Sandbox.Variable.Bool.New(!right.Value()), nil
 		}, anticipateBool),
 	}
 
-	for name, item := range instance.Items {
+	for name, item := range instance.NumberItems {
 		instance.SetFunction(libs.Sandbox.Variable.String.New(name+FuncName), item.Func)
 		instance.SetConst(libs.Sandbox.Variable.String.New(name+LeftName), item.Left)
 		instance.SetConst(libs.Sandbox.Variable.String.New(name+RightName), item.Right)
 		instance.SetConst(libs.Sandbox.Variable.String.New(name+ResultName), item.Result)
 	}
 
-	for name, item := range instance.UnaryItems {
+	for name, item := range instance.BoolItems {
+		instance.SetFunction(libs.Sandbox.Variable.String.New(name+FuncName), item.Func)
+		instance.SetConst(libs.Sandbox.Variable.String.New(name+LeftName), item.Left)
+		instance.SetConst(libs.Sandbox.Variable.String.New(name+RightName), item.Right)
+		instance.SetConst(libs.Sandbox.Variable.String.New(name+ResultName), item.Result)
+	}
+
+	for name, item := range instance.BoolUnaryItems {
 		instance.SetFunction(libs.Sandbox.Variable.String.New(name+FuncName), item.Func)
 		instance.SetConst(libs.Sandbox.Variable.String.New(name+RightName), item.Right)
 		instance.SetConst(libs.Sandbox.Variable.String.New(name+ResultName), item.Result)

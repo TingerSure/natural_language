@@ -70,6 +70,8 @@ func (s *SystemFunction) FunctionType() string {
 }
 
 type SystemFunctionCreatorParam struct {
+	NullCreator      func() concept.Null
+	ExceptionCreator func(string, string) concept.Exception
 }
 
 type SystemFunctionCreator struct {
@@ -85,7 +87,10 @@ func (s *SystemFunctionCreator) New(
 	returnNames []concept.String,
 ) *SystemFunction {
 	return &SystemFunction{
-		AdaptorFunction: adaptor.NewAdaptorFunction(),
+		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
+			NullCreator:      s.param.NullCreator,
+			ExceptionCreator: s.param.ExceptionCreator,
+		}),
 		name:            name,
 		funcs:           funcs,
 		anticipateFuncs: anticipateFuncs,

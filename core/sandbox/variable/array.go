@@ -1,9 +1,9 @@
 package variable
 
 import (
-	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/variable/adaptor"
 	"strings"
 )
 
@@ -11,24 +11,26 @@ const (
 	VariableArrayType = "array"
 )
 
-type Array struct {
-	values []concept.Variable
-	length int
+type ArraySeed interface {
+	ToLanguage(string, *Array) string
+	Type() string
+	NewException(string, string) concept.Exception
 }
 
-var (
-	ArrayLanguageSeeds = map[string]func(string, *Array) string{}
-)
+type Array struct {
+	*adaptor.AdaptorVariable
+	values []concept.Variable
+	seed   ArraySeed
+}
 
 func (f *Array) ToLanguage(language string) string {
-	seed := ArrayLanguageSeeds[language]
-	if seed == nil {
-		return f.ToString("")
-	}
-	return seed(language, f)
+	return f.seed.ToLanguage(language, f)
 }
 
 func (a *Array) ToString(prefix string) string {
+	if len(a.values) == 0 {
+		return "[]"
+	}
 	itemPrefix := fmt.Sprintf("%v\t", prefix)
 	valuesToStrings := make([]string, 0, len(a.values))
 	for _, value := range a.values {
@@ -37,32 +39,81 @@ func (a *Array) ToString(prefix string) string {
 	return fmt.Sprintf("[%v]", strings.Join(valuesToStrings, ", "))
 }
 
-func (a *Array) Set(index int, value concept.Variable) error {
-	if index < 0 || index >= a.length {
-		return errors.New("array index out of bounds error.")
+func (a *Array) Type() string {
+	return a.seed.Type()
+}
+
+func (a *Array) Set(index int, value concept.Variable) concept.Exception {
+	if index < 0 || index >= a.Length() {
+		return a.seed.NewException("runtime error", fmt.Sprintf("array index out of bounds error -> index/length : %v/%v", index, a.Length()))
 	}
 	a.values[index] = value
 	return nil
 }
 
-func (a *Array) Get(index int) (concept.Variable, error) {
-	if index < 0 || index >= a.length {
-		return nil, errors.New("array index out of bounds error.")
+func (a *Array) Append(value concept.Variable) {
+	a.values = append(a.values, value)
+}
+
+func (a *Array) Remove(index int) concept.Exception {
+	if index < 0 || index >= a.Length() {
+		return a.seed.NewException("runtime error", fmt.Sprintf("array index out of bounds error -> index/length : %v/%v", index, a.Length()))
+	}
+	a.values = append(a.values[:index], a.values[index+1:]...)
+	return nil
+}
+
+func (a *Array) Get(index int) (concept.Variable, concept.Exception) {
+	if index < 0 || index >= a.Length() {
+		return nil, a.seed.NewException("runtime error", fmt.Sprintf("array index out of bounds error -> index/length : %v/%v", index, a.Length()))
 	}
 	return a.values[index], nil
 }
 
 func (a *Array) Length() int {
-	return a.length
+	return len(a.values)
 }
 
-func (a *Array) Type() string {
+type ArrayCreatorParam struct {
+	NullCreator      func() concept.Null
+	ExceptionCreator func(string, string) concept.Exception
+}
+
+type ArrayCreator struct {
+	Seeds map[string]func(string, *Array) string
+	param *ArrayCreatorParam
+}
+
+func (s *ArrayCreator) New() *Array {
+	return &Array{
+		AdaptorVariable: adaptor.NewAdaptorVariable(&adaptor.AdaptorVariableParam{
+			NullCreator:      s.param.NullCreator,
+			ExceptionCreator: s.param.ExceptionCreator,
+		}),
+		values: make([]concept.Variable, 0),
+		seed:   s,
+	}
+}
+
+func (s *ArrayCreator) ToLanguage(language string, instance *Array) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, instance)
+}
+
+func (s *ArrayCreator) Type() string {
 	return VariableArrayType
 }
 
-func NewArray(size int) *Array {
-	return &Array{
-		values: make([]concept.Variable, size),
-		length: size,
+func (s *ArrayCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
+}
+
+func NewArrayCreator(param *ArrayCreatorParam) *ArrayCreator {
+	return &ArrayCreator{
+		Seeds: map[string]func(string, *Array) string{},
+		param: param,
 	}
 }

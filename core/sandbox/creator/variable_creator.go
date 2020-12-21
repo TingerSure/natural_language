@@ -18,6 +18,7 @@ type VariableCreator struct {
 	Param             *variable.ParamCreator
 	SystemFunction    *variable.SystemFunctionCreator
 	PreObjectFunction *variable.PreObjectFunctionCreator
+	Array             *variable.ArrayCreator
 }
 
 type VariableCreatorParam struct {
@@ -27,22 +28,51 @@ type VariableCreatorParam struct {
 
 func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 	instance := &VariableCreator{}
-	instance.PreObjectFunction = variable.NewPreObjectFunctionCreator(&variable.PreObjectFunctionCreatorParam{})
-	instance.SystemFunction = variable.NewSystemFunctionCreator(&variable.SystemFunctionCreatorParam{})
-	instance.Bool = variable.NewBoolCreator()
-	instance.Null = variable.NewNullCreator()
-	instance.String = variable.NewStringCreator()
-	instance.Number = variable.NewNumberCreator()
+	instance.Null = variable.NewNullCreator(&variable.NullCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+	})
+	instance.PreObjectFunction = variable.NewPreObjectFunctionCreator(&variable.PreObjectFunctionCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+		NullCreator: func() concept.Null {
+			return instance.Null.New()
+		},
+	})
+	instance.SystemFunction = variable.NewSystemFunctionCreator(&variable.SystemFunctionCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+		NullCreator: func() concept.Null {
+			return instance.Null.New()
+		},
+	})
+	instance.Bool = variable.NewBoolCreator(&variable.BoolCreatorParam{
+		NullCreator: func() concept.Null {
+			return instance.Null.New()
+		},
+		ExceptionCreator: param.ExceptionCreator,
+	})
+	instance.String = variable.NewStringCreator(&variable.StringCreatorParam{
+		NullCreator: func() concept.Null {
+			return instance.Null.New()
+		},
+		ExceptionCreator: param.ExceptionCreator,
+	})
+	instance.Number = variable.NewNumberCreator(&variable.NumberCreatorParam{
+		NullCreator: func() concept.Null {
+			return instance.Null.New()
+		},
+		ExceptionCreator: param.ExceptionCreator,
+	})
 	instance.Class = variable.NewClassCreator(&variable.ClassCreatorParam{
 		NullCreator: func() concept.Null {
 			return instance.Null.New()
 		},
+		ExceptionCreator: param.ExceptionCreator,
 	})
 
 	instance.Param = variable.NewParamCreator(&variable.ParamCreatorParam{
 		NullCreator: func() concept.Null {
 			return instance.Null.New()
 		},
+		ExceptionCreator: param.ExceptionCreator,
 	})
 
 	instance.Function = variable.NewFunctionCreator(&variable.FunctionCreatorParam{
@@ -51,6 +81,9 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		},
 		ParamCreator: func() concept.Param {
 			return instance.Param.New()
+		},
+		NullCreator: func() concept.Null {
+			return instance.Null.New()
 		},
 		ExceptionCreator: param.ExceptionCreator,
 		CodeBlockCreator: param.CodeBlockCreator,
@@ -64,6 +97,13 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 	})
 
 	instance.MappingObject = variable.NewMappingObjectCreator(&variable.MappingObjectCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+	})
+
+	instance.Array = variable.NewArrayCreator(&variable.ArrayCreatorParam{
+		NullCreator: func() concept.Null {
+			return instance.Null.New()
+		},
 		ExceptionCreator: param.ExceptionCreator,
 	})
 

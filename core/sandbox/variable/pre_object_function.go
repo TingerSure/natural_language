@@ -75,6 +75,8 @@ func (s *PreObjectFunction) Name() concept.String {
 }
 
 type PreObjectFunctionCreatorParam struct {
+	NullCreator      func() concept.Null
+	ExceptionCreator func(string, string) concept.Exception
 }
 
 type PreObjectFunctionCreator struct {
@@ -87,10 +89,13 @@ func (s *PreObjectFunctionCreator) New(
 	object concept.Object,
 ) *PreObjectFunction {
 	return &PreObjectFunction{
-		AdaptorFunction: adaptor.NewAdaptorFunction(),
-		function:        function,
-		object:          object,
-		seed:            s,
+		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
+			NullCreator:      s.param.NullCreator,
+			ExceptionCreator: s.param.ExceptionCreator,
+		}),
+		function: function,
+		object:   object,
+		seed:     s,
 	}
 }
 

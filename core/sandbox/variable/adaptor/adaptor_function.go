@@ -4,7 +4,13 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 )
 
+type AdaptorFunctionParam struct {
+	NullCreator      func() concept.Null
+	ExceptionCreator func(string, string) concept.Exception
+}
+
 type AdaptorFunction struct {
+	*AdaptorVariable
 	languageOnCallSeeds map[string]func(concept.Function, *concept.Mapping) string
 }
 
@@ -41,8 +47,12 @@ func (*AdaptorFunction) AdaptorReturnFormat(f concept.Function, back concept.Str
 	return back
 }
 
-func NewAdaptorFunction() *AdaptorFunction {
+func NewAdaptorFunction(param *AdaptorFunctionParam) *AdaptorFunction {
 	return &AdaptorFunction{
+		AdaptorVariable: NewAdaptorVariable(&AdaptorVariableParam{
+			NullCreator:      param.NullCreator,
+			ExceptionCreator: param.ExceptionCreator,
+		}),
 		languageOnCallSeeds: map[string]func(concept.Function, *concept.Mapping) string{},
 	}
 }

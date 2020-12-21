@@ -23,7 +23,7 @@ func (t *Types) Package(wanted string, given string, from tree.Phrase) tree.Phra
 
 	for index := len(rules) - 1; index >= 0; index-- {
 		if rules[index] != nil {
-			from = rules[index].Create(from)
+			from = rules[index].Pack(from)
 		}
 	}
 	return from

@@ -150,6 +150,7 @@ type FunctionCreatorParam struct {
 	StringCreator    func(string) concept.String
 	ParamCreator     func() concept.Param
 	ExceptionCreator func(string, string) concept.Exception
+	NullCreator      func() concept.Null
 }
 
 type FunctionCreator struct {
@@ -159,12 +160,15 @@ type FunctionCreator struct {
 
 func (s *FunctionCreator) New(name concept.String, parent concept.Closure) *Function {
 	return &Function{
-		AdaptorFunction: adaptor.NewAdaptorFunction(),
-		name:            name,
-		parent:          parent,
-		body:            s.param.CodeBlockCreator(),
-		anticipateBody:  s.param.CodeBlockCreator(),
-		seed:            s,
+		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
+			NullCreator:      s.param.NullCreator,
+			ExceptionCreator: s.param.ExceptionCreator,
+		}),
+		name:           name,
+		parent:         parent,
+		body:           s.param.CodeBlockCreator(),
+		anticipateBody: s.param.CodeBlockCreator(),
+		seed:           s,
 	}
 }
 

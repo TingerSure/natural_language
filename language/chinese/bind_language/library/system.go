@@ -9,5 +9,5 @@ func SystemBindLanguage(libs *runtime.LibraryManager, language string) {
 	system.OperatorBindLanguage(libs, language)
 	system.ObjectBindlanguage(libs, language)
 	system.QuestionBindLanguage(libs, language)
-	system.AutoNumberBindlanguage(libs, language)
+	system.NumberBindlanguage(libs, language)
 }

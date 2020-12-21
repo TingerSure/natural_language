@@ -88,6 +88,17 @@ func (v *VariableFamily) IsParam(value concept.Variable) (*Param, bool) {
 	return nil, false
 }
 
+func (v *VariableFamily) IsArray(value concept.Variable) (*Array, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == VariableArrayType {
+		array, yes := value.(*Array)
+		return array, yes
+	}
+	return nil, false
+}
+
 func (v *VariableFamily) IsClass(value concept.Variable) (*Class, bool) {
 	if value == nil {
 		return nil, false

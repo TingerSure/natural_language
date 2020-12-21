@@ -25,7 +25,6 @@ func (p *Noun) GetPhraseTypes() []*tree.PhraseType {
 			Parents: []*tree.PhraseTypeParent{
 				&tree.PhraseTypeParent{
 					Types: EntityName,
-					Rule:  nil,
 				},
 			},
 		}),
