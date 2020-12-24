@@ -1,7 +1,6 @@
 package phrase_type
 
 import (
-	// "github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/language/chinese/system/adaptor"
 )

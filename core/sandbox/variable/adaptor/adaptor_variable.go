@@ -15,7 +15,7 @@ type AdaptorVariableParam struct {
 type AdaptorVariable struct {
 	fields      *concept.Mapping
 	methods     *concept.Mapping
-	reflections []*concept.ClassReflection
+	reflections []*concept.Reflection
 	param       *AdaptorVariableParam
 }
 
@@ -115,7 +115,7 @@ func (o *AdaptorVariable) AddClass(class concept.Class, alias string, mapping ma
 			return o.param.ExceptionCreator("system error", "Duplicate class reflections are added.")
 		}
 	}
-	o.reflections = append(o.reflections, concept.NewClassReflectionWithMapping(class, mapping, alias))
+	o.reflections = append(o.reflections, concept.NewReflectionWithMapping(class, mapping, alias))
 	return nil
 }
 
@@ -222,7 +222,7 @@ func (o *AdaptorVariable) initFields() {
 
 func NewAdaptorVariable(param *AdaptorVariableParam) *AdaptorVariable {
 	return &AdaptorVariable{
-		reflections: make([]*concept.ClassReflection, 0),
+		reflections: make([]*concept.Reflection, 0),
 		param:       param,
 	}
 }
