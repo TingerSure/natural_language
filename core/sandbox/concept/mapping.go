@@ -44,6 +44,15 @@ func (k *Mapping) Init(specimen String, defaultValue interface{}) bool {
 	return exist
 }
 
+func (k *Mapping) Remove(specimen String) {
+	for index, item := range k.values {
+		if item.key.EqualLanguage(specimen) {
+			k.values = append(k.values[:index], k.values[index+1:]...)
+			return
+		}
+	}
+}
+
 func (k *Mapping) Set(specimen String, value interface{}) bool {
 	if nl_interface.IsNil(value) {
 		value = k.param.EmptyValue

@@ -19,6 +19,18 @@ type AdaptorVariable struct {
 	param       *AdaptorVariableParam
 }
 
+func (o *AdaptorVariable) GetSource() concept.Variable {
+	return nil
+}
+
+func (o *AdaptorVariable) HasRequireMethod(concept.String) bool {
+	return false
+}
+
+func (o *AdaptorVariable) GetRequireMethod(concept.String) (concept.Function, concept.Exception) {
+	return nil, o.param.ExceptionCreator("system error", "Unmapping variable cannot get require method.")
+}
+
 func (o *AdaptorVariable) GetClasses() []string {
 	classes := []string{}
 	for _, reflection := range o.reflections {
@@ -67,27 +79,14 @@ func (o *AdaptorVariable) UpdateAlias(class string, old, new string) bool {
 }
 
 func (o *AdaptorVariable) CheckMapping(class concept.Class, mapping map[concept.String]concept.String) bool {
-	if len(mapping) != class.SizeFieldMould() {
-		return false
-	}
-
-	if class.IterateFieldMoulds(func(key concept.String, _ concept.Variable) bool {
+	return !class.IterateRequire(func(key concept.String) bool {
 		for specimen := range mapping {
 			if key.EqualLanguage(specimen) {
 				return false
 			}
 		}
 		return true
-	}) {
-		return false
-	}
-
-	for _, specimen := range mapping {
-		if !o.HasField(specimen) {
-			return false
-		}
-	}
-	return true
+	})
 }
 
 func (o *AdaptorVariable) GetMapping(class string, alias string) (map[concept.String]concept.String, concept.Exception) {

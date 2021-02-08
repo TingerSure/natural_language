@@ -21,7 +21,7 @@ type MappingObject struct {
 	alias     string
 	class     concept.Class
 	className string
-	object    concept.Object
+	object    concept.Variable
 	seed      MappingObjectSeed
 }
 
@@ -29,7 +29,7 @@ func (f *MappingObject) ToLanguage(language string) string {
 	return f.seed.ToLanguage(language, f)
 }
 
-func (m *MappingObject) GetSource() concept.Object {
+func (m *MappingObject) GetSource() concept.Variable {
 	return m.object
 }
 
@@ -82,41 +82,24 @@ func (m *MappingObject) Type() string {
 	return m.seed.Type()
 }
 
-func (m *MappingObject) specimenClassToObject(specimen concept.String) concept.String {
-	var objectSpecimen concept.String = nil
-	m.class.IterateFieldMoulds(func(key concept.String, _ concept.Variable) bool {
-		if key.EqualLanguage(specimen) {
-			for target, source := range m.mapping {
-				if key.EqualLanguage(target) {
-					objectSpecimen = source
-					break
-				}
-			}
-			return true
-		}
-		return false
-	})
-	return objectSpecimen
-}
-
 func (m *MappingObject) SetField(specimen concept.String, value concept.Variable) concept.Exception {
-	return m.object.SetField(m.specimenClassToObject(specimen), value)
+	return m.seed.NewException("system error", "Mapping object cannot set field.")
 }
 
 func (m *MappingObject) GetField(specimen concept.String) (concept.Variable, concept.Exception) {
-	return m.object.GetField(m.specimenClassToObject(specimen))
+	return nil, m.seed.NewException("system error", "Mapping object cannot get field.")
 }
 
 func (m *MappingObject) InitField(concept.String, concept.Variable) concept.Exception {
-	return m.seed.NewException("system error", "Mapping object cannot init.")
+	return m.seed.NewException("system error", "Mapping object cannot init field.")
 }
 
 func (m *MappingObject) HasField(specimen concept.String) bool {
-	return !nl_interface.IsNil(m.specimenClassToObject(specimen))
+	return false
 }
 
 func (m *MappingObject) HasMethod(specimen concept.String) bool {
-	return m.class.HasMethodMould(specimen)
+	return m.class.HasProvide(specimen)
 }
 
 func (m *MappingObject) SetMethod(specimen concept.String, value concept.Function) concept.Exception {
@@ -124,11 +107,29 @@ func (m *MappingObject) SetMethod(specimen concept.String, value concept.Functio
 }
 
 func (m *MappingObject) GetMethod(specimen concept.String) (concept.Function, concept.Exception) {
-	value := m.class.GetMethodMould(specimen)
+	value := m.class.GetProvide(specimen)
 	if nl_interface.IsNil(value) {
 		return nil, m.seed.NewException("system error", fmt.Sprintf("no method called %v", specimen.ToString("")))
 	}
 	return value, nil
+}
+
+func (m *MappingObject) HasRequireMethod(key concept.String) bool {
+	for target, _ := range m.mapping {
+		if key.EqualLanguage(target) {
+			return true
+		}
+	}
+	return false
+}
+
+func (m *MappingObject) GetRequireMethod(key concept.String) (concept.Function, concept.Exception) {
+	for target, source := range m.mapping {
+		if key.EqualLanguage(target) {
+			return m.object.GetMethod(source)
+		}
+	}
+	return nil, m.seed.NewException("system error", fmt.Sprintf("no require method called %v", key.ToString("")))
 }
 
 type MappingObjectCreatorParam struct {
@@ -156,7 +157,7 @@ func (s *MappingObjectCreator) NewException(name string, message string) concept
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *MappingObjectCreator) New(object concept.Object, className string, alias string) (*MappingObject, concept.Exception) {
+func (s *MappingObjectCreator) New(object concept.Variable, className string, alias string) (*MappingObject, concept.Exception) {
 
 	class := object.GetClass(className)
 	if nl_interface.IsNil(class) {

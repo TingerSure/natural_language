@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type ObjectFieldIndexSeed interface {
@@ -41,36 +40,23 @@ func (s *ObjectFieldIndex) ToString(prefix string) string {
 }
 
 func (s *ObjectFieldIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
-	preObject, suspend := s.object.Get(space)
+	object, suspend := s.object.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return s.seed.NewNull(), suspend
-	}
-	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
-	if !ok {
-		return s.seed.NewNull(), s.seed.NewException("type error", "There is not an effective object When system call the ObjectFieldIndex.Get")
 	}
 	return object.GetField(s.key)
 }
 
 func (s *ObjectFieldIndex) Anticipate(space concept.Closure) concept.Variable {
-	preObject := s.object.Anticipate(space)
-
-	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
-	if !ok {
-		return s.seed.NewNull()
-	}
+	object := s.object.Anticipate(space)
 	value, _ := object.GetField(s.key)
 	return value
 }
 
 func (s *ObjectFieldIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
-	preObject, suspend := s.object.Get(space)
+	object, suspend := s.object.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return suspend
-	}
-	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
-	if !ok {
-		return s.seed.NewException("type error", "There is not an effective object When system call the ObjectFieldIndex.Set")
 	}
 	return object.SetField(s.key, value)
 }

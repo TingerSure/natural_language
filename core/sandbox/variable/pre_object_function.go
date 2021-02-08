@@ -20,7 +20,7 @@ type PreObjectFunctionSeed interface {
 type PreObjectFunction struct {
 	*adaptor.AdaptorFunction
 	function concept.Function
-	object   concept.Object
+	object   concept.Variable
 	seed     PreObjectFunctionSeed
 }
 
@@ -48,14 +48,14 @@ func (f *PreObjectFunction) ToString(prefix string) string {
 	return fmt.Sprintf("%s.%s", f.object.ToString(prefix), f.function.ToString(prefix))
 }
 
-func (f *PreObjectFunction) Anticipate(params concept.Param, object concept.Object) concept.Param {
+func (f *PreObjectFunction) Anticipate(params concept.Param, object concept.Variable) concept.Param {
 	if nl_interface.IsNil(object) {
 		object = f.object
 	}
 	return f.function.Anticipate(params, object)
 }
 
-func (f *PreObjectFunction) Exec(params concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+func (f *PreObjectFunction) Exec(params concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 	if nl_interface.IsNil(object) {
 		object = f.object
 	}
@@ -86,7 +86,7 @@ type PreObjectFunctionCreator struct {
 
 func (s *PreObjectFunctionCreator) New(
 	function concept.Function,
-	object concept.Object,
+	object concept.Variable,
 ) *PreObjectFunction {
 	return &PreObjectFunction{
 		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{

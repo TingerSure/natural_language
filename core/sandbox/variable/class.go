@@ -19,10 +19,10 @@ type ClassSeed interface {
 
 type Class struct {
 	*adaptor.AdaptorVariable
-	name         string
-	methodMoulds *concept.Mapping
-	fieldMoulds  *concept.Mapping
-	seed         ClassSeed
+	name    string
+	provide *concept.Mapping
+	require *concept.Mapping
+	seed    ClassSeed
 }
 
 func (f *Class) ToLanguage(language string) string {
@@ -33,12 +33,12 @@ func (c *Class) ToString(prefix string) string {
 	subprefix := fmt.Sprintf("%v\t", prefix)
 
 	items := []string{}
-	c.fieldMoulds.Iterate(func(key concept.String, value interface{}) bool {
-		items = append(items, fmt.Sprintf("%vvar %v = %v", subprefix, key.ToString(subprefix), value.(concept.ToString).ToString(subprefix)))
+	c.require.Iterate(func(key concept.String, value interface{}) bool {
+		items = append(items, fmt.Sprintf("%vrequire %v", subprefix, key.ToString(subprefix)))
 		return false
 	})
-	c.methodMoulds.Iterate(func(key concept.String, value interface{}) bool {
-		items = append(items, fmt.Sprintf("%vfunc %v = %v", subprefix, key.ToString(subprefix), value.(concept.ToString).ToString(subprefix)))
+	c.provide.Iterate(func(key concept.String, value interface{}) bool {
+		items = append(items, fmt.Sprintf("%vprovide %v = %v", subprefix, key.ToString(subprefix), value.(concept.ToString).ToString(subprefix)))
 		return false
 	})
 	return fmt.Sprintf("class %v {\n%v\n%v}", c.name, strings.Join(items, ",\n"), prefix)
@@ -52,47 +52,39 @@ func (c *Class) GetName() string {
 	return c.name
 }
 
-func (c *Class) SizeMethodMould() int {
-	return c.methodMoulds.Size()
+func (c *Class) SetProvide(specimen concept.String, action concept.Function) {
+	c.provide.Set(specimen, action)
 }
 
-func (c *Class) SetMethodMould(specimen concept.String, action concept.Function) {
-	c.methodMoulds.Set(specimen, action)
+func (c *Class) GetProvide(specimen concept.String) concept.Function {
+	return c.provide.Get(specimen).(concept.Function)
 }
 
-func (c *Class) GetMethodMould(specimen concept.String) concept.Function {
-	return c.methodMoulds.Get(specimen).(concept.Function)
+func (c *Class) HasProvide(specimen concept.String) bool {
+	return c.provide.Has(specimen)
 }
 
-func (c *Class) HasMethodMould(specimen concept.String) bool {
-	return c.methodMoulds.Has(specimen)
-}
-
-func (c *Class) IterateMethodMoulds(on func(key concept.String, value concept.Function) bool) bool {
-	return c.methodMoulds.Iterate(func(key concept.String, value interface{}) bool {
+func (c *Class) IterateProvide(on func(key concept.String, value concept.Function) bool) bool {
+	return c.provide.Iterate(func(key concept.String, value interface{}) bool {
 		return on(key, value.(concept.Function))
 	})
 }
 
-func (c *Class) SizeFieldMould() int {
-	return c.fieldMoulds.Size()
+func (c *Class) SetRequire(specimen concept.String) {
+	c.require.Set(specimen, nil)
 }
 
-func (c *Class) SetFieldMould(specimen concept.String, defaultFieldMould concept.Variable) {
-	c.fieldMoulds.Set(specimen, defaultFieldMould)
+func (c *Class) RemoveRequire(specimen concept.String) {
+	c.require.Remove(specimen)
 }
 
-func (c *Class) GetFieldMould(specimen concept.String) concept.Variable {
-	return c.fieldMoulds.Get(specimen).(concept.Variable)
+func (c *Class) HasRequire(specimen concept.String) bool {
+	return c.require.Has(specimen)
 }
 
-func (c *Class) HasFieldMould(specimen concept.String) bool {
-	return c.fieldMoulds.Has(specimen)
-}
-
-func (c *Class) IterateFieldMoulds(on func(key concept.String, value concept.Variable) bool) bool {
-	return c.fieldMoulds.Iterate(func(key concept.String, value interface{}) bool {
-		return on(key, value.(concept.Variable))
+func (c *Class) IterateRequire(on func(key concept.String) bool) bool {
+	return c.require.Iterate(func(key concept.String, value interface{}) bool {
+		return on(key)
 	})
 }
 
@@ -113,13 +105,13 @@ func (s *ClassCreator) New(name string) *Class {
 			ExceptionCreator: s.param.ExceptionCreator,
 		}),
 		name: name,
-		methodMoulds: concept.NewMapping(&concept.MappingParam{
+		provide: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: s.NewNull(),
 		}),
-		fieldMoulds: concept.NewMapping(&concept.MappingParam{
+		require: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: s.NewNull(),
+			EmptyValue: nil,
 		}),
 		seed: s,
 	}

@@ -7,15 +7,16 @@ import (
 )
 
 type IndexCreator struct {
-	ConstIndex        *index.ConstIndexCreator
-	ObjectFieldIndex  *index.ObjectFieldIndexCreator
-	ObjectMethodIndex *index.ObjectMethodIndexCreator
-	ResaultIndex      *index.ResaultIndexCreator
-	SearchIndex       *index.SearchIndexCreator
-	ThisIndex         *index.ThisIndexCreator
-	SelfIndex         *index.SelfIndexCreator
-	BubbleIndex       *index.BubbleIndexCreator
-	LocalIndex        *index.LocalIndexCreator
+	ConstIndex         *index.ConstIndexCreator
+	ObjectFieldIndex   *index.ObjectFieldIndexCreator
+	ObjectMethodIndex  *index.ObjectMethodIndexCreator
+	RequireMethodIndex *index.RequireMethodIndexCreator
+	ResaultIndex       *index.ResaultIndexCreator
+	SearchIndex        *index.SearchIndexCreator
+	ThisIndex          *index.ThisIndexCreator
+	SelfIndex          *index.SelfIndexCreator
+	BubbleIndex        *index.BubbleIndexCreator
+	LocalIndex         *index.LocalIndexCreator
 }
 
 type IndexCreatorParam struct {
@@ -44,6 +45,11 @@ func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
 	instance.ResaultIndex = index.NewResaultIndexCreator(&index.ResaultIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
 		NullCreator:      param.NullCreator,
+	})
+	instance.RequireMethodIndex = index.NewRequireMethodIndexCreator(&index.RequireMethodIndexCreatorParam{
+		ExceptionCreator:         param.ExceptionCreator,
+		PreObjectFunctionCreator: param.PreObjectFunctionCreator,
+		NullCreator:              param.NullCreator,
 	})
 	instance.ObjectMethodIndex = index.NewObjectMethodIndexCreator(&index.ObjectMethodIndexCreatorParam{
 		ExceptionCreator:         param.ExceptionCreator,

@@ -19,6 +19,18 @@ type Null struct {
 	seed NullSeed
 }
 
+func (o *Null) GetSource() concept.Variable {
+	return nil
+}
+
+func (o *Null) HasRequireMethod(concept.String) bool {
+	return false
+}
+
+func (o *Null) GetRequireMethod(concept.String) (concept.Function, concept.Exception) {
+	return nil, o.seed.GetNullPointerException().Copy()
+}
+
 func (o *Null) GetClasses() []string {
 	return []string{}
 }

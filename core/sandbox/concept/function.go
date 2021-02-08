@@ -4,8 +4,8 @@ type Function interface {
 	Variable
 	ExceptionStack
 	Name() String
-	Exec(Param, Object) (Param, Exception)
-	Anticipate(Param, Object) Param
+	Exec(Param, Variable) (Param, Exception)
+	Anticipate(Param, Variable) Param
 	FunctionType() string
 	ParamNames() []String
 	ReturnNames() []String

@@ -42,12 +42,7 @@ func (s *ObjectMethodIndex) ToString(prefix string) string {
 }
 
 func (s *ObjectMethodIndex) Anticipate(space concept.Closure) concept.Variable {
-	preObject := s.object.Anticipate(space)
-
-	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
-	if !ok {
-		return s.seed.NewNull()
-	}
+	object := s.object.Anticipate(space)
 
 	function, suspend := object.GetMethod(s.key)
 	if !nl_interface.IsNil(suspend) {
@@ -61,14 +56,9 @@ func (s *ObjectMethodIndex) Anticipate(space concept.Closure) concept.Variable {
 }
 
 func (s *ObjectMethodIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
-	preObject, suspend := s.object.Get(space)
+	object, suspend := s.object.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return s.seed.NewNull(), suspend
-	}
-
-	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
-	if !ok {
-		return s.seed.NewNull(), s.seed.NewException("type error", "There is not an effective object When system call the ObjectMethodIndex.Get")
 	}
 
 	function, suspend := object.GetMethod(s.key)
@@ -83,15 +73,10 @@ func (s *ObjectMethodIndex) Get(space concept.Closure) (concept.Variable, concep
 }
 
 func (s *ObjectMethodIndex) Set(space concept.Closure, preFunction concept.Variable) concept.Interrupt {
-	preObject, suspend := s.object.Get(space)
+	object, suspend := s.object.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return suspend
 	}
-	object, ok := variable.VariableFamilyInstance.IsObjectHome(preObject)
-	if !ok {
-		return s.seed.NewException("type error", "There is not an effective object When system call the ObjectMethodIndex.Set")
-	}
-
 	function, ok := variable.VariableFamilyInstance.IsFunctionHome(preFunction)
 	if !ok {
 		return s.seed.NewException("type error", "There is not an effective function When system call the ObjectMethodIndex.Set")

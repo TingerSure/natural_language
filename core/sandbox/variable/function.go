@@ -78,7 +78,7 @@ func (f *Function) AnticipateBody() *code_block.CodeBlock {
 	return f.anticipateBody
 }
 
-func (f *Function) Anticipate(params concept.Param, object concept.Object) concept.Param {
+func (f *Function) Anticipate(params concept.Param, object concept.Variable) concept.Param {
 	space, suspend := f.anticipateBody.Exec(f.parent, false, func(space concept.Closure) concept.Interrupt {
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
@@ -107,7 +107,7 @@ func (f *Function) Body() *code_block.CodeBlock {
 	return f.body
 }
 
-func (f *Function) Exec(params concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 
 	space, suspend := f.body.Exec(f.parent, false, func(space concept.Closure) concept.Interrupt {
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
