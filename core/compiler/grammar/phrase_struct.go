@@ -17,7 +17,7 @@ func (p *PhraseStruct) Size() int {
 	return p.size
 }
 
-func (p *PhraseStruct) Type() int {
+func (p *PhraseStruct) PhraseType() int {
 	return TypeStruct
 }
 

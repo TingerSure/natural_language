@@ -3,14 +3,14 @@ package grammar
 import ()
 
 type Rule struct {
-	result Symbol
-	from   []Symbol
+	result   Symbol
+	children []Symbol
 }
 
-func NewRule(result Symbol, from ...Symbol) *Rule {
+func NewRule(result Symbol, children ...Symbol) *Rule {
 	return &Rule{
-		result: result,
-		from:   from,
+		result:   result,
+		children: children,
 	}
 }
 
@@ -18,18 +18,18 @@ func (r *Rule) SetResult(result Symbol) {
 	r.result = result
 }
 
-func (r *Rule) AppendFrom(from Symbol) {
-	r.from = append(r.from, from)
+func (r *Rule) AppendChild(child Symbol) {
+	r.children = append(r.children, child)
 }
 
 func (r *Rule) GetResult() Symbol {
 	return r.result
 }
 
-func (r *Rule) GetFrom(index int) Symbol {
-	return r.from[index]
+func (r *Rule) GetChild(index int) Symbol {
+	return r.children[index]
 }
 
 func (r *Rule) Size() int {
-	return len(r.from)
+	return len(r.children)
 }

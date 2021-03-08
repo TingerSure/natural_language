@@ -5,6 +5,8 @@ import (
 )
 
 type Phrase interface {
+	PhraseType() int
+	SetType(types int)
 	Type() int
 	Size() int
 	SetChild(int, Phrase)

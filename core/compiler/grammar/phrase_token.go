@@ -12,7 +12,15 @@ type PhraseToken struct {
 	token *lexer.Token
 }
 
+func (p *PhraseToken) SetType(types int) {
+	panic("complier.PhraseToken cannot set Type")
+}
+
 func (p *PhraseToken) Type() int {
+	return p.token.Type()
+}
+
+func (p *PhraseToken) PhraseType() int {
 	return TypeToken
 }
 
