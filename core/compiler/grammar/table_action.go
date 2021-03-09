@@ -3,16 +3,34 @@ package grammar
 import ()
 
 const (
-	End = iota
-	Move
-	Polymerize
-	Goto
+	AcceptType = iota
+	MoveType
+	GotoType
 )
 
 type TableAction struct {
 	types  int
 	status int
-	rule   int
+}
+
+func NewTableActionAccept() *TableAction {
+	return &TableAction{
+		types: AcceptType,
+	}
+}
+
+func NewTableActionMove(status int) *TableAction {
+	return &TableAction{
+		types:  MoveType,
+		status: status,
+	}
+}
+
+func NewTableActionGoto(status int) *TableAction {
+	return &TableAction{
+		types:  GotoType,
+		status: status,
+	}
 }
 
 func (t *TableAction) Types() int {
@@ -21,8 +39,4 @@ func (t *TableAction) Types() int {
 
 func (t *TableAction) Status() int {
 	return t.status
-}
-
-func (t *TableAction) Rule() int {
-	return t.rule
 }

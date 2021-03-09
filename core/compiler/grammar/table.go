@@ -2,24 +2,22 @@ package grammar
 
 import (
 	"errors"
-	// "github.com/TingerSure/natural_language/core/compiler/lexer"
 )
 
 type Table struct {
 	typesCount int
 	rules      []*Rule
 	global     *Nonterminal
-	actions    map[int]map[int]*TableAction // map[status]map[symbol]action
-	gotos      map[int]map[int]*TableAction // map[status]map[symbol]goto
-	status     []int
-	phrases    []Phrase
+	accept     *Terminal
+	actions    map[int]*TableActionGroup // map[status]map[symbol]action
+	gotos      map[int]*TableActionGroup // map[status]map[symbol]goto
 }
 
 func NewTable() *Table {
 	return &Table{
 		typesCount: 0,
-		actions:    map[int]map[int]*TableAction{},
-		gotos:      map[int]map[int]*TableAction{},
+		actions:    map[int]*TableActionGroup{},
+		gotos:      map[int]*TableActionGroup{},
 	}
 }
 
@@ -37,26 +35,101 @@ func (g *Table) SetGlobal(global *Nonterminal) {
 }
 
 func (g *Table) Build() error {
-	// projects := g.makeProjects(g.rules)
-	// closures := g.makeClosures(projects)
-	// TODO
+	err := g.format()
+	if err != nil {
+		return err
+	}
+	g.makeClosures(g.makeProjects(g.rules))
 	return nil
 }
 
-func (g *Table) makeClosures(projects [][]*TableProject) []*TableClosure {
-	// TODO
-	return nil
+func (g *Table) makeClosures(
+	startProjects map[int][]*TableProject,
+) {
+	acceptClouse := g.makeClosureStep(
+		startProjects[g.global.Type()][0],
+		NewCount(0),
+		startProjects,
+		[]*TableClosure{},
+		map[*TableProject]*TableClosure{},
+	)
+	// accept
+	g.actions[acceptClouse.Id()].SetAction(g.accept.Type(), NewTableActionAccept())
 }
 
-func (g *Table) makeProjects(rules []*Rule) [][]*TableProject {
-	projects := [][]*TableProject{}
-	for ruleIndex, rule := range rules {
-		projects = append(projects, []*TableProject{})
-		for childIndex := 0; childIndex < rule.Size(); childIndex++ {
-			projects[ruleIndex] = append(projects[ruleIndex], NewTableProject(rule, childIndex))
+func (g *Table) makeClosureStep(
+	cursor *TableProject,
+	counter *Count,
+	startProjects map[int][]*TableProject,
+	closures []*TableClosure,
+	closureMaps map[*TableProject]*TableClosure,
+) *TableClosure {
+	closure := closureMaps[cursor]
+	if closure != nil {
+		// existed
+		return closure
+	}
+	closure = NewTableClosure(counter.Next())
+	closure.AddProject(cursor)
+	closureMaps[cursor] = closure
+	statusIndex := closure.Id()
+	if cursor.Index == cursor.Rule.Size() {
+		// polymerize
+		group := NewTableActionPolymerize(cursor.Rule)
+		g.actions[statusIndex] = group
+		g.gotos[statusIndex] = group
+		return closure
+	}
+	group := NewTableActionGroup()
+	g.actions[statusIndex] = group
+	g.gotos[statusIndex] = group
+	g.equivalenceClosure(cursor, closure, startProjects)
+	for project, _ := range closure.GetProjects() {
+		next := project.Next
+		nextClosure := g.makeClosureStep(next, counter, startProjects, closures, closureMaps)
+		symbol := project.GetNextChild()
+		if symbol.SymbolType() == SymbolTypeTerminal {
+			// move
+			g.actions[statusIndex].SetAction(symbol.Type(), NewTableActionMove(nextClosure.Id()))
+		}
+		// goto
+		g.gotos[statusIndex].SetAction(symbol.Type(), NewTableActionGoto(nextClosure.Id()))
+	}
+	return closure
+}
+
+func (g *Table) equivalenceClosure(
+	cursor *TableProject,
+	closure *TableClosure,
+	startProjects map[int][]*TableProject,
+) {
+	symbol := cursor.GetNextChild()
+	if symbol.SymbolType() == SymbolTypeTerminal {
+		return
+	}
+	equivalences := startProjects[symbol.Type()]
+	for _, equivalence := range equivalences {
+		if closure.AddProject(equivalence) {
+			// add success
+			g.equivalenceClosure(equivalence, closure, startProjects)
+		}
+		// project exist
+	}
+}
+
+func (g *Table) makeProjects(rules []*Rule) map[int][]*TableProject {
+	startProjects := map[int][]*TableProject{}
+	for _, rule := range rules {
+		startProject := NewTableProject(rule, 0)
+		startProjects[rule.GetResult().Type()] = append(startProjects[rule.GetResult().Type()], startProject)
+		last := startProject
+		for childIndex := 1; childIndex <= rule.Size(); childIndex++ {
+			project := NewTableProject(rule, childIndex)
+			last.Next = project
+			last = project
 		}
 	}
-	return projects
+	return startProjects
 }
 
 func (g *Table) format() error {
