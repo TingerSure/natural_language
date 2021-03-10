@@ -7,6 +7,7 @@ import (
 type PhraseStruct struct {
 	size     int
 	children []Phrase
+	rule     *Rule
 }
 
 const (
@@ -33,6 +34,12 @@ func (p *PhraseStruct) GetToken() *lexer.Token {
 	return nil
 }
 
-func NewPhraseStruct() *PhraseStruct {
-	return &PhraseStruct{}
+func (p *PhraseStruct) GetRule() *Rule {
+	return p.rule
+}
+
+func NewPhraseStruct(rule *Rule) *PhraseStruct {
+	return &PhraseStruct{
+		rule: rule,
+	}
 }

@@ -6,17 +6,23 @@ import (
 )
 
 type Grammar struct {
-	table *Table
+	rules    []*Rule
+	global   *Nonterminal
+	accept   *Terminal
+	table    *Table
+	automata *Automata
 }
 
 func NewGrammar() *Grammar {
+	table := NewTable()
 	return &Grammar{
-		table: NewTable(),
+		table:    table,
+		automata: NewAutomata(table),
 	}
 }
 
 func (g *Grammar) AddRule(rule *Rule) {
-	g.table.AddRule(rule)
+	g.rules = append(g.rules, rule)
 }
 
 func (g *Grammar) SetGlobal(global *Nonterminal) {
@@ -24,6 +30,9 @@ func (g *Grammar) SetGlobal(global *Nonterminal) {
 }
 
 func (g *Grammar) Build() error {
+	g.table.SetRules(g.rules)
+	g.table.SetGlobal(g.global)
+	g.table.SetAccept(g.accept)
 	return g.table.Build()
 }
 

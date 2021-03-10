@@ -1,27 +1,27 @@
 package grammar
 
 const (
-	ActionType = iota
-	PolymerizeType
+	GroupActionType = iota
+	GroupPolymerizeType
 )
 
 type TableActionGroup struct {
-	types          int
-	actions        map[int]*TableAction
-	polymerizeRule *Rule
+	types      int
+	actions    map[int]*TableAction
+	polymerize *TableAction
 }
 
 func NewTableActionGroup() *TableActionGroup {
 	return &TableActionGroup{
 		actions: map[int]*TableAction{},
-		types:   ActionType,
+		types:   GroupActionType,
 	}
 }
 
-func NewTableActionPolymerize(polymerizeRule *Rule) *TableActionGroup {
+func NewTableActionGroupPolymerize(polymerizeRule *Rule) *TableActionGroup {
 	return &TableActionGroup{
-		polymerizeRule: polymerizeRule,
-		types:          PolymerizeType,
+		polymerize: NewTableActionPolymerize(polymerizeRule),
+		types:      GroupPolymerizeType,
 	}
 }
 
@@ -30,13 +30,12 @@ func (t *TableActionGroup) Type() int {
 }
 
 func (t *TableActionGroup) GetAction(symbol int) *TableAction {
+	if t.types == GroupPolymerizeType {
+		return t.polymerize
+	}
 	return t.actions[symbol]
 }
 
 func (t *TableActionGroup) SetAction(symbol int, action *TableAction) {
 	t.actions[symbol] = action
-}
-
-func (t *TableActionGroup) GetPolymerizeRule() *Rule {
-	return t.polymerizeRule
 }
