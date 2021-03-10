@@ -19,8 +19,9 @@ func main() {
 		fmt.Printf(err.Error())
 		return
 	}
-	tokens = comp.TokenTrim(tokens)
-	for _, token := range tokens {
+	tokens.Reset()
+	for !tokens.IsEnd() {
+		token := tokens.Next()
 		fmt.Printf("%v | %v\n", token.Type(), token.Value())
 	}
 }

@@ -21,6 +21,7 @@ func NewComplier() *Complier {
 	for _, rule := range manager.LexerRules {
 		instance.lexer.AddRule(rule)
 	}
+	instance.lexer.AddTrim(manager.Space)
 	return instance
 }
 
@@ -29,19 +30,7 @@ func (c *Complier) Read(source *os.File) (tree.Page, error) {
 	if err != nil {
 		return nil, err
 	}
-	return c.grammar.Read(c.TokenTrim(tokens))
-}
-
-func (c *Complier) TokenTrim(tokens []*lexer.Token) []*lexer.Token {
-	cursor := 0
-	for index, token := range tokens {
-		if token.Type() == manager.Space {
-			continue
-		}
-		tokens[cursor] = tokens[index]
-		cursor++
-	}
-	return tokens[:cursor]
+	return c.grammar.Read(tokens)
 }
 
 func (c *Complier) GetLexer() *lexer.Lexer {

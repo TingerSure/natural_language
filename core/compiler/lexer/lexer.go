@@ -9,12 +9,17 @@ import (
 
 type Lexer struct {
 	rules []*Rule
+	trims []int
 }
 
 func NewLexer() *Lexer {
 	return &Lexer{
 		rules: []*Rule{},
 	}
+}
+
+func (l *Lexer) AddTrim(trims ...int) {
+	l.trims = append(l.trims, trims...)
 }
 
 func (l *Lexer) AddRule(rule *Rule) {
@@ -36,21 +41,22 @@ func (l *Lexer) next(content []byte, cursor int) *Token {
 	return nil
 }
 
-func (l *Lexer) Read(source *os.File) ([]*Token, error) {
+func (l *Lexer) Read(source *os.File) (*TokenList, error) {
 	content, err := ioutil.ReadAll(source)
 	if err != nil {
 		return nil, err
 	}
 	size := len(content)
 	cursor := 0
-	tokens := []*Token{}
+	tokens := NewTokenList()
+	tokens.AddTrims(l.trims...)
 	for cursor < size {
 		token := l.next(content, cursor)
 		if token == nil {
 			return nil, l.getIllegalCharacterError(content, cursor)
 		}
 		cursor += token.Size()
-		tokens = append(tokens, token)
+		tokens.AddToken(token)
 	}
 	return tokens, nil
 }

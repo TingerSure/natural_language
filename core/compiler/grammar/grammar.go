@@ -26,7 +26,11 @@ func (g *Grammar) AddRule(rule *Rule) {
 }
 
 func (g *Grammar) SetGlobal(global *Nonterminal) {
-	g.SetGlobal(global)
+	g.global = global
+}
+
+func (g *Grammar) SetAccept(accept *Terminal) {
+	g.accept = accept
 }
 
 func (g *Grammar) Build() error {
@@ -36,6 +40,6 @@ func (g *Grammar) Build() error {
 	return g.table.Build()
 }
 
-func (g *Grammar) Read([]*lexer.Token) (tree.Page, error) {
+func (g *Grammar) Read(*lexer.TokenList) (tree.Page, error) {
 	return nil, nil
 }
