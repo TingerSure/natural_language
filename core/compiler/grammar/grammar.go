@@ -2,7 +2,6 @@ package grammar
 
 import (
 	"github.com/TingerSure/natural_language/core/compiler/lexer"
-	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type Grammar struct {
@@ -40,6 +39,6 @@ func (g *Grammar) Build() error {
 	return g.table.Build()
 }
 
-func (g *Grammar) Read(*lexer.TokenList) (tree.Page, error) {
-	return nil, nil
+func (g *Grammar) Read(tokens *lexer.TokenList) (Phrase, error) {
+	return g.automata.Run(tokens)
 }
