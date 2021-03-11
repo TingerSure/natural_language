@@ -42,7 +42,7 @@ func NewTableActionGoto(status int) *TableAction {
 	}
 }
 
-func (t *TableAction) Types() int {
+func (t *TableAction) Type() int {
 	return t.types
 }
 

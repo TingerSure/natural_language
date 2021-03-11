@@ -5,15 +5,11 @@ import (
 )
 
 const (
-	TypeToken = 0
+	PhraseTypeToken = 0
 )
 
 type PhraseToken struct {
 	token *lexer.Token
-}
-
-func (p *PhraseToken) SetType(types int) {
-	panic("complier.PhraseToken cannot set Type")
 }
 
 func (p *PhraseToken) Type() int {
@@ -21,11 +17,15 @@ func (p *PhraseToken) Type() int {
 }
 
 func (p *PhraseToken) PhraseType() int {
-	return TypeToken
+	return PhraseTypeToken
 }
 
 func (p *PhraseToken) Size() int {
 	return 0
+}
+
+func (p *PhraseToken) AddChild(children ...Phrase) {
+	panic("complier.PhraseToken cannot add child")
 }
 
 func (p *PhraseToken) SetChild(int, Phrase) {
@@ -38,6 +38,10 @@ func (p *PhraseToken) GetChild(int) Phrase {
 
 func (p *PhraseToken) GetToken() *lexer.Token {
 	return p.token
+}
+
+func (p *PhraseToken) GetRule() *Rule {
+	return nil
 }
 
 func NewPhraseToken(token *lexer.Token) *PhraseToken {

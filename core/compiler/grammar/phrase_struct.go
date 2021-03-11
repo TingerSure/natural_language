@@ -5,21 +5,28 @@ import (
 )
 
 type PhraseStruct struct {
-	size     int
 	children []Phrase
 	rule     *Rule
 }
 
 const (
-	TypeStruct = 1
+	PhraseTypeStruct = 1
 )
 
+func (p *PhraseStruct) Type() int {
+	return p.rule.GetResult().Type()
+}
+
 func (p *PhraseStruct) Size() int {
-	return p.size
+	return len(p.children)
 }
 
 func (p *PhraseStruct) PhraseType() int {
-	return TypeStruct
+	return PhraseTypeStruct
+}
+
+func (p *PhraseStruct) AddChild(children ...Phrase) {
+	p.children = append(p.children, children...)
 }
 
 func (p *PhraseStruct) SetChild(index int, child Phrase) {

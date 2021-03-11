@@ -10,6 +10,7 @@ import (
 type Lexer struct {
 	rules []*Rule
 	trims []int
+	end   int
 }
 
 func NewLexer() *Lexer {
@@ -20,6 +21,10 @@ func NewLexer() *Lexer {
 
 func (l *Lexer) AddTrim(trims ...int) {
 	l.trims = append(l.trims, trims...)
+}
+
+func (l *Lexer) SetEnd(end int) {
+	l.end = end
 }
 
 func (l *Lexer) AddRule(rule *Rule) {
@@ -49,6 +54,7 @@ func (l *Lexer) Read(source *os.File) (*TokenList, error) {
 	size := len(content)
 	cursor := 0
 	tokens := NewTokenList()
+	tokens.SetEnd(NewToken(l.end, "EOF"))
 	tokens.AddTrims(l.trims...)
 	for cursor < size {
 		token := l.next(content, cursor)

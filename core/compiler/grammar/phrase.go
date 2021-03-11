@@ -6,10 +6,11 @@ import (
 
 type Phrase interface {
 	PhraseType() int
-	SetType(types int)
 	Type() int
 	Size() int
+	AddChild(children ...Phrase)
 	SetChild(int, Phrase)
 	GetChild(int) Phrase
 	GetToken() *lexer.Token
+	GetRule() *Rule
 }

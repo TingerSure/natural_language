@@ -20,6 +20,7 @@ const (
 	Number                  // [:number:]
 	String                  // [:string:]
 	Identifier              // [:identifier:]
+	End                     // [:end:]
 )
 
 var (

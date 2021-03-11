@@ -31,6 +31,10 @@ func (t *TokenList) SetEnd(end *Token) {
 	t.end = end
 }
 
+func (t *TokenList) End() *Token {
+	return t.end
+}
+
 func (t *TokenList) Reset() {
 	t.index = 0
 }
@@ -40,15 +44,21 @@ func (t *TokenList) Size() int {
 }
 
 func (t *TokenList) IsEnd() bool {
-	return t.index >= len(t.tokens)
+	return t.index > len(t.tokens)
+}
+
+func (t *TokenList) Peek() *Token {
+	if t.index > len(t.tokens) {
+		return nil
+	}
+	if t.index == len(t.tokens) {
+		return t.end
+	}
+	return t.tokens[t.index]
 }
 
 func (t *TokenList) Next() (token *Token) {
-	if t.index >= len(t.tokens) {
-		token = t.end
-		return
-	}
-	token = t.tokens[t.index]
+	token = t.Peek()
 	t.index++
 	return
 }
