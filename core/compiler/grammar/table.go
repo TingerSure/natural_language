@@ -191,6 +191,7 @@ func (g *Table) checkRules() {
 			}
 		}
 	}
+	g.terminalKeys[g.accept] = true
 }
 
 func (g *Table) checkGlobal() error {

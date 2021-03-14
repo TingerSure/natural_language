@@ -20,13 +20,13 @@ func NewComplier() *Complier {
 	for _, rule := range rule.LexerRules {
 		instance.lexer.AddRule(rule)
 	}
-	instance.lexer.AddTrim(rule.TypeSpace)
+	instance.lexer.AddTrim(rule.LexerTrim...)
 	instance.lexer.SetEnd(rule.LexerEnd)
 	for _, rule := range rule.GrammarRules {
 		instance.grammar.AddRule(rule)
 	}
-	instance.grammar.SetAccept(rule.SymbolEnd)
-	instance.grammar.SetGlobal(rule.SymbolPage)
+	instance.grammar.SetAccept(rule.GrammarAccept)
+	instance.grammar.SetGlobal(rule.GrammarGlobal)
 	instance.grammar.Build()
 	return instance
 }

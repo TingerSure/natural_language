@@ -21,6 +21,7 @@ const (
 	TypeString                  // [:string:]
 	TypeEnd                     // [:end:]
 	TypeIdentifier              // [:identifier:]
+	TypePage                    // page
 	TypeImport                  // import
 	TypeExport                  // export
 	TypeClass                   // class
@@ -49,6 +50,7 @@ const (
 	KeyString           = "string"
 	KeyEnd              = "end"
 	KeyIdentifier       = "identifier"
+	KeyPage             = "page"
 	KeyImport           = "import"
 	KeyExport           = "export"
 	KeyClass            = "class"
@@ -62,6 +64,8 @@ const (
 
 var (
 	LexerEnd = lexer.NewToken(TypeEnd, KeyEnd, "EOF")
+
+	LexerTrim = []int{TypeSpace}
 
 	LexerRules = []*lexer.Rule{
 		lexer.NewRule("\\(", func(value []byte) *lexer.Token {
@@ -118,6 +122,8 @@ var (
 		lexer.NewRule("[a-zA-Z_][a-zA-Z0-9_]*", func(value []byte) *lexer.Token {
 			valueIdentifier := string(value)
 			switch valueIdentifier {
+			case KeyPage:
+				return lexer.NewToken(TypePage, KeyPage, KeyPage)
 			case KeyImport:
 				return lexer.NewToken(TypeImport, KeyImport, KeyImport)
 			case KeyExport:

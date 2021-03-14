@@ -22,6 +22,7 @@ import (
 	Identifier
 	End
 	String
+	Page
 	Import
 	Export
 	Class
@@ -31,25 +32,7 @@ import (
 	Function
 	Get
 	Set
-	===========nonterminal=========
-	Page
-	Sentence
-	===========rule=========
-	Page -> Sentence
-
-	Sentence -> Sentence Sentence
-	Sentence -> Import Identifier String Semicolon
 */
-
-const (
-	TypePage = iota
-	TypeSentence
-)
-
-const (
-	KeyPage     = "page"
-	KeySentence = "sentence"
-)
 
 var (
 	SymbolLeftParenthesis  = grammar.NewTerminal(TypeLeftParenthesis, KeyLeftParenthesis)
@@ -68,6 +51,7 @@ var (
 	SymbolIdentifier       = grammar.NewTerminal(TypeIdentifier, KeyIdentifier)
 	SymbolEnd              = grammar.NewTerminal(TypeEnd, KeyEnd)
 	SymbolString           = grammar.NewTerminal(TypeString, KeyString)
+	SymbolPage             = grammar.NewTerminal(TypePage, KeyPage)
 	SymbolImport           = grammar.NewTerminal(TypeImport, KeyImport)
 	SymbolExport           = grammar.NewTerminal(TypeExport, KeyExport)
 	SymbolClass            = grammar.NewTerminal(TypeClass, KeyClass)
@@ -79,15 +63,38 @@ var (
 	SymbolSet              = grammar.NewTerminal(TypeSet, KeySet)
 )
 
-var (
-	SymbolPage     = grammar.NewNonterminal(TypePage, KeyPage)
-	SymbolSentence = grammar.NewNonterminal(TypeSentence, KeySentence)
+const (
+	TypePageGroup = iota
+	TypePageItemArray
+	TypePageItem
+	TypeImportGroup
+)
+
+const (
+	KeyPageGroup     = "page_group"
+	KeyPageItemArray = "page_item_group"
+	KeyPageItem      = "page_item"
+	KeyImportGroup   = "import_group"
 )
 
 var (
+	SymbolPageGroup     = grammar.NewNonterminal(TypePageGroup, KeyPageGroup)
+	SymbolPageItemArray = grammar.NewNonterminal(TypePageItemArray, KeyPageItemArray)
+	SymbolPageItem      = grammar.NewNonterminal(TypePageItem, KeyPageItem)
+	SymbolImportGroup   = grammar.NewNonterminal(TypeImportGroup, KeyImportGroup)
+)
+
+var (
+	GrammarAccept = SymbolEnd
+
+	GrammarGlobal = SymbolPageGroup
+
 	GrammarRules = []*grammar.Rule{
-		grammar.NewRule(SymbolPage, SymbolSentence),
-		grammar.NewRule(SymbolSentence, SymbolSentence, SymbolSentence),
-		grammar.NewRule(SymbolSentence, SymbolImport, SymbolIdentifier, SymbolString, SymbolSemicolon),
+		grammar.NewRule(SymbolPageGroup, SymbolPage, SymbolIdentifier, SymbolLeftBrace, SymbolRightBrace),
+		grammar.NewRule(SymbolPageGroup, SymbolPage, SymbolIdentifier, SymbolLeftBrace, SymbolPageItemArray, SymbolRightBrace),
+		grammar.NewRule(SymbolPageItemArray, SymbolPageItem),
+		grammar.NewRule(SymbolPageItemArray, SymbolPageItemArray, SymbolPageItem),
+		grammar.NewRule(SymbolPageItem, SymbolImportGroup),
+		grammar.NewRule(SymbolImportGroup, SymbolImport, SymbolIdentifier, SymbolString, SymbolSemicolon),
 	}
 )
