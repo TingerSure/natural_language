@@ -1,6 +1,9 @@
 package grammar
 
-import ()
+import (
+	"fmt"
+	"strings"
+)
 
 type Rule struct {
 	result   Symbol
@@ -32,4 +35,12 @@ func (r *Rule) GetChild(index int) Symbol {
 
 func (r *Rule) Size() int {
 	return len(r.children)
+}
+
+func (r *Rule) ToString() string {
+	names := []string{}
+	for _, child := range r.children {
+		names = append(names, child.Name())
+	}
+	return fmt.Sprintf("%v -> %v", r.result.Name(), strings.Join(names, " "))
 }

@@ -1,7 +1,9 @@
 package grammar
 
 import (
+	"fmt"
 	"github.com/TingerSure/natural_language/core/compiler/lexer"
+	"strings"
 )
 
 type PhraseStruct struct {
@@ -43,6 +45,16 @@ func (p *PhraseStruct) GetToken() *lexer.Token {
 
 func (p *PhraseStruct) GetRule() *Rule {
 	return p.rule
+}
+
+func (p *PhraseStruct) ToString(prefix string) string {
+	subPrefix := prefix + "\t"
+	subs := []string{}
+	for index := 0; index < p.Size(); index++ {
+		child := p.GetChild(index)
+		subs = append(subs, fmt.Sprintf("%v%v", subPrefix, child.ToString(subPrefix)))
+	}
+	return fmt.Sprintf("{\n%v\n%v\n%v}", subPrefix, strings.Join(subs, "\n"), prefix)
 }
 
 func NewPhraseStruct(rule *Rule) *PhraseStruct {

@@ -20,7 +20,13 @@ func NewComplier() *Complier {
 	for _, rule := range rule.LexerRules {
 		instance.lexer.AddRule(rule)
 	}
-	instance.lexer.AddTrim(rule.TokenSpace)
+	instance.lexer.AddTrim(rule.TypeSpace)
+	instance.lexer.SetEnd(rule.LexerEnd)
+	for _, rule := range rule.GrammarRules {
+		instance.grammar.AddRule(rule)
+	}
+	instance.grammar.SetAccept(rule.SymbolEnd)
+	instance.grammar.SetGlobal(rule.SymbolPage)
 	instance.grammar.Build()
 	return instance
 }
@@ -35,4 +41,8 @@ func (c *Complier) Read(source *os.File) (grammar.Phrase, error) {
 
 func (c *Complier) GetLexer() *lexer.Lexer {
 	return c.lexer
+}
+
+func (c *Complier) GetGrammar() *grammar.Grammar {
+	return c.grammar
 }

@@ -1,6 +1,7 @@
 package grammar
 
 import (
+	"fmt"
 	"github.com/TingerSure/natural_language/core/compiler/lexer"
 )
 
@@ -42,6 +43,10 @@ func (p *PhraseToken) GetToken() *lexer.Token {
 
 func (p *PhraseToken) GetRule() *Rule {
 	return nil
+}
+
+func (p *PhraseToken) ToString(prefix string) string {
+	return fmt.Sprintf("(<%v>%v)", p.GetToken().Type(), p.GetToken().Value())
 }
 
 func NewPhraseToken(token *lexer.Token) *PhraseToken {

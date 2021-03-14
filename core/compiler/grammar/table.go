@@ -2,22 +2,41 @@ package grammar
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 )
 
 type Table struct {
-	rules   []*Rule
-	global  *Nonterminal
-	accept  *Terminal
-	start   int
-	actions map[int]*TableActionGroup // map[status]map[symbol]action
-	gotos   map[int]*TableActionGroup // map[status]map[symbol]goto
+	rules           []*Rule
+	global          *Nonterminal
+	accept          *Terminal
+	start           int
+	actions         map[int]*TableActionGroup // map[status]map[symbol]action
+	gotos           map[int]*TableActionGroup // map[status]map[symbol]goto
+	nonterminalKeys map[Symbol]bool
+	terminalKeys    map[Symbol]bool
+	statusKeys      []int
 }
 
 func NewTable() *Table {
 	return &Table{
-		actions: map[int]*TableActionGroup{},
-		gotos:   map[int]*TableActionGroup{},
+		actions:         map[int]*TableActionGroup{},
+		gotos:           map[int]*TableActionGroup{},
+		nonterminalKeys: map[Symbol]bool{},
+		terminalKeys:    map[Symbol]bool{},
 	}
+}
+
+func (g *Table) GetStatusKeys() []int {
+	return g.statusKeys
+}
+
+func (g *Table) GetNonterminalKeys() map[Symbol]bool {
+	return g.nonterminalKeys
+}
+
+func (g *Table) GetTerminalKeys() map[Symbol]bool {
+	return g.terminalKeys
 }
 
 func (g *Table) GetAction(status int, symbol int) *TableAction {
@@ -78,6 +97,7 @@ func (g *Table) makeClosureStep(
 	closure.AddProject(cursor)
 	closureMaps[cursor] = closure
 	statusIndex := closure.Id()
+	g.statusKeys = append(g.statusKeys, statusIndex)
 	if cursor.Index == cursor.Rule.Size() && cursor.Rule.GetResult() != g.global {
 		// polymerize
 		group := NewTableActionGroupPolymerize(cursor.Rule)
@@ -85,9 +105,8 @@ func (g *Table) makeClosureStep(
 		g.gotos[statusIndex] = group
 		return closure
 	}
-	group := NewTableActionGroup()
-	g.actions[statusIndex] = group
-	g.gotos[statusIndex] = group
+	g.actions[statusIndex] = NewTableActionGroup()
+	g.gotos[statusIndex] = NewTableActionGroup()
 	if cursor.Index == cursor.Rule.Size() && cursor.Rule.GetResult() == g.global {
 		// accept
 		g.actions[statusIndex].SetAction(g.accept.Type(), NewTableActionAccept())
@@ -101,9 +120,10 @@ func (g *Table) makeClosureStep(
 		if symbol.SymbolType() == SymbolTypeTerminal {
 			// move
 			g.actions[statusIndex].SetAction(symbol.Type(), NewTableActionMove(nextClosure.Id()))
+		} else {
+			// goto
+			g.gotos[statusIndex].SetAction(symbol.Type(), NewTableActionGoto(nextClosure.Id()))
 		}
-		// goto
-		g.gotos[statusIndex].SetAction(symbol.Type(), NewTableActionGoto(nextClosure.Id()))
 	}
 	return closure
 }
@@ -143,7 +163,7 @@ func (g *Table) makeProjects(rules []*Rule) map[int][]*TableProject {
 }
 
 func (g *Table) augmentGlobal() {
-	virtualGlobal := NewNonterminal(-1)
+	virtualGlobal := NewNonterminal(-1, fmt.Sprintf("-%v", g.global.Name()))
 	virtualRule := NewRule(virtualGlobal, g.global)
 	g.rules = append(g.rules, virtualRule)
 	g.global = virtualGlobal
@@ -154,8 +174,23 @@ func (g *Table) check() error {
 	if err != nil {
 		return err
 	}
+	g.checkRules()
 	// TODO check more
 	return nil
+}
+
+func (g *Table) checkRules() {
+	for _, rule := range g.rules {
+		g.nonterminalKeys[rule.GetResult()] = true
+		for index := 0; index < rule.Size(); index++ {
+			symbol := rule.GetChild(index)
+			if symbol.SymbolType() == SymbolTypeNonterminal {
+				g.nonterminalKeys[symbol] = true
+			} else {
+				g.terminalKeys[symbol] = true
+			}
+		}
+	}
 }
 
 func (g *Table) checkGlobal() error {
@@ -178,4 +213,52 @@ func (g *Table) checkGlobal() error {
 		return errors.New("Rule missed which result to global")
 	}
 	return nil
+}
+
+func (g *Table) ToString() string {
+	nonterminals := []Symbol{}
+	for key, _ := range g.GetNonterminalKeys() {
+		nonterminals = append(nonterminals, key)
+	}
+	terminals := []Symbol{}
+	for key, _ := range g.GetTerminalKeys() {
+		terminals = append(terminals, key)
+	}
+	values := []string{}
+	titles := []string{}
+	brs := []string{}
+	titles = append(titles, "status")
+	brs = append(brs, ":--:")
+	for _, terminal := range terminals {
+		titles = append(titles, fmt.Sprintf("%v", terminal.Name()))
+		brs = append(brs, ":--:")
+	}
+	for _, nonterminal := range nonterminals {
+		titles = append(titles, fmt.Sprintf("%v", nonterminal.Name()))
+		brs = append(brs, ":--:")
+	}
+
+	values = append(values, strings.Join(titles, "|"))
+	values = append(values, strings.Join(brs, "|"))
+
+	for _, status := range g.GetStatusKeys() {
+		value := []string{}
+		value = append(value, fmt.Sprintf("%v", status))
+		isPolymerize := false
+		for _, terminal := range terminals {
+			action := g.GetAction(status, terminal.Type())
+			value = append(value, action.ToString())
+			if action != nil && action.Type() == ActionPolymerizeType {
+				isPolymerize = true
+				break
+			}
+		}
+		if !isPolymerize {
+			for _, nonterminal := range nonterminals {
+				value = append(value, g.GetGoto(status, nonterminal.Type()).ToString())
+			}
+		}
+		values = append(values, strings.Join(value, "|"))
+	}
+	return strings.Join(values, "\n")
 }

@@ -25,7 +25,7 @@ func (a *Automata) Run(tokens *lexer.TokenList) (Phrase, error) {
 	for {
 		action := a.table.GetAction(status, phrase.GetToken().Type())
 		if action == nil {
-			return nil, errors.New(fmt.Sprint("syntax error : unexpected : %v", phrase.GetToken().Value()))
+			return nil, errors.New(fmt.Sprintf("syntax error : unexpected : %v", phrase.GetToken().Value()))
 		}
 		if action.Type() == ActionMoveType {
 			statusList = append(statusList, status)
@@ -66,7 +66,7 @@ func (a *Automata) Run(tokens *lexer.TokenList) (Phrase, error) {
 			}
 			break
 		}
-		return nil, errors.New(fmt.Sprint("automata error : illegal action type : %v", action.Type()))
+		return nil, errors.New(fmt.Sprintf("automata error : illegal action type : %v", action.Type()))
 	}
 
 	return phraseList[0], nil

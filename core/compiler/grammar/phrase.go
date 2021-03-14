@@ -13,4 +13,5 @@ type Phrase interface {
 	GetChild(int) Phrase
 	GetToken() *lexer.Token
 	GetRule() *Rule
+	ToString(string) string
 }

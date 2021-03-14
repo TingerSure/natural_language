@@ -1,6 +1,8 @@
 package grammar
 
-import ()
+import (
+	"fmt"
+)
 
 const (
 	ActionAcceptType = iota
@@ -52,4 +54,23 @@ func (t *TableAction) Status() int {
 
 func (t *TableAction) Rule() *Rule {
 	return t.rule
+}
+
+func (t *TableAction) ToString() string {
+	if t == nil {
+		return ""
+	}
+	if t.Type() == ActionAcceptType {
+		return "Accept"
+	}
+	if t.Type() == ActionMoveType {
+		return fmt.Sprintf("move %v", t.Status())
+	}
+	if t.Type() == ActionPolymerizeType {
+		return fmt.Sprintf("%v", t.rule.ToString())
+	}
+	if t.Type() == ActionGotoType {
+		return fmt.Sprintf("goto %v", t.Status())
+	}
+	return "unknown"
 }

@@ -20,6 +20,10 @@ func NewGrammar() *Grammar {
 	}
 }
 
+func (g *Grammar) GetTable() *Table {
+	return g.table
+}
+
 func (g *Grammar) AddRule(rule *Rule) {
 	g.rules = append(g.rules, rule)
 }
