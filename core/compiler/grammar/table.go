@@ -98,7 +98,7 @@ func (g *Table) makeClosureStep(
 	closureMaps[cursor] = closure
 	statusIndex := closure.Id()
 	g.statusKeys = append(g.statusKeys, statusIndex)
-	if cursor.Index == cursor.Rule.Size() && cursor.Rule.GetResult() != g.global {
+	if cursor.IsEnd() && cursor.Rule.GetResult() != g.global {
 		// polymerize
 		group := NewTableActionGroupPolymerize(cursor.Rule)
 		g.actions[statusIndex] = group
@@ -107,7 +107,7 @@ func (g *Table) makeClosureStep(
 	}
 	g.actions[statusIndex] = NewTableActionGroup()
 	g.gotos[statusIndex] = NewTableActionGroup()
-	if cursor.Index == cursor.Rule.Size() && cursor.Rule.GetResult() == g.global {
+	if cursor.IsEnd() && cursor.Rule.GetResult() == g.global {
 		// accept
 		g.actions[statusIndex].SetAction(g.accept.Type(), NewTableActionAccept())
 		return closure

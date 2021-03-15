@@ -23,7 +23,8 @@ func main() {
 		fmt.Println(err.Error())
 		return
 	}
-
+	fmt.Println("```")
 	fmt.Println(phrase.ToString(""))
+	fmt.Println("```")
 
 }

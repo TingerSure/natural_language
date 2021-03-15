@@ -54,7 +54,7 @@ func (p *PhraseStruct) ToString(prefix string) string {
 		child := p.GetChild(index)
 		subs = append(subs, fmt.Sprintf("%v%v", subPrefix, child.ToString(subPrefix)))
 	}
-	return fmt.Sprintf("{\n%v\n%v\n%v}", subPrefix, strings.Join(subs, "\n"), prefix)
+	return fmt.Sprintf("{%v\n%v\n%v\n%v}", p.rule.ToString(), subPrefix, strings.Join(subs, "\n"), prefix)
 }
 
 func NewPhraseStruct(rule *Rule) *PhraseStruct {
