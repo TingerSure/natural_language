@@ -52,6 +52,10 @@ func (t *TableAction) Status() int {
 	return t.status
 }
 
+func (t *TableAction) SetStatus(status int) {
+	t.status = status
+}
+
 func (t *TableAction) Rule() *Rule {
 	return t.rule
 }

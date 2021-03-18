@@ -6,6 +6,12 @@ import (
 	"strings"
 )
 
+const (
+	TableClosureMatchExist     = -1
+	TableClosureMatchReplace   = 1
+	TableClosureMatchUnrelated = 0
+)
+
 type Table struct {
 	rules           []*Rule
 	global          *Nonterminal
@@ -15,7 +21,11 @@ type Table struct {
 	gotos           map[int]*TableActionGroup // map[status]map[symbol]goto
 	nonterminalKeys map[Symbol]bool
 	terminalKeys    map[Symbol]bool
-	statusKeys      []int
+	toActions       map[int][]*TableAction
+	closures        map[int]*TableClosure
+	firsts          map[Symbol]map[Symbol]bool
+	startProjects   map[int][]*TableProject
+	counter         *Count
 }
 
 func NewTable() *Table {
@@ -24,11 +34,16 @@ func NewTable() *Table {
 		gotos:           map[int]*TableActionGroup{},
 		nonterminalKeys: map[Symbol]bool{},
 		terminalKeys:    map[Symbol]bool{},
+		closures:        map[int]*TableClosure{},
+		toActions:       map[int][]*TableAction{},
+		firsts:          map[Symbol]map[Symbol]bool{},
+		startProjects:   map[int][]*TableProject{},
+		counter:         NewCount(0),
 	}
 }
 
-func (g *Table) GetStatusKeys() []int {
-	return g.statusKeys
+func (g *Table) GetClosures() map[int]*TableClosure {
+	return g.closures
 }
 
 func (g *Table) GetNonterminalKeys() map[Symbol]bool {
@@ -69,89 +84,144 @@ func (g *Table) Build() error {
 		return err
 	}
 	g.augmentGlobal()
-	g.makeClosures(g.makeProjects(g.rules))
+	g.makeFirsts()
+	g.makeProjects()
+	g.makeClosures()
 	return nil
 }
 
-func (g *Table) makeClosures(startProjects map[int][]*TableProject) {
-	g.start = g.makeClosureStep(
-		startProjects[g.global.Type()][0],
-		NewCount(0),
-		startProjects,
-		map[*TableProject]*TableClosure{},
-	).Id()
+func (g *Table) makeClosures() {
+	g.start = g.makeClosureStep(map[*TableProject]map[Symbol]bool{
+		g.startProjects[g.global.Type()][0]: map[Symbol]bool{
+			g.accept: true,
+		},
+	}).Id()
 }
 
-func (g *Table) makeClosureStep(
-	cursor *TableProject,
-	counter *Count,
-	startProjects map[int][]*TableProject,
-	closureMaps map[*TableProject]*TableClosure,
-) *TableClosure {
-	closure := closureMaps[cursor]
-	if closure != nil {
-		// existed
-		return closure
+func (g *Table) makeClosureStep(cursors map[*TableProject]map[Symbol]bool) *TableClosure {
+	closure := NewTableClosure(g.counter.Next())
+	for cursor, lookaheads := range cursors {
+		closure.AddProject(cursor, lookaheads)
 	}
-	closure = NewTableClosure(counter.Next())
-	closure.AddProject(cursor)
-	closureMaps[cursor] = closure
-	statusIndex := closure.Id()
-	g.statusKeys = append(g.statusKeys, statusIndex)
-	if cursor.IsEnd() && cursor.Rule.GetResult() != g.global {
-		// polymerize
-		group := NewTableActionGroupPolymerize(cursor.Rule)
-		g.actions[statusIndex] = group
-		g.gotos[statusIndex] = group
-		return closure
+	g.equivalenceClosure(cursors, closure)
+
+	oldClosure, direction := g.matchClosure(closure)
+	if direction == TableClosureMatchExist {
+		//exist
+		return oldClosure
 	}
-	g.actions[statusIndex] = NewTableActionGroup()
-	g.gotos[statusIndex] = NewTableActionGroup()
-	if cursor.IsEnd() && cursor.Rule.GetResult() == g.global {
-		// accept
-		g.actions[statusIndex].SetAction(g.accept.Type(), NewTableActionAccept())
-		return closure
+	if direction == TableClosureMatchReplace {
+		//replace
+		g.moveClosure(oldClosure, closure)
 	}
-	g.equivalenceClosure(cursor, closure, startProjects)
-	for project, _ := range closure.GetProjects() {
-		next := project.Next
-		nextClosure := g.makeClosureStep(next, counter, startProjects, closureMaps)
-		symbol := project.GetNextChild()
-		if symbol.SymbolType() == SymbolTypeTerminal {
-			// move
-			g.actions[statusIndex].SetAction(symbol.Type(), NewTableActionMove(nextClosure.Id()))
+
+	g.closures[closure.Id()] = closure
+	g.toActions[closure.Id()] = []*TableAction{}
+
+	g.actions[closure.Id()] = NewTableActionGroup()
+	g.gotos[closure.Id()] = NewTableActionGroup()
+
+	endProjects := closure.GetProjectsByNextChild(nil)
+	for endProject, lookaheads := range endProjects {
+		for lookahead, _ := range lookaheads {
+			if endProject.Rule.GetResult() == g.global {
+				//accept
+				g.actions[closure.Id()].SetAction(lookahead.Type(), NewTableActionAccept())
+			} else {
+				// polymerize
+				g.actions[closure.Id()].SetAction(lookahead.Type(), NewTableActionPolymerize(endProject.Rule))
+			}
+		}
+	}
+
+	nextChildren := closure.NextChildren()
+	for child, _ := range nextChildren {
+		projects := closure.GetProjectsByNextChild(child)
+		nextProjects := g.nextProjects(projects)
+		nextClosure := g.makeClosureStep(nextProjects)
+		if child.SymbolType() == SymbolTypeTerminal {
+			//move
+			action := NewTableActionMove(nextClosure.Id())
+			g.actions[closure.Id()].SetAction(child.Type(), action)
+			g.toActions[nextClosure.Id()] = append(g.toActions[nextClosure.Id()], action)
 		} else {
 			// goto
-			g.gotos[statusIndex].SetAction(symbol.Type(), NewTableActionGoto(nextClosure.Id()))
+			action := NewTableActionGoto(nextClosure.Id())
+			g.gotos[closure.Id()].SetAction(child.Type(), action)
+			g.toActions[nextClosure.Id()] = append(g.toActions[nextClosure.Id()], action)
 		}
 	}
 	return closure
 }
 
-func (g *Table) equivalenceClosure(
-	cursor *TableProject,
-	closure *TableClosure,
-	startProjects map[int][]*TableProject,
-) {
-	symbol := cursor.GetNextChild()
-	if symbol.SymbolType() == SymbolTypeTerminal {
-		return
+func (g *Table) moveClosure(from, to *TableClosure) {
+	for _, action := range g.toActions[from.Id()] {
+		action.SetStatus(to.Id())
 	}
-	equivalences := startProjects[symbol.Type()]
-	for _, equivalence := range equivalences {
-		if closure.AddProject(equivalence) {
-			// add success
-			g.equivalenceClosure(equivalence, closure, startProjects)
+	delete(g.closures, from.Id())
+	delete(g.actions, from.Id())
+	delete(g.gotos, from.Id())
+	delete(g.toActions, from.Id())
+}
+
+func (g *Table) matchClosure(target *TableClosure) (*TableClosure, int) {
+	for _, closure := range g.closures {
+		if closure.Include(target) {
+			return closure, TableClosureMatchExist
 		}
-		// project exist
+		if target.Include(closure) {
+			return closure, TableClosureMatchReplace
+		}
+	}
+	return nil, TableClosureMatchUnrelated
+}
+
+func (g *Table) nextProjects(nows map[*TableProject]map[Symbol]bool) map[*TableProject]map[Symbol]bool {
+	nexts := map[*TableProject]map[Symbol]bool{}
+	for project, lookaheads := range nows {
+		nexts[project.Next] = lookaheads
+	}
+	return nexts
+}
+
+func (g *Table) equivalenceClosure(cursors map[*TableProject]map[Symbol]bool, closure *TableClosure) {
+	for cursor, lookaheads := range cursors {
+		symbol := cursor.GetNextChild()
+		if symbol == nil || symbol.SymbolType() == SymbolTypeTerminal {
+			continue
+		}
+		equivalences := g.startProjects[symbol.Type()]
+		for _, equivalence := range equivalences {
+			equivalenceLookaheads := lookaheads
+			if cursor.Next != nil && !cursor.Next.IsEnd() {
+				next := cursor.Next.GetNextChild()
+				if next.SymbolType() == SymbolTypeTerminal {
+					equivalenceLookaheads = map[Symbol]bool{
+						next: true,
+					}
+				} else {
+					equivalenceLookaheads = g.firsts[next]
+				}
+			}
+			successLookaheads := closure.AddProject(equivalence, equivalenceLookaheads)
+			if len(successLookaheads) > 0 {
+				// add success
+				g.equivalenceClosure(
+					map[*TableProject]map[Symbol]bool{
+						equivalence: successLookaheads,
+					},
+					closure,
+				)
+			}
+			// project[lookaheads] exist
+		}
 	}
 }
 
-func (g *Table) makeProjects(rules []*Rule) map[int][]*TableProject {
-	startProjects := map[int][]*TableProject{}
-	for _, rule := range rules {
+func (g *Table) makeProjects() {
+	for _, rule := range g.rules {
 		startProject := NewTableProject(rule, 0)
-		startProjects[rule.GetResult().Type()] = append(startProjects[rule.GetResult().Type()], startProject)
+		g.startProjects[rule.GetResult().Type()] = append(g.startProjects[rule.GetResult().Type()], startProject)
 		last := startProject
 		for childIndex := 1; childIndex <= rule.Size(); childIndex++ {
 			project := NewTableProject(rule, childIndex)
@@ -159,7 +229,35 @@ func (g *Table) makeProjects(rules []*Rule) map[int][]*TableProject {
 			last = project
 		}
 	}
-	return startProjects
+}
+
+func (g *Table) makeFirsts() {
+	for next := false; next; {
+		next = false
+		for _, rule := range g.rules {
+			result := rule.GetResult()
+			if g.firsts[result] == nil {
+				g.firsts[result] = map[Symbol]bool{}
+			}
+			child := rule.GetChild(0)
+			if child.SymbolType() == SymbolTypeTerminal {
+				if !g.firsts[result][child] {
+					g.firsts[result][child] = true
+					next = true
+				}
+			} else {
+				if g.firsts[child] == nil {
+					continue
+				}
+				for first, _ := range g.firsts[child] {
+					if !g.firsts[result][first] {
+						g.firsts[result][first] = true
+						next = true
+					}
+				}
+			}
+		}
+	}
 }
 
 func (g *Table) augmentGlobal() {
@@ -242,7 +340,7 @@ func (g *Table) ToString() string {
 	values = append(values, strings.Join(titles, "|"))
 	values = append(values, strings.Join(brs, "|"))
 
-	for _, status := range g.GetStatusKeys() {
+	for status, _ := range g.closures {
 		value := []string{}
 		value = append(value, fmt.Sprintf("%v", status))
 		isPolymerize := false

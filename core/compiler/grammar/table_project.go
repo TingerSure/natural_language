@@ -1,5 +1,10 @@
 package grammar
 
+import (
+	"fmt"
+	"strings"
+)
+
 type TableProject struct {
 	Rule  *Rule
 	Index int
@@ -23,5 +28,22 @@ func (t *TableProject) IsEnd() bool {
 }
 
 func (t *TableProject) GetNextChild() Symbol {
+	if t.IsEnd() {
+		return nil
+	}
 	return t.Rule.GetChild(t.Index)
+}
+
+func (t *TableProject) ToString() string {
+	names := []string{}
+	for index := 0; index < t.Rule.Size(); index++ {
+		if index == t.Index {
+			names = append(names, "•")
+		}
+		names = append(names, t.Rule.GetChild(index).Name())
+	}
+	if t.IsEnd() {
+		names = append(names, "•")
+	}
+	return fmt.Sprintf("%v -> %v", t.Rule.GetResult().Name(), strings.Join(names, " "))
 }
