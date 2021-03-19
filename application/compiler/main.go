@@ -10,12 +10,6 @@ func main() {
 
 	comp := compiler.NewComplier()
 
-	closures := comp.GetGrammar().GetTable().GetClosures()
-	for _, closure := range closures {
-		fmt.Println(closure.ToString())
-		fmt.Println()
-	}
-
 	fmt.Println(comp.GetGrammar().GetTable().ToString())
 	fmt.Println()
 

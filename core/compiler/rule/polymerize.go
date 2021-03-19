@@ -72,7 +72,7 @@ const (
 
 const (
 	KeyPageGroup     = "page_group"
-	KeyPageItemArray = "page_item_group"
+	KeyPageItemArray = "page_item_array"
 	KeyPageItem      = "page_item"
 	KeyImportGroup   = "import_group"
 )

@@ -46,18 +46,18 @@ func (t *TableClosure) Include(another *TableClosure) bool {
 	return true
 }
 
-func (t *TableClosure) AddProject(project *TableProject, lookaheads map[Symbol]bool) (success map[Symbol]bool) {
+func (t *TableClosure) AddProject(project *TableProject, lookaheads map[Symbol]bool) map[Symbol]bool {
 	if t.projects[project] == nil {
 		t.projects[project] = map[Symbol]bool{}
 	}
-	success = map[Symbol]bool{}
+	success := map[Symbol]bool{}
 	for symbol, _ := range lookaheads {
 		if !t.projects[project][symbol] {
 			t.projects[project][symbol] = true
 			success[symbol] = true
 		}
 	}
-	return
+	return success
 }
 
 func (t *TableClosure) Id() int {

@@ -65,7 +65,7 @@ func (t *TableAction) ToString() string {
 		return ""
 	}
 	if t.Type() == ActionAcceptType {
-		return "Accept"
+		return "accept"
 	}
 	if t.Type() == ActionMoveType {
 		return fmt.Sprintf("move %v", t.Status())

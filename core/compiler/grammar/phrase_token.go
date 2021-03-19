@@ -46,7 +46,7 @@ func (p *PhraseToken) GetRule() *Rule {
 }
 
 func (p *PhraseToken) ToString(prefix string) string {
-	return fmt.Sprintf("(<%v>%v)", p.GetToken().Type(), p.GetToken().Value())
+	return fmt.Sprintf("(%v) <%v>", p.GetToken().Value(), p.GetToken().Name())
 }
 
 func NewPhraseToken(token *lexer.Token) *PhraseToken {

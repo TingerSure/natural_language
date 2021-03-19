@@ -42,6 +42,10 @@ func NewTable() *Table {
 	}
 }
 
+func (g *Table) GetFirsts() map[Symbol]map[Symbol]bool {
+	return g.firsts
+}
+
 func (g *Table) GetClosures() map[int]*TableClosure {
 	return g.closures
 }
@@ -213,7 +217,7 @@ func (g *Table) equivalenceClosure(cursors map[*TableProject]map[Symbol]bool, cl
 					closure,
 				)
 			}
-			// project[lookaheads] exist
+			// else project[lookaheads] exist
 		}
 	}
 }
@@ -232,7 +236,7 @@ func (g *Table) makeProjects() {
 }
 
 func (g *Table) makeFirsts() {
-	for next := false; next; {
+	for next := true; next; {
 		next = false
 		for _, rule := range g.rules {
 			result := rule.GetResult()
