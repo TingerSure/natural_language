@@ -1,9 +1,9 @@
 package object
 
 import (
-	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
+	"github.com/TingerSure/natural_language/core/tree"
 )
 
 var (
@@ -12,7 +12,7 @@ var (
 	HasFieldExistName   = "exist"
 )
 
-func initHasField(libs *runtime.LibraryManager, instance *Object) {
+func initHasField(libs *tree.LibraryManager, instance *Object) {
 
 	HasFieldContent := libs.Sandbox.Variable.String.New(HasFieldContentName)
 	HasFieldKey := libs.Sandbox.Variable.String.New(HasFieldKeyName)

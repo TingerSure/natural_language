@@ -1,9 +1,9 @@
 package object
 
 import (
-	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
+	"github.com/TingerSure/natural_language/core/tree"
 )
 
 var (
@@ -12,7 +12,7 @@ var (
 	HasMethodExistName   = "exist"
 )
 
-func initHasMethod(libs *runtime.LibraryManager, instance *Object) {
+func initHasMethod(libs *tree.LibraryManager, instance *Object) {
 	HasMethodContent := libs.Sandbox.Variable.String.New(HasMethodContentName)
 	HasMethodKey := libs.Sandbox.Variable.String.New(HasMethodKeyName)
 	HasMethodExist := libs.Sandbox.Variable.String.New(HasMethodExistName)

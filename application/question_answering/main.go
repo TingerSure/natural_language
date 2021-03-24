@@ -15,7 +15,7 @@ const (
 	ChineseName = "chinese"
 )
 
-func getVM() *runtime.Runtime {
+func getVM() (*runtime.Runtime, error) {
 	VM := runtime.NewRuntime(&runtime.RuntimeParam{
 		OnError: func(err error) {
 			os.Stdout.WriteString(fmt.Sprintf("\033[1;35m[NL]:\033[00m %v\n", err.Error()))
@@ -37,15 +37,23 @@ func getVM() *runtime.Runtime {
 	}))
 	VM.GetLibraryManager().AddLibrary(ChineseName, chinese.NewChinese(VM.GetLibraryManager(), ChineseName))
 	chinese.ChineseBindLanguage(VM.GetLibraryManager(), ChineseName)
+	err := VM.Read("test2.nl")
+	if err != nil {
+		return nil, err
+	}
 	VM.Bind()
 	VM.SetDefaultLanguage(ChineseName)
-	return VM
+	return VM, nil
 }
 
 func test() {
 
-	VM := getVM()
-	err := VM.Start()
+	VM, err := getVM()
+	if err != nil {
+		os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[System]:\033[00m %v\n", err.Error()))
+		return
+	}
+	err = VM.Start()
 	if err != nil {
 		os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[System]:\033[00m %v\n", err.Error()))
 		return

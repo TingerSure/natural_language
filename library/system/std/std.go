@@ -2,7 +2,6 @@ package std
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
 )
@@ -38,7 +37,7 @@ func (s *Std) Error(input concept.Param, object concept.Object) (concept.Param, 
 	return input, nil
 }
 
-func NewStd(libs *runtime.LibraryManager, param *StdParam) *Std {
+func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 	instance := &Std{
 		param:        param,
 		Page:         tree.NewPageAdaptor(libs.Sandbox),

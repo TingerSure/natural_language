@@ -1,7 +1,6 @@
 package object
 
 import (
-	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
@@ -9,7 +8,7 @@ type Object struct {
 	tree.Page
 }
 
-func NewObject(libs *runtime.LibraryManager) *Object {
+func NewObject(libs *tree.LibraryManager) *Object {
 	instance := &Object{
 		Page: tree.NewPageAdaptor(libs.Sandbox),
 	}

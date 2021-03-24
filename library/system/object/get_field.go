@@ -2,9 +2,9 @@ package object
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
+	"github.com/TingerSure/natural_language/core/tree"
 )
 
 var (
@@ -13,7 +13,7 @@ var (
 	GetFieldValueName   = "value"
 )
 
-func initGetField(libs *runtime.LibraryManager, instance *Object) {
+func initGetField(libs *tree.LibraryManager, instance *Object) {
 	GetFieldContent := libs.Sandbox.Variable.String.New(GetFieldContentName)
 	GetFieldKey := libs.Sandbox.Variable.String.New(GetFieldKeyName)
 	GetFieldValue := libs.Sandbox.Variable.String.New(GetFieldValueName)

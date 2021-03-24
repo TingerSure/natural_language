@@ -1,15 +1,15 @@
 package object
 
 import (
-	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/tree"
 )
 
 var (
 	CreateContentName = "object"
 )
 
-func initCreate(libs *runtime.LibraryManager, instance *Object) {
+func initCreate(libs *tree.LibraryManager, instance *Object) {
 
 	CreateContent := libs.Sandbox.Variable.String.New(CreateContentName)
 

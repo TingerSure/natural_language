@@ -3,12 +3,12 @@ package runtime
 import (
 	"errors"
 	"fmt"
+	"github.com/TingerSure/natural_language/core/compiler"
 	"github.com/TingerSure/natural_language/core/parser"
 	"github.com/TingerSure/natural_language/core/sandbox"
 	"github.com/TingerSure/natural_language/core/sandbox/closure"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
-	"os"
 )
 
 var (
@@ -33,7 +33,8 @@ var (
 
 type Runtime struct {
 	parser              *parser.Parser
-	libs                *LibraryManager
+	compiler            *compiler.Complier
+	libs                *tree.LibraryManager
 	box                 *sandbox.Sandbox
 	rootSpace           *closure.Closure
 	defaultLanguage     string
@@ -63,7 +64,7 @@ func (r *Runtime) GetDefaultLanguage() string {
 	return r.defaultLanguage
 }
 
-func (r *Runtime) GetLibraryManager() *LibraryManager {
+func (r *Runtime) GetLibraryManager() *tree.LibraryManager {
 	return r.libs
 }
 
@@ -98,23 +99,8 @@ func (r *Runtime) Deal(sentence string) (concept.Index, error) {
 	return roots[0].Index(), nil
 }
 
-func (r *Runtime) Read(stream *os.File) error {
-	var scanErr error = nil
-	NewScan(&ScanParam{
-		Stream: stream,
-		OnReader: func(input string) bool {
-			index, err := r.Deal(input)
-			if err != nil {
-				scanErr = err
-				return false
-			}
-			r.Exec(index)
-			return true
-		},
-		BeforeReader: func() {},
-	}).Run()
-
-	return scanErr
+func (r *Runtime) Read(path string) error {
+	return r.compiler.Read(path)
 }
 
 func (r *Runtime) Start() error {
@@ -137,10 +123,11 @@ type RuntimeParam struct {
 
 func NewRuntime(param *RuntimeParam) *Runtime {
 	runtime := &Runtime{
-		libs:                NewLibraryManager(),
+		libs:                tree.NewLibraryManager(),
 		structErrorFormat:   runtimeStructErrorFormatDefault,
 		priorityErrorFormat: runtimePriorityErrorFormatDefault,
 	}
+	runtime.compiler = compiler.NewComplier(runtime.libs)
 	runtime.rootSpace = runtime.libs.Sandbox.Closure.New(nil)
 	runtime.parser = parser.NewParser(runtime.rootSpace)
 	runtime.box = sandbox.NewSandbox(&sandbox.SandboxParam{

@@ -15,7 +15,7 @@ const (
 type Table struct {
 	rules           []*Rule
 	global          *Nonterminal
-	accept          *Terminal
+	end             *Terminal
 	start           int
 	actions         map[int]*TableActionGroup // map[status]map[symbol]action
 	gotos           map[int]*TableActionGroup // map[status]map[symbol]goto
@@ -78,8 +78,8 @@ func (g *Table) SetGlobal(global *Nonterminal) {
 	g.global = global
 }
 
-func (g *Table) SetAccept(accept *Terminal) {
-	g.accept = accept
+func (g *Table) SetEnd(end *Terminal) {
+	g.end = end
 }
 
 func (g *Table) Build() error {
@@ -97,7 +97,7 @@ func (g *Table) Build() error {
 func (g *Table) makeClosures() {
 	g.start = g.makeClosureStep(map[*TableProject]map[Symbol]bool{
 		g.startProjects[g.global.Type()][0]: map[Symbol]bool{
-			g.accept: true,
+			g.end: true,
 		},
 	}).Id()
 }
@@ -293,7 +293,7 @@ func (g *Table) checkRules() {
 			}
 		}
 	}
-	g.terminalKeys[g.accept] = true
+	g.terminalKeys[g.end] = true
 }
 
 func (g *Table) checkGlobal() error {

@@ -1,7 +1,6 @@
 package question
 
 import (
-	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/library/system/std"
@@ -21,7 +20,7 @@ type Question struct {
 	WhatResult    concept.String
 }
 
-func NewQuestion(libs *runtime.LibraryManager, output *std.Std) *Question {
+func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 
 	instance := &Question{
 		Page:          tree.NewPageAdaptor(libs.Sandbox),

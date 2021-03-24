@@ -2,9 +2,9 @@ package object
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
+	"github.com/TingerSure/natural_language/core/tree"
 )
 
 var (
@@ -13,7 +13,7 @@ var (
 	SetMethodFunctionName = "function"
 )
 
-func initSetMethod(libs *runtime.LibraryManager, instance *Object) {
+func initSetMethod(libs *tree.LibraryManager, instance *Object) {
 	SetMethodContent := libs.Sandbox.Variable.String.New(SetMethodContentName)
 	SetMethodKey := libs.Sandbox.Variable.String.New(SetMethodKeyName)
 	SetMethodFunction := libs.Sandbox.Variable.String.New(SetMethodFunctionName)

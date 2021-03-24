@@ -1,10 +1,10 @@
 package system
 
 import (
-	"github.com/TingerSure/natural_language/core/runtime"
+	"github.com/TingerSure/natural_language/core/tree"
 )
 
-func NumberBindlanguage(libs *runtime.LibraryManager, language string) {
+func NumberBindlanguage(libs *tree.LibraryManager, language string) {
 	instance := libs.GetLibraryPage("system", "number")
 	//TODO
 	NumberValue := instance.GetConst(libs.Sandbox.Variable.String.New("NumberValue"))

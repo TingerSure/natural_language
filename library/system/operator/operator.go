@@ -2,7 +2,6 @@ package operator
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
@@ -156,12 +155,12 @@ type Operator struct {
 	NumberItems                          map[string]*OperatorItem
 	BoolItems                            map[string]*OperatorItem
 	BoolUnaryItems                       map[string]*OperatorUnaryItem
-	Libs                                 *runtime.LibraryManager
+	Libs                                 *tree.LibraryManager
 	OperatorTypeErrorExceptionTemplate   concept.Exception
 	OperatorDivisorZeroExceptionTemplate concept.Exception
 }
 
-func NewOperator(libs *runtime.LibraryManager) *Operator {
+func NewOperator(libs *tree.LibraryManager) *Operator {
 	instance := &Operator{
 		Page:                                 tree.NewPageAdaptor(libs.Sandbox),
 		OperatorTypeErrorExceptionTemplate:   libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "OperatorTypeErrorException"),

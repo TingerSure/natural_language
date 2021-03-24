@@ -2,7 +2,6 @@ package number
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
@@ -29,7 +28,7 @@ type Number struct {
 	New                         func(value *variable.Number) concept.Object
 }
 
-func NewNumber(libs *runtime.LibraryManager) *Number {
+func NewNumber(libs *tree.LibraryManager) *Number {
 	instance := &Number{
 		Page:             tree.NewPageAdaptor(libs.Sandbox),
 		NumberValue:      libs.Sandbox.Variable.String.New(NumberValueName),

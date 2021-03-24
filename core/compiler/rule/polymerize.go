@@ -85,16 +85,25 @@ var (
 )
 
 var (
-	GrammarAccept = SymbolEnd
+	PolymerizePageGroupEmpty          = grammar.NewRule(SymbolPageGroup, SymbolPage, SymbolIdentifier, SymbolLeftBrace, SymbolRightBrace)
+	PolymerizePageGroup               = grammar.NewRule(SymbolPageGroup, SymbolPage, SymbolIdentifier, SymbolLeftBrace, SymbolPageItemArray, SymbolRightBrace)
+	PolymerizePageItemArrayStart      = grammar.NewRule(SymbolPageItemArray, SymbolPageItem)
+	PolymerizePageItemArray           = grammar.NewRule(SymbolPageItemArray, SymbolPageItemArray, SymbolPageItem)
+	PolymerizePageItemFromImportGroup = grammar.NewRule(SymbolPageItem, SymbolImportGroup)
+	PolymerizePageImportGroup         = grammar.NewRule(SymbolImportGroup, SymbolImport, SymbolIdentifier, SymbolString, SymbolSemicolon)
+)
+
+var (
+	GrammarRules = []*grammar.Rule{
+		PolymerizePageGroupEmpty,
+		PolymerizePageGroup,
+		PolymerizePageItemArrayStart,
+		PolymerizePageItemArray,
+		PolymerizePageItemFromImportGroup,
+		PolymerizePageImportGroup,
+	}
+
+	GrammarEnd = SymbolEnd
 
 	GrammarGlobal = SymbolPageGroup
-
-	GrammarRules = []*grammar.Rule{
-		grammar.NewRule(SymbolPageGroup, SymbolPage, SymbolIdentifier, SymbolLeftBrace, SymbolRightBrace),
-		grammar.NewRule(SymbolPageGroup, SymbolPage, SymbolIdentifier, SymbolLeftBrace, SymbolPageItemArray, SymbolRightBrace),
-		grammar.NewRule(SymbolPageItemArray, SymbolPageItem),
-		grammar.NewRule(SymbolPageItemArray, SymbolPageItemArray, SymbolPageItem),
-		grammar.NewRule(SymbolPageItem, SymbolImportGroup),
-		grammar.NewRule(SymbolImportGroup, SymbolImport, SymbolIdentifier, SymbolString, SymbolSemicolon),
-	}
 )

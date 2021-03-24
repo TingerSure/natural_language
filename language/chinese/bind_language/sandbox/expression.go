@@ -3,15 +3,15 @@ package sandbox
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/expression"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
+	"github.com/TingerSure/natural_language/core/tree"
 	"strings"
 )
 
-func ExpressionBindLanguage(libs *runtime.LibraryManager, language string) {
+func ExpressionBindLanguage(libs *tree.LibraryManager, language string) {
 	libs.Sandbox.Expression.NewParam.Seeds[language] = func(language string, instance *expression.NewParam) string {
 		items := []string{}
 
