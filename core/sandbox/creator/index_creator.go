@@ -17,6 +17,7 @@ type IndexCreator struct {
 	SelfIndex          *index.SelfIndexCreator
 	BubbleIndex        *index.BubbleIndexCreator
 	LocalIndex         *index.LocalIndexCreator
+	ImportIndex        *index.ImportIndexCreator
 }
 
 type IndexCreatorParam struct {
@@ -28,6 +29,9 @@ type IndexCreatorParam struct {
 
 func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
 	instance := &IndexCreator{}
+	instance.ImportIndex = index.NewImportIndexCreator(&index.ImportIndexCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+	})
 	instance.LocalIndex = index.NewLocalIndexCreator(&index.LocalIndexCreatorParam{})
 	instance.BubbleIndex = index.NewBubbleIndexCreator(&index.BubbleIndexCreatorParam{})
 	instance.SelfIndex = index.NewSelfIndexCreator(&index.SelfIndexCreatorParam{

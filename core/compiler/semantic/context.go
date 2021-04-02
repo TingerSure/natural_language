@@ -4,32 +4,42 @@ import (
 	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/compiler/grammar"
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type Context struct {
-	rules map[*grammar.Rule]*Rule
-	libs  *tree.LibraryManager
+	rules   map[*grammar.Rule]*Rule
+	getPage func(path string) (tree.Page, error)
+	libs    *tree.LibraryManager
 }
 
-func NewContext(libs *tree.LibraryManager) *Context {
+func NewContext(libs *tree.LibraryManager, getPage func(path string) (tree.Page, error)) *Context {
 	return &Context{
-		libs:  libs,
-		rules: map[*grammar.Rule]*Rule{},
+		rules:   map[*grammar.Rule]*Rule{},
+		getPage: getPage,
+		libs:    libs,
 	}
 }
 
-func (c *Context) GetImport(path string) (tree.Page, error) {
-	// TODO
-	return nil, nil
+func (c *Context) FormatSymbolString(value string) string {
+	return value[1 : len(value)-1]
 }
 
-func (c *Context) Deal(phrase grammar.Phrase, context *Context, page *FilePage) error {
+func (c *Context) GetLibraryManager() *tree.LibraryManager {
+	return c.libs
+}
+
+func (c *Context) GetPage(path string) (tree.Page, error) {
+	return c.getPage(path)
+}
+
+func (c *Context) Deal(phrase grammar.Phrase) ([]concept.Index, error) {
 	rule, err := c.GetRule(phrase)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return rule.Deal(phrase, context, page)
+	return rule.Deal(phrase, c)
 }
 
 func (c *Context) GetRule(phrase grammar.Phrase) (*Rule, error) {

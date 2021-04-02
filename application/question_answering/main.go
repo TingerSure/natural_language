@@ -24,6 +24,9 @@ func getVM() (*runtime.Runtime, error) {
 			os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[NL]:\033[00m %v\n", value.ToString("")))
 		},
 		EventSize: 1024,
+		Roots: []string{
+			"./",
+		},
 	})
 	VM.GetLibraryManager().AddSystemLibrary(system.NewSystemLibrary(VM.GetLibraryManager(), &system.SystemLibraryParam{
 		Std: &std.StdParam{

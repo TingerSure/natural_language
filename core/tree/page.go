@@ -5,6 +5,7 @@ import (
 )
 
 type Page interface {
+	concept.Index
 	GetFunction(concept.String) concept.Function
 	SetFunction(concept.String, concept.Function) Page
 	GetClass(concept.String) concept.Class

@@ -119,6 +119,7 @@ type RuntimeParam struct {
 	OnError   func(error)
 	OnPrint   func(concept.Variable)
 	EventSize int
+	Roots     []string
 }
 
 func NewRuntime(param *RuntimeParam) *Runtime {
@@ -128,6 +129,7 @@ func NewRuntime(param *RuntimeParam) *Runtime {
 		priorityErrorFormat: runtimePriorityErrorFormatDefault,
 	}
 	runtime.compiler = compiler.NewComplier(runtime.libs)
+	runtime.compiler.AddRoots(param.Roots...)
 	runtime.rootSpace = runtime.libs.Sandbox.Closure.New(nil)
 	runtime.parser = parser.NewParser(runtime.rootSpace)
 	runtime.box = sandbox.NewSandbox(&sandbox.SandboxParam{

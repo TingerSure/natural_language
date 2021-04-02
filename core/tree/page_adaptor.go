@@ -14,6 +14,39 @@ type PageAdaptor struct {
 	sources    []Source
 }
 
+const (
+	IndexPageType = "Page"
+)
+
+func (p *PageAdaptor) Type() string {
+	return IndexPageType
+}
+
+func (p *PageAdaptor) Anticipate(concept.Closure) concept.Variable {
+	return nil
+}
+
+func (p *PageAdaptor) Get(concept.Closure) (concept.Variable, concept.Interrupt) {
+	return nil, nil
+}
+
+func (p *PageAdaptor) Set(concept.Closure, concept.Variable) concept.Interrupt {
+	return nil
+}
+
+func (p *PageAdaptor) SubCodeBlockIterate(func(concept.Index) bool) bool {
+	return false
+}
+
+func (p *PageAdaptor) ToString(prefix string) string {
+	// TODO
+	return "class.ToString()"
+}
+
+func (p *PageAdaptor) ToLanguage(language string) string {
+	return p.ToString("")
+}
+
 func (p *PageAdaptor) GetIndex(key concept.String) concept.Index {
 	return p.indexes.Get(key).(concept.Index)
 }

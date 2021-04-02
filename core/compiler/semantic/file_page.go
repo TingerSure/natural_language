@@ -15,7 +15,8 @@ type FilePage struct {
 
 func NewFilePage(libs *tree.LibraryManager) *FilePage {
 	return &FilePage{
-		Page: tree.NewPageAdaptor(libs.Sandbox),
+		Page:    tree.NewPageAdaptor(libs.Sandbox),
+		imports: map[string]tree.Page{},
 	}
 }
 

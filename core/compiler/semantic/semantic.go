@@ -1,31 +1,31 @@
 package semantic
 
 import (
+	"errors"
 	"github.com/TingerSure/natural_language/core/compiler/grammar"
-	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type Semantic struct {
-	libs    *tree.LibraryManager
 	context *Context
 }
 
-func NewSemantic(libs *tree.LibraryManager) *Semantic {
+func NewSemantic(context *Context) *Semantic {
 	return &Semantic{
-		libs:    libs,
-		context: NewContext(libs),
+		context: context,
 	}
 }
 
 func (s *Semantic) Read(phrase grammar.Phrase) (*FilePage, error) {
-	rule, err := s.context.GetRule(phrase)
+	pageIndex, err := s.context.Deal(phrase)
 	if err != nil {
 		return nil, err
 	}
-	page := NewFilePage(s.libs)
-	err = rule.Deal(phrase, s.context, page)
-	if err != nil {
-		return nil, err
+	if len(pageIndex) != 1 {
+		return nil, errors.New("Illegal global semantic rule whose result is not unique.")
+	}
+	page, ok := pageIndex[0].(*FilePage)
+	if !ok {
+		return nil, errors.New("Illegal global semantic rule whose result is not allowed.")
 	}
 	return page, nil
 }
