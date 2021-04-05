@@ -39,9 +39,9 @@ func getVM() *runtime.Runtime {
 			},
 		},
 	}))
-	VM.GetLibraryManager().AddLibrary(ChineseName, chinese.NewChinese(VM.GetLibraryManager(), ChineseName))
-	chinese.ChineseBindLanguage(VM.GetLibraryManager(), ChineseName)
-	english.EnglishBindLanguage(VM.GetLibraryManager(), EnglishName)
+	chinese.BindRule(VM.GetLibraryManager(), ChineseName)
+	chinese.BindLanguage(VM.GetLibraryManager(), ChineseName)
+	english.BindLanguage(VM.GetLibraryManager(), EnglishName)
 	VM.Bind()
 	VM.SetDefaultLanguage(ChineseName)
 	return VM

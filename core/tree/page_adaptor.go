@@ -11,7 +11,6 @@ type PageAdaptor struct {
 	consts     *concept.Mapping
 	exceptions *concept.Mapping
 	indexes    *concept.Mapping
-	sources    []Source
 }
 
 const (
@@ -92,14 +91,6 @@ func (p *PageAdaptor) SetConst(key concept.String, value concept.String) Page {
 	return p
 }
 
-func (p *PageAdaptor) GetSources() []Source {
-	return p.sources
-}
-
-func (p *PageAdaptor) AddSource(source Source) {
-	p.sources = append(p.sources, source)
-}
-
 func NewPageAdaptor(sandboxSeed *creator.SandboxCreator) *PageAdaptor {
 	return &PageAdaptor{
 		indexes: concept.NewMapping(&concept.MappingParam{
@@ -122,6 +113,5 @@ func NewPageAdaptor(sandboxSeed *creator.SandboxCreator) *PageAdaptor {
 			AutoInit:   true,
 			EmptyValue: sandboxSeed.Variable.Null.New(),
 		}),
-		sources: []Source{},
 	}
 }

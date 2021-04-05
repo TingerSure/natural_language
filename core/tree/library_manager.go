@@ -8,6 +8,15 @@ import (
 type LibraryManager struct {
 	libraries map[string]Library
 	Sandbox   *creator.SandboxCreator
+	sources   []Source
+}
+
+func (p *LibraryManager) GetSources() []Source {
+	return p.sources
+}
+
+func (p *LibraryManager) AddSource(source Source) {
+	p.sources = append(p.sources, source)
 }
 
 func (l *LibraryManager) PageIterate(on func(page Page) bool) bool {
@@ -52,5 +61,6 @@ func NewLibraryManager() *LibraryManager {
 	return &LibraryManager{
 		libraries: map[string]Library{},
 		Sandbox:   creator.NewSandboxCreator(),
+		sources:   []Source{},
 	}
 }

@@ -16,6 +16,4 @@ type Page interface {
 	SetIndex(concept.String, concept.Index) Page
 	GetException(concept.String) concept.Exception
 	SetException(concept.String, concept.Exception) Page
-	GetSources() []Source
-	AddSource(Source)
 }

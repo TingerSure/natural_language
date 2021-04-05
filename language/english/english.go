@@ -5,10 +5,10 @@ import (
 	"github.com/TingerSure/natural_language/language/english/bind_language"
 )
 
-func NewEnglish(libs *tree.LibraryManager, englishName string) tree.Library {
-	return tree.NewLibraryAdaptor()
+func BindRule(libs *tree.LibraryManager, chineseName string) {
+
 }
 
-func EnglishBindLanguage(libs *tree.LibraryManager, englishName string) {
+func BindLanguage(libs *tree.LibraryManager, englishName string) {
 	bind_language.BindLanguage(libs, englishName)
 }

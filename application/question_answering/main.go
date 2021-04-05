@@ -38,8 +38,8 @@ func getVM() (*runtime.Runtime, error) {
 			},
 		},
 	}))
-	VM.GetLibraryManager().AddLibrary(ChineseName, chinese.NewChinese(VM.GetLibraryManager(), ChineseName))
-	chinese.ChineseBindLanguage(VM.GetLibraryManager(), ChineseName)
+	chinese.BindRule(VM.GetLibraryManager(), ChineseName)
+	chinese.BindLanguage(VM.GetLibraryManager(), ChineseName)
 	err := VM.Read("test2.nl")
 	if err != nil {
 		return nil, err

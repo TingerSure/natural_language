@@ -69,12 +69,9 @@ func (r *Runtime) GetLibraryManager() *tree.LibraryManager {
 }
 
 func (r *Runtime) Bind() {
-	r.libs.PageIterate(func(instance tree.Page) bool {
-		for _, source := range instance.GetSources() {
-			r.parser.AddSource(source)
-		}
-		return false
-	})
+	for _, source := range r.libs.GetSources() {
+		r.parser.AddSource(source)
+	}
 }
 
 func (r *Runtime) Deal(sentence string) (concept.Index, error) {
