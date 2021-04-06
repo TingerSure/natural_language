@@ -139,7 +139,7 @@ func (o *AdaptorVariable) SetField(specimen concept.String, value concept.Variab
 }
 
 func (o *AdaptorVariable) GetField(specimen concept.String) (concept.Variable, concept.Exception) {
-	o.initMethods()
+	o.initFields()
 	value := o.fields.Get(specimen)
 	if nl_interface.IsNil(value) {
 		return nil, o.param.ExceptionCreator("system error", fmt.Sprintf("There is no field called \"%v\" to be got here.", specimen.ToString("")))
