@@ -2,6 +2,7 @@ package index
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"strings"
 )
@@ -10,6 +11,7 @@ type ResaultIndexSeed interface {
 	ToLanguage(string, *ResaultIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
+	NewParam() concept.Param
 	NewNull() concept.Null
 }
 
@@ -43,6 +45,25 @@ func (s *ResaultIndex) ToString(prefix string) string {
 	return fmt.Sprintf("result<%v>", strings.Join(subs, ", "))
 }
 
+func (s *ResaultIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+	funcs, interrupt := s.Get(space)
+	if !nl_interface.IsNil(interrupt) {
+		return nil, interrupt.(concept.Exception)
+	}
+	if !funcs.IsFunction() {
+		return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString("")))
+	}
+	return funcs.(concept.Function).Exec(param, nil)
+}
+
+func (s *ResaultIndex) CallAnticipate(space concept.Closure, param concept.Param) concept.Param {
+	funcs := s.Anticipate(space)
+	if !funcs.IsFunction() {
+		return s.seed.NewParam()
+	}
+	return funcs.(concept.Function).Anticipate(param, nil)
+}
+
 func (s *ResaultIndex) Anticipate(space concept.Closure) concept.Variable {
 	value, _ := s.Get(space)
 	return value
@@ -68,6 +89,7 @@ func (s *ResaultIndex) Set(space concept.Closure, value concept.Variable) concep
 
 type ResaultIndexCreatorParam struct {
 	ExceptionCreator func(string, string) concept.Exception
+	ParamCreator     func() concept.Param
 	NullCreator      func() concept.Null
 }
 
@@ -96,6 +118,10 @@ func (s *ResaultIndexCreator) Type() string {
 
 func (s *ResaultIndexCreator) NewException(name string, message string) concept.Exception {
 	return s.param.ExceptionCreator(name, message)
+}
+
+func (s *ResaultIndexCreator) NewParam() concept.Param {
+	return s.param.ParamCreator()
 }
 
 func (s *ResaultIndexCreator) NewNull() concept.Null {

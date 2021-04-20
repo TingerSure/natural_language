@@ -62,7 +62,7 @@ func NewAnticipateFromEntityBelongNoun(param *adaptor.SourceAdaptorParam) *Antic
 	instance := (&AnticipateFromEntityBelongNoun{
 		SourceAdaptor: adaptor.NewSourceAdaptor(param),
 	})
-	libObject := instance.Libs.GetLibraryPage("system", "object")
+	libObject := instance.Libs.GetPage("system/object")
 
 	instance.GetFieldValue = libObject.GetConst(instance.Libs.Sandbox.Variable.String.New("GetFieldValue"))
 	instance.GetFieldKey = libObject.GetConst(instance.Libs.Sandbox.Variable.String.New("GetFieldKey"))

@@ -21,6 +21,10 @@ type Bool struct {
 	seed  BoolSeed
 }
 
+func (o *Bool) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
+	return o.CallAdaptor(specimen, param, o)
+}
+
 func (f *Bool) ToLanguage(language string) string {
 	return f.seed.ToLanguage(language, f)
 }

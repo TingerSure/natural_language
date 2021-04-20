@@ -89,7 +89,7 @@ type IfCreatorParam struct {
 	ExceptionCreator       func(string, string) concept.Exception
 	CodeBlockCreator       func() *code_block.CodeBlock
 	ClosureCreator         func(concept.Closure) concept.Closure
-	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
+	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
 	NullCreator            func() concept.Null
 }
 
@@ -106,7 +106,7 @@ func (s *IfCreator) New() *If {
 		secondary: s.param.CodeBlockCreator(),
 		seed:      s,
 	}
-	back.ExpressionIndex = s.param.ExpressionIndexCreator(back.Exec)
+	back.ExpressionIndex = s.param.ExpressionIndexCreator(back)
 	return back
 }
 

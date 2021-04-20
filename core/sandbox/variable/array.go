@@ -23,6 +23,10 @@ type Array struct {
 	seed   ArraySeed
 }
 
+func (o *Array) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
+	return o.CallAdaptor(specimen, param, o)
+}
+
 func (f *Array) ToLanguage(language string) string {
 	return f.seed.ToLanguage(language, f)
 }

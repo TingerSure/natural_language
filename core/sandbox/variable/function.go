@@ -42,6 +42,10 @@ func (f *Function) ReturnFormat(back concept.String) concept.String {
 	return f.AdaptorFunction.AdaptorReturnFormat(f, back)
 }
 
+func (o *Function) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
+	return o.CallAdaptor(specimen, param, o)
+}
+
 func (f *Function) ToLanguage(language string) string {
 	return f.seed.ToLanguage(language, f)
 }

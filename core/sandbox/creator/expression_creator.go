@@ -14,13 +14,10 @@ type ExpressionCreator struct {
 	ExpressionIndex *adaptor.ExpressionIndexCreator
 	Call            *expression.CallCreator
 	Assignment      *expression.AssignmentCreator
-	ClassRegister   *expression.ClassRegisterCreator
 	For             *expression.ForCreator
 	If              *expression.IfCreator
 	FunctionEnd     *expression.FunctionEndCreator
 	Return          *expression.ReturnCreator
-	ParamSet        *expression.ParamSetCreator
-	ParamGet        *expression.ParamGetCreator
 	NewParam        *expression.NewParamCreator
 }
 
@@ -42,22 +39,13 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 		ParamCreator:           param.ParamCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 	})
-	instance.ParamGet = expression.NewParamGetCreator(&expression.ParamGetCreatorParam{
-		ExceptionCreator:       param.ExceptionCreator,
-		ExpressionIndexCreator: instance.ExpressionIndex.New,
-		NullCreator:            param.NullCreator,
-	})
-	instance.ParamSet = expression.NewParamSetCreator(&expression.ParamSetCreatorParam{
-		ExceptionCreator:       param.ExceptionCreator,
-		NullCreator:            param.NullCreator,
-		ExpressionIndexCreator: instance.ExpressionIndex.New,
-	})
 	instance.Return = expression.NewReturnCreator(&expression.ReturnCreatorParam{
 		NullCreator:            param.NullCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 	})
 	instance.ExpressionIndex = adaptor.NewExpressionIndexCreator(&adaptor.ExpressionIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
 	})
 	instance.FunctionEnd = expression.NewFunctionEndCreator(&expression.FunctionEndCreatorParam{
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
@@ -79,10 +67,6 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 		ExceptionCreator:       param.ExceptionCreator,
 		ConstIndexCreator:      param.ConstIndexCreator,
 		NullCreator:            param.NullCreator,
-	})
-	instance.ClassRegister = expression.NewClassRegisterCreator(&expression.ClassRegisterCreatorParam{
-		ExpressionIndexCreator: instance.ExpressionIndex.New,
-		ExceptionCreator:       param.ExceptionCreator,
 	})
 	instance.Assignment = expression.NewAssignmentCreator(&expression.AssignmentCreatorParam{
 		ExpressionIndexCreator: instance.ExpressionIndex.New,

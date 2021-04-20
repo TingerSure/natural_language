@@ -2,8 +2,8 @@ package matcher
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type FieldMatcher struct {
@@ -27,11 +27,8 @@ func (c *FieldMatcher) ToString(prefix string) string {
 }
 
 func (c *FieldMatcher) Match(value concept.Variable) bool {
-	object, ok := variable.VariableFamilyInstance.IsObjectHome(value)
-	if !ok {
-		return false
-	}
-	return object.HasField(c.fieldName)
+	field, exception := value.GetField(c.fieldName)
+	return nl_interface.IsNil(exception) && !nl_interface.IsNil(field) && !field.IsFunction()
 }
 
 func NewFieldMatcher(fieldName concept.String) *FieldMatcher {

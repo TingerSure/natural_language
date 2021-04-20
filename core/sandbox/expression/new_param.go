@@ -93,7 +93,7 @@ func (a *NewParam) Init(values map[concept.String]concept.Index) *NewParam {
 }
 
 type NewParamCreatorParam struct {
-	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
+	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
 	ParamCreator           func() concept.Param
 }
 
@@ -106,7 +106,7 @@ func (s *NewParamCreator) New() *NewParam {
 	back := &NewParam{
 		seed: s,
 	}
-	back.ExpressionIndex = s.param.ExpressionIndexCreator(back.Exec)
+	back.ExpressionIndex = s.param.ExpressionIndexCreator(back)
 	return back
 }
 

@@ -29,7 +29,7 @@ func (a *Return) Key() concept.String {
 }
 
 func (a *Return) ToString(prefix string) string {
-	return fmt.Sprintf("return[%v] %v", a.key.ToString(prefix), a.result.ToString(prefix))
+	return fmt.Sprintf("return.%v = %v", a.key.ToString(prefix), a.result.ToString(prefix))
 }
 
 func (a *Return) Anticipate(space concept.Closure) concept.Variable {
@@ -48,7 +48,7 @@ func (a *Return) Exec(space concept.Closure) (concept.Variable, concept.Interrup
 
 type ReturnCreatorParam struct {
 	NullCreator            func() concept.Null
-	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
+	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
 }
 
 type ReturnCreator struct {
@@ -62,7 +62,7 @@ func (s *ReturnCreator) New(key concept.String, result concept.Index) *Return {
 		result: result,
 		seed:   s,
 	}
-	back.ExpressionIndex = s.param.ExpressionIndexCreator(back.Exec)
+	back.ExpressionIndex = s.param.ExpressionIndexCreator(back)
 	return back
 }
 

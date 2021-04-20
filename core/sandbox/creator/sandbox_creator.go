@@ -49,11 +49,11 @@ func NewSandboxCreator() *SandboxCreator {
 		NullCreator: func() concept.Null {
 			return instance.Variable.Null.New()
 		},
+		ParamCreator: func() concept.Param {
+			return instance.Variable.Param.New()
+		},
 		StringCreator: func(value string) concept.String {
 			return instance.Variable.String.New(value)
-		},
-		PreObjectFunctionCreator: func(function concept.Function, object concept.Object) *variable.PreObjectFunction {
-			return instance.Variable.PreObjectFunction.New(function, object)
 		},
 	})
 

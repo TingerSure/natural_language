@@ -3,12 +3,10 @@ package matcher
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type ClassMatcher struct {
-	className string
-	alias     string
+	class concept.Class
 }
 
 var (
@@ -24,23 +22,15 @@ func (f *ClassMatcher) ToLanguage(language string) string {
 }
 
 func (c *ClassMatcher) ToString(string) string {
-	if c.alias == "" {
-		return fmt.Sprintf("class=%v", c.className)
-	}
-	return fmt.Sprintf("class=%v(%v)", c.className, c.alias)
+	return fmt.Sprintf("class=%v", c.class.ToString(""))
 }
 
 func (c *ClassMatcher) Match(value concept.Variable) bool {
-	object, ok := variable.VariableFamilyInstance.IsObjectHome(value)
-	if !ok {
-		return false
-	}
-	return object.IsClassAlias(c.className, c.alias)
+	return value.GetClass() == c.class
 }
 
-func NewClassMatcher(className string, alias string) *ClassMatcher {
+func NewClassMatcher(class concept.Class) *ClassMatcher {
 	return &ClassMatcher{
-		className: className,
-		alias:     alias,
+		class: class,
 	}
 }

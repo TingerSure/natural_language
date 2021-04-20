@@ -39,7 +39,7 @@ func (a *Assignment) Exec(space concept.Closure) (concept.Variable, concept.Inte
 }
 
 type AssignmentCreatorParam struct {
-	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
+	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
 }
 
 type AssignmentCreator struct {
@@ -53,7 +53,7 @@ func (s *AssignmentCreator) New(from concept.Index, to concept.Index) *Assignmen
 		to:   to,
 		seed: s,
 	}
-	back.ExpressionIndex = s.param.ExpressionIndexCreator(back.Exec)
+	back.ExpressionIndex = s.param.ExpressionIndexCreator(back)
 	return back
 }
 

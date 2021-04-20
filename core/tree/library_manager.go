@@ -1,14 +1,14 @@
 package tree
 
 import (
-	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/creator"
 )
 
 type LibraryManager struct {
-	libraries map[string]Library
-	Sandbox   *creator.SandboxCreator
-	sources   []Source
+	pages   map[string]concept.Index
+	Sandbox *creator.SandboxCreator
+	sources []Source
 }
 
 func (p *LibraryManager) GetSources() []Source {
@@ -19,48 +19,18 @@ func (p *LibraryManager) AddSource(source Source) {
 	p.sources = append(p.sources, source)
 }
 
-func (l *LibraryManager) PageIterate(on func(page Page) bool) bool {
-	for _, lib := range l.libraries {
-		if lib.PageIterate(on) {
-			return true
-		}
-	}
-	return false
+func (l *LibraryManager) GetPage(name string) concept.Index {
+	return l.pages[name]
 }
 
-func (l *LibraryManager) GetLibraryPage(libraryName string, pageName string) Page {
-	if libraryName == "" {
-		return l.GetPage(pageName)
-	}
-	return l.GetLibrary(libraryName).GetPage(pageName)
-}
-
-func (l *LibraryManager) GetPage(pageName string) Page {
-	for _, library := range l.libraries {
-		page := library.GetPage(pageName)
-		if !nl_interface.IsNil(page) {
-			return page
-		}
-	}
-	return nil
-}
-
-func (l *LibraryManager) AddLibrary(name string, lib Library) {
-	l.libraries[name] = lib
-}
-
-func (l *LibraryManager) AddSystemLibrary(lib Library) {
-	l.AddLibrary("system", lib)
-}
-
-func (l *LibraryManager) GetLibrary(name string) Library {
-	return l.libraries[name]
+func (l *LibraryManager) AddPage(name string, page concept.Index) {
+	l.pages[name] = page
 }
 
 func NewLibraryManager() *LibraryManager {
 	return &LibraryManager{
-		libraries: map[string]Library{},
-		Sandbox:   creator.NewSandboxCreator(),
-		sources:   []Source{},
+		pages:   map[string]concept.Index{},
+		Sandbox: creator.NewSandboxCreator(),
+		sources: []Source{},
 	}
 }

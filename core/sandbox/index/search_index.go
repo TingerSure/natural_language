@@ -2,6 +2,7 @@ package index
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"strings"
 )
@@ -10,6 +11,7 @@ type SearchIndexSeed interface {
 	ToLanguage(string, *SearchIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
+	NewParam() concept.Param
 	NewNull() concept.Null
 }
 
@@ -43,6 +45,25 @@ func (s *SearchIndex) ToString(prefix string) string {
 	return fmt.Sprintf("search<%v>", strings.Join(subs, ", "))
 }
 
+func (s *SearchIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+	funcs, interrupt := s.Get(space)
+	if !nl_interface.IsNil(interrupt) {
+		return nil, interrupt.(concept.Exception)
+	}
+	if !funcs.IsFunction() {
+		return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString("")))
+	}
+	return funcs.(concept.Function).Exec(param, nil)
+}
+
+func (s *SearchIndex) CallAnticipate(space concept.Closure, param concept.Param) concept.Param {
+	funcs := s.Anticipate(space)
+	if !funcs.IsFunction() {
+		return s.seed.NewParam()
+	}
+	return funcs.(concept.Function).Anticipate(param, nil)
+}
+
 func (s *SearchIndex) Anticipate(space concept.Closure) concept.Variable {
 	value, _ := s.Get(space)
 	return value
@@ -68,6 +89,7 @@ func (s *SearchIndex) Set(space concept.Closure, value concept.Variable) concept
 
 type SearchIndexCreatorParam struct {
 	ExceptionCreator func(string, string) concept.Exception
+	ParamCreator     func() concept.Param
 	NullCreator      func() concept.Null
 }
 
@@ -96,6 +118,10 @@ func (s *SearchIndexCreator) Type() string {
 
 func (s *SearchIndexCreator) NewException(name string, message string) concept.Exception {
 	return s.param.ExceptionCreator(name, message)
+}
+
+func (s *SearchIndexCreator) NewParam() concept.Param {
+	return s.param.ParamCreator()
 }
 
 func (s *SearchIndexCreator) NewNull() concept.Null {

@@ -1,12 +1,17 @@
 package index
 
 import (
+	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 )
 
 type BubbleIndexSeed interface {
 	ToLanguage(string, *BubbleIndex) string
 	Type() string
+	NewException(string, string) concept.Exception
+	NewParam() concept.Param
+	NewNull() concept.Null
 }
 
 type BubbleIndex struct {
@@ -39,6 +44,25 @@ func (s *BubbleIndex) Key() concept.String {
 	return s.key
 }
 
+func (s *BubbleIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+	funcs, interrupt := s.Get(space)
+	if !nl_interface.IsNil(interrupt) {
+		return nil, interrupt.(concept.Exception)
+	}
+	if !funcs.IsFunction() {
+		return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString("")))
+	}
+	return funcs.(concept.Function).Exec(param, nil)
+}
+
+func (s *BubbleIndex) CallAnticipate(space concept.Closure, param concept.Param) concept.Param {
+	funcs := s.Anticipate(space)
+	if !funcs.IsFunction() {
+		return s.seed.NewParam()
+	}
+	return funcs.(concept.Function).Anticipate(param, nil)
+}
+
 func (s *BubbleIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	return space.GetBubble(s.key)
 }
@@ -53,6 +77,9 @@ func (s *BubbleIndex) Set(space concept.Closure, value concept.Variable) concept
 }
 
 type BubbleIndexCreatorParam struct {
+	ExceptionCreator func(string, string) concept.Exception
+	ParamCreator     func() concept.Param
+	NullCreator      func() concept.Null
 }
 
 type BubbleIndexCreator struct {
@@ -65,6 +92,18 @@ func (s *BubbleIndexCreator) New(key concept.String) *BubbleIndex {
 		key:  key,
 		seed: s,
 	}
+}
+
+func (s *BubbleIndexCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
+}
+
+func (s *BubbleIndexCreator) NewParam() concept.Param {
+	return s.param.ParamCreator()
+}
+
+func (s *BubbleIndexCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
 }
 
 func (s *BubbleIndexCreator) ToLanguage(language string, instance *BubbleIndex) string {

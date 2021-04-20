@@ -1,6 +1,7 @@
 package index
 
 import (
+	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 )
 
@@ -8,6 +9,8 @@ type ConstIndexSeed interface {
 	ToLanguage(string, *ConstIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
+	NewParam() concept.Param
+	NewNull() concept.Null
 }
 
 type ConstIndex struct {
@@ -39,6 +42,20 @@ func (s *ConstIndex) Value() concept.Variable {
 	return s.value
 }
 
+func (s *ConstIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+	if !s.value.IsFunction() {
+		return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString("")))
+	}
+	return s.value.(concept.Function).Exec(param, nil)
+}
+
+func (s *ConstIndex) CallAnticipate(space concept.Closure, param concept.Param) concept.Param {
+	if !s.value.IsFunction() {
+		return s.seed.NewParam()
+	}
+	return s.value.(concept.Function).Anticipate(param, nil)
+}
+
 func (s *ConstIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	return s.value, nil
 }
@@ -53,6 +70,8 @@ func (s *ConstIndex) Set(space concept.Closure, value concept.Variable) concept.
 
 type ConstIndexCreatorParam struct {
 	ExceptionCreator func(string, string) concept.Exception
+	ParamCreator     func() concept.Param
+	NullCreator      func() concept.Null
 }
 
 type ConstIndexCreator struct {
@@ -80,6 +99,14 @@ func (s *ConstIndexCreator) Type() string {
 
 func (s *ConstIndexCreator) NewException(name string, message string) concept.Exception {
 	return s.param.ExceptionCreator(name, message)
+}
+
+func (s *ConstIndexCreator) NewParam() concept.Param {
+	return s.param.ParamCreator()
+}
+
+func (s *ConstIndexCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
 }
 
 func NewConstIndexCreator(param *ConstIndexCreatorParam) *ConstIndexCreator {

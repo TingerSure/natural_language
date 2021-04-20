@@ -10,11 +10,11 @@ import (
 
 type Context struct {
 	rules   map[*grammar.Rule]*Rule
-	getPage func(path string) (tree.Page, error)
+	getPage func(path string) (concept.Index, error)
 	libs    *tree.LibraryManager
 }
 
-func NewContext(libs *tree.LibraryManager, getPage func(path string) (tree.Page, error)) *Context {
+func NewContext(libs *tree.LibraryManager, getPage func(path string) (concept.Index, error)) *Context {
 	return &Context{
 		rules:   map[*grammar.Rule]*Rule{},
 		getPage: getPage,
@@ -30,7 +30,7 @@ func (c *Context) GetLibraryManager() *tree.LibraryManager {
 	return c.libs
 }
 
-func (c *Context) GetPage(path string) (tree.Page, error) {
+func (c *Context) GetPage(path string) (concept.Index, error) {
 	return c.getPage(path)
 }
 

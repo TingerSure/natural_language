@@ -25,6 +25,10 @@ type Param struct {
 	seed   ParamSeed
 }
 
+func (o *Param) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
+	return o.CallAdaptor(specimen, param, o)
+}
+
 func (f *Param) ToLanguage(language string) string {
 	return f.seed.ToLanguage(language, f)
 }

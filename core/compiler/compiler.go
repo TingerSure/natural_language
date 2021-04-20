@@ -3,12 +3,15 @@ package compiler
 import (
 	"errors"
 	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/compiler/grammar"
 	"github.com/TingerSure/natural_language/core/compiler/lexer"
 	"github.com/TingerSure/natural_language/core/compiler/rule"
 	"github.com/TingerSure/natural_language/core/compiler/semantic"
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -18,6 +21,7 @@ type Complier struct {
 	semantic *semantic.Semantic
 	context  *semantic.Context
 	libs     *tree.LibraryManager
+	reading  map[string]bool
 	roots    []string
 }
 
@@ -26,6 +30,7 @@ func NewComplier(libs *tree.LibraryManager) *Complier {
 		lexer:   lexer.NewLexer(),
 		grammar: grammar.NewGrammar(),
 		libs:    libs,
+		reading: map[string]bool{},
 	}
 	for _, rule := range rule.LexerRules {
 		instance.lexer.AddRule(rule)
@@ -38,7 +43,7 @@ func NewComplier(libs *tree.LibraryManager) *Complier {
 	instance.grammar.SetEnd(rule.GrammarEnd)
 	instance.grammar.SetGlobal(rule.GrammarGlobal)
 	instance.grammar.Build()
-	instance.context = semantic.NewContext(libs, func(path string) (tree.Page, error) {
+	instance.context = semantic.NewContext(libs, func(path string) (concept.Index, error) {
 		return instance.GetPage(path)
 	})
 	instance.semantic = semantic.NewSemantic(instance.context)
@@ -48,52 +53,56 @@ func NewComplier(libs *tree.LibraryManager) *Complier {
 	return instance
 }
 
-func (c *Complier) GetPage(path string) (tree.Page, error) {
-	//TODO
-	return nil, nil
-}
-
-func (c *Complier) PathDecompose(path string) (string, string, error) {
-	if len(path) < 3 {
-		return "", "", errors.New(fmt.Sprintf("invalid path : %v", path))
+func (c *Complier) GetPage(path string) (concept.Index, error) {
+	page := c.libs.GetPage(path)
+	if !nl_interface.IsNil(page) {
+		return page, nil
 	}
-	path = path[1 : len(path)-1]
-	index := strings.LastIndex(path, "/")
-	if index <= 0 {
-		return "/", path[index+1:], nil
+	if c.reading[path] {
+		return nil, errors.New(fmt.Sprintf("Import cycle: \"%v\".", path))
 	}
-	return path[0:index], path[index+1:], nil
-}
-
-const (
-	fileLibrary = "file"
-)
-
-func (c *Complier) Read(path string) error {
-
-	source, err := os.Open(path)
+	c.reading[path] = true
+	page, err := c.ReadPage(path)
 	if err != nil {
-		return err
+		return nil, err
+	}
+	c.libs.AddPage(path, page)
+	c.reading[path] = false
+	return page, nil
+}
+
+func (c *Complier) open(path string) (*os.File, error) {
+	for _, root := range c.roots {
+		fullPath := filepath.Join(root, path)
+		_, err := os.Stat(fullPath)
+		if os.IsNotExist(err) {
+			continue
+		}
+		return os.Open(fullPath)
+	}
+	return nil, errors.New(fmt.Sprintf("Path not found in all roots: \"%v\".\n%v", path, strings.Join(c.roots, "\n")))
+}
+
+func (c *Complier) ReadPage(path string) (concept.Index, error) {
+	source, err := c.open(path)
+	if err != nil {
+		return nil, err
 	}
 	tokens, err := c.lexer.Read(source)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	phrase, err := c.grammar.Read(tokens)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	page, err := c.semantic.Read(phrase)
-	if err != nil {
-		return err
-	}
-	lib := c.libs.GetLibrary(fileLibrary)
-	if lib == nil {
-		lib = tree.NewLibraryAdaptor()
-		c.libs.AddLibrary(fileLibrary, lib)
-	}
-	lib.SetPage(page.GetName(), page)
-	return nil
+	return c.semantic.Read(phrase)
+}
+
+func (c *Complier) Read(path string) error {
+	_, err := c.GetPage(path)
+	// TODO run init()
+	return err
 }
 
 func (c *Complier) GetLexer() *lexer.Lexer {

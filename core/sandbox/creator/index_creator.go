@@ -3,69 +3,69 @@ package creator
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type IndexCreator struct {
-	ConstIndex         *index.ConstIndexCreator
-	ObjectFieldIndex   *index.ObjectFieldIndexCreator
-	ObjectMethodIndex  *index.ObjectMethodIndexCreator
-	RequireMethodIndex *index.RequireMethodIndexCreator
-	ResaultIndex       *index.ResaultIndexCreator
-	SearchIndex        *index.SearchIndexCreator
-	ThisIndex          *index.ThisIndexCreator
-	SelfIndex          *index.SelfIndexCreator
-	BubbleIndex        *index.BubbleIndexCreator
-	LocalIndex         *index.LocalIndexCreator
-	ImportIndex        *index.ImportIndexCreator
+	ConstIndex   *index.ConstIndexCreator
+	ResaultIndex *index.ResaultIndexCreator
+	SearchIndex  *index.SearchIndexCreator
+	ThisIndex    *index.ThisIndexCreator
+	SelfIndex    *index.SelfIndexCreator
+	BubbleIndex  *index.BubbleIndexCreator
+	LocalIndex   *index.LocalIndexCreator
+	ImportIndex  *index.ImportIndexCreator
 }
 
 type IndexCreatorParam struct {
-	ExceptionCreator         func(string, string) concept.Exception
-	NullCreator              func() concept.Null
-	StringCreator            func(string) concept.String
-	PreObjectFunctionCreator func(concept.Function, concept.Object) *variable.PreObjectFunction
+	ExceptionCreator func(string, string) concept.Exception
+	ParamCreator     func() concept.Param
+	NullCreator      func() concept.Null
+	StringCreator    func(string) concept.String
 }
 
 func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
 	instance := &IndexCreator{}
 	instance.ImportIndex = index.NewImportIndexCreator(&index.ImportIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
+		NullCreator:      param.NullCreator,
 	})
-	instance.LocalIndex = index.NewLocalIndexCreator(&index.LocalIndexCreatorParam{})
-	instance.BubbleIndex = index.NewBubbleIndexCreator(&index.BubbleIndexCreatorParam{})
+	instance.LocalIndex = index.NewLocalIndexCreator(&index.LocalIndexCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
+		NullCreator:      param.NullCreator,
+	})
+	instance.BubbleIndex = index.NewBubbleIndexCreator(&index.BubbleIndexCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
+		NullCreator:      param.NullCreator,
+	})
 	instance.SelfIndex = index.NewSelfIndexCreator(&index.SelfIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
 		StringCreator:    param.StringCreator,
+		NullCreator:      param.NullCreator,
 	})
 	instance.ThisIndex = index.NewThisIndexCreator(&index.ThisIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
 		StringCreator:    param.StringCreator,
+		NullCreator:      param.NullCreator,
 	})
 	instance.SearchIndex = index.NewSearchIndexCreator(&index.SearchIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
 		NullCreator:      param.NullCreator,
 	})
 	instance.ResaultIndex = index.NewResaultIndexCreator(&index.ResaultIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
-		NullCreator:      param.NullCreator,
-	})
-	instance.RequireMethodIndex = index.NewRequireMethodIndexCreator(&index.RequireMethodIndexCreatorParam{
-		ExceptionCreator:         param.ExceptionCreator,
-		PreObjectFunctionCreator: param.PreObjectFunctionCreator,
-		NullCreator:              param.NullCreator,
-	})
-	instance.ObjectMethodIndex = index.NewObjectMethodIndexCreator(&index.ObjectMethodIndexCreatorParam{
-		ExceptionCreator:         param.ExceptionCreator,
-		PreObjectFunctionCreator: param.PreObjectFunctionCreator,
-		NullCreator:              param.NullCreator,
-	})
-	instance.ObjectFieldIndex = index.NewObjectFieldIndexCreator(&index.ObjectFieldIndexCreatorParam{
-		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
 		NullCreator:      param.NullCreator,
 	})
 	instance.ConstIndex = index.NewConstIndexCreator(&index.ConstIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
+		NullCreator:      param.NullCreator,
 	})
 	return instance
 }

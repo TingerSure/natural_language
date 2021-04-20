@@ -143,7 +143,7 @@ type ForCreatorParam struct {
 	BoolCreator            func(bool) *variable.Bool
 	CodeBlockCreator       func() *code_block.CodeBlock
 	ConstIndexCreator      func(concept.Variable) *index.ConstIndex
-	ExpressionIndexCreator func(func(concept.Closure) (concept.Variable, concept.Interrupt)) *adaptor.ExpressionIndex
+	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
 	NullCreator            func() concept.Null
 }
 
@@ -162,7 +162,7 @@ func (s *ForCreator) New() *For {
 		body: s.param.CodeBlockCreator(),
 		seed: s,
 	}
-	back.ExpressionIndex = s.param.ExpressionIndexCreator(back.Exec)
+	back.ExpressionIndex = s.param.ExpressionIndexCreator(back)
 	return back
 }
 

@@ -21,6 +21,10 @@ type Number struct {
 	seed  NumberSeed
 }
 
+func (o *Number) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
+	return o.CallAdaptor(specimen, param, o)
+}
+
 func (f *Number) ToLanguage(language string) string {
 	return f.seed.ToLanguage(language, f)
 }

@@ -14,6 +14,10 @@ type AdaptorFunction struct {
 	languageOnCallSeeds map[string]func(concept.Function, *concept.Mapping) string
 }
 
+func (o *AdaptorFunction) IsFunction() bool {
+	return true
+}
+
 func (a *AdaptorFunction) GetLanguageOnCallSeed(language string) func(concept.Function, *concept.Mapping) string {
 	return a.languageOnCallSeeds[language]
 }

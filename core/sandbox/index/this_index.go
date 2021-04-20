@@ -1,6 +1,8 @@
 package index
 
 import (
+	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 )
 
@@ -12,7 +14,9 @@ type ThisIndexSeed interface {
 	ToLanguage(string, *ThisIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
+	NewParam() concept.Param
 	NewString(string) concept.String
+	NewNull() concept.Null
 }
 
 type ThisIndex struct {
@@ -39,6 +43,25 @@ func (s *ThisIndex) ToString(prefix string) string {
 	return thisIndexKey
 }
 
+func (s *ThisIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+	funcs, interrupt := s.Get(space)
+	if !nl_interface.IsNil(interrupt) {
+		return nil, interrupt.(concept.Exception)
+	}
+	if !funcs.IsFunction() {
+		return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString("")))
+	}
+	return funcs.(concept.Function).Exec(param, nil)
+}
+
+func (s *ThisIndex) CallAnticipate(space concept.Closure, param concept.Param) concept.Param {
+	funcs := s.Anticipate(space)
+	if !funcs.IsFunction() {
+		return s.seed.NewParam()
+	}
+	return funcs.(concept.Function).Anticipate(param, nil)
+}
+
 func (s *ThisIndex) Anticipate(space concept.Closure) concept.Variable {
 	value, _ := space.PeekBubble(s.seed.NewString(thisIndexKey))
 	return value
@@ -55,7 +78,9 @@ func (s *ThisIndex) Set(space concept.Closure, value concept.Variable) concept.I
 
 type ThisIndexCreatorParam struct {
 	ExceptionCreator func(string, string) concept.Exception
+	ParamCreator     func() concept.Param
 	StringCreator    func(string) concept.String
+	NullCreator      func() concept.Null
 }
 
 type ThisIndexCreator struct {
@@ -83,6 +108,14 @@ func (s *ThisIndexCreator) Type() string {
 
 func (s *ThisIndexCreator) NewException(name string, message string) concept.Exception {
 	return s.param.ExceptionCreator(name, message)
+}
+
+func (s *ThisIndexCreator) NewParam() concept.Param {
+	return s.param.ParamCreator()
+}
+
+func (s *ThisIndexCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
 }
 
 func (s *ThisIndexCreator) NewString(value string) concept.String {

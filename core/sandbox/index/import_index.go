@@ -9,6 +9,8 @@ type ImportIndexSeed interface {
 	ToLanguage(string, *ImportIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
+	NewParam() concept.Param
+	NewNull() concept.Null
 }
 
 type ImportIndex struct {
@@ -38,6 +40,15 @@ func (s *ImportIndex) ToString(prefix string) string {
 	return fmt.Sprintf("import %v \"%v\";", s.name, s.path)
 }
 
+func (s *ImportIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+	return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString("")))
+
+}
+
+func (s *ImportIndex) CallAnticipate(space concept.Closure, param concept.Param) concept.Param {
+	return s.seed.NewParam()
+}
+
 func (s *ImportIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
 	return nil, nil
 }
@@ -52,6 +63,8 @@ func (s *ImportIndex) Set(space concept.Closure, value concept.Variable) concept
 
 type ImportIndexCreatorParam struct {
 	ExceptionCreator func(string, string) concept.Exception
+	ParamCreator     func() concept.Param
+	NullCreator      func() concept.Null
 }
 
 type ImportIndexCreator struct {
@@ -82,6 +95,14 @@ func (s *ImportIndexCreator) Type() string {
 
 func (s *ImportIndexCreator) NewException(name string, message string) concept.Exception {
 	return s.param.ExceptionCreator(name, message)
+}
+
+func (s *ImportIndexCreator) NewParam() concept.Param {
+	return s.param.ParamCreator()
+}
+
+func (s *ImportIndexCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
 }
 
 func NewImportIndexCreator(param *ImportIndexCreatorParam) *ImportIndexCreator {

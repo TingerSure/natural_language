@@ -162,7 +162,7 @@ type Operator struct {
 
 func NewOperator(libs *tree.LibraryManager) *Operator {
 	instance := &Operator{
-		Page:                                 tree.NewPageAdaptor(libs.Sandbox),
+		Page:                                 libs.Sandbox.Variable.Object.New(),
 		OperatorTypeErrorExceptionTemplate:   libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "OperatorTypeErrorException"),
 		OperatorDivisorZeroExceptionTemplate: libs.Sandbox.Interrupt.Exception.NewOriginal("param error", "OperatorDivisorZeroException"),
 		Libs:                                 libs,
@@ -224,26 +224,26 @@ func NewOperator(libs *tree.LibraryManager) *Operator {
 	}
 
 	for name, item := range instance.NumberItems {
-		instance.SetFunction(libs.Sandbox.Variable.String.New(name+FuncName), item.Func)
-		instance.SetConst(libs.Sandbox.Variable.String.New(name+LeftName), item.Left)
-		instance.SetConst(libs.Sandbox.Variable.String.New(name+RightName), item.Right)
-		instance.SetConst(libs.Sandbox.Variable.String.New(name+ResultName), item.Result)
+		instance.SetField(libs.Sandbox.Variable.String.New(name+FuncName), item.Func)
+		instance.SetField(libs.Sandbox.Variable.String.New(name+LeftName), item.Left)
+		instance.SetField(libs.Sandbox.Variable.String.New(name+RightName), item.Right)
+		instance.SetField(libs.Sandbox.Variable.String.New(name+ResultName), item.Result)
 	}
 
 	for name, item := range instance.BoolItems {
-		instance.SetFunction(libs.Sandbox.Variable.String.New(name+FuncName), item.Func)
-		instance.SetConst(libs.Sandbox.Variable.String.New(name+LeftName), item.Left)
-		instance.SetConst(libs.Sandbox.Variable.String.New(name+RightName), item.Right)
-		instance.SetConst(libs.Sandbox.Variable.String.New(name+ResultName), item.Result)
+		instance.SetField(libs.Sandbox.Variable.String.New(name+FuncName), item.Func)
+		instance.SetField(libs.Sandbox.Variable.String.New(name+LeftName), item.Left)
+		instance.SetField(libs.Sandbox.Variable.String.New(name+RightName), item.Right)
+		instance.SetField(libs.Sandbox.Variable.String.New(name+ResultName), item.Result)
 	}
 
 	for name, item := range instance.BoolUnaryItems {
-		instance.SetFunction(libs.Sandbox.Variable.String.New(name+FuncName), item.Func)
-		instance.SetConst(libs.Sandbox.Variable.String.New(name+RightName), item.Right)
-		instance.SetConst(libs.Sandbox.Variable.String.New(name+ResultName), item.Result)
+		instance.SetField(libs.Sandbox.Variable.String.New(name+FuncName), item.Func)
+		instance.SetField(libs.Sandbox.Variable.String.New(name+RightName), item.Right)
+		instance.SetField(libs.Sandbox.Variable.String.New(name+ResultName), item.Result)
 	}
 
-	instance.SetException(libs.Sandbox.Variable.String.New("OperatorTypeErrorException"), instance.OperatorTypeErrorExceptionTemplate)
-	instance.SetException(libs.Sandbox.Variable.String.New("OperatorDivisorZeroException"), instance.OperatorDivisorZeroExceptionTemplate)
+	instance.SetField(libs.Sandbox.Variable.String.New("OperatorTypeErrorException"), instance.OperatorTypeErrorExceptionTemplate)
+	instance.SetField(libs.Sandbox.Variable.String.New("OperatorDivisorZeroException"), instance.OperatorDivisorZeroExceptionTemplate)
 	return instance
 }
