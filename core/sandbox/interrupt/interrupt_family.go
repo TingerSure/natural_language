@@ -7,15 +7,13 @@ import (
 type InterruptFamily struct {
 }
 
-func (v *InterruptFamily) IsException(value concept.Interrupt) (*Exception, bool) {
+func (v *InterruptFamily) IsException(value concept.Interrupt) (concept.Exception, bool) {
 	if value == nil {
 		return nil, false
 	}
-	if value.InterruptType() == ExceptionInterruptType {
-		exception, yes := value.(*Exception)
-		return exception, yes
-	}
-	return nil, false
+
+	exception, yes := value.(concept.Exception)
+	return exception, yes
 }
 
 func (v *InterruptFamily) IsBreak(value concept.Interrupt) (*Break, bool) {

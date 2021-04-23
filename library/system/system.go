@@ -14,12 +14,12 @@ type SystemLibraryParam struct {
 
 func BindSystem(libs *tree.LibraryManager, param *SystemLibraryParam) {
 	stdInstance := std.NewStd(libs, param.Std)
-	libs.SetPage("system/std", stdInstance)
+	libs.AddPage("system/std", libs.Sandbox.Index.ConstIndex.New(stdInstance))
 
-	libs.SetPage("system/question", question.NewQuestion(libs, stdInstance))
+	libs.AddPage("system/question", libs.Sandbox.Index.ConstIndex.New(question.NewQuestion(libs, stdInstance)))
 
-	libs.SetPage("system/set", set.NewSet(libs))
+	libs.AddPage("system/set", libs.Sandbox.Index.ConstIndex.New(set.NewSet(libs)))
 
-	libs.SetPage("system/operator", operator.NewOperator(libs))
+	libs.AddPage("system/operator", libs.Sandbox.Index.ConstIndex.New(operator.NewOperator(libs)))
 
 }

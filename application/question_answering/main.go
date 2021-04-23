@@ -5,8 +5,8 @@ import (
 	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	// "github.com/TingerSure/natural_language/language/chinese"
-	// "github.com/TingerSure/natural_language/library/system"
-	// "github.com/TingerSure/natural_language/library/system/std"
+	"github.com/TingerSure/natural_language/library/system"
+	"github.com/TingerSure/natural_language/library/system/std"
 	"os"
 	"time"
 )
@@ -29,16 +29,16 @@ func getVM() (*runtime.Runtime, error) {
 		},
 	})
 
-	// system.BindSystem(VM.GetLibraryManager(), &system.SystemLibraryParam{
-	// 	Std: &std.StdParam{
-	// 		Error: func(value concept.Variable) {
-	// 			os.Stdout.WriteString(fmt.Sprintf("\033[1;35m[NL]:\033[00m %v\n", value.ToLanguage(ChineseName)))
-	// 		},
-	// 		Print: func(value concept.Variable) {
-	// 			os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[NL]:\033[00m %v\n", value.ToLanguage(ChineseName)))
-	// 		},
-	// 	},
-	// })
+	system.BindSystem(VM.GetLibraryManager(), &system.SystemLibraryParam{
+		Std: &std.StdParam{
+			Error: func(value concept.Variable) {
+				os.Stdout.WriteString(fmt.Sprintf("\033[1;35m[NL]:\033[00m %v\n", value.ToLanguage(ChineseName)))
+			},
+			Print: func(value concept.Variable) {
+				os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[NL]:\033[00m %v\n", value.ToLanguage(ChineseName)))
+			},
+		},
+	})
 	// chinese.BindRule(VM.GetLibraryManager(), ChineseName)
 	// chinese.BindLanguage(VM.GetLibraryManager(), ChineseName)
 	err := VM.Read("test2.nl")

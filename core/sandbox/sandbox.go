@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/loop"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type SandboxParam struct {
@@ -46,7 +46,7 @@ func NewSandbox(param *SandboxParam) *Sandbox {
 	box.eventLoop.OnClose(param.OnClose)
 	box.eventLoop.OnInterrupt(func(suspend concept.Interrupt) {
 		switch suspend.InterruptType() {
-		case interrupt.ExceptionInterruptType:
+		case variable.ExceptionInterruptType:
 			param.OnError(errors.New(suspend.(concept.Exception).ToString("")))
 		default:
 			param.OnError(errors.New(fmt.Sprintf("Illegel interrupt in the root loop: %v.", suspend.InterruptType())))

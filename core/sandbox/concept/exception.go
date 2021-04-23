@@ -2,7 +2,7 @@ package concept
 
 type Exception interface {
 	Interrupt
-	ToString
+	Variable
 	Name() String
 	Message() String
 	Copy() Exception

@@ -1,25 +1,33 @@
-package interrupt
+package variable
 
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/variable/adaptor"
 )
 
 const (
 	ExceptionInterruptType = "exception"
+	VariableExceptionType  = "exception"
 )
 
 type ExceptionSeed interface {
 	ToLanguage(string, *Exception) string
 	Type() string
-	New(concept.String, concept.String) *Exception
+	InterruptType() string
+	New(concept.String, concept.String) concept.Exception
 }
 
 type Exception struct {
+	*adaptor.AdaptorVariable
 	name    concept.String
 	message concept.String
 	stacks  []concept.ExceptionStack
 	seed    ExceptionSeed
+}
+
+func (o *Exception) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
+	return o.CallAdaptor(specimen, param, o)
 }
 
 func (f *Exception) ToLanguage(language string) string {
@@ -50,7 +58,11 @@ func (e *Exception) Copy() concept.Exception {
 }
 
 func (e *Exception) InterruptType() string {
-	return e.seed.Type()
+	return e.seed.InterruptType()
+}
+
+func (o *Exception) Type() string {
+	return o.seed.Type()
 }
 
 func (e *Exception) Name() concept.String {
@@ -67,6 +79,7 @@ func (e *Exception) ToString(prefix string) string {
 
 type ExceptionCreatorParam struct {
 	StringCreator func(value string) concept.String
+	NullCreator   func() concept.Null
 }
 
 type ExceptionCreator struct {
@@ -74,8 +87,12 @@ type ExceptionCreator struct {
 	param *ExceptionCreatorParam
 }
 
-func (s *ExceptionCreator) NewOriginal(name string, message string) *Exception {
+func (s *ExceptionCreator) NewOriginal(name string, message string) concept.Exception {
 	return &Exception{
+		AdaptorVariable: adaptor.NewAdaptorVariable(&adaptor.AdaptorVariableParam{
+			NullCreator:      s.param.NullCreator,
+			ExceptionCreator: s.NewOriginal,
+		}),
 		name:    s.param.StringCreator(name),
 		message: s.param.StringCreator(message),
 		stacks:  make([]concept.ExceptionStack, 0),
@@ -83,8 +100,12 @@ func (s *ExceptionCreator) NewOriginal(name string, message string) *Exception {
 	}
 }
 
-func (s *ExceptionCreator) New(name concept.String, message concept.String) *Exception {
+func (s *ExceptionCreator) New(name concept.String, message concept.String) concept.Exception {
 	return &Exception{
+		AdaptorVariable: adaptor.NewAdaptorVariable(&adaptor.AdaptorVariableParam{
+			NullCreator:      s.param.NullCreator,
+			ExceptionCreator: s.NewOriginal,
+		}),
 		name:    name,
 		message: message,
 		stacks:  make([]concept.ExceptionStack, 0),
@@ -100,8 +121,12 @@ func (s *ExceptionCreator) ToLanguage(language string, instance *Exception) stri
 	return seed(language, instance)
 }
 
-func (s *ExceptionCreator) Type() string {
+func (s *ExceptionCreator) InterruptType() string {
 	return ExceptionInterruptType
+}
+
+func (s *ExceptionCreator) Type() string {
+	return VariableExceptionType
 }
 
 func NewExceptionCreator(param *ExceptionCreatorParam) *ExceptionCreator {

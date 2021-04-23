@@ -18,20 +18,33 @@ type VariableCreator struct {
 	Param          *variable.ParamCreator
 	SystemFunction *variable.SystemFunctionCreator
 	Array          *variable.ArrayCreator
+	Exception      *variable.ExceptionCreator
 }
 
 type VariableCreatorParam struct {
 	CodeBlockCreator func() *code_block.CodeBlock
-	ExceptionCreator func(string, string) concept.Exception
 }
 
 func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 	instance := &VariableCreator{}
+
+	instance.Exception = variable.NewExceptionCreator(&variable.ExceptionCreatorParam{
+		StringCreator: func(value string) concept.String {
+			return instance.String.New(value)
+		},
+		NullCreator: func() concept.Null {
+			return instance.Null.New()
+		},
+	})
 	instance.Null = variable.NewNullCreator(&variable.NullCreatorParam{
-		ExceptionCreator: param.ExceptionCreator,
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Exception.NewOriginal(name, message)
+		},
 	})
 	instance.SystemFunction = variable.NewSystemFunctionCreator(&variable.SystemFunctionCreatorParam{
-		ExceptionCreator: param.ExceptionCreator,
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Exception.NewOriginal(name, message)
+		},
 		NullCreator: func() concept.Null {
 			return instance.Null.New()
 		},
@@ -40,32 +53,42 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		NullCreator: func() concept.Null {
 			return instance.Null.New()
 		},
-		ExceptionCreator: param.ExceptionCreator,
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Exception.NewOriginal(name, message)
+		},
 	})
 	instance.String = variable.NewStringCreator(&variable.StringCreatorParam{
 		NullCreator: func() concept.Null {
 			return instance.Null.New()
 		},
-		ExceptionCreator: param.ExceptionCreator,
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Exception.NewOriginal(name, message)
+		},
 	})
 	instance.Number = variable.NewNumberCreator(&variable.NumberCreatorParam{
 		NullCreator: func() concept.Null {
 			return instance.Null.New()
 		},
-		ExceptionCreator: param.ExceptionCreator,
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Exception.NewOriginal(name, message)
+		},
 	})
 	instance.Class = variable.NewClassCreator(&variable.ClassCreatorParam{
 		NullCreator: func() concept.Null {
 			return instance.Null.New()
 		},
-		ExceptionCreator: param.ExceptionCreator,
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Exception.NewOriginal(name, message)
+		},
 	})
 
 	instance.Param = variable.NewParamCreator(&variable.ParamCreatorParam{
 		NullCreator: func() concept.Null {
 			return instance.Null.New()
 		},
-		ExceptionCreator: param.ExceptionCreator,
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Exception.NewOriginal(name, message)
+		},
 	})
 
 	instance.Function = variable.NewFunctionCreator(&variable.FunctionCreatorParam{
@@ -78,7 +101,9 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		NullCreator: func() concept.Null {
 			return instance.Null.New()
 		},
-		ExceptionCreator: param.ExceptionCreator,
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Exception.NewOriginal(name, message)
+		},
 		CodeBlockCreator: param.CodeBlockCreator,
 	})
 
@@ -86,19 +111,24 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		NullCreator: func() concept.Null {
 			return instance.Null.New()
 		},
-		ExceptionCreator: param.ExceptionCreator,
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Exception.NewOriginal(name, message)
+		},
 	})
 
 	instance.MappingObject = variable.NewMappingObjectCreator(&variable.MappingObjectCreatorParam{
-		ExceptionCreator: param.ExceptionCreator,
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Exception.NewOriginal(name, message)
+		},
 	})
 
 	instance.Array = variable.NewArrayCreator(&variable.ArrayCreatorParam{
 		NullCreator: func() concept.Null {
 			return instance.Null.New()
 		},
-		ExceptionCreator: param.ExceptionCreator,
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Exception.NewOriginal(name, message)
+		},
 	})
-
 	return instance
 }

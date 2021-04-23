@@ -95,7 +95,7 @@ func (f *Function) Anticipate(params concept.Param, object concept.Variable) con
 
 	if !nl_interface.IsNil(suspend) {
 		switch suspend.InterruptType() {
-		case interrupt.ExceptionInterruptType:
+		case ExceptionInterruptType:
 			return f.seed.NewParam()
 		case interrupt.EndInterruptType:
 			return f.seed.NewParam().Init(space.IterateReturn)
@@ -125,7 +125,7 @@ func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.
 
 	if !nl_interface.IsNil(suspend) {
 		switch suspend.InterruptType() {
-		case interrupt.ExceptionInterruptType:
+		case ExceptionInterruptType:
 			exception, yes := interrupt.InterruptFamilyInstance.IsException(suspend)
 			if !yes {
 				return nil, f.seed.NewException("system panic", fmt.Sprintf("ExceptionInterruptType does not mean an Exception anymore.\n%+v", suspend))

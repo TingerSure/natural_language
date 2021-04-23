@@ -163,8 +163,8 @@ type Operator struct {
 func NewOperator(libs *tree.LibraryManager) *Operator {
 	instance := &Operator{
 		Page:                                 libs.Sandbox.Variable.Object.New(),
-		OperatorTypeErrorExceptionTemplate:   libs.Sandbox.Interrupt.Exception.NewOriginal("type error", "OperatorTypeErrorException"),
-		OperatorDivisorZeroExceptionTemplate: libs.Sandbox.Interrupt.Exception.NewOriginal("param error", "OperatorDivisorZeroException"),
+		OperatorTypeErrorExceptionTemplate:   libs.Sandbox.Variable.Exception.NewOriginal("type error", "OperatorTypeErrorException"),
+		OperatorDivisorZeroExceptionTemplate: libs.Sandbox.Variable.Exception.NewOriginal("param error", "OperatorDivisorZeroException"),
 		Libs:                                 libs,
 	}
 

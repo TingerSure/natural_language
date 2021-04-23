@@ -21,18 +21,14 @@ type SandboxCreator struct {
 func NewSandboxCreator() *SandboxCreator {
 	instance := &SandboxCreator{}
 
-	instance.Interrupt = NewInterruptCreator(&InterruptCreatorParam{
-		StringCreator: func(value string) concept.String {
-			return instance.Variable.String.New(value)
-		},
-	})
+	instance.Interrupt = NewInterruptCreator(&InterruptCreatorParam{})
 
 	instance.Closure = closure.NewClosureCreator(&closure.ClosureCreatorParam{
 		EmptyCreator: func() concept.Null {
 			return instance.Variable.Null.New()
 		},
 		ExceptionCreator: func(name string, message string) concept.Exception {
-			return instance.Interrupt.Exception.NewOriginal(name, message)
+			return instance.Variable.Exception.NewOriginal(name, message)
 		},
 	})
 
@@ -44,7 +40,7 @@ func NewSandboxCreator() *SandboxCreator {
 
 	instance.Index = NewIndexCreator(&IndexCreatorParam{
 		ExceptionCreator: func(name string, message string) concept.Exception {
-			return instance.Interrupt.Exception.NewOriginal(name, message)
+			return instance.Variable.Exception.NewOriginal(name, message)
 		},
 		NullCreator: func() concept.Null {
 			return instance.Variable.Null.New()
@@ -61,9 +57,6 @@ func NewSandboxCreator() *SandboxCreator {
 		CodeBlockCreator: func() *code_block.CodeBlock {
 			return instance.CodeBlock.New()
 		},
-		ExceptionCreator: func(name string, message string) concept.Exception {
-			return instance.Interrupt.Exception.NewOriginal(name, message)
-		},
 	})
 
 	instance.Expression = NewExpressionCreator(&ExpressionCreatorParam{
@@ -71,7 +64,7 @@ func NewSandboxCreator() *SandboxCreator {
 			return instance.CodeBlock.New()
 		},
 		ExceptionCreator: func(name string, message string) concept.Exception {
-			return instance.Interrupt.Exception.NewOriginal(name, message)
+			return instance.Variable.Exception.NewOriginal(name, message)
 		},
 		NullCreator: func() concept.Null {
 			return instance.Variable.Null.New()
