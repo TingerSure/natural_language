@@ -9,24 +9,26 @@ import (
 	"github.com/TingerSure/natural_language/core/compiler/rule"
 	"github.com/TingerSure/natural_language/core/compiler/semantic"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-type Complier struct {
-	lexer    *lexer.Lexer
-	grammar  *grammar.Grammar
-	semantic *semantic.Semantic
-	context  *semantic.Context
-	libs     *tree.LibraryManager
-	reading  map[string]bool
-	roots    []string
+type Compiler struct {
+	lexer     *lexer.Lexer
+	grammar   *grammar.Grammar
+	semantic  *semantic.Semantic
+	context   *semantic.Context
+	libs      *tree.LibraryManager
+	reading   map[string]bool
+	roots     []string
+	extension string
 }
 
-func NewComplier(libs *tree.LibraryManager) *Complier {
-	instance := &Complier{
+func NewCompiler(libs *tree.LibraryManager) *Compiler {
+	instance := &Compiler{
 		lexer:   lexer.NewLexer(),
 		grammar: grammar.NewGrammar(),
 		libs:    libs,
@@ -53,7 +55,7 @@ func NewComplier(libs *tree.LibraryManager) *Complier {
 	return instance
 }
 
-func (c *Complier) GetPage(path string) (concept.Index, error) {
+func (c *Compiler) GetPage(path string) (concept.Index, error) {
 	page := c.libs.GetPage(path)
 	if !nl_interface.IsNil(page) {
 		return page, nil
@@ -71,19 +73,19 @@ func (c *Complier) GetPage(path string) (concept.Index, error) {
 	return page, nil
 }
 
-func (c *Complier) open(path string) (*os.File, error) {
+func (c *Compiler) open(path string) (*os.File, error) {
 	for _, root := range c.roots {
-		fullPath := filepath.Join(root, path)
+		fullPath := filepath.Join(root, path + c.extension)
 		_, err := os.Stat(fullPath)
 		if os.IsNotExist(err) {
 			continue
 		}
 		return os.Open(fullPath)
 	}
-	return nil, errors.New(fmt.Sprintf("Path not found in all roots: \"%v\".\n%v", path, strings.Join(c.roots, "\n")))
+	return nil, errors.New(fmt.Sprintf("Path \"%v\" not found in all roots:\n%v", path, strings.Join(c.roots, "\n")))
 }
 
-func (c *Complier) ReadPage(path string) (concept.Index, error) {
+func (c *Compiler) ReadPage(path string) (concept.Index, error) {
 	source, err := c.open(path)
 	if err != nil {
 		return nil, err
@@ -96,27 +98,59 @@ func (c *Complier) ReadPage(path string) (concept.Index, error) {
 	if err != nil {
 		return nil, err
 	}
-	return c.semantic.Read(phrase)
+	page, err := c.semantic.Read(phrase)
+	if err != nil {
+		return nil, err
+	}
+	err = c.initPage(page, path)
+	if err != nil {
+		return nil, err
+	}
+	return page, nil
 }
 
-func (c *Complier) Read(path string) error {
+func (c *Compiler) initPage(pageIndex concept.Index, path string) error {
+	initKey := c.libs.Sandbox.Variable.String.New("init")
+	page, exception := pageIndex.Get(nil)
+	if !nl_interface.IsNil(exception) {
+		return errors.New(fmt.Sprintf("Page index error: \"%v\"(\"%v\") is not an index without closure, cannot be used as a page index.", path, pageIndex.Type()))
+	}
+	init, exception := page.GetField(initKey)
+	if !nl_interface.IsNil(exception) {
+		return errors.New(exception.(concept.Exception).ToString(""))
+	}
+	_, yes := variable.VariableFamilyInstance.IsFunctionHome(init)
+	if !yes {
+		return errors.New(fmt.Sprintf("\"%v\".init exist but not a function.", path))
+	}
+	_, exception = page.Call(initKey, c.libs.Sandbox.Variable.Param.New())
+	if !nl_interface.IsNil(exception) {
+		return errors.New(exception.(concept.Exception).ToString(""))
+	}
+	return nil
+}
+
+func (c *Compiler) Read(path string) error {
 	_, err := c.GetPage(path)
-	// TODO run init()
 	return err
 }
 
-func (c *Complier) GetLexer() *lexer.Lexer {
+func (c *Compiler) GetLexer() *lexer.Lexer {
 	return c.lexer
 }
 
-func (c *Complier) GetGrammar() *grammar.Grammar {
+func (c *Compiler) GetGrammar() *grammar.Grammar {
 	return c.grammar
 }
 
-func (c *Complier) GetSemantic() *semantic.Semantic {
+func (c *Compiler) GetSemantic() *semantic.Semantic {
 	return c.semantic
 }
 
-func (c *Complier) AddRoots(roots ...string) {
+func (c *Compiler) SetExtension(extension string) {
+	c.extension = extension
+}
+
+func (c *Compiler) AddRoots(roots ...string) {
 	c.roots = append(c.roots, roots...)
 }

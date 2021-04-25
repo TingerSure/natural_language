@@ -12,6 +12,7 @@ const (
 	TypeLeftBrace               // {
 	TypeRightBrace              // }
 	TypeLeftArrow               // <-
+	TypeRightArrow              // ->
 	TypeSpace                   // \r \n \t [:space:]
 	TypeColon                   // :
 	TypeSemicolon               // ;
@@ -41,6 +42,7 @@ const (
 	KeyLeftBrace        = "left_brace"
 	KeyRightBrace       = "right_brace"
 	KeyLeftArrow        = "left_arrow"
+	KeyRightArrow       = "right_arrow"
 	KeySpace            = "space"
 	KeyColon            = "colon"
 	KeySemicolon        = "semicolon"
@@ -88,6 +90,9 @@ var (
 		}),
 		lexer.NewRule("<\\-", func(value []byte) *lexer.Token {
 			return lexer.NewToken(TypeLeftArrow, KeyLeftArrow, string(value))
+		}),
+		lexer.NewRule("\\->", func(value []byte) *lexer.Token {
+			return lexer.NewToken(TypeRightArrow, KeyRightArrow, string(value))
 		}),
 		lexer.NewRule(":", func(value []byte) *lexer.Token {
 			return lexer.NewToken(TypeColon, KeyColon, string(value))

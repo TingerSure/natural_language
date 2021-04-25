@@ -33,7 +33,7 @@ var (
 
 type Runtime struct {
 	parser              *parser.Parser
-	compiler            *compiler.Complier
+	compiler            *compiler.Compiler
 	libs                *tree.LibraryManager
 	box                 *sandbox.Sandbox
 	rootSpace           *closure.Closure
@@ -113,10 +113,11 @@ func (r *Runtime) Exec(hand concept.Index) {
 }
 
 type RuntimeParam struct {
-	OnError   func(error)
-	OnPrint   func(concept.Variable)
-	EventSize int
-	Roots     []string
+	OnError         func(error)
+	OnPrint         func(concept.Variable)
+	EventSize       int
+	SourceRoots     []string
+	SourceExtension string
 }
 
 func NewRuntime(param *RuntimeParam) *Runtime {
@@ -125,8 +126,9 @@ func NewRuntime(param *RuntimeParam) *Runtime {
 		structErrorFormat:   runtimeStructErrorFormatDefault,
 		priorityErrorFormat: runtimePriorityErrorFormatDefault,
 	}
-	runtime.compiler = compiler.NewComplier(runtime.libs)
-	runtime.compiler.AddRoots(param.Roots...)
+	runtime.compiler = compiler.NewCompiler(runtime.libs)
+	runtime.compiler.AddRoots(param.SourceRoots...)
+	runtime.compiler.SetExtension(param.SourceExtension)
 	runtime.rootSpace = runtime.libs.Sandbox.Closure.New(nil)
 	runtime.parser = parser.NewParser(runtime.rootSpace)
 	runtime.box = sandbox.NewSandbox(&sandbox.SandboxParam{

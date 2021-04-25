@@ -24,9 +24,10 @@ func getVM() (*runtime.Runtime, error) {
 			os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[NL]:\033[00m %v\n", value.ToString("")))
 		},
 		EventSize: 1024,
-		Roots: []string{
+		SourceRoots: []string{
 			"./",
 		},
+		SourceExtension: ".nl",
 	})
 
 	system.BindSystem(VM.GetLibraryManager(), &system.SystemLibraryParam{
@@ -41,7 +42,7 @@ func getVM() (*runtime.Runtime, error) {
 	})
 	// chinese.BindRule(VM.GetLibraryManager(), ChineseName)
 	// chinese.BindLanguage(VM.GetLibraryManager(), ChineseName)
-	err := VM.Read("test2.nl")
+	err := VM.Read("main/main")
 	if err != nil {
 		return nil, err
 	}
