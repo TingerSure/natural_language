@@ -25,3 +25,14 @@ func (v *IndexFamily) IsConstIndex(value concept.Index) (*ConstIndex, bool) {
 	}
 	return nil, false
 }
+
+func (v *IndexFamily) IsImportIndex(value concept.Index) (*ImportIndex, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == IndexImportType {
+		index, yes := value.(*ImportIndex)
+		return index, yes
+	}
+	return nil, false
+}

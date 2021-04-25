@@ -13,6 +13,7 @@ import (
 	LeftBrace
 	RightBrace
 	LeftArrow
+	RightArrow
 	Space
 	Colon
 	Semicolon
@@ -42,6 +43,7 @@ var (
 	SymbolLeftBrace        = grammar.NewTerminal(TypeLeftBrace, KeyLeftBrace)
 	SymbolRightBrace       = grammar.NewTerminal(TypeRightBrace, KeyRightBrace)
 	SymbolLeftArrow        = grammar.NewTerminal(TypeLeftArrow, KeyLeftArrow)
+	SymbolRightArrow       = grammar.NewTerminal(TypeRightArrow, KeyRightArrow)
 	SymbolSpace            = grammar.NewTerminal(TypeSpace, KeySpace)
 	SymbolColon            = grammar.NewTerminal(TypeColon, KeyColon)
 	SymbolSemicolon        = grammar.NewTerminal(TypeSemicolon, KeySemicolon)
@@ -85,17 +87,15 @@ var (
 )
 
 var (
-	PolymerizePageGroupEmpty          = grammar.NewRule(SymbolPageGroup, SymbolPage, SymbolIdentifier, SymbolLeftBrace, SymbolRightBrace)
-	PolymerizePageGroup               = grammar.NewRule(SymbolPageGroup, SymbolPage, SymbolIdentifier, SymbolLeftBrace, SymbolPageItemArray, SymbolRightBrace)
+	PolymerizePageGroup               = grammar.NewRule(SymbolPageGroup, SymbolPageItemArray)
 	PolymerizePageItemArrayStart      = grammar.NewRule(SymbolPageItemArray, SymbolPageItem)
 	PolymerizePageItemArray           = grammar.NewRule(SymbolPageItemArray, SymbolPageItemArray, SymbolPageItem)
 	PolymerizePageItemFromImportGroup = grammar.NewRule(SymbolPageItem, SymbolImportGroup)
-	PolymerizePageImportGroup         = grammar.NewRule(SymbolImportGroup, SymbolImport, SymbolIdentifier, SymbolString, SymbolSemicolon)
+	PolymerizePageImportGroup         = grammar.NewRule(SymbolImportGroup, SymbolImport, SymbolIdentifier, SymbolString)
 )
 
 var (
 	GrammarRules = []*grammar.Rule{
-		PolymerizePageGroupEmpty,
 		PolymerizePageGroup,
 		PolymerizePageItemArrayStart,
 		PolymerizePageItemArray,

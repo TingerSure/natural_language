@@ -14,7 +14,7 @@ type ImportIndexSeed interface {
 }
 
 type ImportIndex struct {
-	page concept.Index
+	page concept.Variable
 	path string
 	name string
 	seed ImportIndexSeed
@@ -23,6 +23,18 @@ type ImportIndex struct {
 const (
 	IndexImportType = "Import"
 )
+
+func (f *ImportIndex) Page() concept.Variable {
+	return f.page
+}
+
+func (f *ImportIndex) Name() string {
+	return f.name
+}
+
+func (f *ImportIndex) Path() string {
+	return f.path
+}
 
 func (f *ImportIndex) Type() string {
 	return f.seed.Type()
@@ -37,11 +49,11 @@ func (s *ImportIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 }
 
 func (s *ImportIndex) ToString(prefix string) string {
-	return fmt.Sprintf("import %v \"%v\";", s.name, s.path)
+	return fmt.Sprintf("import %v \"%v\"", s.name, s.path)
 }
 
 func (s *ImportIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
-	return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString("")))
+	return nil, s.seed.NewException("runtime error", "Import cannot be called.")
 
 }
 
@@ -50,15 +62,15 @@ func (s *ImportIndex) CallAnticipate(space concept.Closure, param concept.Param)
 }
 
 func (s *ImportIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
-	return nil, nil
+	return s.page, nil
 }
 
 func (s *ImportIndex) Anticipate(space concept.Closure) concept.Variable {
-	return nil
+	return s.page
 }
 
 func (s *ImportIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
-	return s.seed.NewException("read only", "Import cannot be changed.")
+	return s.seed.NewException("runtime error", "Import cannot be changed.")
 }
 
 type ImportIndexCreatorParam struct {
@@ -72,7 +84,7 @@ type ImportIndexCreator struct {
 	param *ImportIndexCreatorParam
 }
 
-func (s *ImportIndexCreator) New(name string, path string, page concept.Index) *ImportIndex {
+func (s *ImportIndexCreator) New(name string, path string, page concept.Variable) *ImportIndex {
 	return &ImportIndex{
 		name: name,
 		path: path,

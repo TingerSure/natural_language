@@ -20,7 +20,6 @@ type Compiler struct {
 	lexer     *lexer.Lexer
 	grammar   *grammar.Grammar
 	semantic  *semantic.Semantic
-	context   *semantic.Context
 	libs      *tree.LibraryManager
 	reading   map[string]bool
 	roots     []string
@@ -45,10 +44,9 @@ func NewCompiler(libs *tree.LibraryManager) *Compiler {
 	instance.grammar.SetEnd(rule.GrammarEnd)
 	instance.grammar.SetGlobal(rule.GrammarGlobal)
 	instance.grammar.Build()
-	instance.context = semantic.NewContext(libs, func(path string) (concept.Index, error) {
+	instance.semantic = semantic.NewSemantic(libs, func(path string) (concept.Index, error) {
 		return instance.GetPage(path)
 	})
-	instance.semantic = semantic.NewSemantic(instance.context)
 	for _, rule := range rule.SemanticRules {
 		instance.semantic.AddRule(rule)
 	}
@@ -75,7 +73,7 @@ func (c *Compiler) GetPage(path string) (concept.Index, error) {
 
 func (c *Compiler) open(path string) (*os.File, error) {
 	for _, root := range c.roots {
-		fullPath := filepath.Join(root, path + c.extension)
+		fullPath := filepath.Join(root, path+c.extension)
 		_, err := os.Stat(fullPath)
 		if os.IsNotExist(err) {
 			continue
@@ -106,6 +104,8 @@ func (c *Compiler) ReadPage(path string) (concept.Index, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println(page.ToString(""))
 	return page, nil
 }
 
@@ -119,7 +119,12 @@ func (c *Compiler) initPage(pageIndex concept.Index, path string) error {
 	if !nl_interface.IsNil(exception) {
 		return errors.New(exception.(concept.Exception).ToString(""))
 	}
-	_, yes := variable.VariableFamilyInstance.IsFunctionHome(init)
+
+	_, yes := variable.VariableFamilyInstance.IsNull(init)
+	if yes {
+		return nil
+	}
+	_, yes = variable.VariableFamilyInstance.IsFunctionHome(init)
 	if !yes {
 		return errors.New(fmt.Sprintf("\"%v\".init exist but not a function.", path))
 	}

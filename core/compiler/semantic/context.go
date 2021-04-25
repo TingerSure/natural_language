@@ -14,9 +14,9 @@ type Context struct {
 	libs    *tree.LibraryManager
 }
 
-func NewContext(libs *tree.LibraryManager, getPage func(path string) (concept.Index, error)) *Context {
+func NewContext(libs *tree.LibraryManager, getPage func(path string) (concept.Index, error), rules map[*grammar.Rule]*Rule) *Context {
 	return &Context{
-		rules:   map[*grammar.Rule]*Rule{},
+		rules:   rules,
 		getPage: getPage,
 		libs:    libs,
 	}
@@ -51,8 +51,4 @@ func (c *Context) GetRule(phrase grammar.Phrase) (*Rule, error) {
 		return nil, errors.New(fmt.Sprintf("No semantic rule match grammar rule : %v", phrase.GetRule().ToString()))
 	}
 	return rule, nil
-}
-
-func (c *Context) AddRule(rule *Rule) {
-	c.rules[rule.GetSource()] = rule
 }

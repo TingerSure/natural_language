@@ -1,6 +1,7 @@
 package variable
 
 import (
+	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable/adaptor"
 )
@@ -54,7 +55,7 @@ func (s *SystemFunction) ReturnNames() []concept.String {
 }
 
 func (f *SystemFunction) ToString(prefix string) string {
-	return f.name.ToString(prefix)
+	return fmt.Sprintf("%v <%v>", VariableSystemFunctionType, f.name.ToString(prefix))
 }
 
 func (f *SystemFunction) Anticipate(params concept.Param, object concept.Variable) concept.Param {

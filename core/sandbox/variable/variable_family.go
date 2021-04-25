@@ -11,6 +11,17 @@ var (
 type VariableFamily struct {
 }
 
+func (v *VariableFamily) IsNull(value concept.Variable) (concept.Null, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == VariableNullType {
+		exception, yes := value.(concept.Null)
+		return exception, yes
+	}
+	return nil, false
+}
+
 func (v *VariableFamily) IsException(value concept.Variable) (concept.Exception, bool) {
 	if value == nil {
 		return nil, false

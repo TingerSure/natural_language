@@ -4,20 +4,26 @@ import (
 	"errors"
 	"github.com/TingerSure/natural_language/core/compiler/grammar"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type Semantic struct {
-	context *Context
+	rules   map[*grammar.Rule]*Rule
+	getPage func(path string) (concept.Index, error)
+	libs    *tree.LibraryManager
 }
 
-func NewSemantic(context *Context) *Semantic {
+func NewSemantic(libs *tree.LibraryManager, getPage func(path string) (concept.Index, error)) *Semantic {
 	return &Semantic{
-		context: context,
+		rules:   map[*grammar.Rule]*Rule{},
+		getPage: getPage,
+		libs:    libs,
 	}
 }
 
 func (s *Semantic) Read(phrase grammar.Phrase) (concept.Index, error) {
-	pageIndex, err := s.context.Deal(phrase)
+	context := NewContext(s.libs, s.getPage, s.rules)
+	pageIndex, err := context.Deal(phrase)
 	if err != nil {
 		return nil, err
 	}
@@ -28,5 +34,5 @@ func (s *Semantic) Read(phrase grammar.Phrase) (concept.Index, error) {
 }
 
 func (s *Semantic) AddRule(rule *Rule) {
-	s.context.AddRule(rule)
+	s.rules[rule.GetSource()] = rule
 }
