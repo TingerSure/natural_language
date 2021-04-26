@@ -1,6 +1,7 @@
 package concept
 
 type Exception interface {
+	error
 	Interrupt
 	Variable
 	Name() String

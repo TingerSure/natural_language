@@ -12,7 +12,7 @@ const (
 )
 
 type Question struct {
-	tree.Page
+	concept.Page
 	output        *std.Std
 	HowManyParam  concept.String
 	WhatParam     concept.String
@@ -23,14 +23,14 @@ type Question struct {
 func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 
 	instance := &Question{
-		Page:          libs.Sandbox.Variable.Object.New(),
+		Page:          libs.Sandbox.Variable.Page.New(),
 		output:        output,
 		HowManyParam:  libs.Sandbox.Variable.String.New(QuestionParam),
 		WhatParam:     libs.Sandbox.Variable.String.New(QuestionParam),
 		HowManyResult: libs.Sandbox.Variable.String.New(QuestionResult),
 		WhatResult:    libs.Sandbox.Variable.String.New(QuestionResult),
 	}
-	instance.SetField(libs.Sandbox.Variable.String.New("HowMany"), libs.Sandbox.Variable.SystemFunction.New(
+	instance.SetExport(libs.Sandbox.Variable.String.New("HowMany"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("HowMany"),
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 			outParam, suspend := instance.output.Print(libs.Sandbox.Variable.Param.New().Set(instance.output.PrintContent, input.Get(instance.HowManyParam)), object)
@@ -45,9 +45,9 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 		[]concept.String{
 			instance.HowManyResult,
 		},
-	))
+	)))
 
-	instance.SetField(libs.Sandbox.Variable.String.New("What"), libs.Sandbox.Variable.SystemFunction.New(
+	instance.SetExport(libs.Sandbox.Variable.String.New("What"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("What"),
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 			outParam, suspend := instance.output.Print(libs.Sandbox.Variable.Param.New().Set(instance.output.PrintContent, input.Get(instance.WhatParam)), object)
@@ -62,11 +62,11 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 		[]concept.String{
 			instance.WhatResult,
 		},
-	))
+	)))
 
-	instance.SetField(libs.Sandbox.Variable.String.New("HowManyParam"), instance.HowManyParam)
-	instance.SetField(libs.Sandbox.Variable.String.New("WhatParam"), instance.HowManyParam)
-	instance.SetField(libs.Sandbox.Variable.String.New("HowManyResult"), instance.HowManyResult)
-	instance.SetField(libs.Sandbox.Variable.String.New("WhatResult"), instance.HowManyResult)
+	instance.SetExport(libs.Sandbox.Variable.String.New("HowManyParam"), libs.Sandbox.Index.ConstIndex.New(instance.HowManyParam))
+	instance.SetExport(libs.Sandbox.Variable.String.New("WhatParam"), libs.Sandbox.Index.ConstIndex.New(instance.HowManyParam))
+	instance.SetExport(libs.Sandbox.Variable.String.New("HowManyResult"), libs.Sandbox.Index.ConstIndex.New(instance.HowManyResult))
+	instance.SetExport(libs.Sandbox.Variable.String.New("WhatResult"), libs.Sandbox.Index.ConstIndex.New(instance.HowManyResult))
 	return instance
 }

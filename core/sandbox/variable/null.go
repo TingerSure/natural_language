@@ -23,6 +23,10 @@ func (o *Null) IsFunction() bool {
 	return false
 }
 
+func (o *Null) IsNull() bool {
+	return true
+}
+
 func (o *Null) GetSource() concept.Variable {
 	return nil
 }
@@ -41,6 +45,10 @@ func (o *Null) SetField(specimen concept.String, value concept.Variable) concept
 
 func (o *Null) GetField(specimen concept.String) (concept.Variable, concept.Exception) {
 	return nil, o.seed.GetNullPointerException().Copy()
+}
+
+func (m *Null) HasField(specimen concept.String) bool {
+	return false
 }
 
 func (o *Null) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {

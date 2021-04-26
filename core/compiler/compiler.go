@@ -117,7 +117,7 @@ func (c *Compiler) initPage(pageIndex concept.Index, path string) error {
 	}
 	init, exception := page.GetField(initKey)
 	if !nl_interface.IsNil(exception) {
-		return errors.New(exception.(concept.Exception).ToString(""))
+		return exception.(concept.Exception)
 	}
 
 	_, yes := variable.VariableFamilyInstance.IsNull(init)
@@ -130,7 +130,7 @@ func (c *Compiler) initPage(pageIndex concept.Index, path string) error {
 	}
 	_, exception = page.Call(initKey, c.libs.Sandbox.Variable.Param.New())
 	if !nl_interface.IsNil(exception) {
-		return errors.New(exception.(concept.Exception).ToString(""))
+		return exception.(concept.Exception)
 	}
 	return nil
 }

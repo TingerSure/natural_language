@@ -1,19 +1,20 @@
 package set
 
 import (
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type Set struct {
-	tree.Page
+	concept.Page
 }
 
 func NewSet(libs *tree.LibraryManager) *Set {
 	instance := &Set{
-		Page: libs.Sandbox.Variable.Object.New(),
+		Page: libs.Sandbox.Variable.Page.New(),
 	}
 
-	instance.SetField(libs.Sandbox.Variable.String.New("Is"), libs.Sandbox.Variable.String.New("Is"))
-	instance.SetField(libs.Sandbox.Variable.String.New("Equal"), libs.Sandbox.Variable.String.New("Equal"))
+	instance.SetExport(libs.Sandbox.Variable.String.New("Is"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.String.New("Is")))
+	instance.SetExport(libs.Sandbox.Variable.String.New("Equal"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.String.New("Equal")))
 	return instance
 }

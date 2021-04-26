@@ -6,12 +6,14 @@ type Closure interface {
 	MergeReturn(Closure)
 	IterateReturn(func(String, Variable) bool) bool
 	InitLocal(String, Variable)
-	PeekLocal(String) (Variable, Interrupt)
-	GetLocal(String) (Variable, Interrupt)
-	SetLocal(String, Variable) Interrupt
-	PeekBubble(String) (Variable, Interrupt)
-	GetBubble(String) (Variable, Interrupt)
-	SetBubble(String, Variable) Interrupt
+	PeekLocal(String) (Variable, Exception)
+	GetLocal(String) (Variable, Exception)
+	HasLocal(String) bool
+	SetLocal(String, Variable) Exception
+	PeekBubble(String) (Variable, Exception)
+	GetBubble(String) (Variable, Exception)
+	HasBubble(String) bool
+	SetBubble(String, Variable) Exception
 	AddExtempore(Index, Variable)
 	IterateHistory(func(String, Variable) bool) bool
 	IterateExtempore(func(Index, Variable) bool) bool

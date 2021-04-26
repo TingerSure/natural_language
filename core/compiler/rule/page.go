@@ -15,7 +15,7 @@ var (
 
 		semantic.NewRule(PolymerizePageGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			// SymbolPageGroup -> SymbolPageItemArray
-			page := context.GetLibraryManager().Sandbox.Variable.Object.New()
+			page := context.GetLibraryManager().Sandbox.Variable.Page.New()
 
 			items, err := context.Deal(phrase.GetChild(0))
 			if err != nil {
@@ -24,10 +24,10 @@ var (
 			for _, item := range items {
 				importIndex, yes := index.IndexFamilyInstance.IsImportIndex(item)
 				if yes {
-					page.SetField(
-						context.GetLibraryManager().Sandbox.Variable.String.New(importIndex.Name()),
-						importIndex.Page(),
-					)
+					exception := page.SetImport(context.GetLibraryManager().Sandbox.Variable.String.New(importIndex.Name()), importIndex)
+					if nl_interface.IsNil(exception) {
+						return nil, exception
+					}
 					continue
 				}
 				// TODO exportIndex varIndex

@@ -19,10 +19,12 @@ type VariableCreator struct {
 	SystemFunction *variable.SystemFunctionCreator
 	Array          *variable.ArrayCreator
 	Exception      *variable.ExceptionCreator
+	Page           *variable.PageCreator
 }
 
 type VariableCreatorParam struct {
 	CodeBlockCreator func() *code_block.CodeBlock
+	ClosureCreator   func(concept.Closure) concept.Closure
 }
 
 func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
@@ -35,6 +37,15 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		NullCreator: func() concept.Null {
 			return instance.Null.New()
 		},
+	})
+	instance.Page = variable.NewPageCreator(&variable.PageCreatorParam{
+		NullCreator: func() concept.Null {
+			return instance.Null.New()
+		},
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Exception.NewOriginal(name, message)
+		},
+		ClosureCreator: param.ClosureCreator,
 	})
 	instance.Null = variable.NewNullCreator(&variable.NullCreatorParam{
 		ExceptionCreator: func(name string, message string) concept.Exception {

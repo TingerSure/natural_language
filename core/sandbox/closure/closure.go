@@ -28,7 +28,7 @@ type Closure struct {
 func (c *Closure) IterateHistory(match func(concept.String, concept.Variable) bool) bool {
 	return c.history.Iterate(func(key concept.String, types int) bool {
 		var value concept.Variable
-		var suspend concept.Interrupt
+		var suspend concept.Exception
 		switch types {
 		case historyTypeLocal:
 			value, suspend = c.GetLocal(key)
@@ -108,7 +108,7 @@ func (c *Closure) InitLocal(key concept.String, defaultValue concept.Variable) {
 	c.local.Init(key, defaultValue)
 }
 
-func (c *Closure) PeekLocal(key concept.String) (concept.Variable, concept.Interrupt) {
+func (c *Closure) PeekLocal(key concept.String) (concept.Variable, concept.Exception) {
 	value := c.local.Get(key)
 	if nl_interface.IsNil(value) {
 		return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
@@ -116,7 +116,11 @@ func (c *Closure) PeekLocal(key concept.String) (concept.Variable, concept.Inter
 	return value.(concept.Variable), nil
 }
 
-func (c *Closure) GetLocal(key concept.String) (concept.Variable, concept.Interrupt) {
+func (c *Closure) HasLocal(key concept.String) bool {
+	return !nl_interface.IsNil(c.local.Get(key))
+}
+
+func (c *Closure) GetLocal(key concept.String) (concept.Variable, concept.Exception) {
 	value := c.local.Get(key)
 	if nl_interface.IsNil(value) {
 		return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
@@ -125,7 +129,7 @@ func (c *Closure) GetLocal(key concept.String) (concept.Variable, concept.Interr
 	return value.(concept.Variable), nil
 }
 
-func (c *Closure) SetLocal(key concept.String, value concept.Variable) concept.Interrupt {
+func (c *Closure) SetLocal(key concept.String, value concept.Variable) concept.Exception {
 	if !c.local.Set(key, value) {
 		return c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 	}
@@ -133,7 +137,18 @@ func (c *Closure) SetLocal(key concept.String, value concept.Variable) concept.I
 	return nil
 }
 
-func (c *Closure) PeekBubble(key concept.String) (concept.Variable, concept.Interrupt) {
+func (c *Closure) HasBubble(key concept.String) bool {
+	yes := c.HasLocal(key)
+	if yes {
+		return true
+	}
+	if c.parent != nil {
+		return c.parent.HasBubble(key)
+	}
+	return false
+}
+
+func (c *Closure) PeekBubble(key concept.String) (concept.Variable, concept.Exception) {
 	value, suspend := c.PeekLocal(key)
 	if nl_interface.IsNil(suspend) {
 		return value, nil
@@ -144,7 +159,7 @@ func (c *Closure) PeekBubble(key concept.String) (concept.Variable, concept.Inte
 	return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 }
 
-func (c *Closure) GetBubble(key concept.String) (concept.Variable, concept.Interrupt) {
+func (c *Closure) GetBubble(key concept.String) (concept.Variable, concept.Exception) {
 	value, suspend := c.GetLocal(key)
 	if nl_interface.IsNil(suspend) {
 		c.history.Set(key, historyTypeBubble)
@@ -160,7 +175,7 @@ func (c *Closure) GetBubble(key concept.String) (concept.Variable, concept.Inter
 	return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 }
 
-func (c *Closure) SetBubble(key concept.String, value concept.Variable) concept.Interrupt {
+func (c *Closure) SetBubble(key concept.String, value concept.Variable) concept.Exception {
 	suspend := c.SetLocal(key, value)
 	if nl_interface.IsNil(suspend) {
 		return nil

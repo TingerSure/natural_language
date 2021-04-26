@@ -33,6 +33,10 @@ func (o *AdaptorVariable) IsFunction() bool {
 	return false
 }
 
+func (o *AdaptorVariable) IsNull() bool {
+	return false
+}
+
 func (o *AdaptorVariable) CallAdaptor(specimen concept.String, param concept.Param, this concept.Variable) (concept.Param, concept.Exception) {
 	value, exception := o.GetField(specimen)
 	if nl_interface.IsNil(exception) {
@@ -53,6 +57,11 @@ func (o *AdaptorVariable) SetField(specimen concept.String, value concept.Variab
 func (o *AdaptorVariable) GetField(specimen concept.String) (concept.Variable, concept.Exception) {
 	o.initFields()
 	return o.fields.Get(specimen).(concept.Variable), nil
+}
+
+func (o *AdaptorVariable) HasField(specimen concept.String) bool{
+	o.initFields()
+	return o.fields.Has(specimen)
 }
 
 func (a *AdaptorVariable) ToString(prefix string) string {

@@ -77,6 +77,10 @@ func (e *Exception) ToString(prefix string) string {
 	return fmt.Sprintf("[%v] %v", e.name.ToString(prefix), e.message.ToString(prefix))
 }
 
+func (e *Exception) Error() string {
+	return e.ToString("")
+}
+
 type ExceptionCreatorParam struct {
 	StringCreator func(value string) concept.String
 	NullCreator   func() concept.Null

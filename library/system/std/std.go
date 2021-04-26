@@ -17,7 +17,7 @@ const (
 )
 
 type Std struct {
-	tree.Page
+	concept.Page
 	param        *StdParam
 	PrintContent concept.String
 	ErrorContent concept.String
@@ -40,11 +40,11 @@ func (s *Std) Error(input concept.Param, object concept.Object) (concept.Param, 
 func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 	instance := &Std{
 		param:        param,
-		Page:         libs.Sandbox.Variable.Object.New(),
+		Page:         libs.Sandbox.Variable.Page.New(),
 		PrintContent: libs.Sandbox.Variable.String.New(PrintContent),
 		ErrorContent: libs.Sandbox.Variable.String.New(ErrorContent),
 	}
-	instance.SetField(libs.Sandbox.Variable.String.New("Print"), libs.Sandbox.Variable.SystemFunction.New(
+	instance.SetExport(libs.Sandbox.Variable.String.New("Print"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("Print"),
 		instance.Print,
 		func(input concept.Param, _ concept.Object) concept.Param {
@@ -56,8 +56,8 @@ func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 		[]concept.String{
 			instance.PrintContent,
 		},
-	))
-	instance.SetField(libs.Sandbox.Variable.String.New("Error"), libs.Sandbox.Variable.SystemFunction.New(
+	)))
+	instance.SetExport(libs.Sandbox.Variable.String.New("Error"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("Error"),
 		instance.Error,
 		func(input concept.Param, _ concept.Object) concept.Param {
@@ -69,8 +69,8 @@ func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 		[]concept.String{
 			instance.ErrorContent,
 		},
-	))
-	instance.SetField(libs.Sandbox.Variable.String.New("PrintContent"), instance.PrintContent)
-	instance.SetField(libs.Sandbox.Variable.String.New("ErrorContent"), instance.ErrorContent)
+	)))
+	instance.SetExport(libs.Sandbox.Variable.String.New("PrintContent"), libs.Sandbox.Index.ConstIndex.New(instance.PrintContent))
+	instance.SetExport(libs.Sandbox.Variable.String.New("ErrorContent"), libs.Sandbox.Index.ConstIndex.New(instance.ErrorContent))
 	return instance
 }

@@ -57,6 +57,9 @@ func NewSandboxCreator() *SandboxCreator {
 		CodeBlockCreator: func() *code_block.CodeBlock {
 			return instance.CodeBlock.New()
 		},
+		ClosureCreator: func(parent concept.Closure) concept.Closure {
+			return instance.Closure.New(parent)
+		},
 	})
 
 	instance.Expression = NewExpressionCreator(&ExpressionCreatorParam{

@@ -26,6 +26,10 @@ func (o *MappingObject) IsFunction() bool {
 	return false
 }
 
+func (o *MappingObject) IsNull() bool {
+	return false
+}
+
 func (o *MappingObject) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
 	if o.class.HasRequire(specimen) {
 		return o.callRequire(specimen, param)
@@ -79,6 +83,10 @@ func (m *MappingObject) SetField(specimen concept.String, value concept.Variable
 
 func (m *MappingObject) GetField(specimen concept.String) (concept.Variable, concept.Exception) {
 	return nil, m.seed.NewException("system error", "Mapping object cannot get field.")
+}
+
+func (m *MappingObject) HasField(specimen concept.String) bool {
+	return false
 }
 
 type MappingObjectCreatorParam struct {
