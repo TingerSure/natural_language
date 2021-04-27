@@ -34,6 +34,8 @@ import (
 	Function
 	Get
 	Set
+	True
+	False
 */
 
 var (
@@ -65,6 +67,8 @@ var (
 	SymbolFunction         = grammar.NewTerminal(TypeFunction, KeyFunction)
 	SymbolGet              = grammar.NewTerminal(TypeGet, KeyGet)
 	SymbolSet              = grammar.NewTerminal(TypeSet, KeySet)
+	SymbolTrue             = grammar.NewTerminal(TypeTrue, KeyTrue)
+	SymbolFalse            = grammar.NewTerminal(TypeFalse, KeyFalse)
 )
 
 const (
@@ -75,6 +79,7 @@ const (
 	TypeExportGroup
 	TypeVarGroup
 	TypeIndex
+	TypeBool
 )
 
 const (
@@ -85,6 +90,7 @@ const (
 	KeyExportGroup   = "export_group"
 	KeyVarGroup      = "var_group"
 	KeyIndex         = "index"
+	KeyBool          = "bool"
 )
 
 var (
@@ -95,6 +101,7 @@ var (
 	SymbolExportGroup   = grammar.NewNonterminal(TypeExportGroup, KeyExportGroup)
 	SymbolVarGroup      = grammar.NewNonterminal(TypeVarGroup, KeyVarGroup)
 	SymbolIndex         = grammar.NewNonterminal(TypeIndex, KeyIndex)
+	SymbolBool          = grammar.NewNonterminal(TypeBool, KeyBool)
 )
 
 var (
@@ -102,12 +109,16 @@ var (
 	PolymerizePageItemArrayStart      = grammar.NewRule(SymbolPageItemArray, SymbolPageItem)
 	PolymerizePageItemArray           = grammar.NewRule(SymbolPageItemArray, SymbolPageItemArray, SymbolPageItem)
 	PolymerizePageItemFromImportGroup = grammar.NewRule(SymbolPageItem, SymbolImportGroup)
+	PolymerizePageItemFromExportGroup = grammar.NewRule(SymbolPageItem, SymbolExportGroup)
+	PolymerizePageItemFromVarGroup    = grammar.NewRule(SymbolPageItem, SymbolVarGroup)
 	PolymerizeImportGroup             = grammar.NewRule(SymbolImportGroup, SymbolImport, SymbolIdentifier, SymbolString)
 	PolymerizeExportGroup             = grammar.NewRule(SymbolExportGroup, SymbolExport, SymbolIdentifier, SymbolIndex)
 	PolymerizeVarGroup                = grammar.NewRule(SymbolVarGroup, SymbolVar, SymbolIdentifier, SymbolIndex)
 	PolymerizeIndexFromNumber         = grammar.NewRule(SymbolIndex, SymbolNumber)
 	PolymerizeIndexFromString         = grammar.NewRule(SymbolIndex, SymbolString)
-	// PolymerizeIndexFromBool         = grammar.NewRule(SymbolIndex, SymbolBool)
+	PolymerizeIndexFromBool           = grammar.NewRule(SymbolIndex, SymbolBool)
+	PolymerizeBoolFromTrue            = grammar.NewRule(SymbolBool, SymbolTrue)
+	PolymerizeBoolFromFalse           = grammar.NewRule(SymbolBool, SymbolFalse)
 )
 
 var (
@@ -116,11 +127,16 @@ var (
 		PolymerizePageItemArrayStart,
 		PolymerizePageItemArray,
 		PolymerizePageItemFromImportGroup,
+		PolymerizePageItemFromExportGroup,
+		PolymerizePageItemFromVarGroup,
 		PolymerizeImportGroup,
 		PolymerizeExportGroup,
 		PolymerizeVarGroup,
 		PolymerizeIndexFromNumber,
 		PolymerizeIndexFromString,
+		PolymerizeIndexFromBool,
+		PolymerizeBoolFromTrue,
+		PolymerizeBoolFromFalse,
 	}
 
 	GrammarEnd = SymbolEnd

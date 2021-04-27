@@ -33,6 +33,8 @@ const (
 	TypeFunction                // function
 	TypeGet                     // get
 	TypeSet                     // set
+	TypeTrue                    // true
+	TypeFalse                   // false
 )
 
 const (
@@ -64,6 +66,8 @@ const (
 	KeyFunction         = "function"
 	KeyGet              = "get"
 	KeySet              = "set"
+	KeyTrue             = "true"
+	KeyFalse            = "false"
 )
 
 var (
@@ -151,6 +155,10 @@ var (
 				return lexer.NewToken(TypeGet, KeyGet, KeyGet)
 			case KeySet:
 				return lexer.NewToken(TypeSet, KeySet, KeySet)
+			case KeyTrue:
+				return lexer.NewToken(TypeTrue, KeyTrue, KeyTrue)
+			case KeyFalse:
+				return lexer.NewToken(TypeFalse, KeyFalse, KeyFalse)
 			default:
 				return lexer.NewToken(TypeIdentifier, KeyIdentifier, valueIdentifier)
 			}

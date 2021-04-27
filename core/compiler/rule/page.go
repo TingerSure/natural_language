@@ -72,6 +72,14 @@ var (
 			//SymbolPageItem -> SymbolImportGroup
 			return context.Deal(phrase.GetChild(0))
 		}),
+		semantic.NewRule(PolymerizePageItemFromExportGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolPageItem -> SymbolExportGroup
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizePageItemFromVarGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolPageItem -> SymbolVarGroup
+			return context.Deal(phrase.GetChild(0))
+		}),
 		semantic.NewRule(PolymerizeImportGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolImportGroup -> SymbolImport SymbolIdentifier SymbolString
 			path := context.FormatSymbolString(phrase.GetChild(2).GetToken().Value())
@@ -116,6 +124,18 @@ var (
 		semantic.NewRule(PolymerizeIndexFromString, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolIndex -> SymbolString
 			return []concept.Index{context.GetLibraryManager().Sandbox.Index.ConstIndex.New(context.GetLibraryManager().Sandbox.Variable.String.New(context.FormatSymbolString(phrase.GetChild(0).GetToken().Value())))}, nil
+		}),
+		semantic.NewRule(PolymerizeIndexFromBool, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolIndex -> SymbolBool
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeBoolFromTrue, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolBool -> SymbolTrue
+			return []concept.Index{context.GetLibraryManager().Sandbox.Index.ConstIndex.New(context.GetLibraryManager().Sandbox.Variable.Bool.New(true))}, nil
+		}),
+		semantic.NewRule(PolymerizeBoolFromFalse, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolBool -> SymbolFalse
+			return []concept.Index{context.GetLibraryManager().Sandbox.Index.ConstIndex.New(context.GetLibraryManager().Sandbox.Variable.Bool.New(false))}, nil
 		}),
 	}
 )
