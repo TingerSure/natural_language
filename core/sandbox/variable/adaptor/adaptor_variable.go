@@ -59,7 +59,7 @@ func (o *AdaptorVariable) GetField(specimen concept.String) (concept.Variable, c
 	return o.fields.Get(specimen).(concept.Variable), nil
 }
 
-func (o *AdaptorVariable) HasField(specimen concept.String) bool{
+func (o *AdaptorVariable) HasField(specimen concept.String) bool {
 	o.initFields()
 	return o.fields.Has(specimen)
 }

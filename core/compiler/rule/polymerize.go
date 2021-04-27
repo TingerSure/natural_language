@@ -70,6 +70,8 @@ const (
 	TypePageItemArray
 	TypePageItem
 	TypeImportGroup
+	TypeExportGroup
+	TypeIndex
 )
 
 const (
@@ -77,6 +79,8 @@ const (
 	KeyPageItemArray = "page_item_array"
 	KeyPageItem      = "page_item"
 	KeyImportGroup   = "import_group"
+	KeyExportGroup   = "export_group"
+	KeyIndex         = "index"
 )
 
 var (
@@ -84,6 +88,8 @@ var (
 	SymbolPageItemArray = grammar.NewNonterminal(TypePageItemArray, KeyPageItemArray)
 	SymbolPageItem      = grammar.NewNonterminal(TypePageItem, KeyPageItem)
 	SymbolImportGroup   = grammar.NewNonterminal(TypeImportGroup, KeyImportGroup)
+	SymbolExportGroup   = grammar.NewNonterminal(TypeExportGroup, KeyExportGroup)
+	SymbolIndex         = grammar.NewNonterminal(TypeIndex, KeyIndex)
 )
 
 var (
@@ -91,7 +97,11 @@ var (
 	PolymerizePageItemArrayStart      = grammar.NewRule(SymbolPageItemArray, SymbolPageItem)
 	PolymerizePageItemArray           = grammar.NewRule(SymbolPageItemArray, SymbolPageItemArray, SymbolPageItem)
 	PolymerizePageItemFromImportGroup = grammar.NewRule(SymbolPageItem, SymbolImportGroup)
-	PolymerizePageImportGroup         = grammar.NewRule(SymbolImportGroup, SymbolImport, SymbolIdentifier, SymbolString)
+	PolymerizeImportGroup             = grammar.NewRule(SymbolImportGroup, SymbolImport, SymbolIdentifier, SymbolString)
+	PolymerizeExportGroup             = grammar.NewRule(SymbolExportGroup, SymbolExport, SymbolIdentifier, SymbolIndex)
+	PolymerizeIndexFromNumber         = grammar.NewRule(SymbolIndex, SymbolNumber)
+	PolymerizeIndexFromString         = grammar.NewRule(SymbolIndex, SymbolString)
+	// PolymerizeIndexFromBool         = grammar.NewRule(SymbolIndex, SymbolBool)
 )
 
 var (
@@ -100,7 +110,10 @@ var (
 		PolymerizePageItemArrayStart,
 		PolymerizePageItemArray,
 		PolymerizePageItemFromImportGroup,
-		PolymerizePageImportGroup,
+		PolymerizeImportGroup,
+		PolymerizeExportGroup,
+		PolymerizeIndexFromNumber,
+		PolymerizeIndexFromString,
 	}
 
 	GrammarEnd = SymbolEnd

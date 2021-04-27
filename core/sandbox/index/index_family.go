@@ -36,3 +36,14 @@ func (v *IndexFamily) IsImportIndex(value concept.Index) (*ImportIndex, bool) {
 	}
 	return nil, false
 }
+
+func (v *IndexFamily) IsExportIndex(value concept.Index) (*ExportIndex, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == IndexExportType {
+		index, yes := value.(*ExportIndex)
+		return index, yes
+	}
+	return nil, false
+}

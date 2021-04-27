@@ -53,7 +53,7 @@ func (s *ImportIndex) ToString(prefix string) string {
 }
 
 func (s *ImportIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
-	return nil, s.seed.NewException("runtime error", "Import cannot be called.")
+	return nil, s.seed.NewException("runtime error", "ImportIndex cannot be called.")
 
 }
 
