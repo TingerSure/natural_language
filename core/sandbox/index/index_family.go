@@ -37,6 +37,17 @@ func (v *IndexFamily) IsImportIndex(value concept.Index) (*ImportIndex, bool) {
 	return nil, false
 }
 
+func (v *IndexFamily) IsVarIndex(value concept.Index) (*VarIndex, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == IndexVarType {
+		index, yes := value.(*VarIndex)
+		return index, yes
+	}
+	return nil, false
+}
+
 func (v *IndexFamily) IsExportIndex(value concept.Index) (*ExportIndex, bool) {
 	if value == nil {
 		return nil, false

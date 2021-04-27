@@ -25,6 +25,7 @@ const (
 	TypePage                    // page
 	TypeImport                  // import
 	TypeExport                  // export
+	TypeVar                     // var
 	TypeClass                   // class
 	TypeRequire                 // require
 	TypeProvide                 // provide
@@ -55,6 +56,7 @@ const (
 	KeyPage             = "page"
 	KeyImport           = "import"
 	KeyExport           = "export"
+	KeyVar              = "var"
 	KeyClass            = "class"
 	KeyRequire          = "require"
 	KeyProvide          = "provide"
@@ -133,6 +135,8 @@ var (
 				return lexer.NewToken(TypeImport, KeyImport, KeyImport)
 			case KeyExport:
 				return lexer.NewToken(TypeExport, KeyExport, KeyExport)
+			case KeyVar:
+				return lexer.NewToken(TypeVar, KeyVar, KeyVar)
 			case KeyClass:
 				return lexer.NewToken(TypeClass, KeyClass, KeyClass)
 			case KeyRequire:

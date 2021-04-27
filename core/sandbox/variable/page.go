@@ -98,15 +98,15 @@ func (o *Page) HasField(specimen concept.String) bool {
 func (o *Page) ToString(prefix string) string {
 	lines := []string{}
 	o.imports.Iterate(func(key concept.String, value interface{}) bool {
-		lines = append(lines, fmt.Sprintf("import %v \"%v\"", key.ToString(prefix), value.(*index.ImportIndex).Path()))
+		lines = append(lines, value.(*index.ImportIndex).ToString(prefix))
 		return false
 	})
 	o.vars.Iterate(func(key concept.String, value interface{}) bool {
-		lines = append(lines, fmt.Sprintf("var %v %v", key.ToString(""), value.(concept.Index).ToString(prefix)))
+		lines = append(lines, value.(*index.VarIndex).ToString(prefix))
 		return false
 	})
 	o.exports.Iterate(func(key concept.String, value interface{}) bool {
-		lines = append(lines, fmt.Sprintf("export %v %v", key.ToString(""), value.(concept.Index).ToString(prefix)))
+		lines = append(lines, value.(*index.ExportIndex).ToString(prefix))
 		return false
 	})
 

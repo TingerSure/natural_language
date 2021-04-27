@@ -15,6 +15,7 @@ type IndexCreator struct {
 	LocalIndex   *index.LocalIndexCreator
 	ImportIndex  *index.ImportIndexCreator
 	ExportIndex  *index.ExportIndexCreator
+	VarIndex     *index.VarIndexCreator
 }
 
 type IndexCreatorParam struct {
@@ -26,6 +27,11 @@ type IndexCreatorParam struct {
 
 func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
 	instance := &IndexCreator{}
+	instance.VarIndex = index.NewVarIndexCreator(&index.VarIndexCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
+		NullCreator:      param.NullCreator,
+	})
 	instance.ExportIndex = index.NewExportIndexCreator(&index.ExportIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,

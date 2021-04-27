@@ -44,7 +44,7 @@ func (s *ExportIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 }
 
 func (s *ExportIndex) ToString(prefix string) string {
-	return fmt.Sprintf("export %v \"%v\"", s.name, s.originator.ToString(prefix))
+	return fmt.Sprintf("export %v %v", s.name, s.originator.ToString(prefix))
 }
 
 func (s *ExportIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {

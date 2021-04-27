@@ -39,7 +39,14 @@ var (
 					}
 					continue
 				}
-				// TODO varIndex
+				varIndex, yes := index.IndexFamilyInstance.IsVarIndex(item)
+				if yes {
+					exception := page.SetVar(context.GetLibraryManager().Sandbox.Variable.String.New(varIndex.Name()), varIndex)
+					if nl_interface.IsNil(exception) {
+						return nil, exception
+					}
+					continue
+				}
 			}
 			return []concept.Index{
 				context.GetLibraryManager().Sandbox.Index.ConstIndex.New(page),
@@ -88,6 +95,15 @@ var (
 				return nil, err
 			}
 			return []concept.Index{context.GetLibraryManager().Sandbox.Index.ExportIndex.New(name, indexes[0])}, nil
+		}),
+		semantic.NewRule(PolymerizeVarGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolVarGroup -> SymbolVar SymbolIdentifier SymbolIndex
+			name := phrase.GetChild(1).GetToken().Value()
+			indexes, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			return []concept.Index{context.GetLibraryManager().Sandbox.Index.VarIndex.New(name, indexes[0])}, nil
 		}),
 		semantic.NewRule(PolymerizeIndexFromNumber, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolIndex -> SymbolNumber

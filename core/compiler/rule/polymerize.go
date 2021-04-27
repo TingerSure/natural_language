@@ -26,6 +26,7 @@ import (
 	Page
 	Import
 	Export
+	Var
 	Class
 	Require
 	Provide
@@ -56,6 +57,7 @@ var (
 	SymbolPage             = grammar.NewTerminal(TypePage, KeyPage)
 	SymbolImport           = grammar.NewTerminal(TypeImport, KeyImport)
 	SymbolExport           = grammar.NewTerminal(TypeExport, KeyExport)
+	SymbolVar              = grammar.NewTerminal(TypeVar, KeyVar)
 	SymbolClass            = grammar.NewTerminal(TypeClass, KeyClass)
 	SymbolRequire          = grammar.NewTerminal(TypeRequire, KeyRequire)
 	SymbolProvide          = grammar.NewTerminal(TypeProvide, KeyProvide)
@@ -71,6 +73,7 @@ const (
 	TypePageItem
 	TypeImportGroup
 	TypeExportGroup
+	TypeVarGroup
 	TypeIndex
 )
 
@@ -80,6 +83,7 @@ const (
 	KeyPageItem      = "page_item"
 	KeyImportGroup   = "import_group"
 	KeyExportGroup   = "export_group"
+	KeyVarGroup      = "var_group"
 	KeyIndex         = "index"
 )
 
@@ -89,6 +93,7 @@ var (
 	SymbolPageItem      = grammar.NewNonterminal(TypePageItem, KeyPageItem)
 	SymbolImportGroup   = grammar.NewNonterminal(TypeImportGroup, KeyImportGroup)
 	SymbolExportGroup   = grammar.NewNonterminal(TypeExportGroup, KeyExportGroup)
+	SymbolVarGroup      = grammar.NewNonterminal(TypeVarGroup, KeyVarGroup)
 	SymbolIndex         = grammar.NewNonterminal(TypeIndex, KeyIndex)
 )
 
@@ -99,6 +104,7 @@ var (
 	PolymerizePageItemFromImportGroup = grammar.NewRule(SymbolPageItem, SymbolImportGroup)
 	PolymerizeImportGroup             = grammar.NewRule(SymbolImportGroup, SymbolImport, SymbolIdentifier, SymbolString)
 	PolymerizeExportGroup             = grammar.NewRule(SymbolExportGroup, SymbolExport, SymbolIdentifier, SymbolIndex)
+	PolymerizeVarGroup                = grammar.NewRule(SymbolVarGroup, SymbolVar, SymbolIdentifier, SymbolIndex)
 	PolymerizeIndexFromNumber         = grammar.NewRule(SymbolIndex, SymbolNumber)
 	PolymerizeIndexFromString         = grammar.NewRule(SymbolIndex, SymbolString)
 	// PolymerizeIndexFromBool         = grammar.NewRule(SymbolIndex, SymbolBool)
@@ -112,6 +118,7 @@ var (
 		PolymerizePageItemFromImportGroup,
 		PolymerizeImportGroup,
 		PolymerizeExportGroup,
+		PolymerizeVarGroup,
 		PolymerizeIndexFromNumber,
 		PolymerizeIndexFromString,
 	}
