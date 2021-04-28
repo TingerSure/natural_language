@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"strings"
 )
 
@@ -21,7 +20,6 @@ type PageSeed interface {
 
 type Page struct {
 	seed    PageSeed
-	imports *concept.Mapping
 	exports *concept.Mapping
 	vars    *concept.Mapping
 	space   concept.Closure
@@ -46,7 +44,7 @@ func (o *Page) SetImport(specimen concept.String, indexes concept.Index) concept
 	if !nl_interface.IsNil(exception) {
 		return exception.(concept.Exception)
 	}
-	o.imports.Set(specimen, indexes)
+	o.vars.Set(specimen, indexes)
 	o.space.InitLocal(specimen, value)
 	return nil
 }
@@ -55,11 +53,12 @@ func (o *Page) SetExport(specimen concept.String, indexes concept.Index) concept
 	if o.space.HasLocal(specimen) {
 		return o.seed.NewException("runtime error", fmt.Sprintf("Export %v already exists.", specimen.ToString("")))
 	}
-	value, exception := indexes.Get(nil)
+	value, exception := indexes.Get(o.space)
 	if !nl_interface.IsNil(exception) {
 		return exception.(concept.Exception)
 	}
 	o.exports.Set(specimen, indexes)
+	o.vars.Set(specimen, indexes)
 	o.space.InitLocal(specimen, value)
 	return nil
 }
@@ -97,19 +96,10 @@ func (o *Page) HasField(specimen concept.String) bool {
 
 func (o *Page) ToString(prefix string) string {
 	lines := []string{}
-	o.imports.Iterate(func(key concept.String, value interface{}) bool {
-		lines = append(lines, value.(*index.ImportIndex).ToString(prefix))
-		return false
-	})
 	o.vars.Iterate(func(key concept.String, value interface{}) bool {
-		lines = append(lines, value.(*index.VarIndex).ToString(prefix))
+		lines = append(lines, value.(concept.Index).ToString(prefix))
 		return false
 	})
-	o.exports.Iterate(func(key concept.String, value interface{}) bool {
-		lines = append(lines, value.(*index.ExportIndex).ToString(prefix))
-		return false
-	})
-
 	return strings.Join(lines, "\n")
 }
 
@@ -156,10 +146,6 @@ func (s *PageCreator) New() *Page {
 	return &Page{
 		seed:  s,
 		space: s.param.ClosureCreator(nil),
-		imports: concept.NewMapping(&concept.MappingParam{
-			AutoInit:   true,
-			EmptyValue: s.param.NullCreator(),
-		}),
 		exports: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: s.param.NullCreator(),
