@@ -1,9 +1,11 @@
 package variable
 
 import (
+	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"strings"
 )
 
@@ -36,40 +38,30 @@ func (o *Page) Call(specimen concept.String, param concept.Param) (concept.Param
 	return value.(concept.Function).Exec(param, nil)
 }
 
-func (o *Page) SetImport(specimen concept.String, indexes concept.Index) concept.Exception {
-	if o.space.HasLocal(specimen) {
-		return o.seed.NewException("runtime error", fmt.Sprintf("Import %v already exists.", specimen.ToString("")))
-	}
-	value, exception := indexes.Get(nil)
-	if !nl_interface.IsNil(exception) {
-		return exception.(concept.Exception)
-	}
-	o.vars.Set(specimen, indexes)
-	o.space.InitLocal(specimen, value)
-	return nil
+func (o *Page) SetImport(specimen concept.String, indexes concept.Index) error {
+	return o.SetVar(specimen, indexes)
 }
 
-func (o *Page) SetExport(specimen concept.String, indexes concept.Index) concept.Exception {
-	if o.space.HasLocal(specimen) {
-		return o.seed.NewException("runtime error", fmt.Sprintf("Export %v already exists.", specimen.ToString("")))
-	}
-	value, exception := indexes.Get(o.space)
-	if !nl_interface.IsNil(exception) {
-		return exception.(concept.Exception)
+func (o *Page) SetExport(specimen concept.String, indexes concept.Index) error {
+	err := o.SetVar(specimen, indexes)
+	if err != nil {
+		return err
 	}
 	o.exports.Set(specimen, indexes)
-	o.vars.Set(specimen, indexes)
-	o.space.InitLocal(specimen, value)
 	return nil
 }
 
-func (o *Page) SetVar(specimen concept.String, indexes concept.Index) concept.Exception {
+func (o *Page) SetVar(specimen concept.String, indexes concept.Index) error {
 	if o.space.HasLocal(specimen) {
-		return o.seed.NewException("runtime error", fmt.Sprintf("Var %v already exists.", specimen.ToString("")))
+		return o.seed.NewException("runtime error", fmt.Sprintf("Duplicate identifier: %v.", specimen.ToString("")))
 	}
-	value, exception := indexes.Get(o.space)
-	if !nl_interface.IsNil(exception) {
-		return exception.(concept.Exception)
+	value, suspend := indexes.Get(o.space)
+	if !nl_interface.IsNil(suspend) {
+		exception, yes := interrupt.InterruptFamilyInstance.IsException(suspend)
+		if yes {
+			return exception.(concept.Exception)
+		}
+		return errors.New(fmt.Sprintf("An illegal interrupt \"%v\" was thrown while declaring variable : %v.", suspend.InterruptType(), specimen.ToString("")))
 	}
 	o.vars.Set(specimen, indexes)
 	o.space.InitLocal(specimen, value)

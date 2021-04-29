@@ -109,24 +109,22 @@ func (c *Closure) InitLocal(key concept.String, defaultValue concept.Variable) {
 }
 
 func (c *Closure) PeekLocal(key concept.String) (concept.Variable, concept.Exception) {
-	value := c.local.Get(key)
-	if nl_interface.IsNil(value) {
-		return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
+	if !c.local.Has(key) {
+		return nil, c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 	}
-	return value.(concept.Variable), nil
+	return c.local.Get(key).(concept.Variable), nil
 }
 
 func (c *Closure) HasLocal(key concept.String) bool {
-	return !nl_interface.IsNil(c.local.Get(key))
+	return c.local.Has(key)
 }
 
 func (c *Closure) GetLocal(key concept.String) (concept.Variable, concept.Exception) {
-	value := c.local.Get(key)
-	if nl_interface.IsNil(value) {
-		return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
+	if !c.local.Has(key) {
+		return nil, c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
 	}
 	c.history.Set(key, historyTypeLocal)
-	return value.(concept.Variable), nil
+	return c.local.Get(key).(concept.Variable), nil
 }
 
 func (c *Closure) SetLocal(key concept.String, value concept.Variable) concept.Exception {

@@ -2,7 +2,7 @@ package concept
 
 type Page interface {
 	Variable
-	SetImport(String, Index) Exception
-	SetExport(String, Index) Exception
-	SetVar(String, Index) Exception
+	SetImport(String, Index) error
+	SetExport(String, Index) error
+	SetVar(String, Index) error
 }

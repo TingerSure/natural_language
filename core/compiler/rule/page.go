@@ -26,7 +26,7 @@ var (
 				importIndex, yes := index.IndexFamilyInstance.IsImportIndex(item)
 				if yes {
 					exception := page.SetImport(context.GetLibraryManager().Sandbox.Variable.String.New(importIndex.Name()), importIndex)
-					if nl_interface.IsNil(exception) {
+					if !nl_interface.IsNil(exception) {
 						return nil, exception
 					}
 					continue
@@ -34,7 +34,7 @@ var (
 				exportIndex, yes := index.IndexFamilyInstance.IsExportIndex(item)
 				if yes {
 					exception := page.SetExport(context.GetLibraryManager().Sandbox.Variable.String.New(exportIndex.Name()), exportIndex)
-					if nl_interface.IsNil(exception) {
+					if !nl_interface.IsNil(exception) {
 						return nil, exception
 					}
 					continue
@@ -42,7 +42,7 @@ var (
 				varIndex, yes := index.IndexFamilyInstance.IsVarIndex(item)
 				if yes {
 					exception := page.SetVar(context.GetLibraryManager().Sandbox.Variable.String.New(varIndex.Name()), varIndex)
-					if nl_interface.IsNil(exception) {
+					if !nl_interface.IsNil(exception) {
 						return nil, exception
 					}
 					continue
