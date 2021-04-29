@@ -25,25 +25,34 @@ var (
 			for _, item := range items {
 				importIndex, yes := index.IndexFamilyInstance.IsImportIndex(item)
 				if yes {
-					exception := page.SetImport(context.GetLibraryManager().Sandbox.Variable.String.New(importIndex.Name()), importIndex)
-					if !nl_interface.IsNil(exception) {
-						return nil, exception
+					err := page.SetImport(
+						context.GetLibraryManager().Sandbox.Variable.String.New(importIndex.Name()),
+						importIndex,
+					)
+					if !nl_interface.IsNil(err) {
+						return nil, err
 					}
 					continue
 				}
 				exportIndex, yes := index.IndexFamilyInstance.IsExportIndex(item)
 				if yes {
-					exception := page.SetExport(context.GetLibraryManager().Sandbox.Variable.String.New(exportIndex.Name()), exportIndex)
-					if !nl_interface.IsNil(exception) {
-						return nil, exception
+					err := page.SetExport(
+						context.GetLibraryManager().Sandbox.Variable.String.New(exportIndex.Name()),
+						exportIndex,
+					)
+					if !nl_interface.IsNil(err) {
+						return nil, err
 					}
 					continue
 				}
 				varIndex, yes := index.IndexFamilyInstance.IsVarIndex(item)
 				if yes {
-					exception := page.SetVar(context.GetLibraryManager().Sandbox.Variable.String.New(varIndex.Name()), varIndex)
-					if !nl_interface.IsNil(exception) {
-						return nil, exception
+					err := page.SetVar(
+						context.GetLibraryManager().Sandbox.Variable.String.New(varIndex.Name()),
+						varIndex,
+					)
+					if !nl_interface.IsNil(err) {
+						return nil, err
 					}
 					continue
 				}
@@ -83,17 +92,26 @@ var (
 		semantic.NewRule(PolymerizeImportGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolImportGroup -> SymbolImport SymbolIdentifier SymbolString
 			path := context.FormatSymbolString(phrase.GetChild(2).GetToken().Value())
-			name := phrase.GetChild(1).GetToken().Value()
 			pageIndex, err := context.GetPage(path)
 			if err != nil {
 				return nil, err
 			}
 			page, exception := pageIndex.Get(nil)
 			if !nl_interface.IsNil(exception) {
-				return nil, errors.New(fmt.Sprintf("Page index error: \"%v\"(\"%v\") is not an index without closure, cannot be used as a page index.", path, pageIndex.Type()))
+				return nil, errors.New(fmt.Sprintf(
+					"Page index error: \"%v\"(\"%v\") is not an index without closure, cannot be used as a page index.",
+					path,
+					pageIndex.Type(),
+				))
 			}
 
-			return []concept.Index{context.GetLibraryManager().Sandbox.Index.ImportIndex.New(name, path, page)}, nil
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.ImportIndex.New(
+					phrase.GetChild(1).GetToken().Value(),
+					path,
+					page,
+				),
+			}, nil
 		}),
 		semantic.NewRule(PolymerizeExportGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolExportGroup -> SymbolExport SymbolIdentifier SymbolIndex
@@ -102,16 +120,32 @@ var (
 			if err != nil {
 				return nil, err
 			}
-			return []concept.Index{context.GetLibraryManager().Sandbox.Index.ExportIndex.New(name, indexes[0])}, nil
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.ExportIndex.New(name, indexes[0]),
+			}, nil
 		}),
 		semantic.NewRule(PolymerizeVarGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolVarGroup -> SymbolVar SymbolIdentifier SymbolIndex
-			name := phrase.GetChild(1).GetToken().Value()
 			indexes, err := context.Deal(phrase.GetChild(2))
 			if err != nil {
 				return nil, err
 			}
-			return []concept.Index{context.GetLibraryManager().Sandbox.Index.VarIndex.New(name, indexes[0])}, nil
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.VarIndex.New(
+					phrase.GetChild(1).GetToken().Value(),
+					indexes[0],
+				),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeIndexFromIdentifier, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolIndex -> SymbolIdentifier
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.BubbleIndex.New(
+					context.GetLibraryManager().Sandbox.Variable.String.New(
+						phrase.GetChild(0).GetToken().Value(),
+					),
+				),
+			}, nil
 		}),
 		semantic.NewRule(PolymerizeIndexFromNumber, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolIndex -> SymbolNumber
@@ -119,11 +153,23 @@ var (
 			if err != nil {
 				return nil, err
 			}
-			return []concept.Index{context.GetLibraryManager().Sandbox.Index.ConstIndex.New(context.GetLibraryManager().Sandbox.Variable.Number.New(value))}, nil
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.ConstIndex.New(
+					context.GetLibraryManager().Sandbox.Variable.Number.New(value),
+				),
+			}, nil
 		}),
 		semantic.NewRule(PolymerizeIndexFromString, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolIndex -> SymbolString
-			return []concept.Index{context.GetLibraryManager().Sandbox.Index.ConstIndex.New(context.GetLibraryManager().Sandbox.Variable.String.New(context.FormatSymbolString(phrase.GetChild(0).GetToken().Value())))}, nil
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.ConstIndex.New(
+					context.GetLibraryManager().Sandbox.Variable.String.New(
+						context.FormatSymbolString(
+							phrase.GetChild(0).GetToken().Value(),
+						),
+					),
+				),
+			}, nil
 		}),
 		semantic.NewRule(PolymerizeIndexFromBool, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolIndex -> SymbolBool
@@ -131,11 +177,49 @@ var (
 		}),
 		semantic.NewRule(PolymerizeBoolFromTrue, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolBool -> SymbolTrue
-			return []concept.Index{context.GetLibraryManager().Sandbox.Index.ConstIndex.New(context.GetLibraryManager().Sandbox.Variable.Bool.New(true))}, nil
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.ConstIndex.New(
+					context.GetLibraryManager().Sandbox.Variable.Bool.New(true),
+				),
+			}, nil
 		}),
 		semantic.NewRule(PolymerizeBoolFromFalse, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolBool -> SymbolFalse
-			return []concept.Index{context.GetLibraryManager().Sandbox.Index.ConstIndex.New(context.GetLibraryManager().Sandbox.Variable.Bool.New(false))}, nil
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.ConstIndex.New(
+					context.GetLibraryManager().Sandbox.Variable.Bool.New(false),
+				),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeCallWithoutParam, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolIndex -> SymbolIndex SymbolLeftParenthesis SymbolRightParenthesis
+			indexes, err := context.Deal(phrase.GetChild(0))
+			if err != nil {
+				return nil, err
+			}
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.Call.New(
+					indexes[0],
+					context.GetLibraryManager().Sandbox.Index.ConstIndex.New(
+						context.GetLibraryManager().Sandbox.Variable.Param.New(),
+					),
+				),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeComponent, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolIndex -> SymbolIndex SymbolDot SymbolIdentifier
+			indexes, err := context.Deal(phrase.GetChild(0))
+			if err != nil {
+				return nil, err
+			}
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.Component.New(
+					indexes[0],
+					context.GetLibraryManager().Sandbox.Variable.String.New(
+						phrase.GetChild(2).GetToken().Value(),
+					),
+				),
+			}, nil
 		}),
 	}
 )

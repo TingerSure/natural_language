@@ -37,7 +37,7 @@ func (s *BubbleIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
 }
 
 func (s *BubbleIndex) ToString(prefix string) string {
-	return s.key.ToString(prefix)
+	return s.key.Value()
 }
 
 func (s *BubbleIndex) Key() concept.String {

@@ -114,11 +114,14 @@ var (
 	PolymerizeImportGroup             = grammar.NewRule(SymbolImportGroup, SymbolImport, SymbolIdentifier, SymbolString)
 	PolymerizeExportGroup             = grammar.NewRule(SymbolExportGroup, SymbolExport, SymbolIdentifier, SymbolIndex)
 	PolymerizeVarGroup                = grammar.NewRule(SymbolVarGroup, SymbolVar, SymbolIdentifier, SymbolIndex)
+	PolymerizeIndexFromIdentifier     = grammar.NewRule(SymbolIndex, SymbolIdentifier)
 	PolymerizeIndexFromNumber         = grammar.NewRule(SymbolIndex, SymbolNumber)
 	PolymerizeIndexFromString         = grammar.NewRule(SymbolIndex, SymbolString)
 	PolymerizeIndexFromBool           = grammar.NewRule(SymbolIndex, SymbolBool)
 	PolymerizeBoolFromTrue            = grammar.NewRule(SymbolBool, SymbolTrue)
 	PolymerizeBoolFromFalse           = grammar.NewRule(SymbolBool, SymbolFalse)
+	PolymerizeCallWithoutParam        = grammar.NewRule(SymbolIndex, SymbolIndex, SymbolLeftParenthesis, SymbolRightParenthesis)
+	PolymerizeComponent               = grammar.NewRule(SymbolIndex, SymbolIndex, SymbolDot, SymbolIdentifier)
 )
 
 var (
@@ -132,11 +135,14 @@ var (
 		PolymerizeImportGroup,
 		PolymerizeExportGroup,
 		PolymerizeVarGroup,
+		PolymerizeIndexFromIdentifier,
 		PolymerizeIndexFromNumber,
 		PolymerizeIndexFromString,
 		PolymerizeIndexFromBool,
 		PolymerizeBoolFromTrue,
 		PolymerizeBoolFromFalse,
+		PolymerizeCallWithoutParam,
+		PolymerizeComponent,
 	}
 
 	GrammarEnd = SymbolEnd
