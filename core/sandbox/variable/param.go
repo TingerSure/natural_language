@@ -52,9 +52,8 @@ func (o *Param) Type() string {
 	return o.seed.Type()
 }
 
-func (o *Param) Set(key concept.String, value concept.Variable) concept.Param {
+func (o *Param) Set(key concept.String, value concept.Variable) {
 	o.values.Set(key, value)
-	return o
 }
 
 func (o *Param) Get(key concept.String) concept.Variable {
@@ -74,14 +73,6 @@ func (o *Param) Copy() concept.Param {
 		return false
 	})
 	return param
-}
-
-func (o *Param) Init(iterator func(func(concept.String, concept.Variable) bool) bool) concept.Param {
-	iterator(func(key concept.String, value concept.Variable) bool {
-		o.Set(key, value)
-		return false
-	})
-	return o
 }
 
 type ParamCreatorParam struct {

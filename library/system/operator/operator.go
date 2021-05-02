@@ -46,10 +46,14 @@ func (o *Operator) NewNumberOperatorNumberItem(name string, exec func(*variable.
 			if !nl_interface.IsNil(exception) {
 				return nil, exception.Copy().AddStack(instance.Func)
 			}
-			return o.Libs.Sandbox.Variable.Param.New().Set(instance.Result, result), nil
+			param := o.Libs.Sandbox.Variable.Param.New()
+			param.Set(instance.Result, result)
+			return param, nil
 		},
 		func(input concept.Param, object concept.Object) concept.Param {
-			return o.Libs.Sandbox.Variable.Param.New().Set(instance.Result, anticipateValue)
+			param := o.Libs.Sandbox.Variable.Param.New()
+			param.Set(instance.Result, anticipateValue)
+			return param
 		},
 		[]concept.String{
 			instance.Left,
@@ -80,10 +84,14 @@ func (o *Operator) NewBoolOperatorBoolItem(name string, exec func(*variable.Bool
 			if !nl_interface.IsNil(exception) {
 				return nil, exception.Copy().AddStack(instance.Func)
 			}
-			return o.Libs.Sandbox.Variable.Param.New().Set(instance.Result, result), nil
+			param := o.Libs.Sandbox.Variable.Param.New()
+			param.Set(instance.Result, result)
+			return param, nil
 		},
 		func(input concept.Param, object concept.Object) concept.Param {
-			return o.Libs.Sandbox.Variable.Param.New().Set(instance.Result, anticipateValue)
+			param := o.Libs.Sandbox.Variable.Param.New()
+			param.Set(instance.Result, anticipateValue)
+			return param
 		},
 		[]concept.String{
 			instance.Left,
@@ -112,10 +120,14 @@ func (o *Operator) NewOperatorBoolItem(name string, exec func(*variable.Bool) (c
 			if !nl_interface.IsNil(exception) {
 				return nil, exception.Copy().AddStack(instance.Func)
 			}
-			return o.Libs.Sandbox.Variable.Param.New().Set(instance.Result, result), nil
+			param := o.Libs.Sandbox.Variable.Param.New()
+			param.Set(instance.Result, result)
+			return param, nil
 		},
 		func(input concept.Param, object concept.Object) concept.Param {
-			return o.Libs.Sandbox.Variable.Param.New().Set(instance.Result, anticipateValue)
+			param := o.Libs.Sandbox.Variable.Param.New()
+			param.Set(instance.Result, anticipateValue)
+			return param
 		},
 		[]concept.String{
 			instance.Right,

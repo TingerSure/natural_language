@@ -2,9 +2,10 @@ package concept
 
 type Param interface {
 	Variable
-	Set(String, Variable) Param
+	Set(String, Variable)
 	Get(String) Variable
+	// SetIndex(int, Variable)
+	// GetIndex(int) Variable
 	Copy() Param
-	Init(func(func(String, Variable) bool) bool) Param
 	Iterate(func(String, Variable) bool) bool
 }

@@ -98,13 +98,17 @@ func (f *Function) Anticipate(params concept.Param, object concept.Variable) con
 		case ExceptionInterruptType:
 			return f.seed.NewParam()
 		case interrupt.EndInterruptType:
-			return f.seed.NewParam().Init(space.IterateReturn)
+			//Do Nothing
 		default:
 			return f.seed.NewParam()
 		}
 	}
-
-	return f.seed.NewParam().Init(space.IterateReturn)
+	returnParams := f.seed.NewParam()
+	space.IterateReturn(func(key concept.String, value concept.Variable) bool {
+		returnParams.Set(key, value)
+		return false
+	})
+	return returnParams
 }
 
 func (f *Function) Body() *code_block.CodeBlock {
@@ -132,13 +136,17 @@ func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.
 			}
 			return nil, exception
 		case interrupt.EndInterruptType:
-			return f.seed.NewParam().Init(space.IterateReturn), nil
+			// Do Nothing
 		default:
 			return nil, f.seed.NewException("system error", fmt.Sprintf("Unknown Interrupt \"%v\".\n%+v", suspend.InterruptType(), suspend))
 		}
 	}
-
-	return f.seed.NewParam().Init(space.IterateReturn), nil
+	returnParams := f.seed.NewParam()
+	space.IterateReturn(func(key concept.String, value concept.Variable) bool {
+		returnParams.Set(key, value)
+		return false
+	})
+	return returnParams, nil
 }
 
 func (s *Function) Type() string {

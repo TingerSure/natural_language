@@ -33,11 +33,17 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 	instance.SetExport(libs.Sandbox.Variable.String.New("HowMany"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("HowMany"),
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
-			outParam, suspend := instance.output.Print(libs.Sandbox.Variable.Param.New().Set(instance.output.PrintContent, input.Get(instance.HowManyParam)), object)
-			return libs.Sandbox.Variable.Param.New().Set(instance.HowManyResult, outParam.Get(instance.output.PrintContent)), suspend
+			printParam := libs.Sandbox.Variable.Param.New()
+			printParam.Set(instance.output.PrintContent, input.Get(instance.HowManyParam))
+			outParam, suspend := instance.output.Print(printParam, object)
+			param := libs.Sandbox.Variable.Param.New()
+			param.Set(instance.HowManyResult, outParam.Get(instance.output.PrintContent))
+			return param, suspend
 		},
 		func(input concept.Param, _ concept.Object) concept.Param {
-			return libs.Sandbox.Variable.Param.New().Set(instance.HowManyResult, input.Get(instance.output.PrintContent))
+			param := libs.Sandbox.Variable.Param.New()
+			param.Set(instance.HowManyResult, input.Get(instance.output.PrintContent))
+			return param
 		},
 		[]concept.String{
 			instance.HowManyParam,
@@ -50,11 +56,17 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 	instance.SetExport(libs.Sandbox.Variable.String.New("What"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("What"),
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
-			outParam, suspend := instance.output.Print(libs.Sandbox.Variable.Param.New().Set(instance.output.PrintContent, input.Get(instance.WhatParam)), object)
-			return libs.Sandbox.Variable.Param.New().Set(instance.WhatResult, outParam.Get(instance.output.PrintContent)), suspend
+			printParam := libs.Sandbox.Variable.Param.New()
+			printParam.Set(instance.output.PrintContent, input.Get(instance.WhatParam))
+			outParam, suspend := instance.output.Print(printParam, object)
+			param := libs.Sandbox.Variable.Param.New()
+			param.Set(instance.WhatResult, outParam.Get(instance.output.PrintContent))
+			return param, suspend
 		},
 		func(input concept.Param, _ concept.Object) concept.Param {
-			return libs.Sandbox.Variable.Param.New().Set(instance.WhatResult, input.Get(instance.output.PrintContent))
+			param := libs.Sandbox.Variable.Param.New()
+			param.Set(instance.WhatResult, input.Get(instance.output.PrintContent))
+			return param
 		},
 		[]concept.String{
 			instance.WhatParam,
