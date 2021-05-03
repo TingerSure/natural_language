@@ -85,6 +85,14 @@ func (m *MappingObject) GetField(specimen concept.String) (concept.Variable, con
 	return nil, m.seed.NewException("system error", "Mapping object cannot get field.")
 }
 
+func (o *MappingObject) SizeField() int {
+	return 0
+}
+
+func (o *MappingObject) Iterate(on func(concept.String, concept.Variable) bool) bool {
+	return false
+}
+
 func (m *MappingObject) HasField(specimen concept.String) bool {
 	return false
 }

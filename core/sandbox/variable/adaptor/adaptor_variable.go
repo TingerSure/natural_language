@@ -64,6 +64,16 @@ func (o *AdaptorVariable) HasField(specimen concept.String) bool {
 	return o.fields.Has(specimen)
 }
 
+func (o *AdaptorVariable) SizeField() int {
+	return o.fields.Size()
+}
+
+func (o *AdaptorVariable) Iterate(on func(concept.String, concept.Variable) bool) bool {
+	return o.fields.Iterate(func(key concept.String, value interface{}) bool {
+		return on(key, value.(concept.Variable))
+	})
+}
+
 func (a *AdaptorVariable) ToString(prefix string) string {
 	if a.fields == nil || 0 == a.fields.Size() {
 		return "{}"

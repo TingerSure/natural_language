@@ -47,6 +47,14 @@ func (o *Null) GetField(specimen concept.String) (concept.Variable, concept.Exce
 	return nil, o.seed.GetNullPointerException().Copy()
 }
 
+func (o *Null) SizeField() int {
+	return 0
+}
+
+func (o *Null) Iterate(on func(concept.String, concept.Variable) bool) bool {
+	return false
+}
+
 func (m *Null) HasField(specimen concept.String) bool {
 	return false
 }

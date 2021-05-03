@@ -1,11 +1,17 @@
 package concept
 
+const (
+	ParamTypeList = iota
+	ParamTypeKeyValue
+)
+
 type Param interface {
 	Variable
 	Set(String, Variable)
 	Get(String) Variable
-	// SetIndex(int, Variable)
-	// GetIndex(int) Variable
-	Copy() Param
-	Iterate(func(String, Variable) bool) bool
+	SizeIndex() int
+	AppendIndex(Variable)
+	SetIndex(int, Variable)
+	GetIndex(int) Variable
+	ParamType() int
 }

@@ -21,8 +21,9 @@ type ParamSeed interface {
 
 type Param struct {
 	*adaptor.AdaptorVariable
-	values *concept.Mapping
-	seed   ParamSeed
+	list  []concept.Variable
+	types int
+	seed  ParamSeed
 }
 
 func (o *Param) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
@@ -34,18 +35,29 @@ func (f *Param) ToLanguage(language string) string {
 }
 
 func (a *Param) ToString(prefix string) string {
-	if 0 == a.values.Size() {
-		return "{}"
-	}
 	subPrefix := fmt.Sprintf("%v\t", prefix)
-	paramsToString := make([]string, 0, a.values.Size())
-
-	a.values.Iterate(func(key concept.String, value interface{}) bool {
-		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.ToString(subPrefix), value.(concept.ToString).ToString(subPrefix)))
-		return false
-	})
-
-	return fmt.Sprintf("{\n%v\n%v}", strings.Join(paramsToString, ",\n"), prefix)
+	if a.types == concept.ParamTypeList {
+		if a.SizeIndex() == 0 {
+			return ""
+		}
+		paramsToString := make([]string, 0, len(a.list))
+		for _, value := range a.list {
+			paramsToString = append(paramsToString, fmt.Sprintf("%v", value.ToString(subPrefix)))
+		}
+		return strings.Join(paramsToString, ", ")
+	}
+	if a.types == concept.ParamTypeKeyValue {
+		if a.SizeField() == 0 {
+			return ""
+		}
+		paramsToString := make([]string, 0, a.SizeField())
+		a.Iterate(func(key concept.String, value concept.Variable) bool {
+			paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.ToString(subPrefix), value.ToString(subPrefix)))
+			return false
+		})
+		return strings.Join(paramsToString, ",\n")
+	}
+	return ""
 }
 
 func (o *Param) Type() string {
@@ -53,26 +65,35 @@ func (o *Param) Type() string {
 }
 
 func (o *Param) Set(key concept.String, value concept.Variable) {
-	o.values.Set(key, value)
+	o.types = concept.ParamTypeKeyValue
+	o.SetField(key, value)
 }
 
 func (o *Param) Get(key concept.String) concept.Variable {
-	return o.values.Get(key).(concept.Variable)
+	value, _ := o.GetField(key)
+	return value.(concept.Variable)
 }
 
-func (o *Param) Iterate(on func(concept.String, concept.Variable) bool) bool {
-	return o.values.Iterate(func(key concept.String, value interface{}) bool {
-		return on(key, value.(concept.Variable))
-	})
+func (o *Param) SizeIndex() int {
+	return len(o.list)
 }
 
-func (o *Param) Copy() concept.Param {
-	param := o.seed.New()
-	o.values.Iterate(func(key concept.String, value interface{}) bool {
-		param.Set(key, value.(concept.Variable))
-		return false
-	})
-	return param
+func (o *Param) AppendIndex(value concept.Variable) {
+	o.types = concept.ParamTypeList
+	o.list = append(o.list, value)
+}
+
+func (o *Param) SetIndex(index int, value concept.Variable) {
+	o.types = concept.ParamTypeList
+	o.list[index] = value
+}
+
+func (o *Param) GetIndex(index int) concept.Variable {
+	return o.list[index]
+}
+
+func (o *Param) ParamType() int {
+	return o.types
 }
 
 type ParamCreatorParam struct {
@@ -91,11 +112,8 @@ func (s *ParamCreator) New() *Param {
 			NullCreator:      s.param.NullCreator,
 			ExceptionCreator: s.param.ExceptionCreator,
 		}),
-		values: concept.NewMapping(&concept.MappingParam{
-			AutoInit:   true,
-			EmptyValue: s.NewNull(),
-		}),
-		seed: s,
+		types: concept.ParamTypeKeyValue,
+		seed:  s,
 	}
 }
 

@@ -86,8 +86,19 @@ func (f *Function) Anticipate(params concept.Param, object concept.Variable) con
 	space, suspend := f.anticipateBody.Exec(f.parent, false, func(space concept.Closure) concept.Interrupt {
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
-		for _, name := range f.paramNames {
-			space.InitLocal(name, params.Get(name))
+		if params.ParamType() == concept.ParamTypeList {
+			for index, name := range f.paramNames {
+				if index >= params.SizeIndex() {
+					break
+				}
+				space.InitLocal(name, params.GetIndex(index))
+			}
+		}
+		if params.ParamType() == concept.ParamTypeList {
+
+			for _, name := range f.paramNames {
+				space.InitLocal(name, params.Get(name))
+			}
 		}
 		return nil
 	})

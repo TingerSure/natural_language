@@ -86,6 +86,17 @@ func (o *Page) HasField(specimen concept.String) bool {
 	return o.exports.Has(specimen)
 }
 
+func (o *Page) SizeField() int {
+	return o.exports.Size()
+}
+
+func (o *Page) Iterate(on func(concept.String, concept.Variable) bool) bool {
+	return o.exports.Iterate(func(key concept.String, _ interface{}) bool {
+		value, _ := o.space.GetLocal(key)
+		return on(key, value)
+	})
+}
+
 func (o *Page) ToString(prefix string) string {
 	lines := []string{}
 	o.vars.Iterate(func(key concept.String, value interface{}) bool {
