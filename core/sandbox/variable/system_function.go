@@ -59,11 +59,22 @@ func (f *SystemFunction) ToString(prefix string) string {
 }
 
 func (f *SystemFunction) Anticipate(params concept.Param, object concept.Variable) concept.Param {
-	return f.anticipateFuncs(params, object)
+	return f.anticipateFuncs(f.paramFormat(params), object)
 }
 
 func (f *SystemFunction) Exec(params concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
-	return f.funcs(params, object)
+	return f.funcs(f.paramFormat(params), object)
+}
+
+func (f *SystemFunction) paramFormat(params concept.Param) concept.Param {
+	if params.ParamType() == concept.ParamTypeList {
+		for index, name := range f.returnNames {
+			if index < params.SizeIndex() {
+				params.Set(name, params.GetIndex(index))
+			}
+		}
+	}
+	return params
 }
 
 func (s *SystemFunction) Type() string {

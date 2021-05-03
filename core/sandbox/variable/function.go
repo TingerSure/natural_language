@@ -88,14 +88,14 @@ func (f *Function) Anticipate(params concept.Param, object concept.Variable) con
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
 		if params.ParamType() == concept.ParamTypeList {
 			for index, name := range f.paramNames {
-				if index >= params.SizeIndex() {
-					break
+				if index < params.SizeIndex() {
+					space.InitLocal(name, params.GetIndex(index))
+				} else {
+					space.InitLocal(name, params.Get(name))
 				}
-				space.InitLocal(name, params.GetIndex(index))
 			}
 		}
-		if params.ParamType() == concept.ParamTypeList {
-
+		if params.ParamType() == concept.ParamTypeKeyValue {
 			for _, name := range f.paramNames {
 				space.InitLocal(name, params.Get(name))
 			}
@@ -131,8 +131,19 @@ func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.
 	space, suspend := f.body.Exec(f.parent, false, func(space concept.Closure) concept.Interrupt {
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
-		for _, name := range f.paramNames {
-			space.InitLocal(name, params.Get(name))
+		if params.ParamType() == concept.ParamTypeList {
+			for index, name := range f.paramNames {
+				if index < params.SizeIndex() {
+					space.InitLocal(name, params.GetIndex(index))
+				} else {
+					space.InitLocal(name, params.Get(name))
+				}
+			}
+		}
+		if params.ParamType() == concept.ParamTypeKeyValue {
+			for _, name := range f.paramNames {
+				space.InitLocal(name, params.Get(name))
+			}
 		}
 		return nil
 	})
