@@ -42,7 +42,7 @@ func (a *Param) ToString(prefix string) string {
 		}
 		paramsToString := make([]string, 0, len(a.list))
 		for _, value := range a.list {
-			paramsToString = append(paramsToString, fmt.Sprintf("%v", value.ToString(subPrefix)))
+			paramsToString = append(paramsToString, value.ToString(subPrefix))
 		}
 		return strings.Join(paramsToString, ", ")
 	}

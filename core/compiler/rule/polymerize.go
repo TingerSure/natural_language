@@ -79,6 +79,7 @@ const (
 	TypeExportGroup
 	TypeVarGroup
 	TypeIndex
+	TypeIndexArray
 	TypeBool
 )
 
@@ -90,6 +91,7 @@ const (
 	KeyExportGroup   = "export_group"
 	KeyVarGroup      = "var_group"
 	KeyIndex         = "index"
+	KeyIndexArray    = "index_array"
 	KeyBool          = "bool"
 )
 
@@ -101,6 +103,7 @@ var (
 	SymbolExportGroup   = grammar.NewNonterminal(TypeExportGroup, KeyExportGroup)
 	SymbolVarGroup      = grammar.NewNonterminal(TypeVarGroup, KeyVarGroup)
 	SymbolIndex         = grammar.NewNonterminal(TypeIndex, KeyIndex)
+	SymbolIndexArray    = grammar.NewNonterminal(TypeIndexArray, KeyIndexArray)
 	SymbolBool          = grammar.NewNonterminal(TypeBool, KeyBool)
 )
 
@@ -120,7 +123,10 @@ var (
 	PolymerizeIndexFromBool           = grammar.NewRule(SymbolIndex, SymbolBool)
 	PolymerizeBoolFromTrue            = grammar.NewRule(SymbolBool, SymbolTrue)
 	PolymerizeBoolFromFalse           = grammar.NewRule(SymbolBool, SymbolFalse)
+	PolymerizeIndexArrayStart         = grammar.NewRule(SymbolIndexArray, SymbolIndex)
+	PolymerizeIndexArray              = grammar.NewRule(SymbolIndexArray, SymbolIndexArray, SymbolComma, SymbolIndex)
 	PolymerizeCallWithoutParam        = grammar.NewRule(SymbolIndex, SymbolIndex, SymbolLeftParenthesis, SymbolRightParenthesis)
+	PolymerizeCallWithIndexArray      = grammar.NewRule(SymbolIndex, SymbolIndex, SymbolLeftParenthesis, SymbolIndexArray, SymbolRightParenthesis)
 	PolymerizeComponent               = grammar.NewRule(SymbolIndex, SymbolIndex, SymbolDot, SymbolIdentifier)
 )
 
@@ -141,7 +147,10 @@ var (
 		PolymerizeIndexFromBool,
 		PolymerizeBoolFromTrue,
 		PolymerizeBoolFromFalse,
+		PolymerizeIndexArrayStart,
+		PolymerizeIndexArray,
 		PolymerizeCallWithoutParam,
+		PolymerizeCallWithIndexArray,
 		PolymerizeComponent,
 	}
 

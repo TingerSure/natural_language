@@ -23,7 +23,7 @@ func (f *Component) ToLanguage(language string) string {
 }
 
 func (a *Component) ToString(prefix string) string {
-	return fmt.Sprintf("%v.%v", a.object.ToString(prefix), a.field.ToString(prefix))
+	return fmt.Sprintf("%v.%v", a.object.ToString(prefix), a.field.Value())
 }
 
 func (a *Component) Anticipate(space concept.Closure) concept.Variable {

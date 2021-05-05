@@ -18,6 +18,7 @@ type ExpressionCreator struct {
 	If              *expression.IfCreator
 	FunctionEnd     *expression.FunctionEndCreator
 	Return          *expression.ReturnCreator
+	NewParam        *expression.NewParamCreator
 	Component       *expression.ComponentCreator
 }
 
@@ -36,6 +37,11 @@ type ExpressionCreatorParam struct {
 func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance := &ExpressionCreator{}
 	instance.Component = expression.NewComponentCreator(&expression.ComponentCreatorParam{
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+	})
+	instance.NewParam = expression.NewNewParamCreator(&expression.NewParamCreatorParam{
+		ParamCreator:           param.ParamCreator,
+		NullCreator:            param.NullCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 	})
 	instance.Return = expression.NewReturnCreator(&expression.ReturnCreatorParam{

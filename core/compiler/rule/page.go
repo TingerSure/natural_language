@@ -56,6 +56,7 @@ var (
 					}
 					continue
 				}
+				return nil, errors.New(fmt.Sprintf("Unsupport index to be set: %v", item.ToString("")))
 			}
 			return []concept.Index{
 				context.GetLibraryManager().Sandbox.Index.ConstIndex.New(page),
@@ -191,6 +192,22 @@ var (
 				),
 			}, nil
 		}),
+		semantic.NewRule(PolymerizeIndexArrayStart, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolIndexArray -> SymbolIndex
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeIndexArray, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolIndexArray -> SymbolIndexArray SymbolComma SymbolIndex
+			items, err := context.Deal(phrase.GetChild(0))
+			if err != nil {
+				return nil, err
+			}
+			item, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			return append(items, item...), nil
+		}),
 		semantic.NewRule(PolymerizeCallWithoutParam, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolIndex -> SymbolIndex SymbolLeftParenthesis SymbolRightParenthesis
 			indexes, err := context.Deal(phrase.GetChild(0))
@@ -203,6 +220,25 @@ var (
 					context.GetLibraryManager().Sandbox.Index.ConstIndex.New(
 						context.GetLibraryManager().Sandbox.Variable.Param.New(),
 					),
+				),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeCallWithIndexArray, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolIndex -> SymbolIndex SymbolLeftParenthesis SymbolIndexArray SymbolRightParenthesis
+			indexes, err := context.Deal(phrase.GetChild(0))
+			if err != nil {
+				return nil, err
+			}
+			params, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			newParam := context.GetLibraryManager().Sandbox.Expression.NewParam.New()
+			newParam.SetArray(params)
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.Call.New(
+					indexes[0],
+					newParam,
 				),
 			}, nil
 		}),
