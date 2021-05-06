@@ -6,16 +6,17 @@ import (
 )
 
 type IndexCreator struct {
-	ConstIndex   *index.ConstIndexCreator
-	ResaultIndex *index.ResaultIndexCreator
-	SearchIndex  *index.SearchIndexCreator
-	ThisIndex    *index.ThisIndexCreator
-	SelfIndex    *index.SelfIndexCreator
-	BubbleIndex  *index.BubbleIndexCreator
-	LocalIndex   *index.LocalIndexCreator
-	ImportIndex  *index.ImportIndexCreator
-	ExportIndex  *index.ExportIndexCreator
-	VarIndex     *index.VarIndexCreator
+	ConstIndex    *index.ConstIndexCreator
+	ResaultIndex  *index.ResaultIndexCreator
+	SearchIndex   *index.SearchIndexCreator
+	ThisIndex     *index.ThisIndexCreator
+	SelfIndex     *index.SelfIndexCreator
+	BubbleIndex   *index.BubbleIndexCreator
+	LocalIndex    *index.LocalIndexCreator
+	ImportIndex   *index.ImportIndexCreator
+	ExportIndex   *index.ExportIndexCreator
+	VarIndex      *index.VarIndexCreator
+	KeyValueIndex *index.KeyValueIndexCreator
 }
 
 type IndexCreatorParam struct {
@@ -27,6 +28,11 @@ type IndexCreatorParam struct {
 
 func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
 	instance := &IndexCreator{}
+	instance.KeyValueIndex = index.NewKeyValueIndexCreator(&index.KeyValueIndexCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
+		NullCreator:      param.NullCreator,
+	})
 	instance.VarIndex = index.NewVarIndexCreator(&index.VarIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,

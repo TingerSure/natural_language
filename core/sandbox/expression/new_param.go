@@ -5,6 +5,7 @@ import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/expression/adaptor"
+	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"strings"
 )
 
@@ -26,9 +27,15 @@ func (f *NewParam) SetArray(list []concept.Index) {
 	f.list = list
 }
 
-func (f *NewParam) SetKeyValue(keyValue []concept.Index) {
+func (f *NewParam) SetKeyValue(keyValues []concept.Index) {
 	f.types = concept.ParamTypeKeyValue
-	//TODO KeyValueIndex
+	for _, keyValuePre := range keyValues {
+		keyValue, yes := index.IndexFamilyInstance.IsKeyValueIndex(keyValuePre)
+		if !yes {
+			panic(fmt.Sprintf("Unsupported index type in SetKeyValue : %v", keyValuePre.Type()))
+		}
+		f.values.Set(keyValue.Key(), keyValue.Value())
+	}
 }
 
 func (f *NewParam) ToLanguage(language string) string {
@@ -53,10 +60,10 @@ func (a *NewParam) ToString(prefix string) string {
 		}
 		paramsToString := make([]string, 0, a.values.Size())
 		a.values.Iterate(func(key concept.String, value interface{}) bool {
-			paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.ToString(subPrefix), value.(concept.ToString).ToString(subPrefix)))
+			paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.Value(), value.(concept.ToString).ToString(subPrefix)))
 			return false
 		})
-		return strings.Join(paramsToString, ",\n")
+		return fmt.Sprintf("%v\n%v\n%v", prefix, strings.Join(paramsToString, ",\n"), prefix)
 	}
 	return ""
 }

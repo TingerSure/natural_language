@@ -208,6 +208,37 @@ var (
 			}
 			return append(items, item...), nil
 		}),
+		semantic.NewRule(PolymerizeKeyValue, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolKeyValue -> SymbolIdentifier SymbolColon SymbolIndex
+			indexes, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.KeyValueIndex.New(
+					context.GetLibraryManager().Sandbox.Variable.String.New(
+						phrase.GetChild(0).GetToken().Value(),
+					),
+					indexes[0],
+				),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeKeyValueArrayStart, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolKeyValueArray -> SymbolKeyValue
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeKeyValueArray, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolKeyValueArray -> SymbolKeyValueArray SymbolComma SymbolKeyValue
+			items, err := context.Deal(phrase.GetChild(0))
+			if err != nil {
+				return nil, err
+			}
+			item, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			return append(items, item...), nil
+		}),
 		semantic.NewRule(PolymerizeCallWithoutParam, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolIndex -> SymbolIndex SymbolLeftParenthesis SymbolRightParenthesis
 			indexes, err := context.Deal(phrase.GetChild(0))
@@ -225,7 +256,7 @@ var (
 		}),
 		semantic.NewRule(PolymerizeCallWithIndexArray, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolIndex -> SymbolIndex SymbolLeftParenthesis SymbolIndexArray SymbolRightParenthesis
-			indexes, err := context.Deal(phrase.GetChild(0))
+			funcs, err := context.Deal(phrase.GetChild(0))
 			if err != nil {
 				return nil, err
 			}
@@ -237,7 +268,26 @@ var (
 			newParam.SetArray(params)
 			return []concept.Index{
 				context.GetLibraryManager().Sandbox.Expression.Call.New(
-					indexes[0],
+					funcs[0],
+					newParam,
+				),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeCallWithKeyValueArray, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolIndex -> SymbolIndex SymbolLeftParenthesis SymbolKeyValueArray SymbolRightParenthesis
+			funcs, err := context.Deal(phrase.GetChild(0))
+			if err != nil {
+				return nil, err
+			}
+			params, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			newParam := context.GetLibraryManager().Sandbox.Expression.NewParam.New()
+			newParam.SetKeyValue(params)
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.Call.New(
+					funcs[0],
 					newParam,
 				),
 			}, nil

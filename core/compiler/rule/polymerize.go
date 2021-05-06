@@ -81,6 +81,8 @@ const (
 	TypeVarGroup
 	TypeIndex
 	TypeIndexArray
+	TypeKeyValue
+	TypeKeyValueArray
 	TypeBool
 )
 
@@ -93,6 +95,8 @@ const (
 	KeyVarGroup      = "var_group"
 	KeyIndex         = "index"
 	KeyIndexArray    = "index_array"
+	KeyKeyValue      = "key_value"
+	KeyKeyValueArray = "key_value_array"
 	KeyBool          = "bool"
 )
 
@@ -105,6 +109,8 @@ var (
 	SymbolVarGroup      = grammar.NewNonterminal(TypeVarGroup, KeyVarGroup)
 	SymbolIndex         = grammar.NewNonterminal(TypeIndex, KeyIndex)
 	SymbolIndexArray    = grammar.NewNonterminal(TypeIndexArray, KeyIndexArray)
+	SymbolKeyValue      = grammar.NewNonterminal(TypeKeyValue, KeyKeyValue)
+	SymbolKeyValueArray = grammar.NewNonterminal(TypeKeyValueArray, KeyKeyValueArray)
 	SymbolBool          = grammar.NewNonterminal(TypeBool, KeyBool)
 )
 
@@ -126,8 +132,12 @@ var (
 	PolymerizeBoolFromFalse           = grammar.NewRule(SymbolBool, SymbolFalse)
 	PolymerizeIndexArrayStart         = grammar.NewRule(SymbolIndexArray, SymbolIndex)
 	PolymerizeIndexArray              = grammar.NewRule(SymbolIndexArray, SymbolIndexArray, SymbolComma, SymbolIndex)
+	PolymerizeKeyValue                = grammar.NewRule(SymbolKeyValue, SymbolIdentifier, SymbolColon, SymbolIndex)
+	PolymerizeKeyValueArrayStart      = grammar.NewRule(SymbolKeyValueArray, SymbolKeyValue)
+	PolymerizeKeyValueArray           = grammar.NewRule(SymbolKeyValueArray, SymbolKeyValueArray, SymbolComma, SymbolKeyValue)
 	PolymerizeCallWithoutParam        = grammar.NewRule(SymbolIndex, SymbolIndex, SymbolLeftParenthesis, SymbolRightParenthesis)
 	PolymerizeCallWithIndexArray      = grammar.NewRule(SymbolIndex, SymbolIndex, SymbolLeftParenthesis, SymbolIndexArray, SymbolRightParenthesis)
+	PolymerizeCallWithKeyValueArray   = grammar.NewRule(SymbolIndex, SymbolIndex, SymbolLeftParenthesis, SymbolKeyValueArray, SymbolRightParenthesis)
 	PolymerizeComponent               = grammar.NewRule(SymbolIndex, SymbolIndex, SymbolDot, SymbolIdentifier)
 )
 
@@ -150,8 +160,12 @@ var (
 		PolymerizeBoolFromFalse,
 		PolymerizeIndexArrayStart,
 		PolymerizeIndexArray,
+		PolymerizeKeyValue,
+		PolymerizeKeyValueArrayStart,
+		PolymerizeKeyValueArray,
 		PolymerizeCallWithoutParam,
 		PolymerizeCallWithIndexArray,
+		PolymerizeCallWithKeyValueArray,
 		PolymerizeComponent,
 	}
 
