@@ -333,11 +333,11 @@ func (g *Table) ToString() string {
 	titles = append(titles, "status")
 	brs = append(brs, ":--:")
 	for _, terminal := range terminals {
-		titles = append(titles, fmt.Sprintf("%v", terminal.Name()))
+		titles = append(titles, terminal.Name())
 		brs = append(brs, ":--:")
 	}
 	for _, nonterminal := range nonterminals {
-		titles = append(titles, fmt.Sprintf("%v", nonterminal.Name()))
+		titles = append(titles, nonterminal.Name())
 		brs = append(brs, ":--:")
 	}
 

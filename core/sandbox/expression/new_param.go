@@ -27,7 +27,7 @@ func (f *NewParam) SetArray(list []concept.Index) {
 }
 
 func (f *NewParam) SetKeyValue(keyValue []concept.Index) {
-	f.types =concept.ParamTypeKeyValue
+	f.types = concept.ParamTypeKeyValue
 	//TODO KeyValueIndex
 }
 
@@ -65,7 +65,7 @@ func (a *NewParam) Anticipate(space concept.Closure) concept.Variable {
 	param := a.seed.NewParam()
 	if a.types == concept.ParamTypeList {
 		for _, item := range a.list {
-			param.AppendIndex( item.Anticipate(space))
+			param.AppendIndex(item.Anticipate(space))
 		}
 		return param
 	}
@@ -90,7 +90,7 @@ func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interr
 			if !nl_interface.IsNil(suspend) {
 				return nil, suspend
 			}
-			param.AppendIndex( value)
+			param.AppendIndex(value)
 		}
 		return param, nil
 	}

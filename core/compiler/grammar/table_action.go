@@ -71,7 +71,7 @@ func (t *TableAction) ToString() string {
 		return fmt.Sprintf("move %v", t.Status())
 	}
 	if t.Type() == ActionPolymerizeType {
-		return fmt.Sprintf("%v", t.rule.ToString())
+		return t.rule.ToString()
 	}
 	if t.Type() == ActionGotoType {
 		return fmt.Sprintf("goto %v", t.Status())

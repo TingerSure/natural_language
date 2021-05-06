@@ -56,6 +56,7 @@ var (
 	SymbolIdentifier       = grammar.NewTerminal(TypeIdentifier, KeyIdentifier)
 	SymbolEnd              = grammar.NewTerminal(TypeEnd, KeyEnd)
 	SymbolString           = grammar.NewTerminal(TypeString, KeyString)
+	SymbolComment          = grammar.NewTerminal(TypeComment, KeyComment)
 	SymbolPage             = grammar.NewTerminal(TypePage, KeyPage)
 	SymbolImport           = grammar.NewTerminal(TypeImport, KeyImport)
 	SymbolExport           = grammar.NewTerminal(TypeExport, KeyExport)

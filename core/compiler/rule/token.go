@@ -22,6 +22,7 @@ const (
 	TypeString                  // [:string:]
 	TypeEnd                     // [:end:]
 	TypeIdentifier              // [:identifier:]
+	TypeComment                 // [:comment:]
 	TypePage                    // page
 	TypeImport                  // import
 	TypeExport                  // export
@@ -55,6 +56,7 @@ const (
 	KeyString           = "string"
 	KeyEnd              = "end"
 	KeyIdentifier       = "identifier"
+	KeyComment          = "comment"
 	KeyPage             = "page"
 	KeyImport           = "import"
 	KeyExport           = "export"
@@ -73,7 +75,7 @@ const (
 var (
 	LexerEnd = lexer.NewToken(TypeEnd, KeyEnd, "EOF")
 
-	LexerTrim = []int{TypeSpace}
+	LexerTrim = []int{TypeSpace, TypeComment}
 
 	LexerRules = []*lexer.Rule{
 		lexer.NewRule("\\(", func(value []byte) *lexer.Token {
@@ -127,8 +129,14 @@ var (
 		lexer.NewRule("([\\+|-]?\\d+)(\\.\\d+)?(E[\\+|-]?\\d+)?", func(value []byte) *lexer.Token {
 			return lexer.NewToken(TypeNumber, KeyNumber, string(value))
 		}),
-		lexer.NewRule("\"\\S*\"", func(value []byte) *lexer.Token {
+		lexer.NewRule("\"[^\"\\r\\n]*\"", func(value []byte) *lexer.Token {
 			return lexer.NewToken(TypeString, KeyString, string(value))
+		}),
+		lexer.NewRule("//.*", func(value []byte) *lexer.Token {
+			return lexer.NewToken(TypeComment, KeyComment, string(value))
+		}),
+		lexer.NewRule("/\\*[\\s\\S]*?\\*/", func(value []byte) *lexer.Token {
+			return lexer.NewToken(TypeComment, KeyComment, string(value))
 		}),
 		lexer.NewRule("[a-zA-Z_][a-zA-Z0-9_]*", func(value []byte) *lexer.Token {
 			valueIdentifier := string(value)
