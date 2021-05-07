@@ -140,7 +140,7 @@ func (f *For) End() *code_block.CodeBlock {
 type ForCreatorParam struct {
 	ExceptionCreator       func(string, string) concept.Exception
 	StringCreator          func(string) concept.String
-	BoolCreator            func(bool) *variable.Bool
+	BoolCreator            func(bool) concept.Bool
 	CodeBlockCreator       func() *code_block.CodeBlock
 	ConstIndexCreator      func(concept.Variable) *index.ConstIndex
 	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex

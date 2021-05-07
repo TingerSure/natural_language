@@ -7,7 +7,6 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/expression/adaptor"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type ExpressionCreator struct {
@@ -20,12 +19,16 @@ type ExpressionCreator struct {
 	Return          *expression.ReturnCreator
 	NewParam        *expression.NewParamCreator
 	Component       *expression.ComponentCreator
+	NewString       *expression.NewStringCreator
+	NewBool         *expression.NewBoolCreator
+	NewNumber       *expression.NewNumberCreator
 }
 
 type ExpressionCreatorParam struct {
 	CodeBlockCreator  func() *code_block.CodeBlock
 	StringCreator     func(string) concept.String
-	BoolCreator       func(bool) *variable.Bool
+	BoolCreator       func(bool) concept.Bool
+	NumberCreator     func(float64) concept.Number
 	ExceptionCreator  func(string, string) concept.Exception
 	EndCreator        func() *interrupt.End
 	ParamCreator      func() concept.Param
@@ -36,6 +39,22 @@ type ExpressionCreatorParam struct {
 
 func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance := &ExpressionCreator{}
+	instance.NewNumber = expression.NewNewNumberCreator(&expression.NewNumberCreatorParam{
+		NumberCreator:          param.NumberCreator,
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+	})
+	instance.NewBool = expression.NewNewBoolCreator(&expression.NewBoolCreatorParam{
+		BoolCreator:            param.BoolCreator,
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+	})
+	instance.NewBool = expression.NewNewBoolCreator(&expression.NewBoolCreatorParam{
+		BoolCreator:            param.BoolCreator,
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+	})
+	instance.NewString = expression.NewNewStringCreator(&expression.NewStringCreatorParam{
+		StringCreator:          param.StringCreator,
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+	})
 	instance.Component = expression.NewComponentCreator(&expression.ComponentCreatorParam{
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 	})

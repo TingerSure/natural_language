@@ -148,48 +148,44 @@ var (
 				),
 			}, nil
 		}),
-		semantic.NewRule(PolymerizeIndexFromNumber, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolIndex -> SymbolNumber
+		semantic.NewRule(PolymerizeIndexFromVariable, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolIndex -> SymbolVariable
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeVariableFromNumber, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolVariable -> SymbolNumber
 			value, err := strconv.ParseFloat(phrase.GetChild(0).GetToken().Value(), 64)
 			if err != nil {
 				return nil, err
 			}
 			return []concept.Index{
-				context.GetLibraryManager().Sandbox.Index.ConstIndex.New(
-					context.GetLibraryManager().Sandbox.Variable.Number.New(value),
-				),
+				context.GetLibraryManager().Sandbox.Expression.NewNumber.New(value),
 			}, nil
 		}),
-		semantic.NewRule(PolymerizeIndexFromString, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolIndex -> SymbolString
+		semantic.NewRule(PolymerizeVariableFromString, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolVariable -> SymbolString
 			return []concept.Index{
-				context.GetLibraryManager().Sandbox.Index.ConstIndex.New(
-					context.GetLibraryManager().Sandbox.Variable.String.New(
-						context.FormatSymbolString(
-							phrase.GetChild(0).GetToken().Value(),
-						),
+				context.GetLibraryManager().Sandbox.Expression.NewString.New(
+					context.FormatSymbolString(
+						phrase.GetChild(0).GetToken().Value(),
 					),
 				),
 			}, nil
 		}),
-		semantic.NewRule(PolymerizeIndexFromBool, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolIndex -> SymbolBool
+		semantic.NewRule(PolymerizeVariableFromBool, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolVariable -> SymbolBool
 			return context.Deal(phrase.GetChild(0))
 		}),
 		semantic.NewRule(PolymerizeBoolFromTrue, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolBool -> SymbolTrue
 			return []concept.Index{
-				context.GetLibraryManager().Sandbox.Index.ConstIndex.New(
-					context.GetLibraryManager().Sandbox.Variable.Bool.New(true),
-				),
+				context.GetLibraryManager().Sandbox.Expression.NewBool.New(true),
 			}, nil
 		}),
 		semantic.NewRule(PolymerizeBoolFromFalse, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolBool -> SymbolFalse
 			return []concept.Index{
-				context.GetLibraryManager().Sandbox.Index.ConstIndex.New(
-					context.GetLibraryManager().Sandbox.Variable.Bool.New(false),
-				),
+				context.GetLibraryManager().Sandbox.Expression.NewBool.New(false),
 			}, nil
 		}),
 		semantic.NewRule(PolymerizeIndexArrayStart, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {

@@ -6,7 +6,6 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
-	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type SandboxCreator struct {
@@ -81,8 +80,11 @@ func NewSandboxCreator() *SandboxCreator {
 		StringCreator: func(value string) concept.String {
 			return instance.Variable.String.New(value)
 		},
-		BoolCreator: func(value bool) *variable.Bool {
+		BoolCreator: func(value bool) concept.Bool {
 			return instance.Variable.Bool.New(value)
+		},
+		NumberCreator: func(value float64) concept.Number {
+			return instance.Variable.Number.New(value)
 		},
 		EndCreator: func() *interrupt.End {
 			return instance.Interrupt.End.New()

@@ -84,6 +84,7 @@ const (
 	TypeKeyValue
 	TypeKeyValueArray
 	TypeBool
+	TypeVariable
 )
 
 const (
@@ -98,6 +99,7 @@ const (
 	KeyKeyValue      = "key_value"
 	KeyKeyValueArray = "key_value_array"
 	KeyBool          = "bool"
+	KeyVariable      = "variable"
 )
 
 var (
@@ -112,6 +114,7 @@ var (
 	SymbolKeyValue      = grammar.NewNonterminal(TypeKeyValue, KeyKeyValue)
 	SymbolKeyValueArray = grammar.NewNonterminal(TypeKeyValueArray, KeyKeyValueArray)
 	SymbolBool          = grammar.NewNonterminal(TypeBool, KeyBool)
+	SymbolVariable      = grammar.NewNonterminal(TypeVariable, KeyVariable)
 )
 
 var (
@@ -125,9 +128,10 @@ var (
 	PolymerizeExportGroup             = grammar.NewRule(SymbolExportGroup, SymbolExport, SymbolIdentifier, SymbolIndex)
 	PolymerizeVarGroup                = grammar.NewRule(SymbolVarGroup, SymbolVar, SymbolIdentifier, SymbolIndex)
 	PolymerizeIndexFromIdentifier     = grammar.NewRule(SymbolIndex, SymbolIdentifier)
-	PolymerizeIndexFromNumber         = grammar.NewRule(SymbolIndex, SymbolNumber)
-	PolymerizeIndexFromString         = grammar.NewRule(SymbolIndex, SymbolString)
-	PolymerizeIndexFromBool           = grammar.NewRule(SymbolIndex, SymbolBool)
+	PolymerizeIndexFromVariable       = grammar.NewRule(SymbolIndex, SymbolVariable)
+	PolymerizeVariableFromNumber      = grammar.NewRule(SymbolVariable, SymbolNumber)
+	PolymerizeVariableFromString      = grammar.NewRule(SymbolVariable, SymbolString)
+	PolymerizeVariableFromBool        = grammar.NewRule(SymbolVariable, SymbolBool)
 	PolymerizeBoolFromTrue            = grammar.NewRule(SymbolBool, SymbolTrue)
 	PolymerizeBoolFromFalse           = grammar.NewRule(SymbolBool, SymbolFalse)
 	PolymerizeIndexArrayStart         = grammar.NewRule(SymbolIndexArray, SymbolIndex)
@@ -153,9 +157,10 @@ var (
 		PolymerizeExportGroup,
 		PolymerizeVarGroup,
 		PolymerizeIndexFromIdentifier,
-		PolymerizeIndexFromNumber,
-		PolymerizeIndexFromString,
-		PolymerizeIndexFromBool,
+		PolymerizeIndexFromVariable,
+		PolymerizeVariableFromNumber,
+		PolymerizeVariableFromString,
+		PolymerizeVariableFromBool,
 		PolymerizeBoolFromTrue,
 		PolymerizeBoolFromFalse,
 		PolymerizeIndexArrayStart,
