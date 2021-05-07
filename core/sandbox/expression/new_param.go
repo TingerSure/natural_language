@@ -11,6 +11,7 @@ import (
 
 type NewParamSeed interface {
 	ToLanguage(string, *NewParam) string
+	NewException(string, string) concept.Exception
 	NewParam() concept.Param
 }
 
@@ -32,7 +33,7 @@ func (f *NewParam) SetKeyValue(keyValues []concept.Index) {
 	for _, keyValuePre := range keyValues {
 		keyValue, yes := index.IndexFamilyInstance.IsKeyValueIndex(keyValuePre)
 		if !yes {
-			panic(fmt.Sprintf("Unsupported index type in SetKeyValue : %v", keyValuePre.Type()))
+			panic(fmt.Sprintf("Unsupported index type in NewParam.SetKeyValue : %v", keyValuePre.Type()))
 		}
 		f.values.Set(keyValue.Key(), keyValue.Value())
 	}
@@ -115,12 +116,13 @@ func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interr
 		}
 		return param, nil
 	}
-	return param, nil
+	return nil, a.seed.NewException("system panic", fmt.Sprintf("Unknown param types in NewParam.Exec", a.types))
 }
 
 type NewParamCreatorParam struct {
 	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
 	ParamCreator           func() concept.Param
+	ExceptionCreator       func(string, string) concept.Exception
 	NullCreator            func() concept.Null
 }
 
@@ -144,6 +146,10 @@ func (s *NewParamCreator) New() *NewParam {
 
 func (s *NewParamCreator) NewParam() concept.Param {
 	return s.param.ParamCreator()
+}
+
+func (s *NewParamCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
 }
 
 func (s *NewParamCreator) ToLanguage(language string, instance *NewParam) string {

@@ -110,7 +110,7 @@ func (c *Closure) InitLocal(key concept.String, defaultValue concept.Variable) {
 
 func (c *Closure) PeekLocal(key concept.String) (concept.Variable, concept.Exception) {
 	if !c.local.Has(key) {
-		return nil, c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
+		return nil, c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: %v.", key.ToString("")))
 	}
 	return c.local.Get(key).(concept.Variable), nil
 }
@@ -121,7 +121,7 @@ func (c *Closure) HasLocal(key concept.String) bool {
 
 func (c *Closure) GetLocal(key concept.String) (concept.Variable, concept.Exception) {
 	if !c.local.Has(key) {
-		return nil, c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
+		return nil, c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: %v.", key.ToString("")))
 	}
 	c.history.Set(key, historyTypeLocal)
 	return c.local.Get(key).(concept.Variable), nil
@@ -129,7 +129,7 @@ func (c *Closure) GetLocal(key concept.String) (concept.Variable, concept.Except
 
 func (c *Closure) SetLocal(key concept.String, value concept.Variable) concept.Exception {
 	if !c.local.Set(key, value) {
-		return c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
+		return c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: %v.", key.ToString("")))
 	}
 	c.history.Set(key, historyTypeLocal)
 	return nil
@@ -154,7 +154,7 @@ func (c *Closure) PeekBubble(key concept.String) (concept.Variable, concept.Exce
 	if c.parent != nil {
 		return c.parent.PeekBubble(key)
 	}
-	return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
+	return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: %v.", key.ToString("")))
 }
 
 func (c *Closure) GetBubble(key concept.String) (concept.Variable, concept.Exception) {
@@ -170,7 +170,7 @@ func (c *Closure) GetBubble(key concept.String) (concept.Variable, concept.Excep
 		}
 		return value, suspend
 	}
-	return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
+	return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: %v.", key.ToString("")))
 }
 
 func (c *Closure) SetBubble(key concept.String, value concept.Variable) concept.Exception {
@@ -185,7 +185,7 @@ func (c *Closure) SetBubble(key concept.String, value concept.Variable) concept.
 		}
 		return suspend
 	}
-	return c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: \"%v\".", key))
+	return c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: %v.", key.ToString("")))
 }
 
 func (c *Closure) Clear() {

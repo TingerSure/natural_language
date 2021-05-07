@@ -92,6 +92,9 @@ func NewSandboxCreator() *SandboxCreator {
 		ClosureCreator: func(parent concept.Closure) concept.Closure {
 			return instance.Closure.New(parent)
 		},
+		ObjectCreator: func() concept.Object {
+			return instance.Variable.Object.New()
+		},
 	})
 	return instance
 }

@@ -84,6 +84,7 @@ const (
 	TypeKeyValue
 	TypeKeyValueArray
 	TypeBool
+	TypeObject
 	TypeVariable
 )
 
@@ -99,6 +100,7 @@ const (
 	KeyKeyValue      = "key_value"
 	KeyKeyValueArray = "key_value_array"
 	KeyBool          = "bool"
+	KeyObject        = "object"
 	KeyVariable      = "variable"
 )
 
@@ -114,6 +116,7 @@ var (
 	SymbolKeyValue      = grammar.NewNonterminal(TypeKeyValue, KeyKeyValue)
 	SymbolKeyValueArray = grammar.NewNonterminal(TypeKeyValueArray, KeyKeyValueArray)
 	SymbolBool          = grammar.NewNonterminal(TypeBool, KeyBool)
+	SymbolObject        = grammar.NewNonterminal(TypeObject, KeyObject)
 	SymbolVariable      = grammar.NewNonterminal(TypeVariable, KeyVariable)
 )
 
@@ -132,6 +135,7 @@ var (
 	PolymerizeVariableFromNumber      = grammar.NewRule(SymbolVariable, SymbolNumber)
 	PolymerizeVariableFromString      = grammar.NewRule(SymbolVariable, SymbolString)
 	PolymerizeVariableFromBool        = grammar.NewRule(SymbolVariable, SymbolBool)
+	PolymerizeVariableFromObject      = grammar.NewRule(SymbolVariable, SymbolObject)
 	PolymerizeBoolFromTrue            = grammar.NewRule(SymbolBool, SymbolTrue)
 	PolymerizeBoolFromFalse           = grammar.NewRule(SymbolBool, SymbolFalse)
 	PolymerizeIndexArrayStart         = grammar.NewRule(SymbolIndexArray, SymbolIndex)
@@ -143,6 +147,8 @@ var (
 	PolymerizeCallWithIndexArray      = grammar.NewRule(SymbolIndex, SymbolIndex, SymbolLeftParenthesis, SymbolIndexArray, SymbolRightParenthesis)
 	PolymerizeCallWithKeyValueArray   = grammar.NewRule(SymbolIndex, SymbolIndex, SymbolLeftParenthesis, SymbolKeyValueArray, SymbolRightParenthesis)
 	PolymerizeComponent               = grammar.NewRule(SymbolIndex, SymbolIndex, SymbolDot, SymbolIdentifier)
+	PolymerizeObjectEmpty             = grammar.NewRule(SymbolObject, SymbolLeftBrace, SymbolRightBrace)
+	PolymerizeObjectWithKeyValueArray = grammar.NewRule(SymbolObject, SymbolLeftBrace, SymbolKeyValueArray, SymbolRightBrace)
 )
 
 var (
@@ -161,6 +167,7 @@ var (
 		PolymerizeVariableFromNumber,
 		PolymerizeVariableFromString,
 		PolymerizeVariableFromBool,
+		PolymerizeVariableFromObject,
 		PolymerizeBoolFromTrue,
 		PolymerizeBoolFromFalse,
 		PolymerizeIndexArrayStart,
@@ -172,6 +179,8 @@ var (
 		PolymerizeCallWithIndexArray,
 		PolymerizeCallWithKeyValueArray,
 		PolymerizeComponent,
+		PolymerizeObjectEmpty,
+		PolymerizeObjectWithKeyValueArray,
 	}
 
 	GrammarEnd = SymbolEnd

@@ -22,6 +22,7 @@ type ExpressionCreator struct {
 	NewString       *expression.NewStringCreator
 	NewBool         *expression.NewBoolCreator
 	NewNumber       *expression.NewNumberCreator
+	NewObject       *expression.NewObjectCreator
 }
 
 type ExpressionCreatorParam struct {
@@ -35,10 +36,16 @@ type ExpressionCreatorParam struct {
 	ConstIndexCreator func(concept.Variable) *index.ConstIndex
 	ClosureCreator    func(concept.Closure) concept.Closure
 	NullCreator       func() concept.Null
+	ObjectCreator     func() concept.Object
 }
 
 func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance := &ExpressionCreator{}
+	instance.NewObject = expression.NewNewObjectCreator(&expression.NewObjectCreatorParam{
+		ObjectCreator:          param.ObjectCreator,
+		NullCreator:            param.NullCreator,
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+	})
 	instance.NewNumber = expression.NewNewNumberCreator(&expression.NewNumberCreatorParam{
 		NumberCreator:          param.NumberCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
@@ -60,6 +67,7 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	})
 	instance.NewParam = expression.NewNewParamCreator(&expression.NewParamCreatorParam{
 		ParamCreator:           param.ParamCreator,
+		ExceptionCreator:       param.ExceptionCreator,
 		NullCreator:            param.NullCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 	})

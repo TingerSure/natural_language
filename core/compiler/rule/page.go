@@ -176,6 +176,10 @@ var (
 			//SymbolVariable -> SymbolBool
 			return context.Deal(phrase.GetChild(0))
 		}),
+		semantic.NewRule(PolymerizeVariableFromObject, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolVariable -> SymbolObject
+			return context.Deal(phrase.GetChild(0))
+		}),
 		semantic.NewRule(PolymerizeBoolFromTrue, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolBool -> SymbolTrue
 			return []concept.Index{
@@ -244,9 +248,7 @@ var (
 			return []concept.Index{
 				context.GetLibraryManager().Sandbox.Expression.Call.New(
 					indexes[0],
-					context.GetLibraryManager().Sandbox.Index.ConstIndex.New(
-						context.GetLibraryManager().Sandbox.Variable.Param.New(),
-					),
+					context.GetLibraryManager().Sandbox.Expression.NewParam.New(),
 				),
 			}, nil
 		}),
@@ -302,6 +304,22 @@ var (
 					),
 				),
 			}, nil
+		}),
+		semantic.NewRule(PolymerizeObjectEmpty, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolObject -> SymbolLeftBrace SymbolRightBrace
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.NewObject.New(),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeObjectWithKeyValueArray, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolObject -> SymbolLeftBrace SymbolKeyValueArray SymbolRightBrace
+			fields, err := context.Deal(phrase.GetChild(1))
+			if err != nil {
+				return nil, err
+			}
+			newObject := context.GetLibraryManager().Sandbox.Expression.NewObject.New()
+			newObject.SetKeyValue(fields)
+			return []concept.Index{newObject}, nil
 		}),
 	}
 )

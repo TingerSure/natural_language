@@ -22,7 +22,7 @@ func (f *NewBool) ToLanguage(language string) string {
 }
 
 func (a *NewBool) ToString(prefix string) string {
-	return fmt.Sprintf("\"%v\"", a.value)
+	return fmt.Sprintf("%v", a.value)
 }
 
 func (a *NewBool) Anticipate(space concept.Closure) concept.Variable {
