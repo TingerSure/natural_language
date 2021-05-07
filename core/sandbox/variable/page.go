@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	VariablePageType = "object"
+	VariablePageType = "page"
 )
 
 type PageSeed interface {
@@ -29,7 +29,7 @@ type Page struct {
 
 func (o *Page) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
 	value, exception := o.GetField(specimen)
-	if nl_interface.IsNil(exception) {
+	if !nl_interface.IsNil(exception) {
 		return nil, exception
 	}
 	if !value.IsFunction() {

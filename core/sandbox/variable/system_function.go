@@ -68,7 +68,7 @@ func (f *SystemFunction) Exec(params concept.Param, object concept.Variable) (co
 
 func (f *SystemFunction) paramFormat(params concept.Param) concept.Param {
 	if params.ParamType() == concept.ParamTypeList {
-		for index, name := range f.returnNames {
+		for index, name := range f.paramNames {
 			if index < params.SizeIndex() {
 				params.Set(name, params.GetIndex(index))
 			}

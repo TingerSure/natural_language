@@ -37,8 +37,14 @@ func (o *Operator) NewNumberOperatorNumberItem(name string, exec func(*variable.
 	instance.Func = o.Libs.Sandbox.Variable.SystemFunction.New(
 		o.Libs.Sandbox.Variable.String.New(name),
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
-			left, yesLeft := variable.VariableFamilyInstance.IsNumber(input.Get(instance.Left))
-			right, yesRight := variable.VariableFamilyInstance.IsNumber(input.Get(instance.Right))
+			leftPre := input.Get(instance.Left)
+			rightPre := input.Get(instance.Right)
+			if leftPre.IsNull() || rightPre.IsNull() {
+				return nil, o.OperatorParamMissingExceptionTemplate.Copy().AddStack(instance.Func)
+			}
+
+			left, yesLeft := variable.VariableFamilyInstance.IsNumber(leftPre)
+			right, yesRight := variable.VariableFamilyInstance.IsNumber(rightPre)
 			if !yesLeft || !yesRight {
 				return nil, o.OperatorTypeErrorExceptionTemplate.Copy().AddStack(instance.Func)
 			}
@@ -75,8 +81,14 @@ func (o *Operator) NewBoolOperatorBoolItem(name string, exec func(*variable.Bool
 	instance.Func = o.Libs.Sandbox.Variable.SystemFunction.New(
 		o.Libs.Sandbox.Variable.String.New(name),
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
-			left, yesLeft := variable.VariableFamilyInstance.IsBool(input.Get(instance.Left))
-			right, yesRight := variable.VariableFamilyInstance.IsBool(input.Get(instance.Right))
+			leftPre := input.Get(instance.Left)
+			rightPre := input.Get(instance.Right)
+			if leftPre.IsNull() || rightPre.IsNull() {
+				return nil, o.OperatorParamMissingExceptionTemplate.Copy().AddStack(instance.Func)
+			}
+
+			left, yesLeft := variable.VariableFamilyInstance.IsBool(leftPre)
+			right, yesRight := variable.VariableFamilyInstance.IsBool(rightPre)
 			if !yesLeft || !yesRight {
 				return nil, o.OperatorTypeErrorExceptionTemplate.Copy().AddStack(instance.Func)
 			}
@@ -112,7 +124,12 @@ func (o *Operator) NewOperatorBoolItem(name string, exec func(*variable.Bool) (c
 	instance.Func = o.Libs.Sandbox.Variable.SystemFunction.New(
 		o.Libs.Sandbox.Variable.String.New(name),
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
-			right, yesRight := variable.VariableFamilyInstance.IsBool(input.Get(instance.Right))
+			rightPre := input.Get(instance.Right)
+			if rightPre.IsNull() {
+				return nil, o.OperatorParamMissingExceptionTemplate.Copy().AddStack(instance.Func)
+			}
+			right, yesRight := variable.VariableFamilyInstance.IsBool(rightPre)
+
 			if !yesRight {
 				return nil, o.OperatorTypeErrorExceptionTemplate.Copy().AddStack(instance.Func)
 			}
@@ -164,20 +181,22 @@ const (
 
 type Operator struct {
 	concept.Page
-	NumberItems                          map[string]*OperatorItem
-	BoolItems                            map[string]*OperatorItem
-	BoolUnaryItems                       map[string]*OperatorUnaryItem
-	Libs                                 *tree.LibraryManager
-	OperatorTypeErrorExceptionTemplate   concept.Exception
-	OperatorDivisorZeroExceptionTemplate concept.Exception
+	NumberItems                           map[string]*OperatorItem
+	BoolItems                             map[string]*OperatorItem
+	BoolUnaryItems                        map[string]*OperatorUnaryItem
+	Libs                                  *tree.LibraryManager
+	OperatorTypeErrorExceptionTemplate    concept.Exception
+	OperatorParamMissingExceptionTemplate concept.Exception
+	OperatorDivisorZeroExceptionTemplate  concept.Exception
 }
 
 func NewOperator(libs *tree.LibraryManager) *Operator {
 	instance := &Operator{
-		Page:                                 libs.Sandbox.Variable.Page.New(),
-		OperatorTypeErrorExceptionTemplate:   libs.Sandbox.Variable.Exception.NewOriginal("type error", "OperatorTypeErrorException"),
-		OperatorDivisorZeroExceptionTemplate: libs.Sandbox.Variable.Exception.NewOriginal("param error", "OperatorDivisorZeroException"),
-		Libs:                                 libs,
+		Page:                                  libs.Sandbox.Variable.Page.New(),
+		OperatorTypeErrorExceptionTemplate:    libs.Sandbox.Variable.Exception.NewOriginal("type error", "OperatorTypeErrorException"),
+		OperatorParamMissingExceptionTemplate: libs.Sandbox.Variable.Exception.NewOriginal("type error", "OperatorParamMissingException"),
+		OperatorDivisorZeroExceptionTemplate:  libs.Sandbox.Variable.Exception.NewOriginal("param error", "OperatorDivisorZeroException"),
+		Libs:                                  libs,
 	}
 
 	anticipateNumber := libs.Sandbox.Variable.Number.New(0)
@@ -256,6 +275,7 @@ func NewOperator(libs *tree.LibraryManager) *Operator {
 	}
 
 	instance.SetExport(libs.Sandbox.Variable.String.New("OperatorTypeErrorException"), libs.Sandbox.Index.ConstIndex.New(instance.OperatorTypeErrorExceptionTemplate))
+	instance.SetExport(libs.Sandbox.Variable.String.New("OperatorParamMissingException"), libs.Sandbox.Index.ConstIndex.New(instance.OperatorParamMissingExceptionTemplate))
 	instance.SetExport(libs.Sandbox.Variable.String.New("OperatorDivisorZeroException"), libs.Sandbox.Index.ConstIndex.New(instance.OperatorDivisorZeroExceptionTemplate))
 	return instance
 }

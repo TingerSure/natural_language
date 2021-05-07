@@ -52,7 +52,7 @@ func (a *Param) ToString(prefix string) string {
 		}
 		paramsToString := make([]string, 0, a.SizeField())
 		a.Iterate(func(key concept.String, value concept.Variable) bool {
-			paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.ToString(subPrefix), value.ToString(subPrefix)))
+			paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.Value(), value.ToString(subPrefix)))
 			return false
 		})
 		return strings.Join(paramsToString, ",\n")

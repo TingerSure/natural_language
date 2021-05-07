@@ -74,7 +74,7 @@ func (e *Exception) Message() concept.String {
 }
 
 func (e *Exception) ToString(prefix string) string {
-	return fmt.Sprintf("[%v] %v", e.name.ToString(prefix), e.message.ToString(prefix))
+	return fmt.Sprintf("[%v] %v", e.name.Value(), e.message.Value())
 }
 
 func (e *Exception) Error() string {
