@@ -12,8 +12,12 @@ const (
 	TableClosureMatchUnrelated = 0
 )
 
+const (
+	TableVirtualGlobalType = -1
+)
+
 type Table struct {
-	rules           []*Rule
+	rules           *RuleSet
 	global          *Nonterminal
 	end             *Terminal
 	start           int
@@ -30,6 +34,7 @@ type Table struct {
 
 func NewTable() *Table {
 	return &Table{
+		rules:           NewRuleSet(),
 		actions:         map[int]*TableActionGroup{},
 		gotos:           map[int]*TableActionGroup{},
 		nonterminalKeys: NewSymbolSet(),
@@ -71,7 +76,7 @@ func (g *Table) GetStart() int {
 }
 
 func (g *Table) SetRules(rules []*Rule) {
-	g.rules = rules
+	g.rules.Add(rules...)
 }
 
 func (g *Table) SetGlobal(global *Nonterminal) {
@@ -83,11 +88,10 @@ func (g *Table) SetEnd(end *Terminal) {
 }
 
 func (g *Table) Build() error {
-	err := g.check()
+	err := g.init()
 	if err != nil {
 		return err
 	}
-	g.augmentGlobal()
 	g.makeFirsts()
 	g.makeProjects()
 	g.makeClosures()
@@ -221,7 +225,7 @@ func (g *Table) equivalenceClosure(cursors map[*TableProject]*SymbolSet, closure
 }
 
 func (g *Table) makeProjects() {
-	for _, rule := range g.rules {
+	g.rules.Iterate(func(rule *Rule) bool {
 		startProject := NewTableProject(rule, 0)
 		g.startProjects[rule.GetResult().Type()] = append(g.startProjects[rule.GetResult().Type()], startProject)
 		last := startProject
@@ -230,13 +234,14 @@ func (g *Table) makeProjects() {
 			last.Next = project
 			last = project
 		}
-	}
+		return false
+	})
 }
 
 func (g *Table) makeFirsts() {
 	for next := true; next; {
 		next = false
-		for _, rule := range g.rules {
+		g.rules.Iterate(func(rule *Rule) bool {
 			result := rule.GetResult()
 			if g.firsts[result] == nil {
 				g.firsts[result] = NewSymbolSet()
@@ -249,7 +254,7 @@ func (g *Table) makeFirsts() {
 				}
 			} else {
 				if g.firsts[child] == nil {
-					continue
+					return false
 				}
 				g.firsts[child].Iterate(func(first Symbol) bool {
 					if !g.firsts[result].Has(first) {
@@ -259,29 +264,62 @@ func (g *Table) makeFirsts() {
 					return false
 				})
 			}
-		}
+			return false
+		})
 	}
 }
 
 func (g *Table) augmentGlobal() {
-	virtualGlobal := NewNonterminal(-1, fmt.Sprintf("-%v", g.global.Name()))
+	virtualGlobal := NewNonterminal(TableVirtualGlobalType, fmt.Sprintf("-%v", g.global.Name()))
 	virtualRule := NewRule(virtualGlobal, g.global)
-	g.rules = append(g.rules, virtualRule)
+	g.rules.Add(virtualRule)
 	g.global = virtualGlobal
 }
 
-func (g *Table) check() error {
-	err := g.checkGlobal()
+func (g *Table) init() error {
+	g.initKeys()
+	err := g.checkKeys()
 	if err != nil {
 		return err
 	}
-	g.checkRules()
+	err = g.checkGlobal()
+	if err != nil {
+		return err
+	}
+	g.augmentGlobal()
 	// TODO check more
 	return nil
 }
 
-func (g *Table) checkRules() {
-	for _, rule := range g.rules {
+func (g *Table) checkKeys() error {
+	var err error
+	if g.nonterminalKeys.Iterate(func(key Symbol) bool {
+		if key.Type() < 0 {
+			err = errors.New(fmt.Sprintf("Illegal nonterminal type, must be greater than 0. nonterminal: %v, type : %v", key.Name(), key.Type()))
+			return true
+		}
+		if !g.rules.HasByResult(key) {
+			err = errors.New(fmt.Sprintf("No rule can polymerize nonterminal: %v", key.Name()))
+			return true
+		}
+		return false
+	}) {
+		return err
+	}
+	if g.terminalKeys.Iterate(func(key Symbol) bool {
+		if key.Type() < 0 {
+			err = errors.New(fmt.Sprintf("Illegal terminal type, must be greater than 0. terminal: %v, type : %v", key.Name(), key.Type()))
+			return true
+		}
+		return false
+	}) {
+		return err
+	}
+	return nil
+}
+
+func (g *Table) initKeys() {
+	g.rules.Iterate(func(rule *Rule) bool {
 		g.nonterminalKeys.Add(rule.GetResult())
 		for index := 0; index < rule.Size(); index++ {
 			symbol := rule.GetChild(index)
@@ -291,7 +329,8 @@ func (g *Table) checkRules() {
 				g.terminalKeys.Add(symbol)
 			}
 		}
-	}
+		return false
+	})
 	g.terminalKeys.Add(g.end)
 }
 
@@ -299,32 +338,20 @@ func (g *Table) checkGlobal() error {
 	if g.global == nil {
 		return errors.New("Global missed.")
 	}
-	resultCount := 0
-	childCount := 0
-	for _, rule := range g.rules {
-		if g.global.Equal(rule.GetResult()) {
-			resultCount++
-		}
-		for index := 0; index < rule.Size(); index++ {
-			if g.global.Equal(rule.GetChild(index)) {
-				childCount++
-			}
-		}
-	}
-	if resultCount < 1 {
-		return errors.New("Rule missed which result to global")
+	if !g.rules.HasByResult(g.global) {
+		return errors.New("Rule missed which result to global.")
 	}
 	return nil
 }
 
 func (g *Table) ToString() string {
 	nonterminals := []Symbol{}
-	g.GetNonterminalKeys().Iterate(func(key Symbol)bool{
+	g.GetNonterminalKeys().Iterate(func(key Symbol) bool {
 		nonterminals = append(nonterminals, key)
 		return false
 	})
 	terminals := []Symbol{}
-	g.GetTerminalKeys().Iterate(func(key Symbol)bool{
+	g.GetTerminalKeys().Iterate(func(key Symbol) bool {
 		terminals = append(terminals, key)
 		return false
 	})
