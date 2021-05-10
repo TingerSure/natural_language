@@ -19,11 +19,11 @@ type Table struct {
 	start           int
 	actions         map[int]*TableActionGroup // map[status]map[symbol]action
 	gotos           map[int]*TableActionGroup // map[status]map[symbol]goto
-	nonterminalKeys map[Symbol]bool
-	terminalKeys    map[Symbol]bool
+	nonterminalKeys *SymbolSet
+	terminalKeys    *SymbolSet
 	toActions       map[int][]*TableAction
 	closures        map[int]*TableClosure
-	firsts          map[Symbol]map[Symbol]bool
+	firsts          map[Symbol]*SymbolSet
 	startProjects   map[int][]*TableProject
 	counter         *Count
 }
@@ -32,17 +32,17 @@ func NewTable() *Table {
 	return &Table{
 		actions:         map[int]*TableActionGroup{},
 		gotos:           map[int]*TableActionGroup{},
-		nonterminalKeys: map[Symbol]bool{},
-		terminalKeys:    map[Symbol]bool{},
+		nonterminalKeys: NewSymbolSet(),
+		terminalKeys:    NewSymbolSet(),
 		closures:        map[int]*TableClosure{},
 		toActions:       map[int][]*TableAction{},
-		firsts:          map[Symbol]map[Symbol]bool{},
+		firsts:          map[Symbol]*SymbolSet{},
 		startProjects:   map[int][]*TableProject{},
 		counter:         NewCount(0),
 	}
 }
 
-func (g *Table) GetFirsts() map[Symbol]map[Symbol]bool {
+func (g *Table) GetFirsts() map[Symbol]*SymbolSet {
 	return g.firsts
 }
 
@@ -50,11 +50,11 @@ func (g *Table) GetClosures() map[int]*TableClosure {
 	return g.closures
 }
 
-func (g *Table) GetNonterminalKeys() map[Symbol]bool {
+func (g *Table) GetNonterminalKeys() *SymbolSet {
 	return g.nonterminalKeys
 }
 
-func (g *Table) GetTerminalKeys() map[Symbol]bool {
+func (g *Table) GetTerminalKeys() *SymbolSet {
 	return g.terminalKeys
 }
 
@@ -95,14 +95,12 @@ func (g *Table) Build() error {
 }
 
 func (g *Table) makeClosures() {
-	g.start = g.makeClosureStep(map[*TableProject]map[Symbol]bool{
-		g.startProjects[g.global.Type()][0]: map[Symbol]bool{
-			g.end: true,
-		},
+	g.start = g.makeClosureStep(map[*TableProject]*SymbolSet{
+		g.startProjects[g.global.Type()][0]: NewSymbolSet(g.end),
 	}).Id()
 }
 
-func (g *Table) makeClosureStep(cursors map[*TableProject]map[Symbol]bool) *TableClosure {
+func (g *Table) makeClosureStep(cursors map[*TableProject]*SymbolSet) *TableClosure {
 	closure := NewTableClosure(g.counter.Next())
 	for cursor, lookaheads := range cursors {
 		closure.AddProject(cursor, lookaheads)
@@ -127,7 +125,7 @@ func (g *Table) makeClosureStep(cursors map[*TableProject]map[Symbol]bool) *Tabl
 
 	endProjects := closure.GetProjectsByNextChild(nil)
 	for endProject, lookaheads := range endProjects {
-		for lookahead, _ := range lookaheads {
+		lookaheads.Iterate(func(lookahead Symbol) bool {
 			if endProject.Rule.GetResult() == g.global {
 				//accept
 				g.actions[closure.Id()].SetAction(lookahead.Type(), NewTableActionAccept())
@@ -135,11 +133,11 @@ func (g *Table) makeClosureStep(cursors map[*TableProject]map[Symbol]bool) *Tabl
 				// polymerize
 				g.actions[closure.Id()].SetAction(lookahead.Type(), NewTableActionPolymerize(endProject.Rule))
 			}
-		}
+			return false
+		})
 	}
 
-	nextChildren := closure.NextChildren()
-	for child, _ := range nextChildren {
+	closure.NextChildren().Iterate(func(child Symbol) bool {
 		projects := closure.GetProjectsByNextChild(child)
 		nextProjects := g.nextProjects(projects)
 		nextClosure := g.makeClosureStep(nextProjects)
@@ -154,7 +152,8 @@ func (g *Table) makeClosureStep(cursors map[*TableProject]map[Symbol]bool) *Tabl
 			g.gotos[closure.Id()].SetAction(child.Type(), action)
 			g.toActions[nextClosure.Id()] = append(g.toActions[nextClosure.Id()], action)
 		}
-	}
+		return false
+	})
 	return closure
 }
 
@@ -180,15 +179,15 @@ func (g *Table) matchClosure(target *TableClosure) (*TableClosure, int) {
 	return nil, TableClosureMatchUnrelated
 }
 
-func (g *Table) nextProjects(nows map[*TableProject]map[Symbol]bool) map[*TableProject]map[Symbol]bool {
-	nexts := map[*TableProject]map[Symbol]bool{}
+func (g *Table) nextProjects(nows map[*TableProject]*SymbolSet) map[*TableProject]*SymbolSet {
+	nexts := map[*TableProject]*SymbolSet{}
 	for project, lookaheads := range nows {
 		nexts[project.Next] = lookaheads
 	}
 	return nexts
 }
 
-func (g *Table) equivalenceClosure(cursors map[*TableProject]map[Symbol]bool, closure *TableClosure) {
+func (g *Table) equivalenceClosure(cursors map[*TableProject]*SymbolSet, closure *TableClosure) {
 	for cursor, lookaheads := range cursors {
 		symbol := cursor.GetNextChild()
 		if symbol == nil || symbol.SymbolType() == SymbolTypeTerminal {
@@ -200,18 +199,17 @@ func (g *Table) equivalenceClosure(cursors map[*TableProject]map[Symbol]bool, cl
 			if cursor.Next != nil && !cursor.Next.IsEnd() {
 				next := cursor.Next.GetNextChild()
 				if next.SymbolType() == SymbolTypeTerminal {
-					equivalenceLookaheads = map[Symbol]bool{
-						next: true,
-					}
+					equivalenceLookaheads = NewSymbolSet(next)
+
 				} else {
 					equivalenceLookaheads = g.firsts[next]
 				}
 			}
 			successLookaheads := closure.AddProject(equivalence, equivalenceLookaheads)
-			if len(successLookaheads) > 0 {
+			if successLookaheads.Size() > 0 {
 				// add success
 				g.equivalenceClosure(
-					map[*TableProject]map[Symbol]bool{
+					map[*TableProject]*SymbolSet{
 						equivalence: successLookaheads,
 					},
 					closure,
@@ -241,24 +239,25 @@ func (g *Table) makeFirsts() {
 		for _, rule := range g.rules {
 			result := rule.GetResult()
 			if g.firsts[result] == nil {
-				g.firsts[result] = map[Symbol]bool{}
+				g.firsts[result] = NewSymbolSet()
 			}
 			child := rule.GetChild(0)
 			if child.SymbolType() == SymbolTypeTerminal {
-				if !g.firsts[result][child] {
-					g.firsts[result][child] = true
+				if !g.firsts[result].Has(child) {
+					g.firsts[result].Add(child)
 					next = true
 				}
 			} else {
 				if g.firsts[child] == nil {
 					continue
 				}
-				for first, _ := range g.firsts[child] {
-					if !g.firsts[result][first] {
-						g.firsts[result][first] = true
+				g.firsts[child].Iterate(func(first Symbol) bool {
+					if !g.firsts[result].Has(first) {
+						g.firsts[result].Add(first)
 						next = true
 					}
-				}
+					return false
+				})
 			}
 		}
 	}
@@ -283,17 +282,17 @@ func (g *Table) check() error {
 
 func (g *Table) checkRules() {
 	for _, rule := range g.rules {
-		g.nonterminalKeys[rule.GetResult()] = true
+		g.nonterminalKeys.Add(rule.GetResult())
 		for index := 0; index < rule.Size(); index++ {
 			symbol := rule.GetChild(index)
 			if symbol.SymbolType() == SymbolTypeNonterminal {
-				g.nonterminalKeys[symbol] = true
+				g.nonterminalKeys.Add(symbol)
 			} else {
-				g.terminalKeys[symbol] = true
+				g.terminalKeys.Add(symbol)
 			}
 		}
 	}
-	g.terminalKeys[g.end] = true
+	g.terminalKeys.Add(g.end)
 }
 
 func (g *Table) checkGlobal() error {
@@ -320,13 +319,15 @@ func (g *Table) checkGlobal() error {
 
 func (g *Table) ToString() string {
 	nonterminals := []Symbol{}
-	for key, _ := range g.GetNonterminalKeys() {
+	g.GetNonterminalKeys().Iterate(func(key Symbol)bool{
 		nonterminals = append(nonterminals, key)
-	}
+		return false
+	})
 	terminals := []Symbol{}
-	for key, _ := range g.GetTerminalKeys() {
+	g.GetTerminalKeys().Iterate(func(key Symbol)bool{
 		terminals = append(terminals, key)
-	}
+		return false
+	})
 	values := []string{}
 	titles := []string{}
 	brs := []string{}

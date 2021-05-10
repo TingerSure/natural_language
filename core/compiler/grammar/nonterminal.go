@@ -1,7 +1,5 @@
 package grammar
 
-import ()
-
 const (
 	SymbolTypeNonterminal = 1
 )
