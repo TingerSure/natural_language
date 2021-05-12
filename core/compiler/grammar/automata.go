@@ -45,16 +45,26 @@ func (a *Automata) Run(tokens *lexer.TokenList) (Phrase, error) {
 			rule := action.Rule()
 			size := rule.Size()
 			result := NewPhraseStruct(rule)
-			result.AddChild(phraseList[len(phraseList)-size:]...)
-			phraseList = phraseList[:len(phraseList)-size]
-			phraseList = append(phraseList, result)
-			statusList = statusList[:len(statusList)-size+1]
-			lastStatus := statusList[len(statusList)-1]
-			gotos := a.table.GetGoto(lastStatus, result.Type())
-			if gotos == nil {
-				return nil, errors.New("syntax error : unexpected block")
+			if size == 0 {
+				phraseList = append(phraseList, result)
+				statusList = append(statusList, status)
+				gotos := a.table.GetGoto(status, result.Type())
+				if gotos == nil {
+					return nil, errors.New("syntax error : unexpected block")
+				}
+				status = gotos.Status()
+			} else {
+				result.AddChild(phraseList[len(phraseList)-size:]...)
+				phraseList = phraseList[:len(phraseList)-size]
+				phraseList = append(phraseList, result)
+				statusList = statusList[:len(statusList)-size+1]
+				lastStatus := statusList[len(statusList)-1]
+				gotos := a.table.GetGoto(lastStatus, result.Type())
+				if gotos == nil {
+					return nil, errors.New("syntax error : unexpected block")
+				}
+				status = gotos.Status()
 			}
-			status = gotos.Status()
 			continue
 		}
 		if action.Type() == ActionAcceptType {

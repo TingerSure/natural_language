@@ -15,7 +15,7 @@ var (
 	SemanticRules = []*semantic.Rule{
 
 		semantic.NewRule(PolymerizePageGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			// SymbolPageGroup -> SymbolPageItemArray
+			// SymbolPageGroup -> SymbolPageItemList
 			page := context.GetLibraryManager().Sandbox.Variable.Page.New()
 
 			items, err := context.Deal(phrase.GetChild(0))
@@ -61,6 +61,14 @@ var (
 			return []concept.Index{
 				context.GetLibraryManager().Sandbox.Index.ConstIndex.New(page),
 			}, nil
+		}),
+		semantic.NewRule(PolymerizePageItemList, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolPageItemList -> SymbolPageItemArray
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizePageItemListEmpty, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolPageItemList ->
+			return []concept.Index{}, nil
 		}),
 		semantic.NewRule(PolymerizePageItemArrayStart, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			// SymbolPageItemArray -> SymbolPageItem
@@ -192,6 +200,14 @@ var (
 				context.GetLibraryManager().Sandbox.Expression.NewBool.New(false),
 			}, nil
 		}),
+		semantic.NewRule(PolymerizeIndexList, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolIndexList -> SymbolIndexArray
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeIndexListEmpty, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolIndexList ->
+			return []concept.Index{}, nil
+		}),
 		semantic.NewRule(PolymerizeIndexArrayStart, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolIndexArray -> SymbolIndex
 			return context.Deal(phrase.GetChild(0))
@@ -223,6 +239,14 @@ var (
 				),
 			}, nil
 		}),
+		semantic.NewRule(PolymerizeKeyValueList, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolKeyValueList -> SymbolKeyValueArray
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeKeyValueListEmpty, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolKeyValueList ->
+			return []concept.Index{}, nil
+		}),
 		semantic.NewRule(PolymerizeKeyValueArrayStart, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolKeyValueArray -> SymbolKeyValue
 			return context.Deal(phrase.GetChild(0))
@@ -238,19 +262,6 @@ var (
 				return nil, err
 			}
 			return append(items, item...), nil
-		}),
-		semantic.NewRule(PolymerizeCallWithoutParam, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolIndex -> SymbolIndex SymbolLeftParenthesis SymbolRightParenthesis
-			indexes, err := context.Deal(phrase.GetChild(0))
-			if err != nil {
-				return nil, err
-			}
-			return []concept.Index{
-				context.GetLibraryManager().Sandbox.Expression.Call.New(
-					indexes[0],
-					context.GetLibraryManager().Sandbox.Expression.NewParam.New(),
-				),
-			}, nil
 		}),
 		semantic.NewRule(PolymerizeCallWithIndexArray, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolIndex -> SymbolIndex SymbolLeftParenthesis SymbolIndexArray SymbolRightParenthesis
@@ -271,8 +282,8 @@ var (
 				),
 			}, nil
 		}),
-		semantic.NewRule(PolymerizeCallWithKeyValueArray, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolIndex -> SymbolIndex SymbolLeftParenthesis SymbolKeyValueArray SymbolRightParenthesis
+		semantic.NewRule(PolymerizeCallWithKeyValueList, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolIndex -> SymbolIndex SymbolLeftParenthesis SymbolKeyValueList SymbolRightParenthesis
 			funcs, err := context.Deal(phrase.GetChild(0))
 			if err != nil {
 				return nil, err
@@ -305,14 +316,8 @@ var (
 				),
 			}, nil
 		}),
-		semantic.NewRule(PolymerizeObjectEmpty, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolObject -> SymbolLeftBrace SymbolRightBrace
-			return []concept.Index{
-				context.GetLibraryManager().Sandbox.Expression.NewObject.New(),
-			}, nil
-		}),
-		semantic.NewRule(PolymerizeObjectWithKeyValueArray, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolObject -> SymbolLeftBrace SymbolKeyValueArray SymbolRightBrace
+		semantic.NewRule(PolymerizeObjectWithKeyValueList, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolObject -> SymbolLeftBrace SymbolKeyValueList SymbolRightBrace
 			fields, err := context.Deal(phrase.GetChild(1))
 			if err != nil {
 				return nil, err

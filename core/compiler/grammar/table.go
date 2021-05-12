@@ -246,6 +246,9 @@ func (g *Table) makeFirsts() {
 			if g.firsts[result] == nil {
 				g.firsts[result] = NewSymbolSet()
 			}
+			if rule.Size() == 0 {
+				return false
+			}
 			child := rule.GetChild(0)
 			if child.SymbolType() == SymbolTypeTerminal {
 				if !g.firsts[result].Has(child) {
@@ -287,7 +290,6 @@ func (g *Table) init() error {
 		return err
 	}
 	g.augmentGlobal()
-	// TODO check more
 	return nil
 }
 
