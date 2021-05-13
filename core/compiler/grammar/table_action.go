@@ -12,35 +12,40 @@ const (
 )
 
 type TableAction struct {
-	types  int
-	status int
-	rule   *Rule
+	types    int
+	status   int
+	rule     *Rule
+	projects map[*TableProject]*SymbolSet
 }
 
-func NewTableActionPolymerize(rule *Rule) *TableAction {
+func NewTableActionPolymerize(rule *Rule, projects map[*TableProject]*SymbolSet) *TableAction {
 	return &TableAction{
-		types: ActionPolymerizeType,
-		rule:  rule,
+		types:    ActionPolymerizeType,
+		rule:     rule,
+		projects: projects,
 	}
 }
 
-func NewTableActionAccept() *TableAction {
+func NewTableActionAccept(projects map[*TableProject]*SymbolSet) *TableAction {
 	return &TableAction{
-		types: ActionAcceptType,
+		types:    ActionAcceptType,
+		projects: projects,
 	}
 }
 
-func NewTableActionMove(status int) *TableAction {
+func NewTableActionMove(status int, projects map[*TableProject]*SymbolSet) *TableAction {
 	return &TableAction{
-		types:  ActionMoveType,
-		status: status,
+		types:    ActionMoveType,
+		status:   status,
+		projects: projects,
 	}
 }
 
-func NewTableActionGoto(status int) *TableAction {
+func NewTableActionGoto(status int, projects map[*TableProject]*SymbolSet) *TableAction {
 	return &TableAction{
-		types:  ActionGotoType,
-		status: status,
+		types:    ActionGotoType,
+		status:   status,
+		projects: projects,
 	}
 }
 
@@ -58,6 +63,10 @@ func (t *TableAction) SetStatus(status int) {
 
 func (t *TableAction) Rule() *Rule {
 	return t.rule
+}
+
+func (t *TableAction) Projects() map[*TableProject]*SymbolSet {
+	return t.projects
 }
 
 func (t *TableAction) ToString() string {

@@ -43,7 +43,10 @@ func NewCompiler(libs *tree.LibraryManager) *Compiler {
 	}
 	instance.grammar.SetEnd(rule.GrammarEnd)
 	instance.grammar.SetGlobal(rule.GrammarGlobal)
-	instance.grammar.Build()
+	err := instance.grammar.Build()
+	if err != nil {
+		panic(err.Error())
+	}
 	instance.semantic = semantic.NewSemantic(libs, func(path string) (concept.Index, error) {
 		return instance.GetPage(path)
 	})

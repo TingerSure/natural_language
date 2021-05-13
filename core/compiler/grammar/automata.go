@@ -18,19 +18,19 @@ func NewAutomata(table *Table) *Automata {
 
 func (a *Automata) Run(tokens *lexer.TokenList) (Phrase, error) {
 	tokens.Reset()
-	statusList := []int{}
-	phraseList := []Phrase{}
 	status := a.table.GetStart()
 	phrase := NewPhraseToken(tokens.Next())
+	statusList := []int{status}
+	phraseList := []Phrase{}
 	for {
 		action := a.table.GetAction(status, phrase.GetToken().Type())
 		if action == nil {
 			return nil, errors.New(fmt.Sprintf("syntax error : unexpected : %v, status : %v, symbol : %v", phrase.GetToken().Value(), status, phrase.GetToken().Name()))
 		}
 		if action.Type() == ActionMoveType {
+			status = action.Status()
 			statusList = append(statusList, status)
 			phraseList = append(phraseList, phrase)
-			status = action.Status()
 			next := tokens.Next()
 			if next == nil {
 				if phrase.GetToken() != tokens.End() {
@@ -45,26 +45,17 @@ func (a *Automata) Run(tokens *lexer.TokenList) (Phrase, error) {
 			rule := action.Rule()
 			size := rule.Size()
 			result := NewPhraseStruct(rule)
-			if size == 0 {
-				phraseList = append(phraseList, result)
-				statusList = append(statusList, status)
-				gotos := a.table.GetGoto(status, result.Type())
-				if gotos == nil {
-					return nil, errors.New("syntax error : unexpected block")
-				}
-				status = gotos.Status()
-			} else {
-				result.AddChild(phraseList[len(phraseList)-size:]...)
-				phraseList = phraseList[:len(phraseList)-size]
-				phraseList = append(phraseList, result)
-				statusList = statusList[:len(statusList)-size+1]
-				lastStatus := statusList[len(statusList)-1]
-				gotos := a.table.GetGoto(lastStatus, result.Type())
-				if gotos == nil {
-					return nil, errors.New("syntax error : unexpected block")
-				}
-				status = gotos.Status()
+			result.AddChild(phraseList[len(phraseList)-size:]...)
+			phraseList = phraseList[:len(phraseList)-size]
+			statusList = statusList[:len(statusList)-size]
+			status = statusList[len(statusList)-1]
+			gotos := a.table.GetGoto(status, result.Type())
+			if gotos == nil {
+				return nil, errors.New("syntax error : unexpected block")
 			}
+			status = gotos.Status()
+			phraseList = append(phraseList, result)
+			statusList = append(statusList, status)
 			continue
 		}
 		if action.Type() == ActionAcceptType {

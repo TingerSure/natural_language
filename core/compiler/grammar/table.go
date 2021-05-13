@@ -94,18 +94,26 @@ func (g *Table) Build() error {
 	}
 	g.makeFirsts()
 	g.makeProjects()
-	g.makeClosures()
+	err = g.makeClosures()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (g *Table) makeClosures() {
-	g.start = g.makeClosureStep(map[*TableProject]*SymbolSet{
+func (g *Table) makeClosures() error {
+	closure, err := g.makeClosureStep(map[*TableProject]*SymbolSet{
 		g.startProjects[g.global.Type()][0]: NewSymbolSet(g.end),
-	}).Id()
+	})
+	if err != nil {
+		return err
+	}
+	g.start = closure.Id()
+	return nil
 }
 
-func (g *Table) makeClosureStep(cursors map[*TableProject]*SymbolSet) *TableClosure {
-	closure := NewTableClosure(g.counter.Next())
+func (g *Table) makeClosureStep(cursors map[*TableProject]*SymbolSet) (closure *TableClosure, err error) {
+	closure = NewTableClosure(g.counter.Next())
 	for cursor, lookaheads := range cursors {
 		closure.AddProject(cursor, lookaheads)
 	}
@@ -114,7 +122,8 @@ func (g *Table) makeClosureStep(cursors map[*TableProject]*SymbolSet) *TableClos
 	oldClosure, direction := g.matchClosure(closure)
 	if direction == TableClosureMatchExist {
 		//exist
-		return oldClosure
+		closure = oldClosure
+		return
 	}
 	if direction == TableClosureMatchReplace {
 		//replace
@@ -127,38 +136,79 @@ func (g *Table) makeClosureStep(cursors map[*TableProject]*SymbolSet) *TableClos
 	g.actions[closure.Id()] = NewTableActionGroup()
 	g.gotos[closure.Id()] = NewTableActionGroup()
 
-	endProjects := closure.GetProjectsByNextChild(nil)
-	for endProject, lookaheads := range endProjects {
-		lookaheads.Iterate(func(lookahead Symbol) bool {
+	for endProject, lookaheads := range closure.GetProjectsByNextChild(nil) {
+		if lookaheads.Iterate(func(lookahead Symbol) bool {
 			if endProject.Rule.GetResult() == g.global {
-				//accept
-				g.actions[closure.Id()].SetAction(lookahead.Type(), NewTableActionAccept())
+				// accept
+				accept := NewTableActionAccept(map[*TableProject]*SymbolSet{
+					endProject: NewSymbolSet(lookahead),
+				})
+				exist := g.actions[closure.Id()].GetAction(lookahead.Type())
+				if exist != nil {
+					err = g.actionConfictError(exist, accept, closure, lookahead)
+					return true
+				}
+				g.actions[closure.Id()].SetAction(lookahead.Type(), accept)
 			} else {
 				// polymerize
-				g.actions[closure.Id()].SetAction(lookahead.Type(), NewTableActionPolymerize(endProject.Rule))
+				polymerize := NewTableActionPolymerize(endProject.Rule, map[*TableProject]*SymbolSet{
+					endProject: NewSymbolSet(lookahead),
+				})
+				exist := g.actions[closure.Id()].GetAction(lookahead.Type())
+				if exist != nil {
+					err = g.actionConfictError(exist, polymerize, closure, lookahead)
+					return true
+				}
+				g.actions[closure.Id()].SetAction(lookahead.Type(), polymerize)
 			}
 			return false
-		})
+		}) {
+			return
+		}
 	}
 
 	closure.NextChildren().Iterate(func(child Symbol) bool {
-		projects := closure.GetProjectsByNextChild(child)
-		nextProjects := g.nextProjects(projects)
-		nextClosure := g.makeClosureStep(nextProjects)
+		var nextClosure *TableClosure
+		projects := g.nextProjects(closure.GetProjectsByNextChild(child))
+		nextClosure, err = g.makeClosureStep(projects)
+		if err != nil {
+			return true
+		}
 		if child.SymbolType() == SymbolTypeTerminal {
 			//move
-			action := NewTableActionMove(nextClosure.Id())
-			g.actions[closure.Id()].SetAction(child.Type(), action)
-			g.toActions[nextClosure.Id()] = append(g.toActions[nextClosure.Id()], action)
+			move := NewTableActionMove(nextClosure.Id(), projects)
+			exist := g.actions[closure.Id()].GetAction(child.Type())
+			if exist != nil {
+				err = g.actionConfictError(exist, move, closure, child)
+				return true
+			}
+			g.actions[closure.Id()].SetAction(child.Type(), move)
+			g.toActions[nextClosure.Id()] = append(g.toActions[nextClosure.Id()], move)
 		} else {
 			// goto
-			action := NewTableActionGoto(nextClosure.Id())
+			action := NewTableActionGoto(nextClosure.Id(), projects)
+			exist := g.gotos[closure.Id()].GetAction(child.Type())
+			if exist != nil {
+				err = g.actionConfictError(exist, action, closure, child)
+				return true
+			}
 			g.gotos[closure.Id()].SetAction(child.Type(), action)
 			g.toActions[nextClosure.Id()] = append(g.toActions[nextClosure.Id()], action)
 		}
 		return false
 	})
-	return closure
+	return
+}
+
+func (g *Table) actionConfictError(left, right *TableAction, closure *TableClosure, lookahead Symbol) error {
+	leftNames, rightNames := []string{}, []string{}
+	for project, _ := range left.Projects() {
+		leftNames = append(leftNames, project.ToString())
+	}
+	for project, _ := range right.Projects() {
+		rightNames = append(rightNames, project.ToString())
+	}
+	return errors.New(fmt.Sprintf("Rule conflict between (%v) and (%v), status: %v, lookahead: %v.", strings.Join(leftNames, " , "), strings.Join(rightNames, " , "), closure.Id(), lookahead.Name()))
 }
 
 func (g *Table) moveClosure(from, to *TableClosure) {
