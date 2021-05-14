@@ -29,6 +29,7 @@ type Table struct {
 	closures        map[int]*TableClosure
 	firsts          map[Symbol]*SymbolSet
 	startProjects   map[int][]*TableProject
+	moves           map[int]int
 	counter         *Count
 }
 
@@ -43,7 +44,8 @@ func NewTable() *Table {
 		toActions:       map[int][]*TableAction{},
 		firsts:          map[Symbol]*SymbolSet{},
 		startProjects:   map[int][]*TableProject{},
-		counter:         NewCount(0),
+		moves:           map[int]int{},
+		counter:         NewCount(1),
 	}
 }
 
@@ -94,11 +96,7 @@ func (g *Table) Build() error {
 	}
 	g.makeFirsts()
 	g.makeProjects()
-	err = g.makeClosures()
-	if err != nil {
-		return err
-	}
-	return nil
+	return g.makeClosures()
 }
 
 func (g *Table) makeClosures() error {
@@ -169,35 +167,49 @@ func (g *Table) makeClosureStep(cursors map[*TableProject]*SymbolSet) (closure *
 
 	closure.NextChildren().Iterate(func(child Symbol) bool {
 		var nextClosure *TableClosure
-		projects := g.nextProjects(closure.GetProjectsByNextChild(child))
-		nextClosure, err = g.makeClosureStep(projects)
+		projects := closure.GetProjectsByNextChild(child)
+		nextClosure, err = g.makeClosureStep(g.nextProjects(projects))
 		if err != nil {
 			return true
 		}
+		if g.actions[closure.Id()] == nil {
+			return true
+		}
+		nextId := g.getClosureIdMoved(nextClosure.Id())
 		if child.SymbolType() == SymbolTypeTerminal {
 			//move
-			move := NewTableActionMove(nextClosure.Id(), projects)
+			move := NewTableActionMove(nextId, projects)
 			exist := g.actions[closure.Id()].GetAction(child.Type())
 			if exist != nil {
 				err = g.actionConfictError(exist, move, closure, child)
 				return true
 			}
 			g.actions[closure.Id()].SetAction(child.Type(), move)
-			g.toActions[nextClosure.Id()] = append(g.toActions[nextClosure.Id()], move)
+			g.toActions[nextId] = append(g.toActions[nextId], move)
 		} else {
 			// goto
-			action := NewTableActionGoto(nextClosure.Id(), projects)
+			action := NewTableActionGoto(nextId, projects)
 			exist := g.gotos[closure.Id()].GetAction(child.Type())
 			if exist != nil {
 				err = g.actionConfictError(exist, action, closure, child)
 				return true
 			}
 			g.gotos[closure.Id()].SetAction(child.Type(), action)
-			g.toActions[nextClosure.Id()] = append(g.toActions[nextClosure.Id()], action)
+			g.toActions[nextId] = append(g.toActions[nextId], action)
 		}
 		return false
 	})
 	return
+}
+
+func (g *Table) getClosureIdMoved(id int) int {
+	for {
+		to := g.moves[id]
+		if to == 0 {
+			return id
+		}
+		id = to
+	}
 }
 
 func (g *Table) actionConfictError(left, right *TableAction, closure *TableClosure, lookahead Symbol) error {
@@ -212,6 +224,7 @@ func (g *Table) actionConfictError(left, right *TableAction, closure *TableClosu
 }
 
 func (g *Table) moveClosure(from, to *TableClosure) {
+	g.moves[from.Id()] = to.Id()
 	for _, action := range g.toActions[from.Id()] {
 		action.SetStatus(to.Id())
 	}

@@ -2,6 +2,7 @@ package semantic
 
 import (
 	"errors"
+	"fmt"
 	"github.com/TingerSure/natural_language/core/compiler/grammar"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
@@ -33,6 +34,10 @@ func (s *Semantic) Read(phrase grammar.Phrase) (concept.Index, error) {
 	return pageIndex[0], nil
 }
 
-func (s *Semantic) AddRule(rule *Rule) {
+func (s *Semantic) AddRule(rule *Rule) error {
+	if s.rules[rule.GetSource()] != nil {
+		return errors.New(fmt.Sprintf("Semantic rule (%v) repeated.", rule.GetSource()))
+	}
 	s.rules[rule.GetSource()] = rule
+	return nil
 }

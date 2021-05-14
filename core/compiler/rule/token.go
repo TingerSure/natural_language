@@ -14,6 +14,7 @@ const (
 	TypeLeftArrow               // <-
 	TypeRightArrow              // ->
 	TypeSpace                   // \r \n \t [:space:]
+	TypeEqual                   // =
 	TypeColon                   // :
 	TypeSemicolon               // ;
 	TypeDot                     // .
@@ -48,6 +49,7 @@ const (
 	KeyLeftArrow        = "left_arrow"
 	KeyRightArrow       = "right_arrow"
 	KeySpace            = "space"
+	KeyEqual            = "equal"
 	KeyColon            = "colon"
 	KeySemicolon        = "semicolon"
 	KeyDot              = "dot"
@@ -101,6 +103,9 @@ var (
 		}),
 		lexer.NewRule("\\->", func(value []byte) *lexer.Token {
 			return lexer.NewToken(TypeRightArrow, KeyRightArrow, string(value))
+		}),
+		lexer.NewRule("=", func(value []byte) *lexer.Token {
+			return lexer.NewToken(TypeEqual, KeyEqual, string(value))
 		}),
 		lexer.NewRule(":", func(value []byte) *lexer.Token {
 			return lexer.NewToken(TypeColon, KeyColon, string(value))

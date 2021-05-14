@@ -51,7 +51,10 @@ func NewCompiler(libs *tree.LibraryManager) *Compiler {
 		return instance.GetPage(path)
 	})
 	for _, rule := range rule.SemanticRules {
-		instance.semantic.AddRule(rule)
+		err = instance.semantic.AddRule(rule)
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 	return instance
 }
