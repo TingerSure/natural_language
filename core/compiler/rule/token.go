@@ -26,8 +26,8 @@ const (
 	TypeComment                 // [:comment:]
 	TypePage                    // page
 	TypeImport                  // import
-	TypeExport                  // export
-	TypeVar                     // var
+	TypePublic                  // public
+	TypePrivate                 // private
 	TypeClass                   // class
 	TypeRequire                 // require
 	TypeProvide                 // provide
@@ -37,6 +37,7 @@ const (
 	TypeSet                     // set
 	TypeTrue                    // true
 	TypeFalse                   // false
+	TypeNull                    // null
 )
 
 const (
@@ -61,8 +62,8 @@ const (
 	KeyComment          = "comment"
 	KeyPage             = "page"
 	KeyImport           = "import"
-	KeyExport           = "export"
-	KeyVar              = "var"
+	KeyPublic           = "public"
+	KeyPrivate          = "private"
 	KeyClass            = "class"
 	KeyRequire          = "require"
 	KeyProvide          = "provide"
@@ -72,6 +73,7 @@ const (
 	KeySet              = "set"
 	KeyTrue             = "true"
 	KeyFalse            = "false"
+	KeyNull             = "null"
 )
 
 var (
@@ -81,55 +83,55 @@ var (
 
 	LexerRules = []*lexer.Rule{
 		lexer.NewRule("\\(", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeLeftParenthesis, KeyLeftParenthesis, string(value))
+			return lexer.NewToken(TypeLeftParenthesis, KeyLeftParenthesis, "(")
 		}),
 		lexer.NewRule("\\)", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeRightParenthesis, KeyRightParenthesis, string(value))
+			return lexer.NewToken(TypeRightParenthesis, KeyRightParenthesis, ")")
 		}),
 		lexer.NewRule("\\[", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeLeftBracket, KeyLeftBracket, string(value))
+			return lexer.NewToken(TypeLeftBracket, KeyLeftBracket, "[")
 		}),
 		lexer.NewRule("\\]", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeRightBracket, KeyRightBracket, string(value))
+			return lexer.NewToken(TypeRightBracket, KeyRightBracket, "]")
 		}),
 		lexer.NewRule("\\{", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeLeftBrace, KeyLeftBrace, string(value))
+			return lexer.NewToken(TypeLeftBrace, KeyLeftBrace, "{")
 		}),
 		lexer.NewRule("\\}", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeRightBrace, KeyRightBrace, string(value))
+			return lexer.NewToken(TypeRightBrace, KeyRightBrace, "}")
 		}),
 		lexer.NewRule("<\\-", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeLeftArrow, KeyLeftArrow, string(value))
+			return lexer.NewToken(TypeLeftArrow, KeyLeftArrow, "<-")
 		}),
 		lexer.NewRule("\\->", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeRightArrow, KeyRightArrow, string(value))
+			return lexer.NewToken(TypeRightArrow, KeyRightArrow, "->")
 		}),
 		lexer.NewRule("=", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeEqual, KeyEqual, string(value))
+			return lexer.NewToken(TypeEqual, KeyEqual, "=")
 		}),
 		lexer.NewRule(":", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeColon, KeyColon, string(value))
+			return lexer.NewToken(TypeColon, KeyColon, ":")
 		}),
 		lexer.NewRule(";", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeSemicolon, KeySemicolon, string(value))
+			return lexer.NewToken(TypeSemicolon, KeySemicolon, ";")
 		}),
 		lexer.NewRule("\\.", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeDot, KeyDot, string(value))
+			return lexer.NewToken(TypeDot, KeyDot, ".")
 		}),
 		lexer.NewRule("\\,", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeComma, KeyComma, string(value))
+			return lexer.NewToken(TypeComma, KeyComma, ",")
 		}),
 		lexer.NewRule("\\n", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeSpace, KeySpace, string(value))
+			return lexer.NewToken(TypeSpace, KeySpace, "\n")
 		}),
 		lexer.NewRule("\\r", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeSpace, KeySpace, string(value))
+			return lexer.NewToken(TypeSpace, KeySpace, "\r")
 		}),
 		lexer.NewRule("\\t", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeSpace, KeySpace, string(value))
+			return lexer.NewToken(TypeSpace, KeySpace, "\t")
 		}),
 		lexer.NewRule(" ", func(value []byte) *lexer.Token {
-			return lexer.NewToken(TypeSpace, KeySpace, string(value))
+			return lexer.NewToken(TypeSpace, KeySpace, " ")
 		}),
 		lexer.NewRule("([\\+|-]?\\d+)(\\.\\d+)?(E[\\+|-]?\\d+)?", func(value []byte) *lexer.Token {
 			return lexer.NewToken(TypeNumber, KeyNumber, string(value))
@@ -150,10 +152,10 @@ var (
 				return lexer.NewToken(TypePage, KeyPage, KeyPage)
 			case KeyImport:
 				return lexer.NewToken(TypeImport, KeyImport, KeyImport)
-			case KeyExport:
-				return lexer.NewToken(TypeExport, KeyExport, KeyExport)
-			case KeyVar:
-				return lexer.NewToken(TypeVar, KeyVar, KeyVar)
+			case KeyPublic:
+				return lexer.NewToken(TypePublic, KeyPublic, KeyPublic)
+			case KeyPrivate:
+				return lexer.NewToken(TypePrivate, KeyPrivate, KeyPrivate)
 			case KeyClass:
 				return lexer.NewToken(TypeClass, KeyClass, KeyClass)
 			case KeyRequire:
@@ -172,6 +174,8 @@ var (
 				return lexer.NewToken(TypeTrue, KeyTrue, KeyTrue)
 			case KeyFalse:
 				return lexer.NewToken(TypeFalse, KeyFalse, KeyFalse)
+			case KeyNull:
+				return lexer.NewToken(TypeNull, KeyNull, KeyNull)
 			default:
 				return lexer.NewToken(TypeIdentifier, KeyIdentifier, valueIdentifier)
 			}

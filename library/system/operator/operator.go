@@ -255,27 +255,27 @@ func NewOperator(libs *tree.LibraryManager) *Operator {
 	}
 
 	for name, item := range instance.NumberItems {
-		instance.SetExport(libs.Sandbox.Variable.String.New(name+FuncName), libs.Sandbox.Index.ConstIndex.New(item.Func))
-		instance.SetExport(libs.Sandbox.Variable.String.New(name+LeftName), libs.Sandbox.Index.ConstIndex.New(item.Left))
-		instance.SetExport(libs.Sandbox.Variable.String.New(name+RightName), libs.Sandbox.Index.ConstIndex.New(item.Right))
-		instance.SetExport(libs.Sandbox.Variable.String.New(name+ResultName), libs.Sandbox.Index.ConstIndex.New(item.Result))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name+FuncName), libs.Sandbox.Index.ConstIndex.New(item.Func))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name+LeftName), libs.Sandbox.Index.ConstIndex.New(item.Left))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name+RightName), libs.Sandbox.Index.ConstIndex.New(item.Right))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name+ResultName), libs.Sandbox.Index.ConstIndex.New(item.Result))
 	}
 
 	for name, item := range instance.BoolItems {
-		instance.SetExport(libs.Sandbox.Variable.String.New(name+FuncName), libs.Sandbox.Index.ConstIndex.New(item.Func))
-		instance.SetExport(libs.Sandbox.Variable.String.New(name+LeftName), libs.Sandbox.Index.ConstIndex.New(item.Left))
-		instance.SetExport(libs.Sandbox.Variable.String.New(name+RightName), libs.Sandbox.Index.ConstIndex.New(item.Right))
-		instance.SetExport(libs.Sandbox.Variable.String.New(name+ResultName), libs.Sandbox.Index.ConstIndex.New(item.Result))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name+FuncName), libs.Sandbox.Index.ConstIndex.New(item.Func))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name+LeftName), libs.Sandbox.Index.ConstIndex.New(item.Left))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name+RightName), libs.Sandbox.Index.ConstIndex.New(item.Right))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name+ResultName), libs.Sandbox.Index.ConstIndex.New(item.Result))
 	}
 
 	for name, item := range instance.BoolUnaryItems {
-		instance.SetExport(libs.Sandbox.Variable.String.New(name+FuncName), libs.Sandbox.Index.ConstIndex.New(item.Func))
-		instance.SetExport(libs.Sandbox.Variable.String.New(name+RightName), libs.Sandbox.Index.ConstIndex.New(item.Right))
-		instance.SetExport(libs.Sandbox.Variable.String.New(name+ResultName), libs.Sandbox.Index.ConstIndex.New(item.Result))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name+FuncName), libs.Sandbox.Index.ConstIndex.New(item.Func))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name+RightName), libs.Sandbox.Index.ConstIndex.New(item.Right))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name+ResultName), libs.Sandbox.Index.ConstIndex.New(item.Result))
 	}
 
-	instance.SetExport(libs.Sandbox.Variable.String.New("OperatorTypeErrorException"), libs.Sandbox.Index.ConstIndex.New(instance.OperatorTypeErrorExceptionTemplate))
-	instance.SetExport(libs.Sandbox.Variable.String.New("OperatorParamMissingException"), libs.Sandbox.Index.ConstIndex.New(instance.OperatorParamMissingExceptionTemplate))
-	instance.SetExport(libs.Sandbox.Variable.String.New("OperatorDivisorZeroException"), libs.Sandbox.Index.ConstIndex.New(instance.OperatorDivisorZeroExceptionTemplate))
+	instance.SetPublic(libs.Sandbox.Variable.String.New("OperatorTypeErrorException"), libs.Sandbox.Index.ConstIndex.New(instance.OperatorTypeErrorExceptionTemplate))
+	instance.SetPublic(libs.Sandbox.Variable.String.New("OperatorParamMissingException"), libs.Sandbox.Index.ConstIndex.New(instance.OperatorParamMissingExceptionTemplate))
+	instance.SetPublic(libs.Sandbox.Variable.String.New("OperatorDivisorZeroException"), libs.Sandbox.Index.ConstIndex.New(instance.OperatorDivisorZeroExceptionTemplate))
 	return instance
 }

@@ -14,8 +14,8 @@ type IndexCreator struct {
 	BubbleIndex   *index.BubbleIndexCreator
 	LocalIndex    *index.LocalIndexCreator
 	ImportIndex   *index.ImportIndexCreator
-	ExportIndex   *index.ExportIndexCreator
-	VarIndex      *index.VarIndexCreator
+	PublicIndex   *index.PublicIndexCreator
+	PrivateIndex  *index.PrivateIndexCreator
 	KeyValueIndex *index.KeyValueIndexCreator
 }
 
@@ -33,12 +33,12 @@ func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
 		ParamCreator:     param.ParamCreator,
 		NullCreator:      param.NullCreator,
 	})
-	instance.VarIndex = index.NewVarIndexCreator(&index.VarIndexCreatorParam{
+	instance.PrivateIndex = index.NewPrivateIndexCreator(&index.PrivateIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,
 		NullCreator:      param.NullCreator,
 	})
-	instance.ExportIndex = index.NewExportIndexCreator(&index.ExportIndexCreatorParam{
+	instance.PublicIndex = index.NewPublicIndexCreator(&index.PublicIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,
 		NullCreator:      param.NullCreator,

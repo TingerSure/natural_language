@@ -14,7 +14,7 @@ func NewSet(libs *tree.LibraryManager) *Set {
 		Page: libs.Sandbox.Variable.Page.New(),
 	}
 
-	instance.SetExport(libs.Sandbox.Variable.String.New("Is"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.String.New("Is")))
-	instance.SetExport(libs.Sandbox.Variable.String.New("Equal"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.String.New("Equal")))
+	instance.SetPublic(libs.Sandbox.Variable.String.New("Is"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.String.New("Is")))
+	instance.SetPublic(libs.Sandbox.Variable.String.New("Equal"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.String.New("Equal")))
 	return instance
 }

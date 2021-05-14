@@ -30,7 +30,7 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 		HowManyResult: libs.Sandbox.Variable.String.New(QuestionResult),
 		WhatResult:    libs.Sandbox.Variable.String.New(QuestionResult),
 	}
-	instance.SetExport(libs.Sandbox.Variable.String.New("HowMany"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
+	instance.SetPublic(libs.Sandbox.Variable.String.New("HowMany"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("HowMany"),
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 			printParam := libs.Sandbox.Variable.Param.New()
@@ -53,7 +53,7 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 		},
 	)))
 
-	instance.SetExport(libs.Sandbox.Variable.String.New("What"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
+	instance.SetPublic(libs.Sandbox.Variable.String.New("What"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("What"),
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 			printParam := libs.Sandbox.Variable.Param.New()
@@ -76,9 +76,9 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 		},
 	)))
 
-	instance.SetExport(libs.Sandbox.Variable.String.New("HowManyParam"), libs.Sandbox.Index.ConstIndex.New(instance.HowManyParam))
-	instance.SetExport(libs.Sandbox.Variable.String.New("WhatParam"), libs.Sandbox.Index.ConstIndex.New(instance.HowManyParam))
-	instance.SetExport(libs.Sandbox.Variable.String.New("HowManyResult"), libs.Sandbox.Index.ConstIndex.New(instance.HowManyResult))
-	instance.SetExport(libs.Sandbox.Variable.String.New("WhatResult"), libs.Sandbox.Index.ConstIndex.New(instance.HowManyResult))
+	instance.SetPublic(libs.Sandbox.Variable.String.New("HowManyParam"), libs.Sandbox.Index.ConstIndex.New(instance.HowManyParam))
+	instance.SetPublic(libs.Sandbox.Variable.String.New("WhatParam"), libs.Sandbox.Index.ConstIndex.New(instance.HowManyParam))
+	instance.SetPublic(libs.Sandbox.Variable.String.New("HowManyResult"), libs.Sandbox.Index.ConstIndex.New(instance.HowManyResult))
+	instance.SetPublic(libs.Sandbox.Variable.String.New("WhatResult"), libs.Sandbox.Index.ConstIndex.New(instance.HowManyResult))
 	return instance
 }

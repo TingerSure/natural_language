@@ -410,49 +410,34 @@ func (g *Table) checkGlobal() error {
 }
 
 func (g *Table) ToString() string {
-	nonterminals := []Symbol{}
-	g.GetNonterminalKeys().Iterate(func(key Symbol) bool {
-		nonterminals = append(nonterminals, key)
-		return false
-	})
-	terminals := []Symbol{}
-	g.GetTerminalKeys().Iterate(func(key Symbol) bool {
-		terminals = append(terminals, key)
-		return false
-	})
 	values := []string{}
 	titles := []string{}
 	brs := []string{}
 	titles = append(titles, "status")
 	brs = append(brs, ":--:")
-	for _, terminal := range terminals {
-		titles = append(titles, terminal.Name())
+	terminals := []Symbol{}
+	nonterminals := []Symbol{}
+	g.GetTerminalKeys().Iterate(func(key Symbol) bool {
+		terminals = append(terminals, key)
+		titles = append(titles, key.Name())
 		brs = append(brs, ":--:")
-	}
-	for _, nonterminal := range nonterminals {
-		titles = append(titles, nonterminal.Name())
+		return false
+	})
+	g.GetNonterminalKeys().Iterate(func(key Symbol) bool {
+		nonterminals = append(nonterminals, key)
+		titles = append(titles, key.Name())
 		brs = append(brs, ":--:")
-	}
-
-	values = append(values, strings.Join(titles, "|"))
-	values = append(values, strings.Join(brs, "|"))
-
+		return false
+	})
+	values = append(values, strings.Join(titles, "|"), strings.Join(brs, "|"))
 	for status, _ := range g.closures {
 		value := []string{}
 		value = append(value, fmt.Sprintf("%v", status))
-		isPolymerize := false
 		for _, terminal := range terminals {
-			action := g.GetAction(status, terminal.Type())
-			value = append(value, action.ToString())
-			if action != nil && action.Type() == ActionPolymerizeType {
-				isPolymerize = true
-				break
-			}
+			value = append(value, g.GetAction(status, terminal.Type()).ToString())
 		}
-		if !isPolymerize {
-			for _, nonterminal := range nonterminals {
-				value = append(value, g.GetGoto(status, nonterminal.Type()).ToString())
-			}
+		for _, nonterminal := range nonterminals {
+			value = append(value, g.GetGoto(status, nonterminal.Type()).ToString())
 		}
 		values = append(values, strings.Join(value, "|"))
 	}

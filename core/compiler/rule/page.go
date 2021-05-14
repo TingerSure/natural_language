@@ -34,22 +34,22 @@ var (
 					}
 					continue
 				}
-				exportIndex, yes := index.IndexFamilyInstance.IsExportIndex(item)
+				publicIndex, yes := index.IndexFamilyInstance.IsPublicIndex(item)
 				if yes {
-					err := page.SetExport(
-						context.GetLibraryManager().Sandbox.Variable.String.New(exportIndex.Name()),
-						exportIndex,
+					err := page.SetPublic(
+						context.GetLibraryManager().Sandbox.Variable.String.New(publicIndex.Name()),
+						publicIndex,
 					)
 					if !nl_interface.IsNil(err) {
 						return nil, err
 					}
 					continue
 				}
-				varIndex, yes := index.IndexFamilyInstance.IsVarIndex(item)
+				privateIndex, yes := index.IndexFamilyInstance.IsPrivateIndex(item)
 				if yes {
-					err := page.SetVar(
-						context.GetLibraryManager().Sandbox.Variable.String.New(varIndex.Name()),
-						varIndex,
+					err := page.SetPrivate(
+						context.GetLibraryManager().Sandbox.Variable.String.New(privateIndex.Name()),
+						privateIndex,
 					)
 					if !nl_interface.IsNil(err) {
 						return nil, err
@@ -90,12 +90,12 @@ var (
 			//SymbolPageItem -> SymbolImportGroup
 			return context.Deal(phrase.GetChild(0))
 		}),
-		semantic.NewRule(PolymerizePageItemFromExportGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolPageItem -> SymbolExportGroup
+		semantic.NewRule(PolymerizePageItemFromPublicGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolPageItem -> SymbolPublicGroup
 			return context.Deal(phrase.GetChild(0))
 		}),
-		semantic.NewRule(PolymerizePageItemFromVarGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolPageItem -> SymbolVarGroup
+		semantic.NewRule(PolymerizePageItemFromPrivateGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolPageItem -> SymbolPrivateGroup
 			return context.Deal(phrase.GetChild(0))
 		}),
 		semantic.NewRule(PolymerizeImportGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
@@ -122,25 +122,25 @@ var (
 				),
 			}, nil
 		}),
-		semantic.NewRule(PolymerizeExportGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolExportGroup -> SymbolExport SymbolIdentifier SymbolIndex
+		semantic.NewRule(PolymerizePublicGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolPublicGroup -> SymbolPublic SymbolIdentifier SymbolEqual SymbolIndex
 			name := phrase.GetChild(1).GetToken().Value()
-			indexes, err := context.Deal(phrase.GetChild(2))
+			indexes, err := context.Deal(phrase.GetChild(3))
 			if err != nil {
 				return nil, err
 			}
 			return []concept.Index{
-				context.GetLibraryManager().Sandbox.Index.ExportIndex.New(name, indexes[0]),
+				context.GetLibraryManager().Sandbox.Index.PublicIndex.New(name, indexes[0]),
 			}, nil
 		}),
-		semantic.NewRule(PolymerizeVarGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolVarGroup -> SymbolVar SymbolIdentifier SymbolIndex
-			indexes, err := context.Deal(phrase.GetChild(2))
+		semantic.NewRule(PolymerizePrivateGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolPrivateGroup -> SymbolPrivate SymbolIdentifier SymbolEqual SymbolIndex
+			indexes, err := context.Deal(phrase.GetChild(3))
 			if err != nil {
 				return nil, err
 			}
 			return []concept.Index{
-				context.GetLibraryManager().Sandbox.Index.VarIndex.New(
+				context.GetLibraryManager().Sandbox.Index.PrivateIndex.New(
 					phrase.GetChild(1).GetToken().Value(),
 					indexes[0],
 				),
@@ -202,6 +202,12 @@ var (
 			//SymbolBool -> SymbolFalse
 			return []concept.Index{
 				context.GetLibraryManager().Sandbox.Expression.NewBool.New(false),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeVariableFromNull, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolVariable -> SymbolNull
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.NewNull.New(),
 			}, nil
 		}),
 		semantic.NewRule(PolymerizeObjectWithKeyValueList, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {

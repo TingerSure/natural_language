@@ -21,10 +21,10 @@ type PageSeed interface {
 }
 
 type Page struct {
-	seed    PageSeed
-	exports *concept.Mapping
-	vars    *concept.Mapping
-	space   concept.Closure
+	seed     PageSeed
+	publics  *concept.Mapping
+	privates *concept.Mapping
+	space    concept.Closure
 }
 
 func (o *Page) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
@@ -33,25 +33,25 @@ func (o *Page) Call(specimen concept.String, param concept.Param) (concept.Param
 		return nil, exception
 	}
 	if !value.IsFunction() {
-		return nil, o.seed.NewException("runtime error", fmt.Sprintf("There is no export function called %v to be called here.", specimen.ToString("")))
+		return nil, o.seed.NewException("runtime error", fmt.Sprintf("There is no public function called %v to be called here.", specimen.ToString("")))
 	}
 	return value.(concept.Function).Exec(param, nil)
 }
 
 func (o *Page) SetImport(specimen concept.String, indexes concept.Index) error {
-	return o.SetVar(specimen, indexes)
+	return o.SetPrivate(specimen, indexes)
 }
 
-func (o *Page) SetExport(specimen concept.String, indexes concept.Index) error {
-	err := o.SetVar(specimen, indexes)
+func (o *Page) SetPublic(specimen concept.String, indexes concept.Index) error {
+	err := o.SetPrivate(specimen, indexes)
 	if err != nil {
 		return err
 	}
-	o.exports.Set(specimen, indexes)
+	o.publics.Set(specimen, indexes)
 	return nil
 }
 
-func (o *Page) SetVar(specimen concept.String, indexes concept.Index) error {
+func (o *Page) SetPrivate(specimen concept.String, indexes concept.Index) error {
 	if o.space.HasLocal(specimen) {
 		return o.seed.NewException("runtime error", fmt.Sprintf("Duplicate identifier: %v.", specimen.ToString("")))
 	}
@@ -63,35 +63,35 @@ func (o *Page) SetVar(specimen concept.String, indexes concept.Index) error {
 		}
 		return errors.New(fmt.Sprintf("An illegal interrupt \"%v\" was thrown while declaring variable : %v.", suspend.InterruptType(), specimen.ToString("")))
 	}
-	o.vars.Set(specimen, indexes)
+	o.privates.Set(specimen, indexes)
 	o.space.InitLocal(specimen, value)
 	return nil
 }
 
 func (o *Page) SetField(specimen concept.String, value concept.Variable) concept.Exception {
-	if !o.exports.Has(specimen) {
-		return o.seed.NewException("runtime error", fmt.Sprintf("There is no export field called %v to be set here.", specimen.ToString("")))
+	if !o.publics.Has(specimen) {
+		return o.seed.NewException("runtime error", fmt.Sprintf("There is no public field called %v to be set here.", specimen.ToString("")))
 	}
 	return o.space.SetLocal(specimen, value)
 }
 
 func (o *Page) GetField(specimen concept.String) (concept.Variable, concept.Exception) {
-	if !o.exports.Has(specimen) {
+	if !o.publics.Has(specimen) {
 		return o.seed.NewNull(), nil
 	}
 	return o.space.GetLocal(specimen)
 }
 
 func (o *Page) HasField(specimen concept.String) bool {
-	return o.exports.Has(specimen)
+	return o.publics.Has(specimen)
 }
 
 func (o *Page) SizeField() int {
-	return o.exports.Size()
+	return o.publics.Size()
 }
 
 func (o *Page) Iterate(on func(concept.String, concept.Variable) bool) bool {
-	return o.exports.Iterate(func(key concept.String, _ interface{}) bool {
+	return o.publics.Iterate(func(key concept.String, _ interface{}) bool {
 		value, _ := o.space.GetLocal(key)
 		return on(key, value)
 	})
@@ -99,7 +99,7 @@ func (o *Page) Iterate(on func(concept.String, concept.Variable) bool) bool {
 
 func (o *Page) ToString(prefix string) string {
 	lines := []string{}
-	o.vars.Iterate(func(key concept.String, value interface{}) bool {
+	o.privates.Iterate(func(key concept.String, value interface{}) bool {
 		lines = append(lines, value.(concept.Index).ToString(prefix))
 		return false
 	})
@@ -149,11 +149,11 @@ func (s *PageCreator) New() *Page {
 	return &Page{
 		seed:  s,
 		space: s.param.ClosureCreator(nil),
-		exports: concept.NewMapping(&concept.MappingParam{
+		publics: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: s.param.NullCreator(),
 		}),
-		vars: concept.NewMapping(&concept.MappingParam{
+		privates: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: s.param.NullCreator(),
 		}),

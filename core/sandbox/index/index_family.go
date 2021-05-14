@@ -48,23 +48,23 @@ func (v *IndexFamily) IsImportIndex(value concept.Index) (*ImportIndex, bool) {
 	return nil, false
 }
 
-func (v *IndexFamily) IsVarIndex(value concept.Index) (*VarIndex, bool) {
+func (v *IndexFamily) IsPrivateIndex(value concept.Index) (*PrivateIndex, bool) {
 	if value == nil {
 		return nil, false
 	}
-	if value.Type() == IndexVarType {
-		index, yes := value.(*VarIndex)
+	if value.Type() == IndexPrivateType {
+		index, yes := value.(*PrivateIndex)
 		return index, yes
 	}
 	return nil, false
 }
 
-func (v *IndexFamily) IsExportIndex(value concept.Index) (*ExportIndex, bool) {
+func (v *IndexFamily) IsPublicIndex(value concept.Index) (*PublicIndex, bool) {
 	if value == nil {
 		return nil, false
 	}
-	if value.Type() == IndexExportType {
-		index, yes := value.(*ExportIndex)
+	if value.Type() == IndexPublicType {
+		index, yes := value.(*PublicIndex)
 		return index, yes
 	}
 	return nil, false

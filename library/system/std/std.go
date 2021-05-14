@@ -44,7 +44,7 @@ func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 		PrintContent: libs.Sandbox.Variable.String.New(PrintContent),
 		ErrorContent: libs.Sandbox.Variable.String.New(ErrorContent),
 	}
-	instance.SetExport(libs.Sandbox.Variable.String.New("Print"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
+	instance.SetPublic(libs.Sandbox.Variable.String.New("Print"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("Print"),
 		instance.Print,
 		func(input concept.Param, _ concept.Object) concept.Param {
@@ -57,7 +57,7 @@ func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 			instance.PrintContent,
 		},
 	)))
-	instance.SetExport(libs.Sandbox.Variable.String.New("Error"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
+	instance.SetPublic(libs.Sandbox.Variable.String.New("Error"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		libs.Sandbox.Variable.String.New("Error"),
 		instance.Error,
 		func(input concept.Param, _ concept.Object) concept.Param {
@@ -70,7 +70,7 @@ func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 			instance.ErrorContent,
 		},
 	)))
-	instance.SetExport(libs.Sandbox.Variable.String.New("PrintContent"), libs.Sandbox.Index.ConstIndex.New(instance.PrintContent))
-	instance.SetExport(libs.Sandbox.Variable.String.New("ErrorContent"), libs.Sandbox.Index.ConstIndex.New(instance.ErrorContent))
+	instance.SetPublic(libs.Sandbox.Variable.String.New("PrintContent"), libs.Sandbox.Index.ConstIndex.New(instance.PrintContent))
+	instance.SetPublic(libs.Sandbox.Variable.String.New("ErrorContent"), libs.Sandbox.Index.ConstIndex.New(instance.ErrorContent))
 	return instance
 }
