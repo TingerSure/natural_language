@@ -31,7 +31,6 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 		WhatResult:    libs.Sandbox.Variable.String.New(QuestionResult),
 	}
 	instance.SetPublic(libs.Sandbox.Variable.String.New("HowMany"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
-		libs.Sandbox.Variable.String.New("HowMany"),
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 			printParam := libs.Sandbox.Variable.Param.New()
 			printParam.Set(instance.output.PrintContent, input.Get(instance.HowManyParam))
@@ -54,7 +53,6 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 	)))
 
 	instance.SetPublic(libs.Sandbox.Variable.String.New("What"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
-		libs.Sandbox.Variable.String.New("What"),
 		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
 			printParam := libs.Sandbox.Variable.Param.New()
 			printParam.Set(instance.output.PrintContent, input.Get(instance.WhatParam))

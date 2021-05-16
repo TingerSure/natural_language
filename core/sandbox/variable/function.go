@@ -26,10 +26,10 @@ type FunctionSeed interface {
 
 type Function struct {
 	*adaptor.AdaptorFunction
-	name           concept.String
 	body           *code_block.CodeBlock
 	anticipateBody *code_block.CodeBlock
 	paramNames     []concept.String
+	returnNames    []concept.String
 	parent         concept.Closure
 	seed           FunctionSeed
 }
@@ -55,15 +55,7 @@ func (s *Function) ParamNames() []concept.String {
 }
 
 func (s *Function) ReturnNames() []concept.String {
-	names := []concept.String{}
-	s.body.Iterate(func(index concept.Index) bool {
-		end, ok := index.(concept.Return)
-		if ok {
-			names = append(names, end.Key())
-		}
-		return false
-	})
-	return names
+	return s.returnNames
 }
 
 func (s *Function) FunctionType() string {
@@ -71,11 +63,15 @@ func (s *Function) FunctionType() string {
 }
 
 func (f *Function) ToString(prefix string) string {
-	return fmt.Sprintf("function (%v) %v", StringJoin(f.paramNames, ", "), f.body.ToString(prefix))
+	return fmt.Sprintf("function (%v) %v %v", StringJoin(f.paramNames, ", "), StringJoin(f.returnNames, ", "), f.body.ToString(prefix))
 }
 
-func (f *Function) AddParamName(paramName concept.String) {
-	f.paramNames = append(f.paramNames, paramName)
+func (f *Function) AddParamName(paramNames ...concept.String) {
+	f.paramNames = append(f.paramNames, paramNames...)
+}
+
+func (f *Function) AddReturnName(returnNames ...concept.String) {
+	f.returnNames = append(f.returnNames, returnNames...)
 }
 
 func (f *Function) AnticipateBody() *code_block.CodeBlock {
@@ -175,10 +171,6 @@ func (s *Function) Type() string {
 	return s.seed.Type()
 }
 
-func (s *Function) Name() concept.String {
-	return s.name
-}
-
 type FunctionCreatorParam struct {
 	CodeBlockCreator func() *code_block.CodeBlock
 	StringCreator    func(string) concept.String
@@ -192,13 +184,12 @@ type FunctionCreator struct {
 	param *FunctionCreatorParam
 }
 
-func (s *FunctionCreator) New(name concept.String, parent concept.Closure) *Function {
+func (s *FunctionCreator) New(parent concept.Closure) *Function {
 	return &Function{
 		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
 			NullCreator:      s.param.NullCreator,
 			ExceptionCreator: s.param.ExceptionCreator,
 		}),
-		name:           name,
 		parent:         parent,
 		body:           s.param.CodeBlockCreator(),
 		anticipateBody: s.param.CodeBlockCreator(),

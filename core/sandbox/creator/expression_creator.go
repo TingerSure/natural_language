@@ -7,6 +7,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/expression/adaptor"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type ExpressionCreator struct {
@@ -24,10 +25,12 @@ type ExpressionCreator struct {
 	NewNumber       *expression.NewNumberCreator
 	NewObject       *expression.NewObjectCreator
 	NewNull         *expression.NewNullCreator
+	NewFunction     *expression.NewFunctionCreator
 }
 
 type ExpressionCreatorParam struct {
 	CodeBlockCreator  func() *code_block.CodeBlock
+	FunctionCreator   func(concept.Closure) *variable.Function
 	StringCreator     func(string) concept.String
 	BoolCreator       func(bool) concept.Bool
 	NumberCreator     func(float64) concept.Number
@@ -42,6 +45,10 @@ type ExpressionCreatorParam struct {
 
 func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance := &ExpressionCreator{}
+	instance.NewFunction = expression.NewNewFunctionCreator(&expression.NewFunctionCreatorParam{
+		FunctionCreator:        param.FunctionCreator,
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+	})
 	instance.NewNull = expression.NewNewNullCreator(&expression.NewNullCreatorParam{
 		NullCreator:            param.NullCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,

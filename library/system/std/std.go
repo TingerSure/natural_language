@@ -45,7 +45,6 @@ func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 		ErrorContent: libs.Sandbox.Variable.String.New(ErrorContent),
 	}
 	instance.SetPublic(libs.Sandbox.Variable.String.New("Print"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
-		libs.Sandbox.Variable.String.New("Print"),
 		instance.Print,
 		func(input concept.Param, _ concept.Object) concept.Param {
 			return input
@@ -58,7 +57,6 @@ func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 		},
 	)))
 	instance.SetPublic(libs.Sandbox.Variable.String.New("Error"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
-		libs.Sandbox.Variable.String.New("Error"),
 		instance.Error,
 		func(input concept.Param, _ concept.Object) concept.Param {
 			return input

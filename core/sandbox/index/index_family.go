@@ -15,6 +15,17 @@ func newIndexFamily() *IndexFamily {
 type IndexFamily struct {
 }
 
+func (v *IndexFamily) IsKeyIndex(value concept.Index) (*KeyIndex, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == IndexKeyType {
+		index, yes := value.(*KeyIndex)
+		return index, yes
+	}
+	return nil, false
+}
+
 func (v *IndexFamily) IsKeyValueIndex(value concept.Index) (*KeyValueIndex, bool) {
 	if value == nil {
 		return nil, false

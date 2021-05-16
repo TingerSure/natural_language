@@ -6,6 +6,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
 type SandboxCreator struct {
@@ -62,6 +63,9 @@ func NewSandboxCreator() *SandboxCreator {
 	})
 
 	instance.Expression = NewExpressionCreator(&ExpressionCreatorParam{
+		FunctionCreator: func(parent concept.Closure) *variable.Function {
+			return instance.Variable.Function.New(parent)
+		},
 		CodeBlockCreator: func() *code_block.CodeBlock {
 			return instance.CodeBlock.New()
 		},

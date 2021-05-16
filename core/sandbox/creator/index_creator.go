@@ -17,6 +17,7 @@ type IndexCreator struct {
 	PublicIndex   *index.PublicIndexCreator
 	PrivateIndex  *index.PrivateIndexCreator
 	KeyValueIndex *index.KeyValueIndexCreator
+	KeyIndex      *index.KeyIndexCreator
 }
 
 type IndexCreatorParam struct {
@@ -28,10 +29,13 @@ type IndexCreatorParam struct {
 
 func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
 	instance := &IndexCreator{}
+	instance.KeyIndex = index.NewKeyIndexCreator(&index.KeyIndexCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
+	})
 	instance.KeyValueIndex = index.NewKeyValueIndexCreator(&index.KeyValueIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,
-		NullCreator:      param.NullCreator,
 	})
 	instance.PrivateIndex = index.NewPrivateIndexCreator(&index.PrivateIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,

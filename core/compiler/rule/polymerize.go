@@ -92,6 +92,7 @@ const (
 	TypeKeyValueArray
 	TypeBool
 	TypeObject
+	TypeFunctionGroup
 	TypeVariable
 	TypeExpression
 	TypeExpression1
@@ -123,6 +124,7 @@ const (
 	KeyKeyValueArray   = "key_value_array"
 	KeyBool            = "bool"
 	KeyObject          = "object"
+	KeyFunctionGroup   = "function_group"
 	KeyVariable        = "variable"
 	KeyExpression      = "expression"
 	KeyExpression1     = "expression_1"
@@ -151,6 +153,7 @@ var (
 	SymbolKeyValueArray   = grammar.NewNonterminal(TypeKeyValueArray, KeyKeyValueArray)
 	SymbolBool            = grammar.NewNonterminal(TypeBool, KeyBool)
 	SymbolObject          = grammar.NewNonterminal(TypeObject, KeyObject)
+	SymbolFunctionGroup   = grammar.NewNonterminal(TypeFunctionGroup, KeyFunctionGroup)
 	SymbolVariable        = grammar.NewNonterminal(TypeVariable, KeyVariable)
 	SymbolExpression      = grammar.NewNonterminal(TypeExpression, KeyExpression)
 	SymbolExpression1     = grammar.NewNonterminal(TypeExpression1, KeyExpression1)
@@ -164,54 +167,56 @@ var (
 )
 
 var (
-	PolymerizePageGroup                = grammar.NewRule(SymbolPageGroup, SymbolPageItemList)
-	PolymerizePageItemList             = grammar.NewRule(SymbolPageItemList, SymbolPageItemArray)
-	PolymerizePageItemListEmpty        = grammar.NewRule(SymbolPageItemList)
-	PolymerizePageItemArrayStart       = grammar.NewRule(SymbolPageItemArray, SymbolPageItem)
-	PolymerizePageItemArray            = grammar.NewRule(SymbolPageItemArray, SymbolPageItemArray, SymbolPageItem)
-	PolymerizePageItemFromImportGroup  = grammar.NewRule(SymbolPageItem, SymbolImportGroup)
-	PolymerizePageItemFromPublicGroup  = grammar.NewRule(SymbolPageItem, SymbolPublicGroup)
-	PolymerizePageItemFromPrivateGroup = grammar.NewRule(SymbolPageItem, SymbolPrivateGroup)
-	PolymerizeImportGroup              = grammar.NewRule(SymbolImportGroup, SymbolImport, SymbolIdentifier, SymbolString)
-	PolymerizePublicGroup              = grammar.NewRule(SymbolPublicGroup, SymbolPublic, SymbolIdentifier, SymbolEqual, SymbolIndex)
-	PolymerizePrivateGroup             = grammar.NewRule(SymbolPrivateGroup, SymbolPrivate, SymbolIdentifier, SymbolEqual, SymbolIndex)
-	PolymerizeIndexFromIdentifier      = grammar.NewRule(SymbolExpression3, SymbolIdentifier)
-	PolymerizeIndexFromVariable        = grammar.NewRule(SymbolExpression3, SymbolVariable)
-	PolymerizeIndexFromExpression      = grammar.NewRule(SymbolIndex, SymbolExpression)
-	PolymerizeVariableFromNumber       = grammar.NewRule(SymbolVariable, SymbolNumber)
-	PolymerizeVariableFromString       = grammar.NewRule(SymbolVariable, SymbolString)
-	PolymerizeVariableFromBool         = grammar.NewRule(SymbolVariable, SymbolBool)
-	PolymerizeVariableFromObject       = grammar.NewRule(SymbolVariable, SymbolObject)
-	PolymerizeBoolFromTrue             = grammar.NewRule(SymbolBool, SymbolTrue)
-	PolymerizeBoolFromFalse            = grammar.NewRule(SymbolBool, SymbolFalse)
-	PolymerizeVariableFromNull         = grammar.NewRule(SymbolVariable, SymbolNull)
-	PolymerizeObjectWithKeyValueList   = grammar.NewRule(SymbolObject, SymbolLeftBrace, SymbolKeyValueList, SymbolRightBrace)
-	PolymerizeIndexList                = grammar.NewRule(SymbolIndexList, SymbolIndexArray)
-	PolymerizeIndexListEmpty           = grammar.NewRule(SymbolIndexList)
-	PolymerizeIndexArrayStart          = grammar.NewRule(SymbolIndexArray, SymbolIndex)
-	PolymerizeIndexArray               = grammar.NewRule(SymbolIndexArray, SymbolIndexArray, SymbolComma, SymbolIndex)
-	PolymerizeKeyValue                 = grammar.NewRule(SymbolKeyValue, SymbolIdentifier, SymbolColon, SymbolIndex)
-	PolymerizeKeyValueList             = grammar.NewRule(SymbolKeyValueList, SymbolKeyValueArray)
-	PolymerizeKeyValueListEmpty        = grammar.NewRule(SymbolKeyValueList)
-	PolymerizeKeyValueArrayStart       = grammar.NewRule(SymbolKeyValueArray, SymbolKeyValue)
-	PolymerizeKeyValueArray            = grammar.NewRule(SymbolKeyValueArray, SymbolKeyValueArray, SymbolComma, SymbolKeyValue)
-	PolymerizeCallWithIndexArray       = grammar.NewRule(SymbolExpression2, SymbolExpression2, SymbolLeftParenthesis, SymbolIndexArray, SymbolRightParenthesis)
-	PolymerizeCallWithKeyValueList     = grammar.NewRule(SymbolExpression2, SymbolExpression2, SymbolLeftParenthesis, SymbolKeyValueList, SymbolRightParenthesis)
-	PolymerizeAssignment               = grammar.NewRule(SymbolExpression1, SymbolExpression2, SymbolEqual, SymbolExpression2)
-	PolymerizeComponent                = grammar.NewRule(SymbolExpression2, SymbolExpression2, SymbolDot, SymbolIdentifier)
-	PolymerizeParentheses              = grammar.NewRule(SymbolExpression3, SymbolLeftParenthesis, SymbolExpression1, SymbolRightParenthesis)
-	PolymerizeExpression3              = grammar.NewRule(SymbolExpression2, SymbolExpression3)
-	PolymerizeExpression2              = grammar.NewRule(SymbolExpression1, SymbolExpression2)
-	PolymerizeExpression1              = grammar.NewRule(SymbolExpression, SymbolExpression1)
-	PolymerizeExpressionList           = grammar.NewRule(SymbolExpressionList, SymbolExpressionArray)
-	PolymerizeExpressionListEmpty      = grammar.NewRule(SymbolExpressionList)
-	PolymerizeExpressionArrayStart     = grammar.NewRule(SymbolExpressionArray, SymbolExpression)
-	PolymerizeExpressionArray          = grammar.NewRule(SymbolExpressionArray, SymbolExpressionArray, SymbolExpression)
-	PolymerizeKey                      = grammar.NewRule(SymbolKey, SymbolIdentifier)
-	PolymerizeKeyList                  = grammar.NewRule(SymbolKeyList, SymbolKeyArray)
-	PolymerizeKeyListEmpty             = grammar.NewRule(SymbolKeyList)
-	PolymerizeKeyArrayStart            = grammar.NewRule(SymbolKeyArray, SymbolKey)
-	PolymerizeKeyArray                 = grammar.NewRule(SymbolKeyArray, SymbolKeyArray, SymbolKey)
+	PolymerizePageGroup                 = grammar.NewRule(SymbolPageGroup, SymbolPageItemList)
+	PolymerizePageItemList              = grammar.NewRule(SymbolPageItemList, SymbolPageItemArray)
+	PolymerizePageItemListEmpty         = grammar.NewRule(SymbolPageItemList)
+	PolymerizePageItemArrayStart        = grammar.NewRule(SymbolPageItemArray, SymbolPageItem)
+	PolymerizePageItemArray             = grammar.NewRule(SymbolPageItemArray, SymbolPageItemArray, SymbolPageItem)
+	PolymerizePageItemFromImportGroup   = grammar.NewRule(SymbolPageItem, SymbolImportGroup)
+	PolymerizePageItemFromPublicGroup   = grammar.NewRule(SymbolPageItem, SymbolPublicGroup)
+	PolymerizePageItemFromPrivateGroup  = grammar.NewRule(SymbolPageItem, SymbolPrivateGroup)
+	PolymerizeImportGroup               = grammar.NewRule(SymbolImportGroup, SymbolImport, SymbolIdentifier, SymbolString)
+	PolymerizePublicGroup               = grammar.NewRule(SymbolPublicGroup, SymbolPublic, SymbolIdentifier, SymbolEqual, SymbolIndex)
+	PolymerizePrivateGroup              = grammar.NewRule(SymbolPrivateGroup, SymbolPrivate, SymbolIdentifier, SymbolEqual, SymbolIndex)
+	PolymerizeIndexFromIdentifier       = grammar.NewRule(SymbolExpression3, SymbolIdentifier)
+	PolymerizeIndexFromVariable         = grammar.NewRule(SymbolExpression3, SymbolVariable)
+	PolymerizeIndexFromExpression       = grammar.NewRule(SymbolIndex, SymbolExpression1)
+	PolymerizeVariableFromNumber        = grammar.NewRule(SymbolVariable, SymbolNumber)
+	PolymerizeVariableFromString        = grammar.NewRule(SymbolVariable, SymbolString)
+	PolymerizeVariableFromBool          = grammar.NewRule(SymbolVariable, SymbolBool)
+	PolymerizeVariableFromObject        = grammar.NewRule(SymbolVariable, SymbolObject)
+	PolymerizeVariableFromFunctionGroup = grammar.NewRule(SymbolVariable, SymbolFunctionGroup)
+	PolymerizeBoolFromTrue              = grammar.NewRule(SymbolBool, SymbolTrue)
+	PolymerizeBoolFromFalse             = grammar.NewRule(SymbolBool, SymbolFalse)
+	PolymerizeVariableFromNull          = grammar.NewRule(SymbolVariable, SymbolNull)
+	PolymerizeObject                    = grammar.NewRule(SymbolObject, SymbolLeftBrace, SymbolKeyValueList, SymbolRightBrace)
+	PolymerizeFunctionGroup             = grammar.NewRule(SymbolFunctionGroup, SymbolFunction, SymbolLeftParenthesis, SymbolKeyList, SymbolRightParenthesis, SymbolKeyList, SymbolLeftBrace, SymbolExpressionList, SymbolRightBrace)
+	PolymerizeIndexList                 = grammar.NewRule(SymbolIndexList, SymbolIndexArray)
+	PolymerizeIndexListEmpty            = grammar.NewRule(SymbolIndexList)
+	PolymerizeIndexArrayStart           = grammar.NewRule(SymbolIndexArray, SymbolIndex)
+	PolymerizeIndexArray                = grammar.NewRule(SymbolIndexArray, SymbolIndexArray, SymbolComma, SymbolIndex)
+	PolymerizeKeyValue                  = grammar.NewRule(SymbolKeyValue, SymbolIdentifier, SymbolColon, SymbolIndex)
+	PolymerizeKeyValueList              = grammar.NewRule(SymbolKeyValueList, SymbolKeyValueArray)
+	PolymerizeKeyValueListEmpty         = grammar.NewRule(SymbolKeyValueList)
+	PolymerizeKeyValueArrayStart        = grammar.NewRule(SymbolKeyValueArray, SymbolKeyValue)
+	PolymerizeKeyValueArray             = grammar.NewRule(SymbolKeyValueArray, SymbolKeyValueArray, SymbolComma, SymbolKeyValue)
+	PolymerizeCallWithIndexArray        = grammar.NewRule(SymbolExpression2, SymbolExpression2, SymbolLeftParenthesis, SymbolIndexArray, SymbolRightParenthesis)
+	PolymerizeCallWithKeyValueList      = grammar.NewRule(SymbolExpression2, SymbolExpression2, SymbolLeftParenthesis, SymbolKeyValueList, SymbolRightParenthesis)
+	PolymerizeAssignment                = grammar.NewRule(SymbolExpression1, SymbolExpression2, SymbolEqual, SymbolExpression2)
+	PolymerizeComponent                 = grammar.NewRule(SymbolExpression2, SymbolExpression2, SymbolDot, SymbolIdentifier)
+	PolymerizeParentheses               = grammar.NewRule(SymbolExpression3, SymbolLeftParenthesis, SymbolExpression1, SymbolRightParenthesis)
+	PolymerizeExpression3               = grammar.NewRule(SymbolExpression2, SymbolExpression3)
+	PolymerizeExpression2               = grammar.NewRule(SymbolExpression1, SymbolExpression2)
+	PolymerizeExpression1               = grammar.NewRule(SymbolExpression, SymbolExpression1, SymbolSemicolon)
+	PolymerizeExpressionList            = grammar.NewRule(SymbolExpressionList, SymbolExpressionArray)
+	PolymerizeExpressionListEmpty       = grammar.NewRule(SymbolExpressionList)
+	PolymerizeExpressionArrayStart      = grammar.NewRule(SymbolExpressionArray, SymbolExpression)
+	PolymerizeExpressionArray           = grammar.NewRule(SymbolExpressionArray, SymbolExpressionArray, SymbolExpression)
+	PolymerizeKey                       = grammar.NewRule(SymbolKey, SymbolIdentifier)
+	PolymerizeKeyList                   = grammar.NewRule(SymbolKeyList, SymbolKeyArray)
+	PolymerizeKeyListEmpty              = grammar.NewRule(SymbolKeyList)
+	PolymerizeKeyArrayStart             = grammar.NewRule(SymbolKeyArray, SymbolKey)
+	PolymerizeKeyArray                  = grammar.NewRule(SymbolKeyArray, SymbolKeyArray, SymbolComma, SymbolKey)
 )
 
 var (
@@ -234,10 +239,12 @@ var (
 		PolymerizeVariableFromString,
 		PolymerizeVariableFromBool,
 		PolymerizeVariableFromObject,
+		PolymerizeVariableFromFunctionGroup,
 		PolymerizeBoolFromTrue,
 		PolymerizeBoolFromFalse,
 		PolymerizeVariableFromNull,
-		PolymerizeObjectWithKeyValueList,
+		PolymerizeObject,
+		PolymerizeFunctionGroup,
 		PolymerizeIndexList,
 		PolymerizeIndexListEmpty,
 		PolymerizeIndexArrayStart,

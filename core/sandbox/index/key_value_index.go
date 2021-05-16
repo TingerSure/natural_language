@@ -10,7 +10,6 @@ type KeyValueIndexSeed interface {
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
-	NewNull() concept.Null
 }
 
 type KeyValueIndex struct {
@@ -70,7 +69,6 @@ func (s *KeyValueIndex) Set(space concept.Closure, value concept.Variable) conce
 type KeyValueIndexCreatorParam struct {
 	ExceptionCreator func(string, string) concept.Exception
 	ParamCreator     func() concept.Param
-	NullCreator      func() concept.Null
 }
 
 type KeyValueIndexCreator struct {
@@ -104,10 +102,6 @@ func (s *KeyValueIndexCreator) NewException(key string, message string) concept.
 
 func (s *KeyValueIndexCreator) NewParam() concept.Param {
 	return s.param.ParamCreator()
-}
-
-func (s *KeyValueIndexCreator) NewNull() concept.Null {
-	return s.param.NullCreator()
 }
 
 func NewKeyValueIndexCreator(param *KeyValueIndexCreatorParam) *KeyValueIndexCreator {

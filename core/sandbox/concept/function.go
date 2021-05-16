@@ -3,10 +3,11 @@ package concept
 type Function interface {
 	Variable
 	ExceptionStack
-	Name() String
 	Exec(Param, Variable) (Param, Exception)
 	Anticipate(Param, Variable) Param
 	FunctionType() string
+	AddParamName(...String)
+	AddReturnName(...String)
 	ParamNames() []String
 	ReturnNames() []String
 	GetLanguageOnCallSeed(string) func(Function, *Mapping) string
