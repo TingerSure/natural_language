@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 type Lexer struct {
@@ -31,8 +32,19 @@ func (l *Lexer) AddRule(rule *Rule) {
 	l.rules = append(l.rules, rule)
 }
 
-func (l *Lexer) getIllegalCharacterError(content []byte, cursor int) error {
-	return errors.New(fmt.Sprintf("illegal character:'%v'", string(content[cursor])))
+func (l *Lexer) getIllegalCharacterError(content []byte, cursor int, path string, row, col int) error {
+	prev := strings.LastIndex(string(content[:cursor]), "\n") + 1
+	next := strings.Index(string(content[cursor:]), "\n") + cursor
+	line := string(content[prev:next])
+	return errors.New(fmt.Sprintf(
+		"invalid character: '%v'\n%v:%v:%v: \n%v\n%v^",
+		string(content[cursor]),
+		path,
+		row+1,
+		col+1,
+		line,
+		strings.Repeat(" ", cursor-prev),
+	))
 }
 
 func (l *Lexer) next(content []byte, cursor int) *Token {
@@ -46,23 +58,40 @@ func (l *Lexer) next(content []byte, cursor int) *Token {
 	return nil
 }
 
-func (l *Lexer) Read(source *os.File) (*TokenList, error) {
+func (l *Lexer) Read(source *os.File, path string) (*TokenList, error) {
 	content, err := ioutil.ReadAll(source)
 	if err != nil {
 		return nil, err
 	}
 	size := len(content)
 	cursor := 0
+	row := 0
+	col := 0
 	tokens := NewTokenList()
 	tokens.SetEnd(l.end)
 	tokens.AddTrims(l.trims...)
 	for cursor < size {
 		token := l.next(content, cursor)
 		if token == nil {
-			return nil, l.getIllegalCharacterError(content, cursor)
+			return nil, l.getIllegalCharacterError(content, cursor, path, row, col)
 		}
+		token.SetRow(row)
+		token.SetCol(col)
+		row, col = l.updateRowCol(row, col, token)
 		cursor += token.Size()
 		tokens.AddToken(token)
 	}
 	return tokens, nil
+}
+
+func (l *Lexer) updateRowCol(row, col int, token *Token) (int, int) {
+	last := strings.LastIndex(token.Value(), "\n")
+	if last < 0 {
+		col += token.Size()
+		return row, col
+	}
+	count := strings.Count(token.Value(), "\n")
+	row += count
+	col = token.Size() - last - 1
+	return row, col
 }

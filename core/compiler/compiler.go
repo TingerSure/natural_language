@@ -94,7 +94,7 @@ func (c *Compiler) ReadPage(path string) (concept.Index, error) {
 	if err != nil {
 		return nil, err
 	}
-	tokens, err := c.lexer.Read(source)
+	tokens, err := c.lexer.Read(source, path)
 	if err != nil {
 		return nil, err
 	}
