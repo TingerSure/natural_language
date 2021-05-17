@@ -21,7 +21,7 @@ const (
 	TypeComma                   // ,
 	TypeNumber                  // [:number:]
 	TypeString                  // [:string:]
-	TypeEnd                     // [:end:]
+	TypeEof                     // [:eof:]
 	TypeIdentifier              // [:identifier:]
 	TypeComment                 // [:comment:]
 	TypePage                    // page
@@ -57,7 +57,7 @@ const (
 	KeyComma            = "comma"
 	KeyNumber           = "number"
 	KeyString           = "string"
-	KeyEnd              = "end"
+	KeyEof              = "eof"
 	KeyIdentifier       = "identifier"
 	KeyComment          = "comment"
 	KeyPage             = "page"
@@ -77,7 +77,7 @@ const (
 )
 
 var (
-	LexerEnd = lexer.NewToken(TypeEnd, KeyEnd, "EOF")
+	LexerEof = lexer.NewToken(TypeEof, KeyEof, "EOF")
 
 	LexerTrim = []int{TypeSpace, TypeComment}
 

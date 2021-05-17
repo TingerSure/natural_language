@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/compiler/lexer"
+	"strings"
 )
 
 type Automata struct {
@@ -25,7 +26,12 @@ func (a *Automata) Run(tokens *lexer.TokenList) (Phrase, error) {
 	for {
 		action := a.table.GetAction(status, phrase.GetToken().Type())
 		if action == nil {
-			return nil, errors.New(fmt.Sprintf("syntax error : unexpected : %v, status : %v, symbol : %v", phrase.GetToken().Value(), status, phrase.GetToken().Name()))
+			expectations := a.table.GetExpect(status)
+			names := []string{}
+			for _, expectation := range expectations {
+				names = append(names, expectation.Name())
+			}
+			return nil, errors.New(fmt.Sprintf("syntax error : unexpected : '%v' (%v), expected : (%v).\n%v", phrase.GetToken().Value(), phrase.GetToken().Name(), strings.Join(names, ", "), phrase.GetToken().ToLine()))
 		}
 		if action.Type() == ActionMoveType {
 			status = action.Status()
@@ -33,7 +39,7 @@ func (a *Automata) Run(tokens *lexer.TokenList) (Phrase, error) {
 			phraseList = append(phraseList, phrase)
 			next := tokens.Next()
 			if next == nil {
-				if phrase.GetToken() != tokens.End() {
+				if phrase.GetToken() != tokens.Eof() {
 					return nil, errors.New("automata error : illegal token list")
 				}
 				return nil, errors.New("automata error : illegal status table")
@@ -59,10 +65,10 @@ func (a *Automata) Run(tokens *lexer.TokenList) (Phrase, error) {
 			continue
 		}
 		if action.Type() == ActionAcceptType {
-			if len(phraseList) != 1 || phrase.GetToken() != tokens.End() {
+			if len(phraseList) != 1 || phrase.GetToken() != tokens.Eof() {
 				return nil, errors.New("automata error : illegal status table")
 			}
-			if !tokens.IsEnd() {
+			if !tokens.IsEof() {
 				return nil, errors.New("automata error : illegal token list")
 			}
 			break

@@ -22,7 +22,7 @@ import (
 	Comma
 	Number
 	Identifier
-	End
+	Eof
 	String
 	Page
 	Import
@@ -57,7 +57,7 @@ var (
 	SymbolComma            = grammar.NewTerminal(TypeComma, KeyComma)
 	SymbolNumber           = grammar.NewTerminal(TypeNumber, KeyNumber)
 	SymbolIdentifier       = grammar.NewTerminal(TypeIdentifier, KeyIdentifier)
-	SymbolEnd              = grammar.NewTerminal(TypeEnd, KeyEnd)
+	SymbolEof              = grammar.NewTerminal(TypeEof, KeyEof)
 	SymbolString           = grammar.NewTerminal(TypeString, KeyString)
 	SymbolComment          = grammar.NewTerminal(TypeComment, KeyComment)
 	SymbolPage             = grammar.NewTerminal(TypePage, KeyPage)
@@ -273,7 +273,7 @@ var (
 		PolymerizeKeyArray,
 	}
 
-	GrammarEnd = SymbolEnd
+	GrammarEof = SymbolEof
 
 	GrammarGlobal = SymbolPageGroup
 )

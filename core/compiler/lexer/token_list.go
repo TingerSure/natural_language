@@ -3,7 +3,7 @@ package lexer
 type TokenList struct {
 	tokens []*Token
 	index  int
-	end    *Token
+	eof    *Token
 	trims  map[int]bool
 }
 
@@ -27,12 +27,12 @@ func (t *TokenList) AddTrims(trims ...int) {
 	}
 }
 
-func (t *TokenList) SetEnd(end *Token) {
-	t.end = end
+func (t *TokenList) SetEof(eof *Token) {
+	t.eof = eof
 }
 
-func (t *TokenList) End() *Token {
-	return t.end
+func (t *TokenList) Eof() *Token {
+	return t.eof
 }
 
 func (t *TokenList) Reset() {
@@ -43,7 +43,7 @@ func (t *TokenList) Size() int {
 	return len(t.tokens)
 }
 
-func (t *TokenList) IsEnd() bool {
+func (t *TokenList) IsEof() bool {
 	return t.index > len(t.tokens)
 }
 
@@ -52,7 +52,7 @@ func (t *TokenList) Peek() *Token {
 		return nil
 	}
 	if t.index == len(t.tokens) {
-		return t.end
+		return t.eof
 	}
 	return t.tokens[t.index]
 }

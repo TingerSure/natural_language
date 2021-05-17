@@ -37,11 +37,11 @@ func NewCompiler(libs *tree.LibraryManager) *Compiler {
 		instance.lexer.AddRule(rule)
 	}
 	instance.lexer.AddTrim(rule.LexerTrim...)
-	instance.lexer.SetEnd(rule.LexerEnd)
+	instance.lexer.SetEof(rule.LexerEof)
 	for _, rule := range rule.GrammarRules {
 		instance.grammar.AddRule(rule)
 	}
-	instance.grammar.SetEnd(rule.GrammarEnd)
+	instance.grammar.SetEof(rule.GrammarEof)
 	instance.grammar.SetGlobal(rule.GrammarGlobal)
 	err := instance.grammar.Build()
 	if err != nil {

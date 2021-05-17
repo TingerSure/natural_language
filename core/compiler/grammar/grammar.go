@@ -7,7 +7,7 @@ import (
 type Grammar struct {
 	rules    []*Rule
 	global   *Nonterminal
-	end      *Terminal
+	eof      *Terminal
 	table    *Table
 	automata *Automata
 }
@@ -32,14 +32,14 @@ func (g *Grammar) SetGlobal(global *Nonterminal) {
 	g.global = global
 }
 
-func (g *Grammar) SetEnd(end *Terminal) {
-	g.end = end
+func (g *Grammar) SetEof(eof *Terminal) {
+	g.eof = eof
 }
 
 func (g *Grammar) Build() error {
 	g.table.SetRules(g.rules)
 	g.table.SetGlobal(g.global)
-	g.table.SetEnd(g.end)
+	g.table.SetEof(g.eof)
 	return g.table.Build()
 }
 

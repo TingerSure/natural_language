@@ -19,7 +19,7 @@ const (
 type Table struct {
 	rules           *RuleSet
 	global          *Nonterminal
-	end             *Terminal
+	eof             *Terminal
 	start           int
 	actions         map[int]*TableActionGroup // map[status]map[symbol]action
 	gotos           map[int]*TableActionGroup // map[status]map[symbol]goto
@@ -65,6 +65,17 @@ func (g *Table) GetTerminalKeys() *SymbolSet {
 	return g.terminalKeys
 }
 
+func (g *Table) GetExpect(status int) []Symbol {
+	expectations := []Symbol{}
+	g.terminalKeys.Iterate(func(key Symbol) bool {
+		if g.GetAction(status, key.Type()) != nil {
+			expectations = append(expectations, key)
+		}
+		return false
+	})
+	return expectations
+}
+
 func (g *Table) GetAction(status int, symbol int) *TableAction {
 	return g.actions[status].GetAction(symbol)
 }
@@ -85,8 +96,8 @@ func (g *Table) SetGlobal(global *Nonterminal) {
 	g.global = global
 }
 
-func (g *Table) SetEnd(end *Terminal) {
-	g.end = end
+func (g *Table) SetEof(eof *Terminal) {
+	g.eof = eof
 }
 
 func (g *Table) Build() error {
@@ -101,7 +112,7 @@ func (g *Table) Build() error {
 
 func (g *Table) makeClosures() error {
 	closure, err := g.makeClosureStep(map[*TableProject]*SymbolSet{
-		g.startProjects[g.global.Type()][0]: NewSymbolSet(g.end),
+		g.startProjects[g.global.Type()][0]: NewSymbolSet(g.eof),
 	})
 	if err != nil {
 		return err
@@ -396,7 +407,7 @@ func (g *Table) initKeys() {
 		}
 		return false
 	})
-	g.terminalKeys.Add(g.end)
+	g.terminalKeys.Add(g.eof)
 }
 
 func (g *Table) checkGlobal() error {

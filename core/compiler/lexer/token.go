@@ -1,11 +1,19 @@
 package lexer
 
+import (
+	"fmt"
+	"strings"
+)
+
 type Token struct {
-	types int
-	name  string
-	value string
-	row   int
-	col   int
+	types   int
+	name    string
+	value   string
+	path    string
+	row     int
+	col     int
+	cursor  int
+	content []byte
 }
 
 func NewToken(types int, name string, value string) *Token {
@@ -20,12 +28,36 @@ func (t *Token) Size() int {
 	return len(t.value)
 }
 
+func (t *Token) SetContent(content []byte) {
+	t.content = content
+}
+
+func (t *Token) SetCursor(cursor int) {
+	t.cursor = cursor
+}
+
+func (t *Token) SetPath(path string) {
+	t.path = path
+}
+
 func (t *Token) SetRow(row int) {
 	t.row = row
 }
 
 func (t *Token) SetCol(col int) {
 	t.col = col
+}
+
+func (t *Token) Content() []byte {
+	return t.content
+}
+
+func (t *Token) Cursor() int {
+	return t.cursor
+}
+
+func (t *Token) Path() string {
+	return t.path
 }
 
 func (t *Token) Row() int {
@@ -46,4 +78,15 @@ func (t *Token) Value() string {
 
 func (t *Token) Name() string {
 	return t.name
+}
+
+func (t *Token) ToLine() string {
+	return t.ToLineStatic(t.path, t.row, t.col, t.cursor, t.content)
+}
+
+func (t *Token) ToLineStatic(path string, row int, col int, cursor int, content []byte) string {
+	prev := strings.LastIndex(string(content[:cursor]), "\n") + 1
+	next := strings.Index(string(content[cursor:]), "\n") + cursor
+	line := string(content[prev:next])
+	return fmt.Sprintf("%v:%v:%v:\n%v\n%v^", path, row+1, col+1, line, strings.Repeat(" ", cursor-prev))
 }

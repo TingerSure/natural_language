@@ -11,7 +11,7 @@ import (
 type Lexer struct {
 	rules []*Rule
 	trims []int
-	end   *Token
+	eof   *Token
 }
 
 func NewLexer() *Lexer {
@@ -24,27 +24,12 @@ func (l *Lexer) AddTrim(trims ...int) {
 	l.trims = append(l.trims, trims...)
 }
 
-func (l *Lexer) SetEnd(end *Token) {
-	l.end = end
+func (l *Lexer) SetEof(eof *Token) {
+	l.eof = eof
 }
 
 func (l *Lexer) AddRule(rule *Rule) {
 	l.rules = append(l.rules, rule)
-}
-
-func (l *Lexer) getIllegalCharacterError(content []byte, cursor int, path string, row, col int) error {
-	prev := strings.LastIndex(string(content[:cursor]), "\n") + 1
-	next := strings.Index(string(content[cursor:]), "\n") + cursor
-	line := string(content[prev:next])
-	return errors.New(fmt.Sprintf(
-		"invalid character: '%v'\n%v:%v:%v: \n%v\n%v^",
-		string(content[cursor]),
-		path,
-		row+1,
-		col+1,
-		line,
-		strings.Repeat(" ", cursor-prev),
-	))
 }
 
 func (l *Lexer) next(content []byte, cursor int) *Token {
@@ -68,13 +53,16 @@ func (l *Lexer) Read(source *os.File, path string) (*TokenList, error) {
 	row := 0
 	col := 0
 	tokens := NewTokenList()
-	tokens.SetEnd(l.end)
+	tokens.SetEof(l.eof)
 	tokens.AddTrims(l.trims...)
 	for cursor < size {
 		token := l.next(content, cursor)
 		if token == nil {
-			return nil, l.getIllegalCharacterError(content, cursor, path, row, col)
+			return nil, errors.New(fmt.Sprintf("invalid character: '%v'\n%v", string(content[cursor]), token.ToLineStatic(path, row, col, cursor, content)))
 		}
+		token.SetPath(path)
+		token.SetContent(content)
+		token.SetCursor(cursor)
 		token.SetRow(row)
 		token.SetCol(col)
 		row, col = l.updateRowCol(row, col, token)
