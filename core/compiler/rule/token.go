@@ -41,6 +41,7 @@ const (
 	TypeVar                     // var
 	TypeIf                      // if
 	TypeElse                    // else
+	TypeFor                     // for
 )
 
 const (
@@ -80,6 +81,7 @@ const (
 	KeyVar              = "var"
 	KeyIf               = "if"
 	KeyElse             = "else"
+	KeyFor              = "for"
 )
 
 var (
@@ -188,6 +190,8 @@ var (
 				return lexer.NewToken(TypeIf, KeyIf, KeyIf)
 			case KeyElse:
 				return lexer.NewToken(TypeElse, KeyElse, KeyElse)
+			case KeyFor:
+				return lexer.NewToken(TypeFor, KeyFor, KeyFor)
 			default:
 				return lexer.NewToken(TypeIdentifier, KeyIdentifier, valueIdentifier)
 			}

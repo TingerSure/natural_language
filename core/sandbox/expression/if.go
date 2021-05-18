@@ -33,7 +33,7 @@ func (f *If) SubCodeBlockIterate(onIndex func(concept.Index) bool) bool {
 }
 
 func (f *If) ToString(prefix string) string {
-	primaryToString := fmt.Sprintf("if %v %v", f.condition.ToString(prefix), f.primary.ToString(prefix))
+	primaryToString := fmt.Sprintf("if (%v) %v", f.condition.ToString(prefix), f.primary.ToString(prefix))
 	if f.secondary.Size() == 0 {
 		return primaryToString
 	}

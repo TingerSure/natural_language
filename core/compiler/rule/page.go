@@ -347,11 +347,11 @@ var (
 		}),
 		semantic.NewRule(PolymerizeAssignment, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolExpressionIndependent -> SymbolExpression1 SymbolEqual SymbolExpression1
-			froms, err := context.Deal(phrase.GetChild(0))
+			toes, err := context.Deal(phrase.GetChild(0))
 			if err != nil {
 				return nil, err
 			}
-			toes, err := context.Deal(phrase.GetChild(2))
+			froms, err := context.Deal(phrase.GetChild(2))
 			if err != nil {
 				return nil, err
 			}
@@ -407,12 +407,12 @@ var (
 			return context.Deal(phrase.GetChild(1))
 		}),
 		semantic.NewRule(PolymerizeIf, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolExpressionIndependent -> SymbolIf SymbolExpression1 SymbolLeftBrace SymbolExpressionList SymbolRightBrace
-			condition, err := context.Deal(phrase.GetChild(1))
+			//SymbolExpressionIndependent -> SymbolIf SymbolLeftParenthesis SymbolExpression1 SymbolRightParenthesis SymbolLeftBrace SymbolExpressionList SymbolRightBrace
+			condition, err := context.Deal(phrase.GetChild(2))
 			if err != nil {
 				return nil, err
 			}
-			steps, err := context.Deal(phrase.GetChild(3))
+			steps, err := context.Deal(phrase.GetChild(5))
 			if err != nil {
 				return nil, err
 			}
@@ -422,16 +422,16 @@ var (
 			return []concept.Index{eif}, nil
 		}),
 		semantic.NewRule(PolymerizeIfElse, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolExpressionIndependent -> SymbolIf SymbolExpression1 SymbolLeftBrace SymbolExpressionList SymbolRightBrace SymbolElse SymbolLeftBrace SymbolExpressionList SymbolRightBrace
-			condition, err := context.Deal(phrase.GetChild(1))
+			//SymbolExpressionIndependent -> SymbolIf SymbolLeftParenthesis SymbolExpression1 SymbolRightParenthesis SymbolLeftBrace SymbolExpressionList SymbolRightBrace SymbolElse SymbolLeftBrace SymbolExpressionList SymbolRightBrace
+			condition, err := context.Deal(phrase.GetChild(2))
 			if err != nil {
 				return nil, err
 			}
-			primarySteps, err := context.Deal(phrase.GetChild(3))
+			primarySteps, err := context.Deal(phrase.GetChild(5))
 			if err != nil {
 				return nil, err
 			}
-			secondarySteps, err := context.Deal(phrase.GetChild(7))
+			secondarySteps, err := context.Deal(phrase.GetChild(9))
 			if err != nil {
 				return nil, err
 			}
@@ -440,6 +440,46 @@ var (
 			eif.Primary().AddStep(primarySteps...)
 			eif.Secondary().AddStep(secondarySteps...)
 			return []concept.Index{eif}, nil
+		}),
+		semantic.NewRule(PolymerizeFor, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependent -> SymbolFor SymbolLeftParenthesis SymbolExpressionIndependentList SymbolSemicolon SymbolExpression1 SymbolSemicolon SymbolExpressionIndependentList SymbolRightParenthesis SymbolLeftBrace SymbolExpressionList SymbolRightBrace
+			initSteps, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			condition, err := context.Deal(phrase.GetChild(4))
+			if err != nil {
+				return nil, err
+			}
+			endSteps, err := context.Deal(phrase.GetChild(6))
+			if err != nil {
+				return nil, err
+			}
+			bodySteps, err := context.Deal(phrase.GetChild(9))
+			if err != nil {
+				return nil, err
+			}
+			efor := context.GetLibraryManager().Sandbox.Expression.For.New()
+			efor.SetCondition(condition[0])
+			efor.Init().AddStep(initSteps...)
+			efor.End().AddStep(endSteps...)
+			efor.Body().AddStep(bodySteps...)
+			return []concept.Index{efor}, nil
+		}),
+		semantic.NewRule(PolymerizeWhile, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependent -> SymbolFor SymbolLeftParenthesis SymbolExpression1 SymbolRightParenthesis SymbolLeftBrace SymbolExpressionList SymbolRightBrace
+			condition, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			bodySteps, err := context.Deal(phrase.GetChild(5))
+			if err != nil {
+				return nil, err
+			}
+			efor := context.GetLibraryManager().Sandbox.Expression.For.New()
+			efor.SetCondition(condition[0])
+			efor.Body().AddStep(bodySteps...)
+			return []concept.Index{efor}, nil
 		}),
 		semantic.NewRule(PolymerizeExpression2To1, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			// SymbolExpression1 -> SymbolExpression2
@@ -452,6 +492,30 @@ var (
 		semantic.NewRule(PolymerizeExpression, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			// SymbolExpression -> SymbolExpressionIndependent SymbolSemicolon
 			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeExpressionIndependentList, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolExpressionIndependentList -> SymbolExpressionIndependentArray
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeExpressionIndependentListEmpty, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolExpressionIndependentList ->
+			return []concept.Index{}, nil
+		}),
+		semantic.NewRule(PolymerizeExpressionIndependentArrayStart, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependentArray -> SymbolExpressionIndependent
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeExpressionIndependentArray, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependentArray -> SymbolExpressionIndependentArray SymbolComma SymbolExpressionIndependent
+			items, err := context.Deal(phrase.GetChild(0))
+			if err != nil {
+				return nil, err
+			}
+			item, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			return append(items, item...), nil
 		}),
 		semantic.NewRule(PolymerizeExpressionList, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			// SymbolExpressionList -> SymbolExpressionArray
