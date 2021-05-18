@@ -252,21 +252,21 @@ func NewOperator(libs *tree.LibraryManager) *Operator {
 	}
 
 	for name, item := range instance.NumberItems {
-		instance.SetPublic(libs.Sandbox.Variable.String.New(name+FuncName), libs.Sandbox.Index.ConstIndex.New(item.Func))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name), libs.Sandbox.Index.ConstIndex.New(item.Func))
 		instance.SetPublic(libs.Sandbox.Variable.String.New(name+LeftName), libs.Sandbox.Index.ConstIndex.New(item.Left))
 		instance.SetPublic(libs.Sandbox.Variable.String.New(name+RightName), libs.Sandbox.Index.ConstIndex.New(item.Right))
 		instance.SetPublic(libs.Sandbox.Variable.String.New(name+ResultName), libs.Sandbox.Index.ConstIndex.New(item.Result))
 	}
 
 	for name, item := range instance.BoolItems {
-		instance.SetPublic(libs.Sandbox.Variable.String.New(name+FuncName), libs.Sandbox.Index.ConstIndex.New(item.Func))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name), libs.Sandbox.Index.ConstIndex.New(item.Func))
 		instance.SetPublic(libs.Sandbox.Variable.String.New(name+LeftName), libs.Sandbox.Index.ConstIndex.New(item.Left))
 		instance.SetPublic(libs.Sandbox.Variable.String.New(name+RightName), libs.Sandbox.Index.ConstIndex.New(item.Right))
 		instance.SetPublic(libs.Sandbox.Variable.String.New(name+ResultName), libs.Sandbox.Index.ConstIndex.New(item.Result))
 	}
 
 	for name, item := range instance.BoolUnaryItems {
-		instance.SetPublic(libs.Sandbox.Variable.String.New(name+FuncName), libs.Sandbox.Index.ConstIndex.New(item.Func))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name), libs.Sandbox.Index.ConstIndex.New(item.Func))
 		instance.SetPublic(libs.Sandbox.Variable.String.New(name+RightName), libs.Sandbox.Index.ConstIndex.New(item.Right))
 		instance.SetPublic(libs.Sandbox.Variable.String.New(name+ResultName), libs.Sandbox.Index.ConstIndex.New(item.Result))
 	}

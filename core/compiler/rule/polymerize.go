@@ -39,6 +39,8 @@ import (
 	False
 	Null
 	Var
+	If
+	Else
 */
 
 var (
@@ -76,6 +78,8 @@ var (
 	SymbolFalse            = grammar.NewTerminal(TypeFalse, KeyFalse)
 	SymbolNull             = grammar.NewTerminal(TypeNull, KeyNull)
 	SymbolVar              = grammar.NewTerminal(TypeVar, KeyVar)
+	SymbolIf               = grammar.NewTerminal(TypeIf, KeyIf)
+	SymbolElse             = grammar.NewTerminal(TypeElse, KeyElse)
 )
 
 const (
@@ -209,6 +213,8 @@ var (
 	PolymerizeDefine                    = grammar.NewRule(SymbolExpressionIndependent, SymbolVar, SymbolIdentifier)
 	PolymerizeDefineAndInit             = grammar.NewRule(SymbolExpressionIndependent, SymbolVar, SymbolIdentifier, SymbolEqual, SymbolExpression1)
 	PolymerizeParentheses               = grammar.NewRule(SymbolExpression2, SymbolLeftParenthesis, SymbolExpression1, SymbolRightParenthesis)
+	PolymerizeIf                        = grammar.NewRule(SymbolExpressionIndependent, SymbolIf, SymbolExpression1, SymbolLeftBrace, SymbolExpressionList, SymbolRightBrace)
+	PolymerizeIfElse                    = grammar.NewRule(SymbolExpressionIndependent, SymbolIf, SymbolExpression1, SymbolLeftBrace, SymbolExpressionList, SymbolRightBrace, SymbolElse, SymbolLeftBrace, SymbolExpressionList, SymbolRightBrace)
 	PolymerizeExpression2To1            = grammar.NewRule(SymbolExpression1, SymbolExpression2)
 	PolymerizeExpression1ToIndependent  = grammar.NewRule(SymbolExpressionIndependent, SymbolExpression1)
 	PolymerizeExpression                = grammar.NewRule(SymbolExpression, SymbolExpressionIndependent, SymbolSemicolon)
@@ -265,6 +271,8 @@ var (
 		PolymerizeDefine,
 		PolymerizeDefineAndInit,
 		PolymerizeParentheses,
+		PolymerizeIf,
+		PolymerizeIfElse,
 		PolymerizeExpression2To1,
 		PolymerizeExpression1ToIndependent,
 		PolymerizeExpression,

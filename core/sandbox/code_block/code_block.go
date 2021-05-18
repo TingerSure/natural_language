@@ -49,7 +49,7 @@ func (c *CodeBlock) ToString(prefix string) string {
 	flowPrefix := fmt.Sprintf("%v\t", prefix)
 	flowToStrings := make([]string, 0, c.Size())
 	for _, flow := range c.flow {
-		flowToStrings = append(flowToStrings, fmt.Sprintf("%v%v", flowPrefix, flow.ToString(flowPrefix)))
+		flowToStrings = append(flowToStrings, fmt.Sprintf("%v%v;", flowPrefix, flow.ToString(flowPrefix)))
 	}
 	return fmt.Sprintf("{\n%v\n%v}", strings.Join(flowToStrings, "\n"), prefix)
 }

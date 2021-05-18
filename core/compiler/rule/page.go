@@ -406,6 +406,41 @@ var (
 			// SymbolExpression2 -> SymbolLeftParenthesis SymbolExpression1 SymbolRightParenthesis
 			return context.Deal(phrase.GetChild(1))
 		}),
+		semantic.NewRule(PolymerizeIf, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependent -> SymbolIf SymbolExpression1 SymbolLeftBrace SymbolExpressionList SymbolRightBrace
+			condition, err := context.Deal(phrase.GetChild(1))
+			if err != nil {
+				return nil, err
+			}
+			steps, err := context.Deal(phrase.GetChild(3))
+			if err != nil {
+				return nil, err
+			}
+			eif := context.GetLibraryManager().Sandbox.Expression.If.New()
+			eif.SetCondition(condition[0])
+			eif.Primary().AddStep(steps...)
+			return []concept.Index{eif}, nil
+		}),
+		semantic.NewRule(PolymerizeIfElse, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependent -> SymbolIf SymbolExpression1 SymbolLeftBrace SymbolExpressionList SymbolRightBrace SymbolElse SymbolLeftBrace SymbolExpressionList SymbolRightBrace
+			condition, err := context.Deal(phrase.GetChild(1))
+			if err != nil {
+				return nil, err
+			}
+			primarySteps, err := context.Deal(phrase.GetChild(3))
+			if err != nil {
+				return nil, err
+			}
+			secondarySteps, err := context.Deal(phrase.GetChild(7))
+			if err != nil {
+				return nil, err
+			}
+			eif := context.GetLibraryManager().Sandbox.Expression.If.New()
+			eif.SetCondition(condition[0])
+			eif.Primary().AddStep(primarySteps...)
+			eif.Secondary().AddStep(secondarySteps...)
+			return []concept.Index{eif}, nil
+		}),
 		semantic.NewRule(PolymerizeExpression2To1, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			// SymbolExpression1 -> SymbolExpression2
 			return context.Deal(phrase.GetChild(0))
