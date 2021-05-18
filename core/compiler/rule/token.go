@@ -38,6 +38,7 @@ const (
 	TypeTrue                    // true
 	TypeFalse                   // false
 	TypeNull                    // null
+	TypeVar                     // var
 )
 
 const (
@@ -74,6 +75,7 @@ const (
 	KeyTrue             = "true"
 	KeyFalse            = "false"
 	KeyNull             = "null"
+	KeyVar              = "var"
 )
 
 var (
@@ -176,6 +178,8 @@ var (
 				return lexer.NewToken(TypeFalse, KeyFalse, KeyFalse)
 			case KeyNull:
 				return lexer.NewToken(TypeNull, KeyNull, KeyNull)
+			case KeyVar:
+				return lexer.NewToken(TypeVar, KeyVar, KeyVar)
 			default:
 				return lexer.NewToken(TypeIdentifier, KeyIdentifier, valueIdentifier)
 			}

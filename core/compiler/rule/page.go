@@ -374,6 +374,34 @@ var (
 				),
 			}, nil
 		}),
+
+		semantic.NewRule(PolymerizeDefine, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependent -> SymbolVar SymbolIdentifier
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.Define.New(
+					context.GetLibraryManager().Sandbox.Variable.String.New(
+						phrase.GetChild(1).GetToken().Value(),
+					),
+					nil,
+				),
+			}, nil
+		}),
+
+		semantic.NewRule(PolymerizeDefineAndInit, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependent -> SymbolVar SymbolIdentifier SymbolEqual SymbolExpression1
+			defaultValue, err := context.Deal(phrase.GetChild(3))
+			if err != nil {
+				return nil, err
+			}
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.Define.New(
+					context.GetLibraryManager().Sandbox.Variable.String.New(
+						phrase.GetChild(1).GetToken().Value(),
+					),
+					defaultValue[0],
+				),
+			}, nil
+		}),
 		semantic.NewRule(PolymerizeParentheses, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			// SymbolExpression2 -> SymbolLeftParenthesis SymbolExpression1 SymbolRightParenthesis
 			return context.Deal(phrase.GetChild(1))

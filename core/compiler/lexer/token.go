@@ -84,9 +84,14 @@ func (t *Token) ToLine() string {
 	return t.ToLineStatic(t.path, t.row, t.col, t.cursor, t.content)
 }
 
+const (
+	TokenTabCharactorWidth = 4
+)
+
 func (t *Token) ToLineStatic(path string, row int, col int, cursor int, content []byte) string {
 	prev := strings.LastIndex(string(content[:cursor]), "\n") + 1
 	next := strings.Index(string(content[cursor:]), "\n") + cursor
-	line := string(content[prev:next])
-	return fmt.Sprintf("%v:%v:%v:\n%v\n%v^", path, row+1, col+1, line, strings.Repeat(" ", cursor-prev))
+	tabSize := strings.Count(string(content[prev:cursor]), "\t")
+	spaceSize := cursor - prev - tabSize + tabSize*TokenTabCharactorWidth
+	return fmt.Sprintf("%v:%v:%v:\n%v\n%v^", path, row+1, col+1, string(content[prev:next]), strings.Repeat(" ", spaceSize))
 }
