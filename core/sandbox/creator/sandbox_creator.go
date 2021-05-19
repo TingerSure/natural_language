@@ -99,6 +99,12 @@ func NewSandboxCreator() *SandboxCreator {
 		ObjectCreator: func() concept.Object {
 			return instance.Variable.Object.New()
 		},
+		ContinueCreator: func(tag concept.String) *interrupt.Continue {
+			return instance.Interrupt.Continue.New(tag)
+		},
+		BreakCreator: func(tag concept.String) *interrupt.Break {
+			return instance.Interrupt.Break.New(tag)
+		},
 	})
 	return instance
 }

@@ -575,6 +575,48 @@ var (
 			}
 			return append(items, item...), nil
 		}),
+		semantic.NewRule(PolymerizeContinue, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependent -> SymbolContinue
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.NewContinue.New(
+					context.GetLibraryManager().Sandbox.Variable.String.New(""),
+				),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeContinueTag, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependent -> SymbolContinue SymbolIdentifier
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.NewContinue.New(
+					context.GetLibraryManager().Sandbox.Variable.String.New(
+						phrase.GetChild(1).GetToken().Value(),
+					),
+				),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeBreak, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependent -> SymbolBreak
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.NewBreak.New(
+					context.GetLibraryManager().Sandbox.Variable.String.New(""),
+				),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeBreakTag, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependent -> SymbolBreak SymbolIdentifier
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.NewBreak.New(
+					context.GetLibraryManager().Sandbox.Variable.String.New(
+						phrase.GetChild(1).GetToken().Value(),
+					),
+				),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeEnd, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependent -> SymbolEnd
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.NewEnd.New(),
+			}, nil
+		}),
 	}
 )
 

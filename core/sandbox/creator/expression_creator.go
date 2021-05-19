@@ -27,6 +27,9 @@ type ExpressionCreator struct {
 	NewObject       *expression.NewObjectCreator
 	NewNull         *expression.NewNullCreator
 	NewFunction     *expression.NewFunctionCreator
+	NewBreak        *expression.NewBreakCreator
+	NewContinue     *expression.NewContinueCreator
+	NewEnd          *expression.NewEndCreator
 }
 
 type ExpressionCreatorParam struct {
@@ -42,10 +45,27 @@ type ExpressionCreatorParam struct {
 	ClosureCreator    func(concept.Closure) concept.Closure
 	NullCreator       func() concept.Null
 	ObjectCreator     func() concept.Object
+	ContinueCreator   func(concept.String) *interrupt.Continue
+	BreakCreator      func(concept.String) *interrupt.Break
 }
 
 func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance := &ExpressionCreator{}
+	instance.NewEnd = expression.NewNewEndCreator(&expression.NewEndCreatorParam{
+		EndCreator:             param.EndCreator,
+		NullCreator:            param.NullCreator,
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+	})
+	instance.NewBreak = expression.NewNewBreakCreator(&expression.NewBreakCreatorParam{
+		BreakCreator:           param.BreakCreator,
+		NullCreator:            param.NullCreator,
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+	})
+	instance.NewContinue = expression.NewNewContinueCreator(&expression.NewContinueCreatorParam{
+		ContinueCreator:        param.ContinueCreator,
+		NullCreator:            param.NullCreator,
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+	})
 	instance.NewFunction = expression.NewNewFunctionCreator(&expression.NewFunctionCreatorParam{
 		FunctionCreator:        param.FunctionCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,

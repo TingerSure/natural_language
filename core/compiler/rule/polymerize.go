@@ -42,6 +42,8 @@ import (
 	If
 	Else
 	For
+	Continue
+	Break
 */
 
 var (
@@ -82,6 +84,9 @@ var (
 	SymbolIf               = grammar.NewTerminal(TypeIf, KeyIf)
 	SymbolElse             = grammar.NewTerminal(TypeElse, KeyElse)
 	SymbolFor              = grammar.NewTerminal(TypeFor, KeyFor)
+	SymbolContinue         = grammar.NewTerminal(TypeContinue, KeyContinue)
+	SymbolBreak            = grammar.NewTerminal(TypeBreak, KeyBreak)
+	SymbolEnd              = grammar.NewTerminal(TypeEnd, KeyEnd)
 )
 
 const (
@@ -241,6 +246,11 @@ var (
 	PolymerizeKeyListEmpty                    = grammar.NewRule(SymbolKeyList)
 	PolymerizeKeyArrayStart                   = grammar.NewRule(SymbolKeyArray, SymbolKey)
 	PolymerizeKeyArray                        = grammar.NewRule(SymbolKeyArray, SymbolKeyArray, SymbolComma, SymbolKey)
+	PolymerizeContinue                        = grammar.NewRule(SymbolExpressionIndependent, SymbolContinue)
+	PolymerizeContinueTag                     = grammar.NewRule(SymbolExpressionIndependent, SymbolContinue, SymbolIdentifier)
+	PolymerizeBreak                           = grammar.NewRule(SymbolExpressionIndependent, SymbolBreak)
+	PolymerizeBreakTag                        = grammar.NewRule(SymbolExpressionIndependent, SymbolBreak, SymbolIdentifier)
+	PolymerizeEnd                             = grammar.NewRule(SymbolExpressionIndependent, SymbolEnd)
 )
 
 var (
@@ -305,6 +315,11 @@ var (
 		PolymerizeKeyListEmpty,
 		PolymerizeKeyArrayStart,
 		PolymerizeKeyArray,
+		PolymerizeContinue,
+		PolymerizeContinueTag,
+		PolymerizeBreak,
+		PolymerizeBreakTag,
+		PolymerizeEnd,
 	}
 
 	GrammarEof = SymbolEof

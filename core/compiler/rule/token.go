@@ -42,6 +42,9 @@ const (
 	TypeIf                      // if
 	TypeElse                    // else
 	TypeFor                     // for
+	TypeContinue                // continue
+	TypeBreak                   // break
+	TypeEnd                     // end
 )
 
 const (
@@ -82,6 +85,9 @@ const (
 	KeyIf               = "if"
 	KeyElse             = "else"
 	KeyFor              = "for"
+	KeyContinue         = "continue"
+	KeyBreak            = "break"
+	KeyEnd              = "end"
 )
 
 var (
@@ -192,6 +198,12 @@ var (
 				return lexer.NewToken(TypeElse, KeyElse, KeyElse)
 			case KeyFor:
 				return lexer.NewToken(TypeFor, KeyFor, KeyFor)
+			case KeyContinue:
+				return lexer.NewToken(TypeContinue, KeyContinue, KeyContinue)
+			case KeyBreak:
+				return lexer.NewToken(TypeBreak, KeyBreak, KeyBreak)
+			case KeyEnd:
+				return lexer.NewToken(TypeEnd, KeyEnd, KeyEnd)
 			default:
 				return lexer.NewToken(TypeIdentifier, KeyIdentifier, valueIdentifier)
 			}
