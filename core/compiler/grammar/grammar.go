@@ -36,11 +36,13 @@ func (g *Grammar) SetEof(eof *Terminal) {
 	g.eof = eof
 }
 
-func (g *Grammar) Build() error {
+func (g *Grammar) Build() (err error) {
 	g.table.SetRules(g.rules)
 	g.table.SetGlobal(g.global)
 	g.table.SetEof(g.eof)
-	return g.table.Build()
+	err = g.table.Build()
+	g.table.Clear()
+	return
 }
 
 func (g *Grammar) Read(tokens *lexer.TokenList) (Phrase, error) {

@@ -110,6 +110,18 @@ func (g *Table) Build() error {
 	return g.makeClosures()
 }
 
+func (g *Table) Clear() {
+	g.rules = nil
+	g.global = nil
+	g.eof = nil
+	g.toActions = nil
+	g.closures = nil
+	g.firsts = nil
+	g.startProjects = nil
+	g.moves = nil
+	g.counter = nil
+}
+
 func (g *Table) makeClosures() error {
 	closure, err := g.makeClosureStep(map[*TableProject]*SymbolSet{
 		g.startProjects[g.global.Type()][0]: NewSymbolSet(g.eof),
@@ -128,22 +140,20 @@ func (g *Table) makeClosureStep(cursors map[*TableProject]*SymbolSet) (closure *
 	}
 	g.equivalenceClosure(cursors, closure)
 
-	oldClosure, direction := g.matchClosure(closure)
+	oldClosures, direction := g.matchClosure(closure)
 	if direction == TableClosureMatchExist {
 		//exist
-		closure = oldClosure
+		closure = oldClosures[0]
 		return
 	}
-	if direction == TableClosureMatchReplace {
-		//replace
-		g.moveClosure(oldClosure, closure)
-	}
-
 	g.closures[closure.Id()] = closure
 	g.toActions[closure.Id()] = []*TableAction{}
-
 	g.actions[closure.Id()] = NewTableActionGroup()
 	g.gotos[closure.Id()] = NewTableActionGroup()
+	if direction == TableClosureMatchReplace {
+		//replace
+		g.moveClosure(oldClosures, closure)
+	}
 
 	for endProject, lookaheads := range closure.GetProjectsByNextChild(nil) {
 		if lookaheads.Iterate(func(lookahead Symbol) bool {
@@ -234,25 +244,34 @@ func (g *Table) actionConfictError(left, right *TableAction, closure *TableClosu
 	return errors.New(fmt.Sprintf("Rule conflict between (%v) and (%v), status: %v, lookahead: %v.", strings.Join(leftNames, " , "), strings.Join(rightNames, " , "), closure.Id(), lookahead.Name()))
 }
 
-func (g *Table) moveClosure(from, to *TableClosure) {
-	g.moves[from.Id()] = to.Id()
-	for _, action := range g.toActions[from.Id()] {
-		action.SetStatus(to.Id())
+func (g *Table) moveClosure(froms []*TableClosure, to *TableClosure) {
+	for _, from := range froms {
+		g.moves[from.Id()] = to.Id()
+		for _, action := range g.toActions[from.Id()] {
+			action.SetStatus(to.Id())
+			g.toActions[to.Id()] = append(g.toActions[to.Id()], action)
+		}
+		delete(g.closures, from.Id())
+		delete(g.actions, from.Id())
+		delete(g.gotos, from.Id())
+		delete(g.toActions, from.Id())
 	}
-	delete(g.closures, from.Id())
-	delete(g.actions, from.Id())
-	delete(g.gotos, from.Id())
-	delete(g.toActions, from.Id())
 }
 
-func (g *Table) matchClosure(target *TableClosure) (*TableClosure, int) {
+func (g *Table) matchClosure(target *TableClosure) ([]*TableClosure, int) {
 	for _, closure := range g.closures {
 		if closure.Include(target) {
-			return closure, TableClosureMatchExist
+			return []*TableClosure{closure}, TableClosureMatchExist
 		}
+	}
+	replaces := []*TableClosure{}
+	for _, closure := range g.closures {
 		if target.Include(closure) {
-			return closure, TableClosureMatchReplace
+			replaces = append(replaces, closure)
 		}
+	}
+	if len(replaces) > 0 {
+		return replaces, TableClosureMatchReplace
 	}
 	return nil, TableClosureMatchUnrelated
 }
@@ -441,7 +460,7 @@ func (g *Table) ToString() string {
 		return false
 	})
 	values = append(values, strings.Join(titles, "|"), strings.Join(brs, "|"))
-	for status, _ := range g.closures {
+	for status, _ := range g.actions {
 		value := []string{}
 		value = append(value, fmt.Sprintf("%v", status))
 		for _, terminal := range terminals {
