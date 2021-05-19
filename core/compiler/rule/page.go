@@ -617,6 +617,24 @@ var (
 				context.GetLibraryManager().Sandbox.Expression.NewEnd.New(),
 			}, nil
 		}),
+		semantic.NewRule(PolymerizeThis, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpression2 -> SymbolThis
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.ThisIndex.New(),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeSelf, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpression2 -> SymbolSelf
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.SelfIndex.New(),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeReturn, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpression2 -> SymbolReturn
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.ReturnIndex.New(),
+			}, nil
+		}),
 	}
 )
 

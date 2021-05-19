@@ -59,21 +59,9 @@ func (c *CodeBlock) AddStep(steps ...concept.Index) {
 
 func (f *CodeBlock) Exec(
 	parent concept.Closure,
-	returnBubble bool,
 	init func(concept.Closure) concept.Interrupt,
 ) (concept.Closure, concept.Interrupt) {
-
-	if parent == nil {
-		returnBubble = false
-	}
-
 	space := f.seed.NewClosure(parent)
-	defer func() {
-		if returnBubble {
-			parent.MergeReturn(space)
-		}
-	}()
-
 	if init != nil {
 		suspend := init(space)
 		if !nl_interface.IsNil(suspend) {

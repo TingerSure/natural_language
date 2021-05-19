@@ -180,7 +180,7 @@ func NewStringCreator(param *StringCreatorParam) *StringCreator {
 func StringJoin(values []concept.String, separator string) string {
 	paramsToString := make([]string, 0, len(values))
 	for _, value := range values {
-		paramsToString = append(paramsToString, value.ToString(""))
+		paramsToString = append(paramsToString, value.Value())
 	}
 	return strings.Join(paramsToString, separator)
 }

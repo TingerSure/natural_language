@@ -45,6 +45,8 @@ const (
 	TypeContinue                // continue
 	TypeBreak                   // break
 	TypeEnd                     // end
+	TypeThis                    // this
+	TypeSelf                    // self
 )
 
 const (
@@ -88,6 +90,8 @@ const (
 	KeyContinue         = "continue"
 	KeyBreak            = "break"
 	KeyEnd              = "end"
+	KeyThis             = "this"
+	KeySelf             = "self"
 )
 
 var (
@@ -204,6 +208,10 @@ var (
 				return lexer.NewToken(TypeBreak, KeyBreak, KeyBreak)
 			case KeyEnd:
 				return lexer.NewToken(TypeEnd, KeyEnd, KeyEnd)
+			case KeyThis:
+				return lexer.NewToken(TypeThis, KeyThis, KeyThis)
+			case KeySelf:
+				return lexer.NewToken(TypeSelf, KeySelf, KeySelf)
 			default:
 				return lexer.NewToken(TypeIdentifier, KeyIdentifier, valueIdentifier)
 			}

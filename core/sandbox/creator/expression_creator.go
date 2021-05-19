@@ -16,8 +16,6 @@ type ExpressionCreator struct {
 	Assignment      *expression.AssignmentCreator
 	For             *expression.ForCreator
 	If              *expression.IfCreator
-	FunctionEnd     *expression.FunctionEndCreator
-	Return          *expression.ReturnCreator
 	Define          *expression.DefineCreator
 	NewParam        *expression.NewParamCreator
 	Component       *expression.ComponentCreator
@@ -51,6 +49,10 @@ type ExpressionCreatorParam struct {
 
 func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance := &ExpressionCreator{}
+	instance.ExpressionIndex = adaptor.NewExpressionIndexCreator(&adaptor.ExpressionIndexCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
+	})
 	instance.NewEnd = expression.NewNewEndCreator(&expression.NewEndCreatorParam{
 		EndCreator:             param.EndCreator,
 		NullCreator:            param.NullCreator,
@@ -104,19 +106,6 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 		NullCreator:            param.NullCreator,
 		ExceptionCreator:       param.ExceptionCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
-	})
-	instance.Return = expression.NewReturnCreator(&expression.ReturnCreatorParam{
-		NullCreator:            param.NullCreator,
-		ExpressionIndexCreator: instance.ExpressionIndex.New,
-	})
-	instance.ExpressionIndex = adaptor.NewExpressionIndexCreator(&adaptor.ExpressionIndexCreatorParam{
-		ExceptionCreator: param.ExceptionCreator,
-		ParamCreator:     param.ParamCreator,
-	})
-	instance.FunctionEnd = expression.NewFunctionEndCreator(&expression.FunctionEndCreatorParam{
-		ExpressionIndexCreator: instance.ExpressionIndex.New,
-		EndCreator:             param.EndCreator,
-		NullCreator:            param.NullCreator,
 	})
 	instance.If = expression.NewIfCreator(&expression.IfCreatorParam{
 		ExpressionIndexCreator: instance.ExpressionIndex.New,

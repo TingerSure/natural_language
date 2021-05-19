@@ -45,20 +45,19 @@ func (e *If) Anticipate(space concept.Closure) concept.Variable {
 func (f *If) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) {
 
 	if nl_interface.IsNil(f.condition) {
-		return f.seed.NewNull(), f.seed.NewException("system error", "No condition for judgment.")
+		return nil, f.seed.NewException("system error", "No condition for judgment.")
 	}
 	initSpace := f.seed.NewClosure(parent)
 	defer initSpace.Clear()
-	defer parent.MergeReturn(initSpace)
 
 	preCondition, suspend := f.condition.Get(initSpace)
 	if !nl_interface.IsNil(suspend) {
-		return f.seed.NewNull(), suspend
+		return nil, suspend
 	}
 
 	condition, yes := variable.VariableFamilyInstance.IsBool(preCondition)
 	if !yes {
-		return f.seed.NewNull(), f.seed.NewException("type error", "Only bool can be judged.")
+		return nil, f.seed.NewException("type error", "Only bool can be judged.")
 	}
 
 	var active *code_block.CodeBlock
@@ -68,7 +67,7 @@ func (f *If) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) 
 		active = f.secondary
 	}
 
-	space, suspend := active.Exec(initSpace, true, nil)
+	space, suspend := active.Exec(initSpace, nil)
 	defer space.Clear()
 	return f.seed.NewNull(), suspend
 }

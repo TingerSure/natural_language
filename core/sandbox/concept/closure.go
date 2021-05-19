@@ -2,9 +2,6 @@ package concept
 
 type Closure interface {
 	SetParent(Closure)
-	SetReturn(String, Variable)
-	MergeReturn(Closure)
-	IterateReturn(func(String, Variable) bool) bool
 	InitLocal(String, Variable)
 	PeekLocal(String) (Variable, Exception)
 	GetLocal(String) (Variable, Exception)

@@ -10,10 +10,11 @@ import (
 )
 
 const (
-	VariableFunctionType  = "function"
-	FunctionFunctionType  = "general"
-	FunctionAutoParamSelf = "self"
-	FunctionAutoParamThis = "this"
+	VariableFunctionType    = "function"
+	FunctionFunctionType    = "general"
+	FunctionAutoParamSelf   = "self"
+	FunctionAutoParamThis   = "this"
+	FunctionAutoParamReturn = "return"
 )
 
 type FunctionSeed interface {
@@ -79,9 +80,11 @@ func (f *Function) AnticipateBody() *code_block.CodeBlock {
 }
 
 func (f *Function) Anticipate(params concept.Param, object concept.Variable) concept.Param {
-	space, suspend := f.anticipateBody.Exec(f.parent, false, func(space concept.Closure) concept.Interrupt {
+	returnParams := f.seed.NewParam()
+	space, suspend := f.anticipateBody.Exec(f.parent, func(space concept.Closure) concept.Interrupt {
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
+		space.InitLocal(f.seed.NewString(FunctionAutoParamReturn), returnParams)
 		if params.ParamType() == concept.ParamTypeList {
 			for index, name := range f.paramNames {
 				if index < params.SizeIndex() {
@@ -110,11 +113,6 @@ func (f *Function) Anticipate(params concept.Param, object concept.Variable) con
 			return f.seed.NewParam()
 		}
 	}
-	returnParams := f.seed.NewParam()
-	space.IterateReturn(func(key concept.String, value concept.Variable) bool {
-		returnParams.Set(key, value)
-		return false
-	})
 	return returnParams
 }
 
@@ -123,10 +121,11 @@ func (f *Function) Body() *code_block.CodeBlock {
 }
 
 func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
-
-	space, suspend := f.body.Exec(f.parent, false, func(space concept.Closure) concept.Interrupt {
+	returnParams := f.seed.NewParam()
+	space, suspend := f.body.Exec(f.parent, func(space concept.Closure) concept.Interrupt {
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
+		space.InitLocal(f.seed.NewString(FunctionAutoParamReturn), returnParams)
 		if params.ParamType() == concept.ParamTypeList {
 			for index, name := range f.paramNames {
 				if index < params.SizeIndex() {
@@ -159,11 +158,6 @@ func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.
 			return nil, f.seed.NewException("system error", fmt.Sprintf("Unknown Interrupt \"%v\".\n%+v", suspend.InterruptType(), suspend))
 		}
 	}
-	returnParams := f.seed.NewParam()
-	space.IterateReturn(func(key concept.String, value concept.Variable) bool {
-		returnParams.Set(key, value)
-		return false
-	})
 	return returnParams, nil
 }
 

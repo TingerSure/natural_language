@@ -17,7 +17,6 @@ type ClosureSeed interface {
 }
 
 type Closure struct {
-	returns   *concept.Mapping
 	local     *concept.Mapping
 	parent    concept.Closure
 	history   *History
@@ -85,23 +84,6 @@ func (c *Closure) SetParent(parent concept.Closure) {
 
 func (c *Closure) AddExtempore(index concept.Index, value concept.Variable) {
 	c.extempore.Add(index, value)
-}
-
-func (c *Closure) SetReturn(key concept.String, value concept.Variable) {
-	c.returns.Set(key, value)
-}
-
-func (c *Closure) MergeReturn(other concept.Closure) {
-	other.IterateReturn(func(key concept.String, value concept.Variable) bool {
-		c.returns.Set(key, value)
-		return false
-	})
-}
-
-func (c *Closure) IterateReturn(on func(key concept.String, value concept.Variable) bool) bool {
-	return c.returns.Iterate(func(key concept.String, value interface{}) bool {
-		return on(key, value.(concept.Variable))
-	})
 }
 
 func (c *Closure) InitLocal(key concept.String, defaultValue concept.Variable) {
@@ -213,10 +195,6 @@ func (s *ClosureCreator) New(parent concept.Closure) *Closure {
 		parent:    parent,
 		history:   NewHistory(),
 		extempore: NewExtempore(),
-		returns: concept.NewMapping(&concept.MappingParam{
-			AutoInit:   true,
-			EmptyValue: s.NewNull(),
-		}),
 		local: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   false,
 			EmptyValue: s.NewNull(),

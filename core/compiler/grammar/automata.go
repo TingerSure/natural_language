@@ -31,7 +31,7 @@ func (a *Automata) Run(tokens *lexer.TokenList) (Phrase, error) {
 			for _, expectation := range expectations {
 				names = append(names, expectation.Name())
 			}
-			return nil, errors.New(fmt.Sprintf("syntax error : unexpected : '%v' (%v), expected : (%v).\n%v", phrase.GetToken().Value(), phrase.GetToken().Name(), strings.Join(names, ", "), phrase.GetToken().ToLine()))
+			return nil, errors.New(fmt.Sprintf("syntax error : unexpected : '%v' (%v), expecting : (%v).\n%v", phrase.GetToken().Value(), phrase.GetToken().Name(), strings.Join(names, ", "), phrase.GetToken().ToLine()))
 		}
 		if action.Type() == ActionMoveType {
 			status = action.Status()

@@ -51,58 +51,57 @@ func (f *For) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt)
 		f.condition = f.seed.GetDefaultCondition()
 	}
 
-	initSpace, suspend := f.init.Exec(parent, false, nil)
+	initSpace, suspend := f.init.Exec(parent, nil)
 	defer initSpace.Clear()
-	defer parent.MergeReturn(initSpace)
 	if !nl_interface.IsNil(suspend) {
-		return f.seed.NewNull(), suspend
+		return nil, suspend
 	}
 
 body:
 	for {
 		preCondition, suspend := f.condition.Get(initSpace)
 		if !nl_interface.IsNil(suspend) {
-			return f.seed.NewNull(), suspend
+			return nil, suspend
 		}
 
 		condition, yes := variable.VariableFamilyInstance.IsBool(preCondition)
 		if !yes {
-			return f.seed.NewNull(), f.seed.NewException("type error", "Only bool can be judged.")
+			return nil, f.seed.NewException("type error", "Only bool can be judged.")
 		}
 
 		if !condition.Value() {
 			break body
 		}
 
-		space, suspend := f.body.Exec(initSpace, true, nil)
+		space, suspend := f.body.Exec(initSpace, nil)
 		defer space.Clear()
 		if !nl_interface.IsNil(suspend) {
 			switch suspend.InterruptType() {
 			case interrupt.BreakInterruptType:
 				breaks, yes := interrupt.InterruptFamilyInstance.IsBreak(suspend)
 				if !yes {
-					return f.seed.NewNull(), f.seed.NewException("system panic", fmt.Sprintf("BreakInterruptType does not mean a Break anymore.\n%+v", suspend))
+					return nil, f.seed.NewException("system panic", fmt.Sprintf("BreakInterruptType does not mean a Break anymore.\n%+v", suspend))
 				}
 				if !f.IsMyTag(breaks.Tag()) {
-					return f.seed.NewNull(), suspend
+					return nil, suspend
 				}
 				break body
 			case interrupt.ContinueInterruptType:
 				continues, yes := interrupt.InterruptFamilyInstance.IsContinue(suspend)
 				if !yes {
-					return f.seed.NewNull(), f.seed.NewException("system panic", fmt.Sprintf("ContinueInterruptType does not mean a Continue anymore.\n%+v", suspend))
+					return nil, f.seed.NewException("system panic", fmt.Sprintf("ContinueInterruptType does not mean a Continue anymore.\n%+v", suspend))
 				}
 				if !f.IsMyTag(continues.Tag()) {
-					return f.seed.NewNull(), suspend
+					return nil, suspend
 				}
 			default:
-				return f.seed.NewNull(), suspend
+				return nil, suspend
 			}
 		}
-		endSpace, suspend := f.end.Exec(initSpace, true, nil)
+		endSpace, suspend := f.end.Exec(initSpace, nil)
 		defer endSpace.Clear()
 		if !nl_interface.IsNil(suspend) {
-			return f.seed.NewNull(), suspend
+			return nil, suspend
 		}
 	}
 

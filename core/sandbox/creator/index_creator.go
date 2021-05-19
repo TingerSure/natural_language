@@ -11,6 +11,7 @@ type IndexCreator struct {
 	SearchIndex   *index.SearchIndexCreator
 	ThisIndex     *index.ThisIndexCreator
 	SelfIndex     *index.SelfIndexCreator
+	ReturnIndex   *index.ReturnIndexCreator
 	BubbleIndex   *index.BubbleIndexCreator
 	LocalIndex    *index.LocalIndexCreator
 	ImportIndex   *index.ImportIndexCreator
@@ -60,6 +61,12 @@ func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
 	instance.BubbleIndex = index.NewBubbleIndexCreator(&index.BubbleIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,
+		NullCreator:      param.NullCreator,
+	})
+	instance.ReturnIndex = index.NewReturnIndexCreator(&index.ReturnIndexCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
+		StringCreator:    param.StringCreator,
 		NullCreator:      param.NullCreator,
 	})
 	instance.SelfIndex = index.NewSelfIndexCreator(&index.SelfIndexCreatorParam{
