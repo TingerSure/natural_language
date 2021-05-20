@@ -5,7 +5,7 @@ import (
 )
 
 type InterruptCreator struct {
-	End      *interrupt.EndCreator
+	Return   *interrupt.ReturnCreator
 	Continue *interrupt.ContinueCreator
 	Break    *interrupt.BreakCreator
 }
@@ -17,6 +17,6 @@ func NewInterruptCreator(param *InterruptCreatorParam) *InterruptCreator {
 	instance := &InterruptCreator{}
 	instance.Break = interrupt.NewBreakCreator(&interrupt.BreakCreatorParam{})
 	instance.Continue = interrupt.NewContinueCreator(&interrupt.ContinueCreatorParam{})
-	instance.End = interrupt.NewEndCreator(&interrupt.EndCreatorParam{})
+	instance.Return = interrupt.NewReturnCreator(&interrupt.ReturnCreatorParam{})
 	return instance
 }

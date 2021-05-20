@@ -44,7 +44,6 @@ import (
 	For
 	Continue
 	Break
-	End
 	This
 	Self
 */
@@ -89,7 +88,6 @@ var (
 	SymbolFor              = grammar.NewTerminal(TypeFor, KeyFor)
 	SymbolContinue         = grammar.NewTerminal(TypeContinue, KeyContinue)
 	SymbolBreak            = grammar.NewTerminal(TypeBreak, KeyBreak)
-	SymbolEnd              = grammar.NewTerminal(TypeEnd, KeyEnd)
 	SymbolThis             = grammar.NewTerminal(TypeThis, KeyThis)
 	SymbolSelf             = grammar.NewTerminal(TypeSelf, KeySelf)
 )
@@ -255,10 +253,9 @@ var (
 	PolymerizeContinueTag                     = grammar.NewRule(SymbolExpressionIndependent, SymbolContinue, SymbolIdentifier)
 	PolymerizeBreak                           = grammar.NewRule(SymbolExpressionIndependent, SymbolBreak)
 	PolymerizeBreakTag                        = grammar.NewRule(SymbolExpressionIndependent, SymbolBreak, SymbolIdentifier)
-	PolymerizeEnd                             = grammar.NewRule(SymbolExpressionIndependent, SymbolEnd)
+	PolymerizeReturn                          = grammar.NewRule(SymbolExpressionIndependent, SymbolReturn)
 	PolymerizeThis                            = grammar.NewRule(SymbolExpression2, SymbolThis)
 	PolymerizeSelf                            = grammar.NewRule(SymbolExpression2, SymbolSelf)
-	PolymerizeReturn                          = grammar.NewRule(SymbolExpression2, SymbolReturn)
 )
 
 var (
@@ -327,10 +324,9 @@ var (
 		PolymerizeContinueTag,
 		PolymerizeBreak,
 		PolymerizeBreakTag,
-		PolymerizeEnd,
+		PolymerizeReturn,
 		PolymerizeThis,
 		PolymerizeSelf,
-		PolymerizeReturn,
 	}
 
 	GrammarEof = SymbolEof

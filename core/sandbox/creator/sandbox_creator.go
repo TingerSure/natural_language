@@ -90,8 +90,8 @@ func NewSandboxCreator() *SandboxCreator {
 		NumberCreator: func(value float64) concept.Number {
 			return instance.Variable.Number.New(value)
 		},
-		EndCreator: func() *interrupt.End {
-			return instance.Interrupt.End.New()
+		ReturnCreator: func() *interrupt.Return {
+			return instance.Interrupt.Return.New()
 		},
 		ClosureCreator: func(parent concept.Closure) concept.Closure {
 			return instance.Closure.New(parent)

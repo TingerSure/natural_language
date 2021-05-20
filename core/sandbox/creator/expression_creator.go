@@ -27,7 +27,7 @@ type ExpressionCreator struct {
 	NewFunction     *expression.NewFunctionCreator
 	NewBreak        *expression.NewBreakCreator
 	NewContinue     *expression.NewContinueCreator
-	NewEnd          *expression.NewEndCreator
+	NewReturn       *expression.NewReturnCreator
 }
 
 type ExpressionCreatorParam struct {
@@ -37,7 +37,7 @@ type ExpressionCreatorParam struct {
 	BoolCreator       func(bool) concept.Bool
 	NumberCreator     func(float64) concept.Number
 	ExceptionCreator  func(string, string) concept.Exception
-	EndCreator        func() *interrupt.End
+	ReturnCreator     func() *interrupt.Return
 	ParamCreator      func() concept.Param
 	ConstIndexCreator func(concept.Variable) *index.ConstIndex
 	ClosureCreator    func(concept.Closure) concept.Closure
@@ -53,8 +53,8 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,
 	})
-	instance.NewEnd = expression.NewNewEndCreator(&expression.NewEndCreatorParam{
-		EndCreator:             param.EndCreator,
+	instance.NewReturn = expression.NewNewReturnCreator(&expression.NewReturnCreatorParam{
+		ReturnCreator:          param.ReturnCreator,
 		NullCreator:            param.NullCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 	})

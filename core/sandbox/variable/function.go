@@ -10,11 +10,10 @@ import (
 )
 
 const (
-	VariableFunctionType    = "function"
-	FunctionFunctionType    = "general"
-	FunctionAutoParamSelf   = "self"
-	FunctionAutoParamThis   = "this"
-	FunctionAutoParamReturn = "return"
+	VariableFunctionType  = "function"
+	FunctionFunctionType  = "general"
+	FunctionAutoParamSelf = "self"
+	FunctionAutoParamThis = "this"
 )
 
 type FunctionSeed interface {
@@ -23,6 +22,7 @@ type FunctionSeed interface {
 	NewString(string) concept.String
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
+	NewNull() concept.Null
 }
 
 type Function struct {
@@ -80,11 +80,9 @@ func (f *Function) AnticipateBody() *code_block.CodeBlock {
 }
 
 func (f *Function) Anticipate(params concept.Param, object concept.Variable) concept.Param {
-	returnParams := f.seed.NewParam()
 	space, suspend := f.anticipateBody.Exec(f.parent, func(space concept.Closure) concept.Interrupt {
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
-		space.InitLocal(f.seed.NewString(FunctionAutoParamReturn), returnParams)
 		if params.ParamType() == concept.ParamTypeList {
 			for index, name := range f.paramNames {
 				if index < params.SizeIndex() {
@@ -98,6 +96,9 @@ func (f *Function) Anticipate(params concept.Param, object concept.Variable) con
 			for _, name := range f.paramNames {
 				space.InitLocal(name, params.Get(name))
 			}
+		}
+		for _, name := range f.returnNames {
+			space.InitLocal(name, f.seed.NewNull())
 		}
 		return nil
 	})
@@ -107,11 +108,16 @@ func (f *Function) Anticipate(params concept.Param, object concept.Variable) con
 		switch suspend.InterruptType() {
 		case ExceptionInterruptType:
 			return f.seed.NewParam()
-		case interrupt.EndInterruptType:
+		case interrupt.ReturnInterruptType:
 			//Do Nothing
 		default:
 			return f.seed.NewParam()
 		}
+	}
+	returnParams := f.seed.NewParam()
+	for _, name := range f.returnNames {
+		value, _ := space.PeekLocal(name)
+		returnParams.Set(name, value)
 	}
 	return returnParams
 }
@@ -121,11 +127,9 @@ func (f *Function) Body() *code_block.CodeBlock {
 }
 
 func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
-	returnParams := f.seed.NewParam()
 	space, suspend := f.body.Exec(f.parent, func(space concept.Closure) concept.Interrupt {
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
-		space.InitLocal(f.seed.NewString(FunctionAutoParamReturn), returnParams)
 		if params.ParamType() == concept.ParamTypeList {
 			for index, name := range f.paramNames {
 				if index < params.SizeIndex() {
@@ -139,6 +143,9 @@ func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.
 			for _, name := range f.paramNames {
 				space.InitLocal(name, params.Get(name))
 			}
+		}
+		for _, name := range f.returnNames {
+			space.InitLocal(name, f.seed.NewNull())
 		}
 		return nil
 	})
@@ -152,11 +159,19 @@ func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.
 				return nil, f.seed.NewException("system panic", fmt.Sprintf("ExceptionInterruptType does not mean an Exception anymore.\n%+v", suspend))
 			}
 			return nil, exception
-		case interrupt.EndInterruptType:
+		case interrupt.ReturnInterruptType:
 			// Do Nothing
 		default:
 			return nil, f.seed.NewException("system error", fmt.Sprintf("Unknown Interrupt \"%v\".\n%+v", suspend.InterruptType(), suspend))
 		}
+	}
+	returnParams := f.seed.NewParam()
+	for _, name := range f.returnNames {
+		value, returnSuspend := space.PeekLocal(name)
+		if !nl_interface.IsNil(returnSuspend) {
+			return nil, returnSuspend
+		}
+		returnParams.Set(name, value)
 	}
 	return returnParams, nil
 }
@@ -205,6 +220,10 @@ func (s *FunctionCreator) Type() string {
 
 func (s *FunctionCreator) NewString(value string) concept.String {
 	return s.param.StringCreator(value)
+}
+
+func (s *FunctionCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
 }
 
 func (s *FunctionCreator) NewParam() concept.Param {

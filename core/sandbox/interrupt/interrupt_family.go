@@ -38,12 +38,12 @@ func (v *InterruptFamily) IsContinue(value concept.Interrupt) (*Continue, bool) 
 	return nil, false
 }
 
-func (v *InterruptFamily) IsEnd(value concept.Interrupt) (*End, bool) {
+func (v *InterruptFamily) IsReturn(value concept.Interrupt) (*Return, bool) {
 	if value == nil {
 		return nil, false
 	}
-	if value.InterruptType() == EndInterruptType {
-		end, yes := value.(*End)
+	if value.InterruptType() == ReturnInterruptType {
+		end, yes := value.(*Return)
 		return end, yes
 	}
 	return nil, false

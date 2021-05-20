@@ -46,7 +46,7 @@ func (l *Loop) Start() error {
 			}
 			suspend := event.Exec()
 			if !nl_interface.IsNil(suspend) {
-				if suspend.InterruptType() == interrupt.EndInterruptType {
+				if suspend.InterruptType() == interrupt.ReturnInterruptType {
 					break
 				}
 				if l.interruptListener != nil {

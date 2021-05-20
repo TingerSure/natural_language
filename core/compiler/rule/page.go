@@ -611,10 +611,10 @@ var (
 				),
 			}, nil
 		}),
-		semantic.NewRule(PolymerizeEnd, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolExpressionIndependent -> SymbolEnd
+		semantic.NewRule(PolymerizeReturn, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependent -> SymbolReturn
 			return []concept.Index{
-				context.GetLibraryManager().Sandbox.Expression.NewEnd.New(),
+				context.GetLibraryManager().Sandbox.Expression.NewReturn.New(),
 			}, nil
 		}),
 		semantic.NewRule(PolymerizeThis, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
@@ -627,12 +627,6 @@ var (
 			//SymbolExpression2 -> SymbolSelf
 			return []concept.Index{
 				context.GetLibraryManager().Sandbox.Index.SelfIndex.New(),
-			}, nil
-		}),
-		semantic.NewRule(PolymerizeReturn, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
-			//SymbolExpression2 -> SymbolReturn
-			return []concept.Index{
-				context.GetLibraryManager().Sandbox.Index.ReturnIndex.New(),
 			}, nil
 		}),
 	}
