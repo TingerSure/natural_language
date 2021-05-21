@@ -32,10 +32,6 @@ func (f *SearchIndex) ToLanguage(language string) string {
 	return f.seed.ToLanguage(language, f)
 }
 
-func (s *SearchIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
-	return false
-}
-
 func (s *SearchIndex) ToString(prefix string) string {
 	var subprefix = fmt.Sprintf("%v\t", prefix)
 	subs := []string{}

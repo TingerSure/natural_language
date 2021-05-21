@@ -7,6 +7,5 @@ type Index interface {
 	Set(Closure, Variable) Interrupt
 	Call(Closure, Param) (Param, Exception)
 	CallAnticipate(Closure, Param) Param
-	SubCodeBlockIterate(func(Index) bool) bool
 	ToString
 }

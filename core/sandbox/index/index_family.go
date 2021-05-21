@@ -80,3 +80,24 @@ func (v *IndexFamily) IsPublicIndex(value concept.Index) (*PublicIndex, bool) {
 	}
 	return nil, false
 }
+func (v *IndexFamily) IsProvideIndex(value concept.Index) (*ProvideIndex, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == IndexProvideType {
+		index, yes := value.(*ProvideIndex)
+		return index, yes
+	}
+	return nil, false
+}
+
+func (v *IndexFamily) IsRequireIndex(value concept.Index) (*RequireIndex, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == IndexRequireType {
+		index, yes := value.(*RequireIndex)
+		return index, yes
+	}
+	return nil, false
+}

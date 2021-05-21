@@ -88,6 +88,17 @@ func (v *VariableFamily) IsSystemFunction(value concept.Variable) (*SystemFuncti
 	return nil, false
 }
 
+func (v *VariableFamily) IsDefineFunction(value concept.Variable) (*DefineFunction, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == VariableDefineFunctionType {
+		function, yes := value.(*DefineFunction)
+		return function, yes
+	}
+	return nil, false
+}
+
 func (v *VariableFamily) IsParam(value concept.Variable) (*Param, bool) {
 	if value == nil {
 		return nil, false
@@ -153,6 +164,12 @@ func (v *VariableFamily) IsFunctionHome(value concept.Variable) (concept.Functio
 	if yes {
 		return systemFunction, yes
 	}
+
+	defineFunction, yes := v.IsDefineFunction(value)
+	if yes {
+		return defineFunction, yes
+	}
+
 	return nil, false
 }
 

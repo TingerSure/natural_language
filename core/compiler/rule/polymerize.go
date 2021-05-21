@@ -97,9 +97,15 @@ const (
 	TypePageItemList
 	TypePageItemArray
 	TypePageItem
+	TypeClassGroup
+	TypeClassItemList
+	TypeClassItemArray
+	TypeClassItem
 	TypeImportGroup
 	TypePublicGroup
 	TypePrivateGroup
+	TypeProvideGroup
+	TypeRequireGroup
 	TypeIndex
 	TypeIndexList
 	TypeIndexArray
@@ -109,6 +115,7 @@ const (
 	TypeBool
 	TypeObject
 	TypeFunctionGroup
+	TypeDefineFunctionGroup
 	TypeVariable
 	TypeExpression
 	TypeExpressionIndependent
@@ -131,9 +138,15 @@ const (
 	KeyPageItemList               = "page_item_list"
 	KeyPageItemArray              = "page_item_array"
 	KeyPageItem                   = "page_item"
+	KeyClassGroup                 = "class_group"
+	KeyClassItemList              = "class_item_list"
+	KeyClassItemArray             = "class_item_array"
+	KeyClassItem                  = "class_item"
 	KeyImportGroup                = "import_group"
 	KeyPublicGroup                = "public_group"
 	KeyPrivateGroup               = "private_group"
+	KeyProvideGroup               = "provide_group"
+	KeyRequireGroup               = "require_group"
 	KeyIndex                      = "index"
 	KeyIndexList                  = "index_list"
 	KeyIndexArray                 = "index_array"
@@ -143,6 +156,7 @@ const (
 	KeyBool                       = "bool"
 	KeyObject                     = "object"
 	KeyFunctionGroup              = "function_group"
+	KeyDefineFunctionGroup        = "define_function_group"
 	KeyVariable                   = "variable"
 	KeyExpression                 = "expression"
 	KeyExpressionIndependent      = "expression_independent"
@@ -162,9 +176,15 @@ var (
 	SymbolPageItemList               = grammar.NewNonterminal(TypePageItemList, KeyPageItemList)
 	SymbolPageItemArray              = grammar.NewNonterminal(TypePageItemArray, KeyPageItemArray)
 	SymbolPageItem                   = grammar.NewNonterminal(TypePageItem, KeyPageItem)
+	SymbolClassGroup                 = grammar.NewNonterminal(TypeClassGroup, KeyClassGroup)
+	SymbolClassItemList              = grammar.NewNonterminal(TypeClassItemList, KeyClassItemList)
+	SymbolClassItemArray             = grammar.NewNonterminal(TypeClassItemArray, KeyClassItemArray)
+	SymbolClassItem                  = grammar.NewNonterminal(TypeClassItem, KeyClassItem)
 	SymbolImportGroup                = grammar.NewNonterminal(TypeImportGroup, KeyImportGroup)
 	SymbolPublicGroup                = grammar.NewNonterminal(TypePublicGroup, KeyPublicGroup)
 	SymbolPrivateGroup               = grammar.NewNonterminal(TypePrivateGroup, KeyPrivateGroup)
+	SymbolProvideGroup               = grammar.NewNonterminal(TypeProvideGroup, KeyProvideGroup)
+	SymbolRequireGroup               = grammar.NewNonterminal(TypeRequireGroup, KeyRequireGroup)
 	SymbolIndex                      = grammar.NewNonterminal(TypeIndex, KeyIndex)
 	SymbolIndexList                  = grammar.NewNonterminal(TypeIndexList, KeyIndexList)
 	SymbolIndexArray                 = grammar.NewNonterminal(TypeIndexArray, KeyIndexArray)
@@ -174,6 +194,7 @@ var (
 	SymbolBool                       = grammar.NewNonterminal(TypeBool, KeyBool)
 	SymbolObject                     = grammar.NewNonterminal(TypeObject, KeyObject)
 	SymbolFunctionGroup              = grammar.NewNonterminal(TypeFunctionGroup, KeyFunctionGroup)
+	SymbolDefineFunctionGroup        = grammar.NewNonterminal(TypeDefineFunctionGroup, KeyDefineFunctionGroup)
 	SymbolVariable                   = grammar.NewNonterminal(TypeVariable, KeyVariable)
 	SymbolExpression                 = grammar.NewNonterminal(TypeExpression, KeyExpression)
 	SymbolExpressionIndependent      = grammar.NewNonterminal(TypeExpressionIndependent, KeyExpressionIndependent)
@@ -194,12 +215,21 @@ var (
 	PolymerizePageItemListEmpty               = grammar.NewRule(SymbolPageItemList)
 	PolymerizePageItemArrayStart              = grammar.NewRule(SymbolPageItemArray, SymbolPageItem)
 	PolymerizePageItemArray                   = grammar.NewRule(SymbolPageItemArray, SymbolPageItemArray, SymbolPageItem)
+	PolymerizeClassGroup                      = grammar.NewRule(SymbolClassGroup, SymbolClass, SymbolLeftBrace, SymbolClassItemList, SymbolRightBrace)
+	PolymerizeClassItemList                   = grammar.NewRule(SymbolClassItemList, SymbolClassItemArray)
+	PolymerizeClassItemListEmpty              = grammar.NewRule(SymbolClassItemList)
+	PolymerizeClassItemArrayStart             = grammar.NewRule(SymbolClassItemArray, SymbolClassItem)
+	PolymerizeClassItemArray                  = grammar.NewRule(SymbolClassItemArray, SymbolClassItemArray, SymbolClassItem)
 	PolymerizePageItemFromImportGroup         = grammar.NewRule(SymbolPageItem, SymbolImportGroup)
 	PolymerizePageItemFromPublicGroup         = grammar.NewRule(SymbolPageItem, SymbolPublicGroup)
 	PolymerizePageItemFromPrivateGroup        = grammar.NewRule(SymbolPageItem, SymbolPrivateGroup)
+	PolymerizeClassItemFromProvideGroup       = grammar.NewRule(SymbolClassItem, SymbolProvideGroup)
+	PolymerizeClassItemFromRequireGroup       = grammar.NewRule(SymbolClassItem, SymbolRequireGroup)
 	PolymerizeImportGroup                     = grammar.NewRule(SymbolImportGroup, SymbolImport, SymbolIdentifier, SymbolString)
 	PolymerizePublicGroup                     = grammar.NewRule(SymbolPublicGroup, SymbolPublic, SymbolIdentifier, SymbolEqual, SymbolIndex)
 	PolymerizePrivateGroup                    = grammar.NewRule(SymbolPrivateGroup, SymbolPrivate, SymbolIdentifier, SymbolEqual, SymbolIndex)
+	PolymerizeProvideGroup                    = grammar.NewRule(SymbolProvideGroup, SymbolProvide, SymbolIdentifier, SymbolEqual, SymbolIndex)
+	PolymerizeRequireGroup                    = grammar.NewRule(SymbolRequireGroup, SymbolRequire, SymbolIdentifier, SymbolEqual, SymbolDefineFunctionGroup)
 	PolymerizeExpressionFromIdentifier        = grammar.NewRule(SymbolExpression2, SymbolIdentifier)
 	PolymerizeExpressionFromVariable          = grammar.NewRule(SymbolExpression2, SymbolVariable)
 	PolymerizeIndexFromExpression             = grammar.NewRule(SymbolIndex, SymbolExpression1)
@@ -208,11 +238,13 @@ var (
 	PolymerizeVariableFromBool                = grammar.NewRule(SymbolVariable, SymbolBool)
 	PolymerizeVariableFromObject              = grammar.NewRule(SymbolVariable, SymbolObject)
 	PolymerizeVariableFromFunctionGroup       = grammar.NewRule(SymbolVariable, SymbolFunctionGroup)
+	PolymerizeVariableFromClassGroup          = grammar.NewRule(SymbolVariable, SymbolClassGroup)
 	PolymerizeBoolFromTrue                    = grammar.NewRule(SymbolBool, SymbolTrue)
 	PolymerizeBoolFromFalse                   = grammar.NewRule(SymbolBool, SymbolFalse)
 	PolymerizeVariableFromNull                = grammar.NewRule(SymbolVariable, SymbolNull)
 	PolymerizeObject                          = grammar.NewRule(SymbolObject, SymbolLeftBrace, SymbolKeyValueList, SymbolRightBrace)
 	PolymerizeFunctionGroup                   = grammar.NewRule(SymbolFunctionGroup, SymbolFunction, SymbolLeftParenthesis, SymbolKeyList, SymbolRightParenthesis, SymbolKeyList, SymbolLeftBrace, SymbolExpressionList, SymbolRightBrace)
+	PolymerizeDefineFunctionGroup             = grammar.NewRule(SymbolDefineFunctionGroup, SymbolFunction, SymbolLeftParenthesis, SymbolKeyList, SymbolRightParenthesis, SymbolKeyList)
 	PolymerizeIndexList                       = grammar.NewRule(SymbolIndexList, SymbolIndexArray)
 	PolymerizeIndexListEmpty                  = grammar.NewRule(SymbolIndexList)
 	PolymerizeIndexArrayStart                 = grammar.NewRule(SymbolIndexArray, SymbolIndex)
@@ -265,12 +297,21 @@ var (
 		PolymerizePageItemListEmpty,
 		PolymerizePageItemArrayStart,
 		PolymerizePageItemArray,
+		PolymerizeClassGroup,
+		PolymerizeClassItemList,
+		PolymerizeClassItemListEmpty,
+		PolymerizeClassItemArrayStart,
+		PolymerizeClassItemArray,
 		PolymerizePageItemFromImportGroup,
 		PolymerizePageItemFromPublicGroup,
 		PolymerizePageItemFromPrivateGroup,
+		PolymerizeClassItemFromProvideGroup,
+		PolymerizeClassItemFromRequireGroup,
 		PolymerizeImportGroup,
 		PolymerizePublicGroup,
 		PolymerizePrivateGroup,
+		PolymerizeProvideGroup,
+		PolymerizeRequireGroup,
 		PolymerizeExpressionFromIdentifier,
 		PolymerizeExpressionFromVariable,
 		PolymerizeIndexFromExpression,
@@ -279,11 +320,13 @@ var (
 		PolymerizeVariableFromBool,
 		PolymerizeVariableFromObject,
 		PolymerizeVariableFromFunctionGroup,
+		PolymerizeVariableFromClassGroup,
 		PolymerizeBoolFromTrue,
 		PolymerizeBoolFromFalse,
 		PolymerizeVariableFromNull,
 		PolymerizeObject,
 		PolymerizeFunctionGroup,
+		PolymerizeDefineFunctionGroup,
 		PolymerizeIndexList,
 		PolymerizeIndexListEmpty,
 		PolymerizeIndexArrayStart,

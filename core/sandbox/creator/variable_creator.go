@@ -20,6 +20,7 @@ type VariableCreator struct {
 	Array          *variable.ArrayCreator
 	Exception      *variable.ExceptionCreator
 	Page           *variable.PageCreator
+	DefineFunction *variable.DefineFunctionCreator
 }
 
 type VariableCreatorParam struct {
@@ -29,7 +30,17 @@ type VariableCreatorParam struct {
 
 func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 	instance := &VariableCreator{}
-
+	instance.DefineFunction = variable.NewDefineFunctionCreator(&variable.DefineFunctionCreatorParam{
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Exception.NewOriginal(name, message)
+		},
+		ParamCreator: func() concept.Param {
+			return instance.Param.New()
+		},
+		NullCreator: func() concept.Null {
+			return instance.Null.New()
+		},
+	})
 	instance.Exception = variable.NewExceptionCreator(&variable.ExceptionCreatorParam{
 		StringCreator: func(value string) concept.String {
 			return instance.String.New(value)

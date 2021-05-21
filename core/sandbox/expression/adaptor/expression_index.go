@@ -24,10 +24,6 @@ func (e *ExpressionIndex) Type() string {
 	return e.seed.Type()
 }
 
-func (e *ExpressionIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
-	return false
-}
-
 func (s *ExpressionIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
 	funcs, interrupt := s.Get(space)
 	if !nl_interface.IsNil(interrupt) {

@@ -31,10 +31,6 @@ func (f *LocalIndex) ToLanguage(language string) string {
 	return f.seed.ToLanguage(language, f)
 }
 
-func (s *LocalIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
-	return false
-}
-
 func (s *LocalIndex) ToString(prefix string) string {
 	return s.key.ToString(prefix)
 }

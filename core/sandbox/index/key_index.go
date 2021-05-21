@@ -34,10 +34,6 @@ func (f *KeyIndex) ToLanguage(language string) string {
 	return f.seed.ToLanguage(language, f)
 }
 
-func (s *KeyIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
-	return false
-}
-
 func (s *KeyIndex) ToString(prefix string) string {
 	return fmt.Sprintf("%v", s.key.ToString(""))
 }

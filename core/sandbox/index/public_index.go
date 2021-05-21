@@ -39,10 +39,6 @@ func (f *PublicIndex) ToLanguage(language string) string {
 	return f.seed.ToLanguage(language, f)
 }
 
-func (s *PublicIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
-	return false
-}
-
 func (s *PublicIndex) ToString(prefix string) string {
 	return fmt.Sprintf("public %v = %v", s.name, s.originator.ToString(prefix))
 }

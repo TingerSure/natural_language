@@ -19,7 +19,6 @@ type ClassSeed interface {
 
 type Class struct {
 	*adaptor.AdaptorVariable
-	name    string
 	provide *concept.Mapping
 	require *concept.Mapping
 	seed    ClassSeed
@@ -38,22 +37,18 @@ func (c *Class) ToString(prefix string) string {
 
 	items := []string{}
 	c.require.Iterate(func(key concept.String, value interface{}) bool {
-		items = append(items, fmt.Sprintf("%vrequire %v", subprefix, key.ToString(subprefix)))
+		items = append(items, fmt.Sprintf("%vrequire %v = %v", subprefix, key.ToString(subprefix), value.(concept.ToString).ToString(subprefix)))
 		return false
 	})
 	c.provide.Iterate(func(key concept.String, value interface{}) bool {
 		items = append(items, fmt.Sprintf("%vprovide %v = %v", subprefix, key.ToString(subprefix), value.(concept.ToString).ToString(subprefix)))
 		return false
 	})
-	return fmt.Sprintf("class %v {\n%v\n%v}", c.name, strings.Join(items, ",\n"), prefix)
+	return fmt.Sprintf("class {\n%v\n%v}", strings.Join(items, ",\n"), prefix)
 }
 
 func (c *Class) Type() string {
 	return c.seed.Type()
-}
-
-func (c *Class) GetName() string {
-	return c.name
 }
 
 func (c *Class) SetProvide(specimen concept.String, action concept.Function) {
@@ -74,21 +69,21 @@ func (c *Class) IterateProvide(on func(key concept.String, value concept.Functio
 	})
 }
 
-func (c *Class) SetRequire(specimen concept.String) {
-	c.require.Set(specimen, nil)
+func (c *Class) SetRequire(specimen concept.String, define concept.Function) {
+	c.require.Set(specimen, define)
 }
 
-func (c *Class) RemoveRequire(specimen concept.String) {
-	c.require.Remove(specimen)
+func (c *Class) GetRequire(specimen concept.String) concept.Function {
+	return c.require.Get(specimen).(concept.Function)
 }
 
 func (c *Class) HasRequire(specimen concept.String) bool {
 	return c.require.Has(specimen)
 }
 
-func (c *Class) IterateRequire(on func(key concept.String) bool) bool {
+func (c *Class) IterateRequire(on func(key concept.String, value concept.Function) bool) bool {
 	return c.require.Iterate(func(key concept.String, value interface{}) bool {
-		return on(key)
+		return on(key, value.(concept.Function))
 	})
 }
 
@@ -102,13 +97,12 @@ type ClassCreator struct {
 	param *ClassCreatorParam
 }
 
-func (s *ClassCreator) New(name string) *Class {
+func (s *ClassCreator) New() *Class {
 	return &Class{
 		AdaptorVariable: adaptor.NewAdaptorVariable(&adaptor.AdaptorVariableParam{
 			NullCreator:      s.param.NullCreator,
 			ExceptionCreator: s.param.ExceptionCreator,
 		}),
-		name: name,
 		provide: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: s.NewNull(),

@@ -44,10 +44,6 @@ func (f *ImportIndex) ToLanguage(language string) string {
 	return f.seed.ToLanguage(language, f)
 }
 
-func (s *ImportIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
-	return false
-}
-
 func (s *ImportIndex) ToString(prefix string) string {
 	return fmt.Sprintf("import %v \"%v\"", s.name, s.path)
 }

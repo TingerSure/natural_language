@@ -32,10 +32,6 @@ func (f *BubbleIndex) ToLanguage(language string) string {
 
 }
 
-func (s *BubbleIndex) SubCodeBlockIterate(func(concept.Index) bool) bool {
-	return false
-}
-
 func (s *BubbleIndex) ToString(prefix string) string {
 	return s.key.Value()
 }

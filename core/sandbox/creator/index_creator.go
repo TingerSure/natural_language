@@ -16,6 +16,8 @@ type IndexCreator struct {
 	ImportIndex   *index.ImportIndexCreator
 	PublicIndex   *index.PublicIndexCreator
 	PrivateIndex  *index.PrivateIndexCreator
+	ProvideIndex  *index.ProvideIndexCreator
+	RequireIndex  *index.RequireIndexCreator
 	KeyValueIndex *index.KeyValueIndexCreator
 	KeyIndex      *index.KeyIndexCreator
 }
@@ -36,6 +38,16 @@ func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
 	instance.KeyValueIndex = index.NewKeyValueIndexCreator(&index.KeyValueIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,
+	})
+	instance.RequireIndex = index.NewRequireIndexCreator(&index.RequireIndexCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
+		NullCreator:      param.NullCreator,
+	})
+	instance.ProvideIndex = index.NewProvideIndexCreator(&index.ProvideIndexCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
+		NullCreator:      param.NullCreator,
 	})
 	instance.PrivateIndex = index.NewPrivateIndexCreator(&index.PrivateIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,

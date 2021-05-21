@@ -86,6 +86,40 @@ var (
 			}
 			return append(items, item...), nil
 		}),
+		semantic.NewRule(PolymerizeClassGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolClassGroup -> SymbolClass SymbolLeftBrace SymbolClassItemList SymbolRightBrace
+			items, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			newClass := context.GetLibraryManager().Sandbox.Expression.NewClass.New()
+			newClass.SetLines(items)
+			return []concept.Index{newClass}, nil
+		}),
+		semantic.NewRule(PolymerizeClassItemList, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolClassItemList -> SymbolClassItemArray
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeClassItemListEmpty, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolClassItemList ->
+			return []concept.Index{}, nil
+		}),
+		semantic.NewRule(PolymerizeClassItemArrayStart, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolClassItemArray -> SymbolClassItem
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeClassItemArray, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolClassItemArray -> SymbolClassItemArray SymbolClassItem
+			items, err := context.Deal(phrase.GetChild(0))
+			if err != nil {
+				return nil, err
+			}
+			item, err := context.Deal(phrase.GetChild(1))
+			if err != nil {
+				return nil, err
+			}
+			return append(items, item...), nil
+		}),
 		semantic.NewRule(PolymerizePageItemFromImportGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolPageItem -> SymbolImportGroup
 			return context.Deal(phrase.GetChild(0))
@@ -96,6 +130,14 @@ var (
 		}),
 		semantic.NewRule(PolymerizePageItemFromPrivateGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolPageItem -> SymbolPrivateGroup
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeClassItemFromProvideGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolClassItem -> SymbolProvideGroup
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeClassItemFromRequireGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolClassItem -> SymbolRequireGroup
 			return context.Deal(phrase.GetChild(0))
 		}),
 		semantic.NewRule(PolymerizeImportGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
@@ -141,6 +183,30 @@ var (
 			}
 			return []concept.Index{
 				context.GetLibraryManager().Sandbox.Index.PrivateIndex.New(
+					phrase.GetChild(1).GetToken().Value(),
+					indexes[0],
+				),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeProvideGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolProvideGroup -> SymbolProvide SymbolIdentifier SymbolEqual SymbolFunction
+			name := phrase.GetChild(1).GetToken().Value()
+			indexes, err := context.Deal(phrase.GetChild(3))
+			if err != nil {
+				return nil, err
+			}
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.ProvideIndex.New(name, indexes[0]),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeRequireGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolRequireGroup -> SymbolRequire SymbolIdentifier SymbolEqual SymbolDefineFunctionGroup
+			indexes, err := context.Deal(phrase.GetChild(3))
+			if err != nil {
+				return nil, err
+			}
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.RequireIndex.New(
 					phrase.GetChild(1).GetToken().Value(),
 					indexes[0],
 				),
@@ -196,6 +262,10 @@ var (
 			//SymbolVariable -> SymbolFunctionGroup
 			return context.Deal(phrase.GetChild(0))
 		}),
+		semantic.NewRule(PolymerizeVariableFromClassGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolVariable -> SymbolClassGroup
+			return context.Deal(phrase.GetChild(0))
+		}),
 		semantic.NewRule(PolymerizeBoolFromTrue, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolBool -> SymbolTrue
 			return []concept.Index{
@@ -242,6 +312,21 @@ var (
 			newFunction.SetParams(params)
 			newFunction.SetReturns(returns)
 			newFunction.SetSteps(steps)
+			return []concept.Index{newFunction}, nil
+		}),
+		semantic.NewRule(PolymerizeDefineFunctionGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolDefineFunctionGroup -> SymbolFunction SymbolLeftParenthesis SymbolKeyList SymbolRightParenthesis SymbolKeyList
+			params, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			returns, err := context.Deal(phrase.GetChild(4))
+			if err != nil {
+				return nil, err
+			}
+			newFunction := context.GetLibraryManager().Sandbox.Expression.NewDefineFunction.New()
+			newFunction.SetParams(params)
+			newFunction.SetReturns(returns)
 			return []concept.Index{newFunction}, nil
 		}),
 		semantic.NewRule(PolymerizeIndexList, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {

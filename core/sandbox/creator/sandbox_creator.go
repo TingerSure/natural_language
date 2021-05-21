@@ -63,6 +63,12 @@ func NewSandboxCreator() *SandboxCreator {
 	})
 
 	instance.Expression = NewExpressionCreator(&ExpressionCreatorParam{
+		ClassCreator: func() concept.Class {
+			return instance.Variable.Class.New()
+		},
+		DefineFunctionCreator: func() *variable.DefineFunction {
+			return instance.Variable.DefineFunction.New()
+		},
 		FunctionCreator: func(parent concept.Closure) *variable.Function {
 			return instance.Variable.Function.New(parent)
 		},

@@ -11,44 +11,58 @@ import (
 )
 
 type ExpressionCreator struct {
-	ExpressionIndex *adaptor.ExpressionIndexCreator
-	Call            *expression.CallCreator
-	Assignment      *expression.AssignmentCreator
-	For             *expression.ForCreator
-	If              *expression.IfCreator
-	Define          *expression.DefineCreator
-	NewParam        *expression.NewParamCreator
-	Component       *expression.ComponentCreator
-	NewString       *expression.NewStringCreator
-	NewBool         *expression.NewBoolCreator
-	NewNumber       *expression.NewNumberCreator
-	NewObject       *expression.NewObjectCreator
-	NewNull         *expression.NewNullCreator
-	NewFunction     *expression.NewFunctionCreator
-	NewBreak        *expression.NewBreakCreator
-	NewContinue     *expression.NewContinueCreator
-	NewReturn       *expression.NewReturnCreator
+	ExpressionIndex   *adaptor.ExpressionIndexCreator
+	Call              *expression.CallCreator
+	Assignment        *expression.AssignmentCreator
+	For               *expression.ForCreator
+	If                *expression.IfCreator
+	Define            *expression.DefineCreator
+	NewParam          *expression.NewParamCreator
+	Component         *expression.ComponentCreator
+	NewString         *expression.NewStringCreator
+	NewBool           *expression.NewBoolCreator
+	NewNumber         *expression.NewNumberCreator
+	NewObject         *expression.NewObjectCreator
+	NewNull           *expression.NewNullCreator
+	NewFunction       *expression.NewFunctionCreator
+	NewBreak          *expression.NewBreakCreator
+	NewContinue       *expression.NewContinueCreator
+	NewReturn         *expression.NewReturnCreator
+	NewDefineFunction *expression.NewDefineFunctionCreator
+	NewClass          *expression.NewClassCreator
 }
 
 type ExpressionCreatorParam struct {
-	CodeBlockCreator  func() *code_block.CodeBlock
-	FunctionCreator   func(concept.Closure) *variable.Function
-	StringCreator     func(string) concept.String
-	BoolCreator       func(bool) concept.Bool
-	NumberCreator     func(float64) concept.Number
-	ExceptionCreator  func(string, string) concept.Exception
-	ReturnCreator     func() *interrupt.Return
-	ParamCreator      func() concept.Param
-	ConstIndexCreator func(concept.Variable) *index.ConstIndex
-	ClosureCreator    func(concept.Closure) concept.Closure
-	NullCreator       func() concept.Null
-	ObjectCreator     func() concept.Object
-	ContinueCreator   func(concept.String) *interrupt.Continue
-	BreakCreator      func(concept.String) *interrupt.Break
+	CodeBlockCreator      func() *code_block.CodeBlock
+	DefineFunctionCreator func() *variable.DefineFunction
+	FunctionCreator       func(concept.Closure) *variable.Function
+	StringCreator         func(string) concept.String
+	BoolCreator           func(bool) concept.Bool
+	NumberCreator         func(float64) concept.Number
+	ExceptionCreator      func(string, string) concept.Exception
+	ReturnCreator         func() *interrupt.Return
+	ParamCreator          func() concept.Param
+	ConstIndexCreator     func(concept.Variable) *index.ConstIndex
+	ClosureCreator        func(concept.Closure) concept.Closure
+	NullCreator           func() concept.Null
+	ObjectCreator         func() concept.Object
+	ContinueCreator       func(concept.String) *interrupt.Continue
+	BreakCreator          func(concept.String) *interrupt.Break
+	ClassCreator          func() concept.Class
 }
 
 func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance := &ExpressionCreator{}
+	instance.NewClass = expression.NewNewClassCreator(&expression.NewClassCreatorParam{
+		ClassCreator:           param.ClassCreator,
+		StringCreator:          param.StringCreator,
+		ExceptionCreator:       param.ExceptionCreator,
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+	})
+	instance.NewDefineFunction = expression.NewNewDefineFunctionCreator(&expression.NewDefineFunctionCreatorParam{
+		DefineFunctionCreator:  param.DefineFunctionCreator,
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+	})
 	instance.ExpressionIndex = adaptor.NewExpressionIndexCreator(&adaptor.ExpressionIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,
