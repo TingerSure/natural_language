@@ -63,6 +63,9 @@ func NewSandboxCreator() *SandboxCreator {
 	})
 
 	instance.Expression = NewExpressionCreator(&ExpressionCreatorParam{
+		MappingObjectCreator: func(object concept.Variable, class concept.Class) *variable.MappingObject {
+			return instance.Variable.MappingObject.New(object, class)
+		},
 		ClassCreator: func() concept.Class {
 			return instance.Variable.Class.New()
 		},

@@ -26,6 +26,17 @@ func (v *IndexFamily) IsKeyIndex(value concept.Index) (*KeyIndex, bool) {
 	return nil, false
 }
 
+func (v *IndexFamily) IsKeyKeyIndex(value concept.Index) (*KeyKeyIndex, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == IndexKeyKeyType {
+		index, yes := value.(*KeyKeyIndex)
+		return index, yes
+	}
+	return nil, false
+}
+
 func (v *IndexFamily) IsKeyValueIndex(value concept.Index) (*KeyValueIndex, bool) {
 	if value == nil {
 		return nil, false

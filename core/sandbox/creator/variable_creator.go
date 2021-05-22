@@ -142,6 +142,9 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		ExceptionCreator: func(name string, message string) concept.Exception {
 			return instance.Exception.NewOriginal(name, message)
 		},
+		NullCreator: func() concept.Null {
+			return instance.Null.New()
+		},
 	})
 
 	instance.Array = variable.NewArrayCreator(&variable.ArrayCreatorParam{

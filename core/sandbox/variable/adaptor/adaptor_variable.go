@@ -38,8 +38,8 @@ func (o *AdaptorVariable) IsNull() bool {
 }
 
 func (o *AdaptorVariable) CallAdaptor(specimen concept.String, param concept.Param, this concept.Variable) (concept.Param, concept.Exception) {
-	value, exception := o.GetField(specimen)
-	if nl_interface.IsNil(exception) {
+	value, exception := this.GetField(specimen)
+	if !nl_interface.IsNil(exception) {
 		return nil, exception
 	}
 	if !value.IsFunction() {
@@ -84,7 +84,7 @@ func (a *AdaptorVariable) ToString(prefix string) string {
 	paramsToString := make([]string, 0, a.fields.Size())
 	if a.fields != nil {
 		a.fields.Iterate(func(key concept.String, value interface{}) bool {
-			paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.ToString(subPrefix), value.(concept.ToString).ToString(subPrefix)))
+			paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.Value(), value.(concept.ToString).ToString(subPrefix)))
 			return false
 		})
 	}

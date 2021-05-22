@@ -37,14 +37,14 @@ func (c *Class) ToString(prefix string) string {
 
 	items := []string{}
 	c.require.Iterate(func(key concept.String, value interface{}) bool {
-		items = append(items, fmt.Sprintf("%vrequire %v = %v", subprefix, key.ToString(subprefix), value.(concept.ToString).ToString(subprefix)))
+		items = append(items, fmt.Sprintf("%vrequire %v = %v", subprefix, key.Value(), value.(concept.ToString).ToString(subprefix)))
 		return false
 	})
 	c.provide.Iterate(func(key concept.String, value interface{}) bool {
-		items = append(items, fmt.Sprintf("%vprovide %v = %v", subprefix, key.ToString(subprefix), value.(concept.ToString).ToString(subprefix)))
+		items = append(items, fmt.Sprintf("%vprovide %v = %v", subprefix, key.Value(), value.(concept.ToString).ToString(subprefix)))
 		return false
 	})
-	return fmt.Sprintf("class {\n%v\n%v}", strings.Join(items, ",\n"), prefix)
+	return fmt.Sprintf("class {\n%v\n%v}", strings.Join(items, "\n"), prefix)
 }
 
 func (c *Class) Type() string {

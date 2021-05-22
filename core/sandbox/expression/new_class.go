@@ -71,7 +71,7 @@ func (a *NewClass) Exec(space concept.Closure) (concept.Variable, concept.Interr
 		lineProvide, yes := index.IndexFamilyInstance.IsProvideIndex(linePre)
 		if yes {
 			funcsPre, suspend := lineProvide.Get(space)
-			if nl_interface.IsNil(suspend) {
+			if !nl_interface.IsNil(suspend) {
 				return nil, suspend
 			}
 			funcs, yes := variable.VariableFamilyInstance.IsFunctionHome(funcsPre)
@@ -84,7 +84,7 @@ func (a *NewClass) Exec(space concept.Closure) (concept.Variable, concept.Interr
 		lineRequire, yes := index.IndexFamilyInstance.IsRequireIndex(linePre)
 		if yes {
 			funcsPre, suspend := lineRequire.Get(space)
-			if nl_interface.IsNil(suspend) {
+			if !nl_interface.IsNil(suspend) {
 				return nil, suspend
 			}
 			funcs, yes := variable.VariableFamilyInstance.IsDefineFunction(funcsPre)

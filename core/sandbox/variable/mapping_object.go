@@ -3,6 +3,7 @@ package variable
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"strings"
 )
 
 const (
@@ -12,6 +13,7 @@ const (
 type MappingObjectSeed interface {
 	ToLanguage(string, *MappingObject) string
 	Type() string
+	NewNull() concept.Null
 	NewException(string, string) concept.Exception
 }
 
@@ -69,8 +71,26 @@ func (m *MappingObject) GetMapping() *concept.Mapping {
 	return m.mapping
 }
 
+func (m *MappingObject) SetMapping(from, to concept.String) {
+	m.mapping.Set(from, to)
+}
+
 func (a *MappingObject) ToString(prefix string) string {
-	return "TODO MappingObject.ToString()"
+	subprefix := fmt.Sprintf("%v\t", prefix)
+	if a.mapping.Size() == 0 {
+		return fmt.Sprintf("%v -> %v", a.object.ToString(prefix), a.class.ToString(prefix))
+	}
+	keykey := []string{}
+	a.mapping.Iterate(func(key concept.String, value interface{}) bool {
+		keykey = append(keykey, fmt.Sprintf("%v%v : %v", subprefix, key.Value(), value.(concept.String).Value()))
+		return false
+	})
+	return fmt.Sprintf("%v -> %v {\n%v\n%v}",
+		a.object.ToString(prefix),
+		a.class.ToString(prefix),
+		strings.Join(keykey, ",\n"),
+		prefix,
+	)
 }
 
 func (m *MappingObject) Type() string {
@@ -98,6 +118,7 @@ func (m *MappingObject) HasField(specimen concept.String) bool {
 }
 
 type MappingObjectCreatorParam struct {
+	NullCreator      func() concept.Null
 	ExceptionCreator func(string, string) concept.Exception
 }
 
@@ -122,12 +143,19 @@ func (s *MappingObjectCreator) NewException(name string, message string) concept
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *MappingObjectCreator) New(object concept.Variable, classInstance concept.Class, mapping *concept.Mapping) *MappingObject {
+func (s *MappingObjectCreator) NewNull() concept.Null {
+	return s.param.NullCreator()
+}
+
+func (s *MappingObjectCreator) New(object concept.Variable, classInstance concept.Class) *MappingObject {
 	return &MappingObject{
-		mapping: mapping,
-		class:   classInstance,
-		object:  object,
-		seed:    s,
+		mapping: concept.NewMapping(&concept.MappingParam{
+			AutoInit:   true,
+			EmptyValue: s.param.NullCreator(),
+		}),
+		class:  classInstance,
+		object: object,
+		seed:   s,
 	}
 }
 

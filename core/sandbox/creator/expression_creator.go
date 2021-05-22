@@ -30,6 +30,7 @@ type ExpressionCreator struct {
 	NewReturn         *expression.NewReturnCreator
 	NewDefineFunction *expression.NewDefineFunctionCreator
 	NewClass          *expression.NewClassCreator
+	NewMappingObject  *expression.NewMappingObjectCreator
 }
 
 type ExpressionCreatorParam struct {
@@ -46,6 +47,7 @@ type ExpressionCreatorParam struct {
 	ClosureCreator        func(concept.Closure) concept.Closure
 	NullCreator           func() concept.Null
 	ObjectCreator         func() concept.Object
+	MappingObjectCreator  func(concept.Variable, concept.Class) *variable.MappingObject
 	ContinueCreator       func(concept.String) *interrupt.Continue
 	BreakCreator          func(concept.String) *interrupt.Break
 	ClassCreator          func() concept.Class
@@ -53,6 +55,15 @@ type ExpressionCreatorParam struct {
 
 func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance := &ExpressionCreator{}
+	instance.ExpressionIndex = adaptor.NewExpressionIndexCreator(&adaptor.ExpressionIndexCreatorParam{
+		ExceptionCreator: param.ExceptionCreator,
+		ParamCreator:     param.ParamCreator,
+	})
+	instance.NewMappingObject = expression.NewNewMappingObjectCreator(&expression.NewMappingObjectCreatorParam{
+		MappingObjectCreator:   param.MappingObjectCreator,
+		ExceptionCreator:       param.ExceptionCreator,
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+	})
 	instance.NewClass = expression.NewNewClassCreator(&expression.NewClassCreatorParam{
 		ClassCreator:           param.ClassCreator,
 		StringCreator:          param.StringCreator,
@@ -62,10 +73,6 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance.NewDefineFunction = expression.NewNewDefineFunctionCreator(&expression.NewDefineFunctionCreatorParam{
 		DefineFunctionCreator:  param.DefineFunctionCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
-	})
-	instance.ExpressionIndex = adaptor.NewExpressionIndexCreator(&adaptor.ExpressionIndexCreatorParam{
-		ExceptionCreator: param.ExceptionCreator,
-		ParamCreator:     param.ParamCreator,
 	})
 	instance.NewReturn = expression.NewNewReturnCreator(&expression.NewReturnCreatorParam{
 		ReturnCreator:          param.ReturnCreator,

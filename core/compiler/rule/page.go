@@ -392,6 +392,63 @@ var (
 			}
 			return append(items, item...), nil
 		}),
+		semantic.NewRule(PolymerizeKeyKey, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolKeyKey -> SymbolIdentifier SymbolColon SymbolIdentifier
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Index.KeyKeyIndex.New(
+					context.GetLibraryManager().Sandbox.Variable.String.New(
+						phrase.GetChild(0).GetToken().Value(),
+					),
+					context.GetLibraryManager().Sandbox.Variable.String.New(
+						phrase.GetChild(2).GetToken().Value(),
+					),
+				),
+			}, nil
+		}),
+		semantic.NewRule(PolymerizeKeyKeyList, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolKeyKeyList -> SymbolKeyKeyArray
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeKeyKeyListEmpty, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			// SymbolKeyKeyList ->
+			return []concept.Index{}, nil
+		}),
+		semantic.NewRule(PolymerizeKeyKeyArrayStart, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolKeyKeyArray -> SymbolKeyKey
+			return context.Deal(phrase.GetChild(0))
+		}),
+		semantic.NewRule(PolymerizeKeyKeyArray, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolKeyKeyArray -> SymbolKeyKeyArray SymbolComma SymbolKeyKey
+			items, err := context.Deal(phrase.GetChild(0))
+			if err != nil {
+				return nil, err
+			}
+			item, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			return append(items, item...), nil
+		}),
+		semantic.NewRule(PolymerizeMappingObject, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolObject -> SymbolIndex SymbolRightArrow SymbolIndex SymbolLeftBrace SymbolKeyKeyList SymbolRightBrace
+			object, err := context.Deal(phrase.GetChild(0))
+			if err != nil {
+				return nil, err
+			}
+			class, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			mapping, err := context.Deal(phrase.GetChild(4))
+			if err != nil {
+				return nil, err
+			}
+			newMappingObject := context.GetLibraryManager().Sandbox.Expression.NewMappingObject.New()
+			newMappingObject.SetObject(object[0])
+			newMappingObject.SetClass(class[0])
+			newMappingObject.SetMapping(mapping)
+			return []concept.Index{newMappingObject}, nil
+		}),
 		semantic.NewRule(PolymerizeCallWithIndexArray, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolExpression1 -> SymbolExpression1 SymbolLeftParenthesis SymbolIndexArray SymbolRightParenthesis
 			funcs, err := context.Deal(phrase.GetChild(0))

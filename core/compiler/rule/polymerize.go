@@ -112,6 +112,9 @@ const (
 	TypeKeyValue
 	TypeKeyValueList
 	TypeKeyValueArray
+	TypeKeyKey
+	TypeKeyKeyList
+	TypeKeyKeyArray
 	TypeBool
 	TypeObject
 	TypeFunctionGroup
@@ -153,6 +156,9 @@ const (
 	KeyKeyValue                   = "key_value"
 	KeyKeyValueList               = "key_value_list"
 	KeyKeyValueArray              = "key_value_array"
+	KeyKeyKey                     = "key_key"
+	KeyKeyKeyList                 = "key_key_list"
+	KeyKeyKeyArray                = "key_key_array"
 	KeyBool                       = "bool"
 	KeyObject                     = "object"
 	KeyFunctionGroup              = "function_group"
@@ -191,6 +197,9 @@ var (
 	SymbolKeyValue                   = grammar.NewNonterminal(TypeKeyValue, KeyKeyValue)
 	SymbolKeyValueList               = grammar.NewNonterminal(TypeKeyValueList, KeyKeyValueList)
 	SymbolKeyValueArray              = grammar.NewNonterminal(TypeKeyValueArray, KeyKeyValueArray)
+	SymbolKeyKey                     = grammar.NewNonterminal(TypeKeyKey, KeyKeyKey)
+	SymbolKeyKeyList                 = grammar.NewNonterminal(TypeKeyKeyList, KeyKeyKeyList)
+	SymbolKeyKeyArray                = grammar.NewNonterminal(TypeKeyKeyArray, KeyKeyKeyArray)
 	SymbolBool                       = grammar.NewNonterminal(TypeBool, KeyBool)
 	SymbolObject                     = grammar.NewNonterminal(TypeObject, KeyObject)
 	SymbolFunctionGroup              = grammar.NewNonterminal(TypeFunctionGroup, KeyFunctionGroup)
@@ -254,6 +263,12 @@ var (
 	PolymerizeKeyValueListEmpty               = grammar.NewRule(SymbolKeyValueList)
 	PolymerizeKeyValueArrayStart              = grammar.NewRule(SymbolKeyValueArray, SymbolKeyValue)
 	PolymerizeKeyValueArray                   = grammar.NewRule(SymbolKeyValueArray, SymbolKeyValueArray, SymbolComma, SymbolKeyValue)
+	PolymerizeKeyKey                          = grammar.NewRule(SymbolKeyKey, SymbolIdentifier, SymbolColon, SymbolIdentifier)
+	PolymerizeKeyKeyList                      = grammar.NewRule(SymbolKeyKeyList, SymbolKeyKeyArray)
+	PolymerizeKeyKeyListEmpty                 = grammar.NewRule(SymbolKeyKeyList)
+	PolymerizeKeyKeyArrayStart                = grammar.NewRule(SymbolKeyKeyArray, SymbolKeyKey)
+	PolymerizeKeyKeyArray                     = grammar.NewRule(SymbolKeyKeyArray, SymbolKeyKeyArray, SymbolComma, SymbolKeyKey)
+	PolymerizeMappingObject                   = grammar.NewRule(SymbolObject, SymbolIndex, SymbolRightArrow, SymbolIndex, SymbolLeftBrace, SymbolKeyKeyList, SymbolRightBrace)
 	PolymerizeCallWithIndexArray              = grammar.NewRule(SymbolExpression1, SymbolExpression1, SymbolLeftParenthesis, SymbolIndexArray, SymbolRightParenthesis)
 	PolymerizeCallWithKeyValueList            = grammar.NewRule(SymbolExpression1, SymbolExpression1, SymbolLeftParenthesis, SymbolKeyValueList, SymbolRightParenthesis)
 	PolymerizeAssignment                      = grammar.NewRule(SymbolExpressionIndependent, SymbolExpression1, SymbolEqual, SymbolExpression1)
@@ -336,6 +351,12 @@ var (
 		PolymerizeKeyValueListEmpty,
 		PolymerizeKeyValueArrayStart,
 		PolymerizeKeyValueArray,
+		PolymerizeKeyKey,
+		PolymerizeKeyKeyList,
+		PolymerizeKeyKeyListEmpty,
+		PolymerizeKeyKeyArrayStart,
+		PolymerizeKeyKeyArray,
+		PolymerizeMappingObject,
 		PolymerizeCallWithIndexArray,
 		PolymerizeCallWithKeyValueList,
 		PolymerizeAssignment,
