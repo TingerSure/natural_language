@@ -42,6 +42,9 @@ func (f *NewMappingObject) ToLanguage(language string) string {
 
 func (a *NewMappingObject) ToString(prefix string) string {
 	subPrefix := fmt.Sprintf("%v\t", prefix)
+	if len(a.mapping) == 0 {
+		return fmt.Sprintf("%v -> %v", a.object.ToString(prefix), a.class.ToString(prefix))
+	}
 	mapping := []string{}
 	for _, keykey := range a.mapping {
 		mapping = append(mapping, fmt.Sprintf("%v%v", subPrefix, keykey.ToString(subPrefix)))

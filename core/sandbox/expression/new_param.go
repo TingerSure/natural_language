@@ -51,7 +51,7 @@ func (a *NewParam) ToString(prefix string) string {
 		}
 		paramsToString := make([]string, 0, len(a.list))
 		for _, value := range a.list {
-			paramsToString = append(paramsToString, value.ToString(subPrefix))
+			paramsToString = append(paramsToString, value.ToString(prefix))
 		}
 		return strings.Join(paramsToString, ", ")
 	}
