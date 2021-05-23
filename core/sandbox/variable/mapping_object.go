@@ -43,12 +43,11 @@ func (o *MappingObject) Call(specimen concept.String, param concept.Param) (conc
 }
 
 func (o *MappingObject) callRequire(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
-	mappingSpecimenInterface := o.mapping.Get(specimen)
-	mappingSpecimen, yes := VariableFamilyInstance.IsString(mappingSpecimenInterface.(concept.Variable))
-	if !yes {
-		return nil, o.seed.NewException("runtime error", fmt.Sprintf("There is no require function called \"%v\" in mapping.", specimen.ToString("")))
+	mappingSpecimen := o.mapping.Get(specimen).(concept.Variable)
+	if mappingSpecimen.IsNull() {
+		return o.object.Call(specimen, param)
 	}
-	return o.object.Call(mappingSpecimen, param)
+	return o.object.Call(mappingSpecimen.(concept.String), param)
 }
 
 func (o *MappingObject) callProvide(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
