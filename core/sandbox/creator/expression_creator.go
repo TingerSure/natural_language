@@ -31,6 +31,7 @@ type ExpressionCreator struct {
 	NewDefineFunction *expression.NewDefineFunctionCreator
 	NewClass          *expression.NewClassCreator
 	NewMappingObject  *expression.NewMappingObjectCreator
+	Parenthesis       *expression.ParenthesisCreator
 }
 
 type ExpressionCreatorParam struct {
@@ -58,6 +59,9 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance.ExpressionIndex = adaptor.NewExpressionIndexCreator(&adaptor.ExpressionIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,
+	})
+	instance.Parenthesis = expression.NewParenthesisCreator(&expression.ParenthesisCreatorParam{
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
 	})
 	instance.NewMappingObject = expression.NewNewMappingObjectCreator(&expression.NewMappingObjectCreatorParam{
 		MappingObjectCreator:   param.MappingObjectCreator,
