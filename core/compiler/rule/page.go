@@ -545,7 +545,23 @@ var (
 				),
 			}, nil
 		}),
-
+		semantic.NewRule(PolymerizeIndexComponent, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionFloor -> SymbolExpressionFloor SymbolLeftBracket SymbolExpressionCeil SymbolRightBracket
+			indexes, err := context.Deal(phrase.GetChild(0))
+			if err != nil {
+				return nil, err
+			}
+			field, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.IndexComponent.New(
+					indexes[0],
+					field[0],
+				),
+			}, nil
+		}),
 		semantic.NewRule(PolymerizeDefine, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolExpressionIndependent -> SymbolVar SymbolIdentifier
 			return []concept.Index{
