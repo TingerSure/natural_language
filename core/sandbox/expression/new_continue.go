@@ -24,7 +24,7 @@ func (f *NewContinue) ToLanguage(language string) string {
 }
 
 func (a *NewContinue) ToString(prefix string) string {
-	return fmt.Sprintf("continue %v", a.tag.ToString(prefix))
+	return fmt.Sprintf("continue %v", a.tag.Value())
 }
 
 func (a *NewContinue) Anticipate(space concept.Closure) concept.Variable {

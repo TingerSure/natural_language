@@ -24,7 +24,7 @@ func (f *NewBreak) ToLanguage(language string) string {
 }
 
 func (a *NewBreak) ToString(prefix string) string {
-	return fmt.Sprintf("break %v", a.tag.ToString(prefix))
+	return fmt.Sprintf("break %v", a.tag.Value())
 }
 
 func (a *NewBreak) Anticipate(space concept.Closure) concept.Variable {

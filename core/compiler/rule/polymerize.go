@@ -283,7 +283,9 @@ var (
 	PolymerizeIf                              = grammar.NewRule(SymbolExpressionIndependent, SymbolIf, SymbolLeftParenthesis, SymbolExpressionCeil, SymbolRightParenthesis, SymbolLeftBrace, SymbolExpressionList, SymbolRightBrace)
 	PolymerizeIfElse                          = grammar.NewRule(SymbolExpressionIndependent, SymbolIf, SymbolLeftParenthesis, SymbolExpressionCeil, SymbolRightParenthesis, SymbolLeftBrace, SymbolExpressionList, SymbolRightBrace, SymbolElse, SymbolLeftBrace, SymbolExpressionList, SymbolRightBrace)
 	PolymerizeFor                             = grammar.NewRule(SymbolExpressionIndependent, SymbolFor, SymbolLeftParenthesis, SymbolExpressionIndependentList, SymbolSemicolon, SymbolExpressionCeil, SymbolSemicolon, SymbolExpressionIndependentList, SymbolRightParenthesis, SymbolLeftBrace, SymbolExpressionList, SymbolRightBrace)
+	PolymerizeForTag                          = grammar.NewRule(SymbolExpressionIndependent, SymbolIdentifier, SymbolColon, SymbolFor, SymbolLeftParenthesis, SymbolExpressionIndependentList, SymbolSemicolon, SymbolExpressionCeil, SymbolSemicolon, SymbolExpressionIndependentList, SymbolRightParenthesis, SymbolLeftBrace, SymbolExpressionList, SymbolRightBrace)
 	PolymerizeWhile                           = grammar.NewRule(SymbolExpressionIndependent, SymbolFor, SymbolLeftParenthesis, SymbolExpressionCeil, SymbolRightParenthesis, SymbolLeftBrace, SymbolExpressionList, SymbolRightBrace)
+	PolymerizeWhileTag                        = grammar.NewRule(SymbolExpressionIndependent, SymbolIdentifier, SymbolColon, SymbolFor, SymbolLeftParenthesis, SymbolExpressionCeil, SymbolRightParenthesis, SymbolLeftBrace, SymbolExpressionList, SymbolRightBrace)
 	PolymerizeExpression1FromFloor            = grammar.NewRule(SymbolExpression1, SymbolExpressionFloor)
 	PolymerizeExpressionCeilFrom1             = grammar.NewRule(SymbolExpressionCeil, SymbolExpression1)
 	PolymerizeExpressionIndependentFromCeil   = grammar.NewRule(SymbolExpressionIndependent, SymbolExpressionCeil)
@@ -373,7 +375,9 @@ var (
 		PolymerizeIf,
 		PolymerizeIfElse,
 		PolymerizeFor,
+		PolymerizeForTag,
 		PolymerizeWhile,
+		PolymerizeWhileTag,
 		PolymerizeExpression1FromFloor,
 		PolymerizeExpressionCeilFrom1,
 		PolymerizeExpressionIndependentFromCeil,

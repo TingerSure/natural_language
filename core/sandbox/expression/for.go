@@ -34,7 +34,18 @@ func (f *For) ToLanguage(language string) string {
 }
 
 func (f *For) ToString(prefix string) string {
-	return fmt.Sprintf("for (%v; %v; %v) %v", f.init.ToStringSimplify(prefix), f.condition.ToString(prefix), f.end.ToStringSimplify(prefix), f.body.ToString(prefix))
+	back := ""
+	if f.condition != f.seed.GetDefaultCondition() {
+		back = f.condition.ToString(prefix)
+	}
+	if f.init.Size() != 0 || f.end.Size() != 0 {
+		back = fmt.Sprintf("%v; %v; %v", f.init.ToStringSimplify(prefix), back, f.end.ToStringSimplify(prefix))
+	}
+	back = fmt.Sprintf("for (%v)", back)
+	if f.tag != f.seed.GetDefaultTag() {
+		back = fmt.Sprintf("%v : %v", f.tag.Value(), back)
+	}
+	return fmt.Sprintf("%v %v", back, f.body.ToString(prefix))
 }
 
 func (e *For) Anticipate(space concept.Closure) concept.Variable {

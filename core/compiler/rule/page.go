@@ -629,6 +629,34 @@ var (
 			efor.Body().AddStep(bodySteps...)
 			return []concept.Index{efor}, nil
 		}),
+		semantic.NewRule(PolymerizeForTag, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependent -> SymbolIdentifier SymbolColon SymbolFor SymbolLeftParenthesis SymbolExpressionIndependentList SymbolSemicolon SymbolExpressionCeil SymbolSemicolon SymbolExpressionIndependentList SymbolRightParenthesis SymbolLeftBrace SymbolExpressionList SymbolRightBrace
+			initSteps, err := context.Deal(phrase.GetChild(4))
+			if err != nil {
+				return nil, err
+			}
+			condition, err := context.Deal(phrase.GetChild(6))
+			if err != nil {
+				return nil, err
+			}
+			endSteps, err := context.Deal(phrase.GetChild(8))
+			if err != nil {
+				return nil, err
+			}
+			bodySteps, err := context.Deal(phrase.GetChild(11))
+			if err != nil {
+				return nil, err
+			}
+			efor := context.GetLibraryManager().Sandbox.Expression.For.New()
+			efor.SetTag(context.GetLibraryManager().Sandbox.Variable.String.New(
+				phrase.GetChild(0).GetToken().Value(),
+			))
+			efor.SetCondition(condition[0])
+			efor.Init().AddStep(initSteps...)
+			efor.End().AddStep(endSteps...)
+			efor.Body().AddStep(bodySteps...)
+			return []concept.Index{efor}, nil
+		}),
 		semantic.NewRule(PolymerizeWhile, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolExpressionIndependent -> SymbolFor SymbolLeftParenthesis SymbolExpressionCeil SymbolRightParenthesis SymbolLeftBrace SymbolExpressionList SymbolRightBrace
 			condition, err := context.Deal(phrase.GetChild(2))
@@ -640,6 +668,24 @@ var (
 				return nil, err
 			}
 			efor := context.GetLibraryManager().Sandbox.Expression.For.New()
+			efor.SetCondition(condition[0])
+			efor.Body().AddStep(bodySteps...)
+			return []concept.Index{efor}, nil
+		}),
+		semantic.NewRule(PolymerizeWhileTag, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionIndependent -> SymbolIdentifier SymbolColon SymbolFor SymbolLeftParenthesis SymbolExpressionCeil SymbolRightParenthesis SymbolLeftBrace SymbolExpressionList SymbolRightBrace
+			condition, err := context.Deal(phrase.GetChild(4))
+			if err != nil {
+				return nil, err
+			}
+			bodySteps, err := context.Deal(phrase.GetChild(7))
+			if err != nil {
+				return nil, err
+			}
+			efor := context.GetLibraryManager().Sandbox.Expression.For.New()
+			efor.SetTag(context.GetLibraryManager().Sandbox.Variable.String.New(
+				phrase.GetChild(0).GetToken().Value(),
+			))
 			efor.SetCondition(condition[0])
 			efor.Body().AddStep(bodySteps...)
 			return []concept.Index{efor}, nil
