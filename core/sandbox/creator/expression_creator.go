@@ -32,6 +32,7 @@ type ExpressionCreator struct {
 	NewClass          *expression.NewClassCreator
 	NewMappingObject  *expression.NewMappingObjectCreator
 	Parenthesis       *expression.ParenthesisCreator
+	NewArray          *expression.NewArrayCreator
 }
 
 type ExpressionCreatorParam struct {
@@ -52,6 +53,7 @@ type ExpressionCreatorParam struct {
 	ContinueCreator       func(concept.String) *interrupt.Continue
 	BreakCreator          func(concept.String) *interrupt.Break
 	ClassCreator          func() concept.Class
+	ArrayCreator          func() *variable.Array
 }
 
 func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
@@ -59,6 +61,10 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance.ExpressionIndex = adaptor.NewExpressionIndexCreator(&adaptor.ExpressionIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,
+	})
+	instance.NewArray = expression.NewNewArrayCreator(&expression.NewArrayCreatorParam{
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+		ArrayCreator:           param.ArrayCreator,
 	})
 	instance.Parenthesis = expression.NewParenthesisCreator(&expression.ParenthesisCreatorParam{
 		ExpressionIndexCreator: instance.ExpressionIndex.New,

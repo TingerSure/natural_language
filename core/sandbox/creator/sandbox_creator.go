@@ -114,6 +114,9 @@ func NewSandboxCreator() *SandboxCreator {
 		BreakCreator: func(tag concept.String) *interrupt.Break {
 			return instance.Interrupt.Break.New(tag)
 		},
+		ArrayCreator: func() *variable.Array {
+			return instance.Variable.Array.New()
+		},
 	})
 	return instance
 }

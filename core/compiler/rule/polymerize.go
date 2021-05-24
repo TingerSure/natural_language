@@ -135,6 +135,7 @@ const (
 	TypeKey
 	TypeKeyList
 	TypeKeyArray
+	TypeArray
 )
 
 const (
@@ -177,6 +178,7 @@ const (
 	KeyKey                        = "param"
 	KeyKeyList                    = "param_list"
 	KeyKeyArray                   = "param_array"
+	KeyArray                      = "array"
 )
 
 var (
@@ -219,6 +221,7 @@ var (
 	SymbolKey                        = grammar.NewNonterminal(TypeKey, KeyKey)
 	SymbolKeyList                    = grammar.NewNonterminal(TypeKeyList, KeyKeyList)
 	SymbolKeyArray                   = grammar.NewNonterminal(TypeKeyArray, KeyKeyArray)
+	SymbolArray                      = grammar.NewNonterminal(TypeArray, KeyArray)
 )
 
 var (
@@ -248,12 +251,14 @@ var (
 	PolymerizeVariableFromNumber              = grammar.NewRule(SymbolVariable, SymbolNumber)
 	PolymerizeVariableFromString              = grammar.NewRule(SymbolVariable, SymbolString)
 	PolymerizeVariableFromBool                = grammar.NewRule(SymbolVariable, SymbolBool)
+	PolymerizeVariableFromArray               = grammar.NewRule(SymbolVariable, SymbolArray)
 	PolymerizeVariableFromObject              = grammar.NewRule(SymbolVariable, SymbolObject)
 	PolymerizeVariableFromFunctionGroup       = grammar.NewRule(SymbolVariable, SymbolFunctionGroup)
 	PolymerizeVariableFromClassGroup          = grammar.NewRule(SymbolVariable, SymbolClassGroup)
 	PolymerizeBoolFromTrue                    = grammar.NewRule(SymbolBool, SymbolTrue)
 	PolymerizeBoolFromFalse                   = grammar.NewRule(SymbolBool, SymbolFalse)
 	PolymerizeVariableFromNull                = grammar.NewRule(SymbolVariable, SymbolNull)
+	PolymerizeArray                           = grammar.NewRule(SymbolArray, SymbolLeftBracket, SymbolIndexList, SymbolRightBracket)
 	PolymerizeObject                          = grammar.NewRule(SymbolObject, SymbolLeftBrace, SymbolKeyValueList, SymbolRightBrace)
 	PolymerizeFunctionGroup                   = grammar.NewRule(SymbolFunctionGroup, SymbolFunction, SymbolLeftParenthesis, SymbolKeyList, SymbolRightParenthesis, SymbolKeyList, SymbolLeftBrace, SymbolExpressionList, SymbolRightBrace)
 	PolymerizeDefineFunctionGroup             = grammar.NewRule(SymbolDefineFunctionGroup, SymbolFunction, SymbolLeftParenthesis, SymbolKeyList, SymbolRightParenthesis, SymbolKeyList)
@@ -340,12 +345,14 @@ var (
 		PolymerizeVariableFromNumber,
 		PolymerizeVariableFromString,
 		PolymerizeVariableFromBool,
+		PolymerizeVariableFromArray,
 		PolymerizeVariableFromObject,
 		PolymerizeVariableFromFunctionGroup,
 		PolymerizeVariableFromClassGroup,
 		PolymerizeBoolFromTrue,
 		PolymerizeBoolFromFalse,
 		PolymerizeVariableFromNull,
+		PolymerizeArray,
 		PolymerizeObject,
 		PolymerizeFunctionGroup,
 		PolymerizeDefineFunctionGroup,
