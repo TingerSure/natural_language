@@ -79,8 +79,17 @@ func (a *Array) Length() int {
 }
 
 type ArrayCreatorParam struct {
-	NullCreator      func() concept.Null
-	ExceptionCreator func(string, string) concept.Exception
+	NullCreator           func() concept.Null
+	ExceptionCreator      func(string, string) concept.Exception
+	ParamCreator          func() concept.Param
+	StringCreator         func(string) concept.String
+	NumberCreator         func(float64) concept.Number
+	SystemFunctionCreator func(
+		funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
+		anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
+		paramNames []concept.String,
+		returnNames []concept.String,
+	) concept.Function
 }
 
 type ArrayCreator struct {
@@ -89,7 +98,7 @@ type ArrayCreator struct {
 }
 
 func (s *ArrayCreator) New() *Array {
-	return &Array{
+	array := &Array{
 		AdaptorVariable: adaptor.NewAdaptorVariable(&adaptor.AdaptorVariableParam{
 			NullCreator:      s.param.NullCreator,
 			ExceptionCreator: s.param.ExceptionCreator,
@@ -97,6 +106,25 @@ func (s *ArrayCreator) New() *Array {
 		values: make([]concept.Variable, 0),
 		seed:   s,
 	}
+	backSize := s.param.StringCreator("size")
+	fieldSize := s.param.StringCreator("size")
+	array.SetField(fieldSize, s.param.SystemFunctionCreator(
+		func(param concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
+			back := s.param.ParamCreator()
+			back.Set(backSize, s.param.NumberCreator(float64(array.Length())))
+			return back, nil
+		},
+		func(param concept.Param, _ concept.Variable) concept.Param {
+			back := s.param.ParamCreator()
+			back.Set(backSize, s.param.NumberCreator(float64(array.Length())))
+			return back
+		},
+		[]concept.String{},
+		[]concept.String{
+			backSize,
+		},
+	))
+	return array
 }
 
 func (s *ArrayCreator) ToLanguage(language string, instance *Array) string {

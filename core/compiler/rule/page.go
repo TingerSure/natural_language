@@ -530,6 +530,20 @@ var (
 				context.GetLibraryManager().Sandbox.Expression.Assignment.New(froms[0], toes[0]),
 			}, nil
 		}),
+		semantic.NewRule(PolymerizeAppend, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
+			//SymbolExpressionCeil -> SymbolExpressionCeil SymbolLeftArrow SymbolExpression1
+			array, err := context.Deal(phrase.GetChild(0))
+			if err != nil {
+				return nil, err
+			}
+			item, err := context.Deal(phrase.GetChild(2))
+			if err != nil {
+				return nil, err
+			}
+			return []concept.Index{
+				context.GetLibraryManager().Sandbox.Expression.Append.New(array[0], item[0]),
+			}, nil
+		}),
 		semantic.NewRule(PolymerizeComponent, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Index, error) {
 			//SymbolExpressionFloor -> SymbolExpressionFloor SymbolDot SymbolIdentifier
 			indexes, err := context.Deal(phrase.GetChild(0))

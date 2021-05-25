@@ -281,6 +281,7 @@ var (
 	PolymerizeCallWithIndexArray              = grammar.NewRule(SymbolExpressionFloor, SymbolExpression1, SymbolLeftParenthesis, SymbolIndexArray, SymbolRightParenthesis)
 	PolymerizeCallWithKeyValueList            = grammar.NewRule(SymbolExpressionFloor, SymbolExpression1, SymbolLeftParenthesis, SymbolKeyValueList, SymbolRightParenthesis)
 	PolymerizeAssignment                      = grammar.NewRule(SymbolExpressionIndependent, SymbolExpressionCeil, SymbolEqual, SymbolExpressionCeil)
+	PolymerizeAppend                          = grammar.NewRule(SymbolExpressionCeil, SymbolExpressionCeil, SymbolLeftArrow, SymbolExpression1)
 	PolymerizeComponent                       = grammar.NewRule(SymbolExpressionFloor, SymbolExpressionFloor, SymbolDot, SymbolIdentifier)
 	PolymerizeIndexComponent                  = grammar.NewRule(SymbolExpressionFloor, SymbolExpressionFloor, SymbolLeftBracket, SymbolExpressionCeil, SymbolRightBracket)
 	PolymerizeDefine                          = grammar.NewRule(SymbolExpressionIndependent, SymbolVar, SymbolIdentifier)
@@ -376,6 +377,7 @@ var (
 		PolymerizeCallWithIndexArray,
 		PolymerizeCallWithKeyValueList,
 		PolymerizeAssignment,
+		PolymerizeAppend,
 		PolymerizeComponent,
 		PolymerizeIndexComponent,
 		PolymerizeDefine,

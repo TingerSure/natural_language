@@ -23,14 +23,14 @@ type Std struct {
 	ErrorContent concept.String
 }
 
-func (s *Std) Print(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+func (s *Std) Print(input concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 	if s.param != nil || !nl_interface.IsNil(input) {
 		s.param.Print(input.Get(s.PrintContent))
 	}
 	return input, nil
 }
 
-func (s *Std) Error(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+func (s *Std) Error(input concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 	if s.param != nil || !nl_interface.IsNil(input) {
 		s.param.Error(input.Get(s.ErrorContent))
 	}
@@ -46,7 +46,7 @@ func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 	}
 	instance.SetPublic(libs.Sandbox.Variable.String.New("Print"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		instance.Print,
-		func(input concept.Param, _ concept.Object) concept.Param {
+		func(input concept.Param, _ concept.Variable) concept.Param {
 			return input
 		},
 		[]concept.String{
@@ -58,7 +58,7 @@ func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 	)))
 	instance.SetPublic(libs.Sandbox.Variable.String.New("Error"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		instance.Error,
-		func(input concept.Param, _ concept.Object) concept.Param {
+		func(input concept.Param, _ concept.Variable) concept.Param {
 			return input
 		},
 		[]concept.String{

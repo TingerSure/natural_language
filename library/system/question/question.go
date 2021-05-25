@@ -31,7 +31,7 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 		WhatResult:    libs.Sandbox.Variable.String.New(QuestionResult),
 	}
 	instance.SetPublic(libs.Sandbox.Variable.String.New("HowMany"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
-		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+		func(input concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 			printParam := libs.Sandbox.Variable.Param.New()
 			printParam.Set(instance.output.PrintContent, input.Get(instance.HowManyParam))
 			outParam, suspend := instance.output.Print(printParam, object)
@@ -39,7 +39,7 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 			param.Set(instance.HowManyResult, outParam.Get(instance.output.PrintContent))
 			return param, suspend
 		},
-		func(input concept.Param, _ concept.Object) concept.Param {
+		func(input concept.Param, _ concept.Variable) concept.Param {
 			param := libs.Sandbox.Variable.Param.New()
 			param.Set(instance.HowManyResult, input.Get(instance.output.PrintContent))
 			return param
@@ -53,7 +53,7 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 	)))
 
 	instance.SetPublic(libs.Sandbox.Variable.String.New("What"), libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
-		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+		func(input concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 			printParam := libs.Sandbox.Variable.Param.New()
 			printParam.Set(instance.output.PrintContent, input.Get(instance.WhatParam))
 			outParam, suspend := instance.output.Print(printParam, object)
@@ -61,7 +61,7 @@ func NewQuestion(libs *tree.LibraryManager, output *std.Std) *Question {
 			param.Set(instance.WhatResult, outParam.Get(instance.output.PrintContent))
 			return param, suspend
 		},
-		func(input concept.Param, _ concept.Object) concept.Param {
+		func(input concept.Param, _ concept.Variable) concept.Param {
 			param := libs.Sandbox.Variable.Param.New()
 			param.Set(instance.WhatResult, input.Get(instance.output.PrintContent))
 			return param

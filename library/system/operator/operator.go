@@ -35,7 +35,7 @@ func (o *Operator) NewNumberOperatorNumberItem(exec func(*variable.Number, *vari
 		Result: o.Libs.Sandbox.Variable.String.New(OperatorResult),
 	}
 	instance.Func = o.Libs.Sandbox.Variable.SystemFunction.New(
-		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+		func(input concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 			leftPre := input.Get(instance.Left)
 			rightPre := input.Get(instance.Right)
 			if leftPre.IsNull() || rightPre.IsNull() {
@@ -55,7 +55,7 @@ func (o *Operator) NewNumberOperatorNumberItem(exec func(*variable.Number, *vari
 			param.Set(instance.Result, result)
 			return param, nil
 		},
-		func(input concept.Param, object concept.Object) concept.Param {
+		func(input concept.Param, object concept.Variable) concept.Param {
 			param := o.Libs.Sandbox.Variable.Param.New()
 			param.Set(instance.Result, anticipateValue)
 			return param
@@ -78,7 +78,7 @@ func (o *Operator) NewBoolOperatorBoolItem(exec func(*variable.Bool, *variable.B
 		Result: o.Libs.Sandbox.Variable.String.New(OperatorResult),
 	}
 	instance.Func = o.Libs.Sandbox.Variable.SystemFunction.New(
-		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+		func(input concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 			leftPre := input.Get(instance.Left)
 			rightPre := input.Get(instance.Right)
 			if leftPre.IsNull() || rightPre.IsNull() {
@@ -98,7 +98,7 @@ func (o *Operator) NewBoolOperatorBoolItem(exec func(*variable.Bool, *variable.B
 			param.Set(instance.Result, result)
 			return param, nil
 		},
-		func(input concept.Param, object concept.Object) concept.Param {
+		func(input concept.Param, object concept.Variable) concept.Param {
 			param := o.Libs.Sandbox.Variable.Param.New()
 			param.Set(instance.Result, anticipateValue)
 			return param
@@ -120,7 +120,7 @@ func (o *Operator) NewOperatorBoolItem(exec func(*variable.Bool) (concept.Variab
 		Result: o.Libs.Sandbox.Variable.String.New(OperatorResult),
 	}
 	instance.Func = o.Libs.Sandbox.Variable.SystemFunction.New(
-		func(input concept.Param, object concept.Object) (concept.Param, concept.Exception) {
+		func(input concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 			rightPre := input.Get(instance.Right)
 			if rightPre.IsNull() {
 				return nil, o.OperatorParamMissingExceptionTemplate.Copy().AddStack(instance.Func)
@@ -138,7 +138,7 @@ func (o *Operator) NewOperatorBoolItem(exec func(*variable.Bool) (concept.Variab
 			param.Set(instance.Result, result)
 			return param, nil
 		},
-		func(input concept.Param, object concept.Object) concept.Param {
+		func(input concept.Param, object concept.Variable) concept.Param {
 			param := o.Libs.Sandbox.Variable.Param.New()
 			param.Set(instance.Result, anticipateValue)
 			return param

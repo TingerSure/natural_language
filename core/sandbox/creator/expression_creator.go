@@ -34,6 +34,7 @@ type ExpressionCreator struct {
 	Parenthesis       *expression.ParenthesisCreator
 	NewArray          *expression.NewArrayCreator
 	IndexComponent    *expression.IndexComponentCreator
+	Append            *expression.AppendCreator
 }
 
 type ExpressionCreatorParam struct {
@@ -62,6 +63,10 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance.ExpressionIndex = adaptor.NewExpressionIndexCreator(&adaptor.ExpressionIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,
+	})
+	instance.Append = expression.NewAppendCreator(&expression.AppendCreatorParam{
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+		ExceptionCreator:       param.ExceptionCreator,
 	})
 	instance.IndexComponent = expression.NewIndexComponentCreator(&expression.IndexComponentCreatorParam{
 		ExceptionCreator:       param.ExceptionCreator,

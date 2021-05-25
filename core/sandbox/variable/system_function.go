@@ -20,8 +20,8 @@ type SystemFunction struct {
 	*adaptor.AdaptorFunction
 	paramNames      []concept.String
 	returnNames     []concept.String
-	funcs           func(concept.Param, concept.Object) (concept.Param, concept.Exception)
-	anticipateFuncs func(concept.Param, concept.Object) concept.Param
+	funcs           func(concept.Param, concept.Variable) (concept.Param, concept.Exception)
+	anticipateFuncs func(concept.Param, concept.Variable) concept.Param
 	seed            SystemFunctionSeed
 }
 
@@ -99,8 +99,8 @@ type SystemFunctionCreator struct {
 }
 
 func (s *SystemFunctionCreator) New(
-	funcs func(concept.Param, concept.Object) (concept.Param, concept.Exception),
-	anticipateFuncs func(concept.Param, concept.Object) concept.Param,
+	funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
+	anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
 	paramNames []concept.String,
 	returnNames []concept.String,
 ) *SystemFunction {

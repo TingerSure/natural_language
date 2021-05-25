@@ -154,6 +154,23 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		ExceptionCreator: func(name string, message string) concept.Exception {
 			return instance.Exception.NewOriginal(name, message)
 		},
+		ParamCreator: func() concept.Param {
+			return instance.Param.New()
+		},
+		StringCreator: func(value string) concept.String {
+			return instance.String.New(value)
+		},
+		NumberCreator: func(value float64) concept.Number {
+			return instance.Number.New(value)
+		},
+		SystemFunctionCreator: func(
+			funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
+			anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
+			paramNames []concept.String,
+			returnNames []concept.String,
+		) concept.Function {
+			return instance.SystemFunction.New(funcs, anticipateFuncs, paramNames, returnNames)
+		},
 	})
 	return instance
 }
