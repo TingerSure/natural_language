@@ -6,7 +6,7 @@ import (
 
 type Mapping struct {
 	param  *MappingParam
-	values []*MappingItem
+	values map[string]*MappingItem
 }
 
 type MappingItem struct {
@@ -23,74 +23,52 @@ func (k *Mapping) Size() int {
 }
 
 func (k *Mapping) Init(specimen String, defaultValue interface{}) bool {
-	if nl_interface.IsNil(defaultValue) {
-		defaultValue = k.param.EmptyValue
-	}
-	exist := k.iterate(func(item *MappingItem) bool {
-		if item.key.EqualLanguage(specimen) {
-			if nl_interface.IsNil(item.value) {
-				item.value = defaultValue
-			}
-			return true
+	_, yes := k.values[specimen.Value()]
+	if !yes {
+		if nl_interface.IsNil(defaultValue) {
+			defaultValue = k.param.EmptyValue
 		}
-		return false
-	})
-	if !exist {
-		k.values = append(k.values, &MappingItem{
+		k.values[specimen.Value()] = &MappingItem{
 			key:   specimen,
 			value: defaultValue,
-		})
+		}
 	}
-	return exist
+	return yes
 }
 
 func (k *Mapping) Remove(specimen String) {
-	for index, item := range k.values {
-		if item.key.EqualLanguage(specimen) {
-			k.values = append(k.values[:index], k.values[index+1:]...)
-			return
-		}
-	}
+	delete(k.values, specimen.Value())
 }
 
 func (k *Mapping) Set(specimen String, value interface{}) bool {
 	if nl_interface.IsNil(value) {
 		value = k.param.EmptyValue
 	}
-	exist := k.iterate(func(item *MappingItem) bool {
-		if item.key.EqualLanguage(specimen) {
-			item.value = value
-			return true
-		}
-		return false
-	})
-
-	if !exist && k.param.AutoInit {
-		k.values = append(k.values, &MappingItem{
+	item, yes := k.values[specimen.Value()]
+	if yes {
+		item.value = value
+		return true
+	}
+	if k.param.AutoInit {
+		k.values[specimen.Value()] = &MappingItem{
 			key:   specimen,
 			value: value,
-		})
+		}
 	}
-
-	return exist
+	return false
 }
 
 func (k *Mapping) Get(specimen String) interface{} {
-	var choosen interface{} = k.param.EmptyValue
-	k.iterate(func(item *MappingItem) bool {
-		if item.key.EqualLanguage(specimen) {
-			choosen = item.value
-			return true
-		}
-		return false
-	})
-	return choosen
+	item, yes := k.values[specimen.Value()]
+	if !yes {
+		return k.param.EmptyValue
+	}
+	return item.value
 }
 
 func (k *Mapping) Has(specimen String) bool {
-	return k.iterate(func(item *MappingItem) bool {
-		return item.key.EqualLanguage(specimen)
-	})
+	_, yes := k.values[specimen.Value()]
+	return yes
 }
 
 func (k *Mapping) iterate(on func(item *MappingItem) bool) bool {
@@ -103,9 +81,12 @@ func (k *Mapping) iterate(on func(item *MappingItem) bool) bool {
 }
 
 func (k *Mapping) Iterate(on func(key String, value interface{}) bool) bool {
-	return k.iterate(func(item *MappingItem) bool {
-		return on(item.key, item.value)
-	})
+	for _, item := range k.values {
+		if on(item.key, item.value) {
+			return true
+		}
+	}
+	return false
 }
 
 type MappingParam struct {
@@ -115,7 +96,7 @@ type MappingParam struct {
 
 func NewMapping(param *MappingParam) *Mapping {
 	return &Mapping{
-		values: make([]*MappingItem, 0),
+		values: map[string]*MappingItem{},
 		param:  param,
 	}
 }

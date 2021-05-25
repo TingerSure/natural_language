@@ -8,7 +8,6 @@ type String interface {
 	GetLanguage(string) string
 	SetLanguage(string, string)
 	IsLanguage(string, string) bool
-	EqualLanguage(String) bool
 	Equal(String) bool
 	Clone() String
 	CloneTo(String)

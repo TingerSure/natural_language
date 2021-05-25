@@ -31,7 +31,7 @@ func (c *History) Set(key concept.String, types int) {
 	var last *historyNode
 	var hit *historyNode
 	for cursor := c.root; cursor != nil; cursor = cursor.next {
-		if cursor.key.EqualLanguage(key) && cursor.types == types {
+		if cursor.key.Equal(key) && cursor.types == types {
 			hit = cursor
 			break
 		}

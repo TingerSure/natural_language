@@ -31,7 +31,7 @@ func (*AdaptorFunction) AdaptorParamFormat(f concept.Function, params *concept.M
 	instance := concept.NewMapping(params.Param())
 	params.Iterate(func(target concept.String, value interface{}) bool {
 		for _, src := range keys {
-			if target.EqualLanguage(src) {
+			if target.Equal(src) {
 				instance.Set(src, value)
 				return false
 			}
@@ -44,7 +44,7 @@ func (*AdaptorFunction) AdaptorParamFormat(f concept.Function, params *concept.M
 
 func (*AdaptorFunction) AdaptorReturnFormat(f concept.Function, back concept.String) concept.String {
 	for _, name := range f.ReturnNames() {
-		if name.EqualLanguage(back) {
+		if name.Equal(back) {
 			return name
 		}
 	}

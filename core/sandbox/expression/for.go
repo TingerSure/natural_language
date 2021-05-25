@@ -123,8 +123,7 @@ func (f *For) Tag() concept.String {
 }
 func (f *For) IsMyTag(tag concept.String) bool {
 	if tag.Equal(f.seed.GetDefaultTag()) ||
-		tag.Equal(f.tag) ||
-		tag.EqualLanguage(f.tag) {
+		tag.Equal(f.tag) {
 		return true
 	}
 	return false
