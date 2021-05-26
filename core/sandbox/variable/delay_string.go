@@ -12,17 +12,18 @@ const (
 type DelayStringSeed interface {
 	ToLanguage(string, *DelayString) string
 	Type() string
+	NewString(string) concept.String
 }
 
 type DelayString struct {
-	create func() concept.String
-	value  concept.String
-	seed   DelayStringSeed
+	original string
+	value    concept.String
+	seed     DelayStringSeed
 }
 
 func (o *DelayString) init() {
 	if nl_interface.IsNil(o.value) {
-		o.value = o.create()
+		o.value = o.seed.NewString(o.original)
 	}
 }
 
@@ -129,8 +130,7 @@ func (n *DelayString) IterateLanguages(on func(string, string) bool) bool {
 }
 
 func (n *DelayString) Value() string {
-	n.init()
-	return n.value.Value()
+	return n.original
 }
 
 func (s *DelayString) Type() string {
@@ -148,6 +148,7 @@ func (n *DelayString) CloneTo(instance concept.String) {
 }
 
 type DelayStringCreatorParam struct {
+	StringCreator func(string) concept.String
 }
 
 type DelayStringCreator struct {
@@ -155,11 +156,15 @@ type DelayStringCreator struct {
 	param *DelayStringCreatorParam
 }
 
-func (s *DelayStringCreator) New(create func() concept.String) *DelayString {
+func (s *DelayStringCreator) New(original string) *DelayString {
 	return &DelayString{
-		create: create,
-		seed:   s,
+		original: original,
+		seed:     s,
 	}
+}
+
+func (s *DelayStringCreator) NewString(value string) concept.String {
+	return s.param.StringCreator(value)
 }
 
 func (s *DelayStringCreator) ToLanguage(language string, instance *DelayString) string {

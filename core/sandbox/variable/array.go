@@ -83,7 +83,7 @@ type ArrayCreatorParam struct {
 	ExceptionCreator      func(string, string) concept.Exception
 	ParamCreator          func() concept.Param
 	StringCreator         func(string) concept.String
-	DelayStringCreator    func(func() concept.String) concept.String
+	DelayStringCreator    func(string) concept.String
 	NumberCreator         func(float64) concept.Number
 	DelayFunctionCreator  func(func() concept.Function) concept.Function
 	SystemFunctionCreator func(
@@ -108,9 +108,12 @@ func (s *ArrayCreator) New() *Array {
 		values: make([]concept.Variable, 0),
 		seed:   s,
 	}
-	array.SetField(s.param.DelayStringCreator(func() concept.String {
-		return s.param.StringCreator("size")
-	}), s.param.DelayFunctionCreator(func() concept.Function {
+	array.SetField(s.param.DelayStringCreator("size"), s.param.DelayFunctionCreator(s.FieldSize(array)))
+	return array
+}
+
+func (s *ArrayCreator) FieldSize(array *Array) func() concept.Function {
+	return func() concept.Function {
 		backSize := s.param.StringCreator("size")
 		return s.param.SystemFunctionCreator(
 			func(param concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
@@ -128,10 +131,8 @@ func (s *ArrayCreator) New() *Array {
 				backSize,
 			},
 		)
-	}))
-	return array
+	}
 }
-
 func (s *ArrayCreator) ToLanguage(language string, instance *Array) string {
 	seed := s.Seeds[language]
 	if seed == nil {

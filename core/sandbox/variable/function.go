@@ -181,11 +181,20 @@ func (s *Function) Type() string {
 }
 
 type FunctionCreatorParam struct {
-	CodeBlockCreator func() *code_block.CodeBlock
-	StringCreator    func(string) concept.String
-	ParamCreator     func() concept.Param
-	ExceptionCreator func(string, string) concept.Exception
-	NullCreator      func() concept.Null
+	CodeBlockCreator      func() *code_block.CodeBlock
+	StringCreator         func(string) concept.String
+	ParamCreator          func() concept.Param
+	ExceptionCreator      func(string, string) concept.Exception
+	NullCreator           func() concept.Null
+	DelayStringCreator    func(string) concept.String
+	DelayFunctionCreator  func(func() concept.Function) concept.Function
+	ArrayCreator          func() *Array
+	SystemFunctionCreator func(
+		funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
+		anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
+		paramNames []concept.String,
+		returnNames []concept.String,
+	) concept.Function
 }
 
 type FunctionCreator struct {
@@ -194,7 +203,7 @@ type FunctionCreator struct {
 }
 
 func (s *FunctionCreator) New(parent concept.Closure) *Function {
-	return &Function{
+	funcs := &Function{
 		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
 			NullCreator:      s.param.NullCreator,
 			ExceptionCreator: s.param.ExceptionCreator,
@@ -203,6 +212,70 @@ func (s *FunctionCreator) New(parent concept.Closure) *Function {
 		body:           s.param.CodeBlockCreator(),
 		anticipateBody: s.param.CodeBlockCreator(),
 		seed:           s,
+	}
+
+	funcs.SetField(s.param.DelayStringCreator("paramList"), s.param.DelayFunctionCreator(s.FieldParamList(funcs)))
+	funcs.SetField(s.param.DelayStringCreator("returnList"), s.param.DelayFunctionCreator(s.FieldReturnList(funcs)))
+	return funcs
+}
+
+func (s *FunctionCreator) FieldParamList(funcs concept.Function) func() concept.Function {
+	return func() concept.Function {
+		backList := s.param.StringCreator("list")
+		return s.param.SystemFunctionCreator(
+			func(param concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
+				paramNames := s.param.ArrayCreator()
+				for _, paramName := range funcs.ParamNames() {
+					paramNames.Append(paramName)
+				}
+				back := s.param.ParamCreator()
+				back.Set(backList, paramNames)
+				return back, nil
+			},
+			func(param concept.Param, _ concept.Variable) concept.Param {
+				paramNames := s.param.ArrayCreator()
+				for _, paramName := range funcs.ParamNames() {
+					paramNames.Append(paramName)
+				}
+				back := s.param.ParamCreator()
+				back.Set(backList, paramNames)
+				return back
+			},
+			[]concept.String{},
+			[]concept.String{
+				backList,
+			},
+		)
+	}
+}
+
+func (s *FunctionCreator) FieldReturnList(funcs concept.Function) func() concept.Function {
+	return func() concept.Function {
+		backList := s.param.StringCreator("list")
+		return s.param.SystemFunctionCreator(
+			func(param concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
+				returnNames := s.param.ArrayCreator()
+				for _, returnName := range funcs.ReturnNames() {
+					returnNames.Append(returnName)
+				}
+				back := s.param.ParamCreator()
+				back.Set(backList, returnNames)
+				return back, nil
+			},
+			func(param concept.Param, _ concept.Variable) concept.Param {
+				returnNames := s.param.ArrayCreator()
+				for _, returnName := range funcs.ReturnNames() {
+					returnNames.Append(returnName)
+				}
+				back := s.param.ParamCreator()
+				back.Set(backList, returnNames)
+				return back
+			},
+			[]concept.String{},
+			[]concept.String{
+				backList,
+			},
+		)
 	}
 }
 

@@ -26,6 +26,7 @@ func getVM() (*runtime.Runtime, error) {
 		EventSize: 1024,
 		SourceRoots: []string{
 			"./",
+			"../../library/second/",
 		},
 		SourceExtension: ".nl",
 	})

@@ -252,27 +252,16 @@ func NewOperator(libs *tree.LibraryManager) *Operator {
 	}
 
 	for name, item := range instance.NumberItems {
-		instance.SetPublic(libs.Sandbox.Variable.String.New(name), libs.Sandbox.Index.ConstIndex.New(item.Func))
-		instance.SetPublic(libs.Sandbox.Variable.String.New(name+LeftName), libs.Sandbox.Index.ConstIndex.New(item.Left))
-		instance.SetPublic(libs.Sandbox.Variable.String.New(name+RightName), libs.Sandbox.Index.ConstIndex.New(item.Right))
-		instance.SetPublic(libs.Sandbox.Variable.String.New(name+ResultName), libs.Sandbox.Index.ConstIndex.New(item.Result))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name), libs.Sandbox.Index.PublicIndex.New(name, libs.Sandbox.Index.ConstIndex.New(item.Func)))
 	}
 
 	for name, item := range instance.BoolItems {
-		instance.SetPublic(libs.Sandbox.Variable.String.New(name), libs.Sandbox.Index.ConstIndex.New(item.Func))
-		instance.SetPublic(libs.Sandbox.Variable.String.New(name+LeftName), libs.Sandbox.Index.ConstIndex.New(item.Left))
-		instance.SetPublic(libs.Sandbox.Variable.String.New(name+RightName), libs.Sandbox.Index.ConstIndex.New(item.Right))
-		instance.SetPublic(libs.Sandbox.Variable.String.New(name+ResultName), libs.Sandbox.Index.ConstIndex.New(item.Result))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name), libs.Sandbox.Index.PublicIndex.New(name, libs.Sandbox.Index.ConstIndex.New(item.Func)))
 	}
 
 	for name, item := range instance.BoolUnaryItems {
-		instance.SetPublic(libs.Sandbox.Variable.String.New(name), libs.Sandbox.Index.ConstIndex.New(item.Func))
-		instance.SetPublic(libs.Sandbox.Variable.String.New(name+RightName), libs.Sandbox.Index.ConstIndex.New(item.Right))
-		instance.SetPublic(libs.Sandbox.Variable.String.New(name+ResultName), libs.Sandbox.Index.ConstIndex.New(item.Result))
+		instance.SetPublic(libs.Sandbox.Variable.String.New(name), libs.Sandbox.Index.PublicIndex.New(name, libs.Sandbox.Index.ConstIndex.New(item.Func)))
 	}
 
-	instance.SetPublic(libs.Sandbox.Variable.String.New("OperatorTypeErrorException"), libs.Sandbox.Index.ConstIndex.New(instance.OperatorTypeErrorExceptionTemplate))
-	instance.SetPublic(libs.Sandbox.Variable.String.New("OperatorParamMissingException"), libs.Sandbox.Index.ConstIndex.New(instance.OperatorParamMissingExceptionTemplate))
-	instance.SetPublic(libs.Sandbox.Variable.String.New("OperatorDivisorZeroException"), libs.Sandbox.Index.ConstIndex.New(instance.OperatorDivisorZeroExceptionTemplate))
 	return instance
 }

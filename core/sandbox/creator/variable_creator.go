@@ -32,7 +32,11 @@ type VariableCreatorParam struct {
 
 func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 	instance := &VariableCreator{}
-	instance.DelayString = variable.NewDelayStringCreator(&variable.DelayStringCreatorParam{})
+	instance.DelayString = variable.NewDelayStringCreator(&variable.DelayStringCreatorParam{
+		StringCreator: func(value string) concept.String {
+			return instance.String.New(value)
+		},
+	})
 	instance.DelayFunction = variable.NewDelayFunctionCreator(&variable.DelayFunctionCreatorParam{})
 	instance.DefineFunction = variable.NewDefineFunctionCreator(&variable.DefineFunctionCreatorParam{
 		ExceptionCreator: func(name string, message string) concept.Exception {
@@ -118,6 +122,23 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 	})
 
 	instance.Function = variable.NewFunctionCreator(&variable.FunctionCreatorParam{
+		DelayStringCreator: func(original string) concept.String {
+			return instance.DelayString.New(original)
+		},
+		DelayFunctionCreator: func(create func() concept.Function) concept.Function {
+			return instance.DelayFunction.New(create)
+		},
+		SystemFunctionCreator: func(
+			funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
+			anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
+			paramNames []concept.String,
+			returnNames []concept.String,
+		) concept.Function {
+			return instance.SystemFunction.New(funcs, anticipateFuncs, paramNames, returnNames)
+		},
+		ArrayCreator: func() *variable.Array {
+			return instance.Array.New()
+		},
 		StringCreator: func(value string) concept.String {
 			return instance.String.New(value)
 		},
@@ -164,8 +185,8 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		StringCreator: func(value string) concept.String {
 			return instance.String.New(value)
 		},
-		DelayStringCreator: func(create func() concept.String) concept.String {
-			return instance.DelayString.New(create)
+		DelayStringCreator: func(original string) concept.String {
+			return instance.DelayString.New(original)
 		},
 		NumberCreator: func(value float64) concept.Number {
 			return instance.Number.New(value)
