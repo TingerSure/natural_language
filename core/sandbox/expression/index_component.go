@@ -34,7 +34,7 @@ func (a *IndexComponent) Anticipate(space concept.Closure) concept.Variable {
 	if yes {
 		return a.indexAnticipate(space, fieldNumber)
 	}
-	fieldString, yes := variable.VariableFamilyInstance.IsString(fieldPre)
+	fieldString, yes := variable.VariableFamilyInstance.IsStringHome(fieldPre)
 	if yes {
 		return a.stringAnticipate(space, fieldString)
 	}
@@ -66,7 +66,7 @@ func (a *IndexComponent) Exec(space concept.Closure) (concept.Variable, concept.
 	if yes {
 		return a.indexGet(space, fieldNumber)
 	}
-	fieldString, yes := variable.VariableFamilyInstance.IsString(fieldPre)
+	fieldString, yes := variable.VariableFamilyInstance.IsStringHome(fieldPre)
 	if yes {
 		return a.stringGet(space, fieldString)
 	}
@@ -102,7 +102,7 @@ func (a *IndexComponent) Set(space concept.Closure, value concept.Variable) conc
 	if yes {
 		return a.indexSet(space, fieldNumber, value)
 	}
-	fieldString, yes := variable.VariableFamilyInstance.IsString(fieldPre)
+	fieldString, yes := variable.VariableFamilyInstance.IsStringHome(fieldPre)
 	if yes {
 		return a.stringSet(space, fieldString, value)
 	}
@@ -138,7 +138,7 @@ func (a *IndexComponent) Call(space concept.Closure, param concept.Param) (conce
 	if yes {
 		return a.indexCall(space, fieldNumber, param)
 	}
-	fieldString, yes := variable.VariableFamilyInstance.IsString(fieldPre)
+	fieldString, yes := variable.VariableFamilyInstance.IsStringHome(fieldPre)
 	if yes {
 		return a.stringCall(space, fieldString, param)
 	}

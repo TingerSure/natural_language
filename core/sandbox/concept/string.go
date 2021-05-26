@@ -7,6 +7,7 @@ type String interface {
 	SetSystem(string)
 	GetLanguage(string) string
 	SetLanguage(string, string)
+	HasLanguage(string) bool
 	IsLanguage(string, string) bool
 	Equal(String) bool
 	Clone() String

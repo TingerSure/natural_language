@@ -44,6 +44,17 @@ func (v *VariableFamily) IsString(value concept.Variable) (*String, bool) {
 	return nil, false
 }
 
+func (v *VariableFamily) IsDelayString(value concept.Variable) (*DelayString, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == VariableDelayStringType {
+		str, yes := value.(*DelayString)
+		return str, yes
+	}
+	return nil, false
+}
+
 func (v *VariableFamily) IsNumber(value concept.Variable) (*Number, bool) {
 	if value == nil {
 		return nil, false
@@ -94,6 +105,17 @@ func (v *VariableFamily) IsDefineFunction(value concept.Variable) (*DefineFuncti
 	}
 	if value.Type() == VariableDefineFunctionType {
 		function, yes := value.(*DefineFunction)
+		return function, yes
+	}
+	return nil, false
+}
+
+func (v *VariableFamily) IsDelayFunction(value concept.Variable) (*DelayFunction, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == VariableDelayFunctionType {
+		function, yes := value.(*DelayFunction)
 		return function, yes
 	}
 	return nil, false
@@ -154,6 +176,20 @@ func (v *VariableFamily) IsMappingObject(value concept.Variable) (*MappingObject
 	return nil, false
 }
 
+func (v *VariableFamily) IsStringHome(value concept.Variable) (concept.String, bool) {
+	str, yes := v.IsString(value)
+	if yes {
+		return str, yes
+	}
+
+	delayStr, yes := v.IsDelayString(value)
+	if yes {
+		return delayStr, yes
+	}
+
+	return nil, false
+}
+
 func (v *VariableFamily) IsFunctionHome(value concept.Variable) (concept.Function, bool) {
 	function, yes := v.IsFunction(value)
 	if yes {
@@ -163,6 +199,11 @@ func (v *VariableFamily) IsFunctionHome(value concept.Variable) (concept.Functio
 	systemFunction, yes := v.IsSystemFunction(value)
 	if yes {
 		return systemFunction, yes
+	}
+
+	delayFunction, yes := v.IsDelayFunction(value)
+	if yes {
+		return delayFunction, yes
 	}
 
 	defineFunction, yes := v.IsDefineFunction(value)

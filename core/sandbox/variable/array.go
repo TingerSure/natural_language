@@ -83,7 +83,9 @@ type ArrayCreatorParam struct {
 	ExceptionCreator      func(string, string) concept.Exception
 	ParamCreator          func() concept.Param
 	StringCreator         func(string) concept.String
+	DelayStringCreator    func(func() concept.String) concept.String
 	NumberCreator         func(float64) concept.Number
+	DelayFunctionCreator  func(func() concept.Function) concept.Function
 	SystemFunctionCreator func(
 		funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
 		anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
@@ -106,24 +108,27 @@ func (s *ArrayCreator) New() *Array {
 		values: make([]concept.Variable, 0),
 		seed:   s,
 	}
-	backSize := s.param.StringCreator("size")
-	fieldSize := s.param.StringCreator("size")
-	array.SetField(fieldSize, s.param.SystemFunctionCreator(
-		func(param concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
-			back := s.param.ParamCreator()
-			back.Set(backSize, s.param.NumberCreator(float64(array.Length())))
-			return back, nil
-		},
-		func(param concept.Param, _ concept.Variable) concept.Param {
-			back := s.param.ParamCreator()
-			back.Set(backSize, s.param.NumberCreator(float64(array.Length())))
-			return back
-		},
-		[]concept.String{},
-		[]concept.String{
-			backSize,
-		},
-	))
+	array.SetField(s.param.DelayStringCreator(func() concept.String {
+		return s.param.StringCreator("size")
+	}), s.param.DelayFunctionCreator(func() concept.Function {
+		backSize := s.param.StringCreator("size")
+		return s.param.SystemFunctionCreator(
+			func(param concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
+				back := s.param.ParamCreator()
+				back.Set(backSize, s.param.NumberCreator(float64(array.Length())))
+				return back, nil
+			},
+			func(param concept.Param, _ concept.Variable) concept.Param {
+				back := s.param.ParamCreator()
+				back.Set(backSize, s.param.NumberCreator(float64(array.Length())))
+				return back
+			},
+			[]concept.String{},
+			[]concept.String{
+				backSize,
+			},
+		)
+	}))
 	return array
 }
 
