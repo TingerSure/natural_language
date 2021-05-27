@@ -26,7 +26,7 @@ type DefineFunction struct {
 	seed        DefineFunctionSeed
 }
 
-func (f *DefineFunction) ParamFormat(params *concept.Mapping) *concept.Mapping {
+func (f *DefineFunction) ParamFormat(params concept.Param) concept.Param {
 	return f.AdaptorFunction.AdaptorParamFormat(f, params)
 }
 
@@ -104,6 +104,7 @@ func (s *DefineFunctionCreator) New() *DefineFunction {
 	return &DefineFunction{
 		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
 			NullCreator:      s.param.NullCreator,
+			ParamCreator:     s.param.ParamCreator,
 			ExceptionCreator: s.param.ExceptionCreator,
 		}),
 		seed: s,

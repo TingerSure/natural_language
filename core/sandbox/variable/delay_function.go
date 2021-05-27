@@ -80,17 +80,17 @@ func (o *DelayFunction) ToString(prefix string) string {
 	return o.funcs.ToString(prefix)
 }
 
-func (a *DelayFunction) GetLanguageOnCallSeed(language string) func(concept.Function, *concept.Mapping) string {
+func (a *DelayFunction) GetLanguageOnCallSeed(language string) func(concept.Function, concept.Param) string {
 	a.init()
 	return a.funcs.GetLanguageOnCallSeed(language)
 }
 
-func (a *DelayFunction) SetLanguageOnCallSeed(language string, seed func(concept.Function, *concept.Mapping) string) {
+func (a *DelayFunction) SetLanguageOnCallSeed(language string, seed func(concept.Function, concept.Param) string) {
 	a.init()
 	a.funcs.SetLanguageOnCallSeed(language, seed)
 }
 
-func (f *DelayFunction) ParamFormat(params *concept.Mapping) *concept.Mapping {
+func (f *DelayFunction) ParamFormat(params concept.Param) concept.Param {
 	f.init()
 	return f.funcs.ParamFormat(params)
 }

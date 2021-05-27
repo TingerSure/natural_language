@@ -35,7 +35,7 @@ type Function struct {
 	seed           FunctionSeed
 }
 
-func (f *Function) ParamFormat(params *concept.Mapping) *concept.Mapping {
+func (f *Function) ParamFormat(params concept.Param) concept.Param {
 	return f.AdaptorFunction.AdaptorParamFormat(f, params)
 }
 
@@ -207,6 +207,7 @@ func (s *FunctionCreator) New(parent concept.Closure) *Function {
 		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
 			NullCreator:      s.param.NullCreator,
 			ExceptionCreator: s.param.ExceptionCreator,
+			ParamCreator:     s.param.ParamCreator,
 		}),
 		parent:         parent,
 		body:           s.param.CodeBlockCreator(),

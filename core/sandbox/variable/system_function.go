@@ -25,7 +25,7 @@ type SystemFunction struct {
 	seed            SystemFunctionSeed
 }
 
-func (f *SystemFunction) ParamFormat(params *concept.Mapping) *concept.Mapping {
+func (f *SystemFunction) ParamFormat(params concept.Param) concept.Param {
 	return f.AdaptorFunction.AdaptorParamFormat(f, params)
 }
 
@@ -90,6 +90,7 @@ func (s *SystemFunction) FunctionType() string {
 
 type SystemFunctionCreatorParam struct {
 	NullCreator      func() concept.Null
+	ParamCreator     func() concept.Param
 	ExceptionCreator func(string, string) concept.Exception
 }
 
@@ -107,6 +108,7 @@ func (s *SystemFunctionCreator) New(
 	return &SystemFunction{
 		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
 			NullCreator:      s.param.NullCreator,
+			ParamCreator:     s.param.ParamCreator,
 			ExceptionCreator: s.param.ExceptionCreator,
 		}),
 		funcs:           funcs,

@@ -173,6 +173,7 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 		ExceptionCreator:       param.ExceptionCreator,
 		ParamCreator:           param.ParamCreator,
 		ConstIndexCreator:      param.ConstIndexCreator,
+		NewParamCreator:        instance.NewParam.New,
 	})
 	return instance
 }

@@ -19,7 +19,7 @@ type CallSeed interface {
 type Call struct {
 	*adaptor.ExpressionIndex
 	funcs concept.Index
-	param concept.Index
+	param *NewParam
 	seed  CallSeed
 }
 
@@ -27,7 +27,7 @@ func (c *Call) Function() concept.Index {
 	return c.funcs
 }
 
-func (c *Call) Param() concept.Index {
+func (c *Call) Param() *NewParam {
 	return c.param
 }
 
@@ -66,16 +66,17 @@ type CallCreatorParam struct {
 	ParamCreator           func() concept.Param
 	ConstIndexCreator      func(concept.Variable) *index.ConstIndex
 	NullCreator            func() concept.Null
+	NewParamCreator        func() *NewParam
 	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
 }
 
 type CallCreator struct {
 	Seeds        map[string]func(string, *Call) string
 	param        *CallCreatorParam
-	defaultParam concept.Index
+	defaultParam *NewParam
 }
 
-func (s *CallCreator) New(funcs concept.Index, param concept.Index) *Call {
+func (s *CallCreator) New(funcs concept.Index, param *NewParam) *Call {
 	if nl_interface.IsNil(param) {
 		param = s.defaultParam
 	}
@@ -112,6 +113,6 @@ func NewCallCreator(param *CallCreatorParam) *CallCreator {
 	return &CallCreator{
 		Seeds:        map[string]func(string, *Call) string{},
 		param:        param,
-		defaultParam: param.ConstIndexCreator(param.ParamCreator()),
+		defaultParam: param.NewParamCreator(),
 	}
 }

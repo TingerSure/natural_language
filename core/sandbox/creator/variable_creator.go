@@ -78,6 +78,9 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		NullCreator: func() concept.Null {
 			return instance.Null.New()
 		},
+		ParamCreator: func() concept.Param {
+			return instance.Param.New()
+		},
 	})
 	instance.Bool = variable.NewBoolCreator(&variable.BoolCreatorParam{
 		NullCreator: func() concept.Null {
