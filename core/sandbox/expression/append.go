@@ -9,7 +9,7 @@ import (
 )
 
 type AppendSeed interface {
-	ToLanguage(string, *Append) string
+	ToLanguage(string, concept.Closure, *Append) string
 	NewException(string, string) concept.Exception
 }
 
@@ -20,8 +20,8 @@ type Append struct {
 	seed  AppendSeed
 }
 
-func (f *Append) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *Append) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *Append) ToString(prefix string) string {
@@ -55,7 +55,7 @@ type AppendCreatorParam struct {
 }
 
 type AppendCreator struct {
-	Seeds map[string]func(string, *Append) string
+	Seeds map[string]func(string, concept.Closure, *Append) string
 	param *AppendCreatorParam
 }
 
@@ -73,17 +73,17 @@ func (s *AppendCreator) NewException(name string, message string) concept.Except
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *AppendCreator) ToLanguage(language string, instance *Append) string {
+func (s *AppendCreator) ToLanguage(language string, space concept.Closure, instance *Append) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func NewAppendCreator(param *AppendCreatorParam) *AppendCreator {
 	return &AppendCreator{
-		Seeds: map[string]func(string, *Append) string{},
+		Seeds: map[string]func(string, concept.Closure, *Append) string{},
 		param: param,
 	}
 }

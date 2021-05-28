@@ -17,7 +17,7 @@ const (
 )
 
 type FunctionSeed interface {
-	ToLanguage(string, *Function) string
+	ToLanguage(string, concept.Closure, *Function) string
 	Type() string
 	NewString(string) concept.String
 	NewException(string, string) concept.Exception
@@ -47,8 +47,12 @@ func (o *Function) Call(specimen concept.String, param concept.Param) (concept.P
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *Function) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *Function) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
+}
+
+func (f *Function) ToCallLanguage(language string, space concept.Closure, self string, param concept.Param) string {
+	return f.ToCallLanguageAdaptor(f, language, space, self, param)
 }
 
 func (s *Function) ParamNames() []concept.String {
@@ -198,7 +202,7 @@ type FunctionCreatorParam struct {
 }
 
 type FunctionCreator struct {
-	Seeds map[string]func(string, *Function) string
+	Seeds map[string]func(string, concept.Closure, *Function) string
 	param *FunctionCreatorParam
 }
 
@@ -280,12 +284,12 @@ func (s *FunctionCreator) FieldReturnList(funcs concept.Function) func() concept
 	}
 }
 
-func (s *FunctionCreator) ToLanguage(language string, instance *Function) string {
+func (s *FunctionCreator) ToLanguage(language string, space concept.Closure, instance *Function) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func (s *FunctionCreator) Type() string {
@@ -310,7 +314,7 @@ func (s *FunctionCreator) NewException(name string, message string) concept.Exce
 
 func NewFunctionCreator(param *FunctionCreatorParam) *FunctionCreator {
 	return &FunctionCreator{
-		Seeds: map[string]func(string, *Function) string{},
+		Seeds: map[string]func(string, concept.Closure, *Function) string{},
 		param: param,
 	}
 }

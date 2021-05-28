@@ -34,10 +34,10 @@ func getVM() (*runtime.Runtime, error) {
 	system.BindSystem(VM.GetLibraryManager(), &system.SystemLibraryParam{
 		Std: &std.StdParam{
 			Error: func(value concept.Variable) {
-				os.Stdout.WriteString(fmt.Sprintf("\033[1;35m[NL]:\033[00m %v\n", value.ToLanguage(ChineseName)))
+				os.Stdout.WriteString(fmt.Sprintf("\033[1;35m[NL]:\033[00m %v\n", value.ToLanguage(ChineseName, nil)))
 			},
 			Print: func(value concept.Variable) {
-				os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[NL]:\033[00m %v\n", value.ToLanguage(ChineseName)))
+				os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[NL]:\033[00m %v\n", value.ToLanguage(ChineseName, nil)))
 			},
 		},
 	})

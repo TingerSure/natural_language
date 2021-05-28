@@ -8,7 +8,7 @@ import (
 )
 
 type SearchIndexSeed interface {
-	ToLanguage(string, *SearchIndex) string
+	ToLanguage(string, concept.Closure, *SearchIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -28,8 +28,8 @@ func (f *SearchIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *SearchIndex) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *SearchIndex) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (s *SearchIndex) ToString(prefix string) string {
@@ -90,7 +90,7 @@ type SearchIndexCreatorParam struct {
 }
 
 type SearchIndexCreator struct {
-	Seeds map[string]func(string, *SearchIndex) string
+	Seeds map[string]func(string, concept.Closure, *SearchIndex) string
 	param *SearchIndexCreatorParam
 }
 
@@ -100,12 +100,12 @@ func (s *SearchIndexCreator) New(items []concept.Matcher) *SearchIndex {
 		seed:  s,
 	}
 }
-func (s *SearchIndexCreator) ToLanguage(language string, instance *SearchIndex) string {
+func (s *SearchIndexCreator) ToLanguage(language string, space concept.Closure, instance *SearchIndex) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func (s *SearchIndexCreator) Type() string {
@@ -126,7 +126,7 @@ func (s *SearchIndexCreator) NewNull() concept.Null {
 
 func NewSearchIndexCreator(param *SearchIndexCreatorParam) *SearchIndexCreator {
 	return &SearchIndexCreator{
-		Seeds: map[string]func(string, *SearchIndex) string{},
+		Seeds: map[string]func(string, concept.Closure, *SearchIndex) string{},
 		param: param,
 	}
 }

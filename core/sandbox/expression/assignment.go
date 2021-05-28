@@ -8,7 +8,7 @@ import (
 )
 
 type AssignmentSeed interface {
-	ToLanguage(string, *Assignment) string
+	ToLanguage(string, concept.Closure, *Assignment) string
 }
 
 type Assignment struct {
@@ -18,8 +18,8 @@ type Assignment struct {
 	seed AssignmentSeed
 }
 
-func (f *Assignment) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *Assignment) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *Assignment) ToString(prefix string) string {
@@ -43,7 +43,7 @@ type AssignmentCreatorParam struct {
 }
 
 type AssignmentCreator struct {
-	Seeds map[string]func(string, *Assignment) string
+	Seeds map[string]func(string, concept.Closure, *Assignment) string
 	param *AssignmentCreatorParam
 }
 
@@ -57,17 +57,17 @@ func (s *AssignmentCreator) New(from concept.Index, to concept.Index) *Assignmen
 	return back
 }
 
-func (s *AssignmentCreator) ToLanguage(language string, instance *Assignment) string {
+func (s *AssignmentCreator) ToLanguage(language string, space concept.Closure, instance *Assignment) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func NewAssignmentCreator(param *AssignmentCreatorParam) *AssignmentCreator {
 	return &AssignmentCreator{
-		Seeds: map[string]func(string, *Assignment) string{},
+		Seeds: map[string]func(string, concept.Closure, *Assignment) string{},
 		param: param,
 	}
 }

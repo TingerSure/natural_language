@@ -7,7 +7,7 @@ import (
 )
 
 type NewBoolSeed interface {
-	ToLanguage(string, *NewBool) string
+	ToLanguage(string, concept.Closure, *NewBool) string
 	NewBool(bool) concept.Bool
 }
 
@@ -17,8 +17,8 @@ type NewBool struct {
 	seed  NewBoolSeed
 }
 
-func (f *NewBool) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *NewBool) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *NewBool) ToString(prefix string) string {
@@ -39,7 +39,7 @@ type NewBoolCreatorParam struct {
 }
 
 type NewBoolCreator struct {
-	Seeds map[string]func(string, *NewBool) string
+	Seeds map[string]func(string, concept.Closure, *NewBool) string
 	param *NewBoolCreatorParam
 }
 
@@ -56,17 +56,17 @@ func (s *NewBoolCreator) NewBool(value bool) concept.Bool {
 	return s.param.BoolCreator(value)
 }
 
-func (s *NewBoolCreator) ToLanguage(language string, instance *NewBool) string {
+func (s *NewBoolCreator) ToLanguage(language string, space concept.Closure, instance *NewBool) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func NewNewBoolCreator(param *NewBoolCreatorParam) *NewBoolCreator {
 	return &NewBoolCreator{
-		Seeds: map[string]func(string, *NewBool) string{},
+		Seeds: map[string]func(string, concept.Closure, *NewBool) string{},
 		param: param,
 	}
 }

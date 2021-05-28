@@ -10,7 +10,7 @@ import (
 )
 
 type IfSeed interface {
-	ToLanguage(string, *If) string
+	ToLanguage(string, concept.Closure, *If) string
 	NewException(string, string) concept.Exception
 	NewNull() concept.Null
 	NewClosure(concept.Closure) concept.Closure
@@ -24,8 +24,8 @@ type If struct {
 	seed      IfSeed
 }
 
-func (f *If) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *If) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (f *If) ToString(prefix string) string {
@@ -89,7 +89,7 @@ type IfCreatorParam struct {
 }
 
 type IfCreator struct {
-	Seeds            map[string]func(string, *If) string
+	Seeds            map[string]func(string, concept.Closure, *If) string
 	param            *IfCreatorParam
 	defaultCondition concept.Index
 	defaultTag       concept.String
@@ -105,12 +105,12 @@ func (s *IfCreator) New() *If {
 	return back
 }
 
-func (s *IfCreator) ToLanguage(language string, instance *If) string {
+func (s *IfCreator) ToLanguage(language string, space concept.Closure, instance *If) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func (s *IfCreator) NewClosure(parent concept.Closure) concept.Closure {
@@ -127,7 +127,7 @@ func (s *IfCreator) NewException(name string, message string) concept.Exception 
 
 func NewIfCreator(param *IfCreatorParam) *IfCreator {
 	return &IfCreator{
-		Seeds: map[string]func(string, *If) string{},
+		Seeds: map[string]func(string, concept.Closure, *If) string{},
 		param: param,
 	}
 }

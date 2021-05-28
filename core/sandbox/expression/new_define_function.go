@@ -10,7 +10,7 @@ import (
 )
 
 type NewDefineFunctionSeed interface {
-	ToLanguage(string, *NewDefineFunction) string
+	ToLanguage(string, concept.Closure, *NewDefineFunction) string
 	NewDefineFunction() *variable.DefineFunction
 }
 
@@ -41,8 +41,8 @@ func (f *NewDefineFunction) SetParams(params []concept.Index) {
 	}
 }
 
-func (f *NewDefineFunction) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *NewDefineFunction) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *NewDefineFunction) ToString(prefix string) string {
@@ -77,7 +77,7 @@ type NewDefineFunctionCreatorParam struct {
 }
 
 type NewDefineFunctionCreator struct {
-	Seeds map[string]func(string, *NewDefineFunction) string
+	Seeds map[string]func(string, concept.Closure, *NewDefineFunction) string
 	param *NewDefineFunctionCreatorParam
 }
 
@@ -95,17 +95,17 @@ func (s *NewDefineFunctionCreator) NewDefineFunction() *variable.DefineFunction 
 	return s.param.DefineFunctionCreator()
 }
 
-func (s *NewDefineFunctionCreator) ToLanguage(language string, instance *NewDefineFunction) string {
+func (s *NewDefineFunctionCreator) ToLanguage(language string, space concept.Closure, instance *NewDefineFunction) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func NewNewDefineFunctionCreator(param *NewDefineFunctionCreatorParam) *NewDefineFunctionCreator {
 	return &NewDefineFunctionCreator{
-		Seeds: map[string]func(string, *NewDefineFunction) string{},
+		Seeds: map[string]func(string, concept.Closure, *NewDefineFunction) string{},
 		param: param,
 	}
 }

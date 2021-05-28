@@ -74,7 +74,7 @@ type CodeBlockCreatorParam struct {
 }
 
 type CodeBlockCreator struct {
-	Seeds map[string]func(string, *CodeBlock) string
+	Seeds map[string]func(string, concept.Closure, *CodeBlock) string
 	param *CodeBlockCreatorParam
 }
 
@@ -84,12 +84,12 @@ func (s *CodeBlockCreator) New() *CodeBlock {
 	}
 }
 
-func (s *CodeBlockCreator) ToLanguage(language string, instance *CodeBlock) string {
+func (s *CodeBlockCreator) ToLanguage(language string, space concept.Closure, instance *CodeBlock) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func (s *CodeBlockCreator) NewClosure(parent concept.Closure) concept.Closure {
@@ -98,7 +98,7 @@ func (s *CodeBlockCreator) NewClosure(parent concept.Closure) concept.Closure {
 
 func NewCodeBlockCreator(param *CodeBlockCreatorParam) *CodeBlockCreator {
 	return &CodeBlockCreator{
-		Seeds: map[string]func(string, *CodeBlock) string{},
+		Seeds: map[string]func(string, concept.Closure, *CodeBlock) string{},
 		param: param,
 	}
 }

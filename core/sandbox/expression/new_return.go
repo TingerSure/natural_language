@@ -7,7 +7,7 @@ import (
 )
 
 type NewReturnSeed interface {
-	ToLanguage(string, *NewReturn) string
+	ToLanguage(string, concept.Closure, *NewReturn) string
 	NewNull() concept.Null
 	NewReturn() *interrupt.Return
 }
@@ -17,8 +17,8 @@ type NewReturn struct {
 	seed NewReturnSeed
 }
 
-func (f *NewReturn) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *NewReturn) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *NewReturn) ToString(prefix string) string {
@@ -40,7 +40,7 @@ type NewReturnCreatorParam struct {
 }
 
 type NewReturnCreator struct {
-	Seeds map[string]func(string, *NewReturn) string
+	Seeds map[string]func(string, concept.Closure, *NewReturn) string
 	param *NewReturnCreatorParam
 }
 
@@ -60,17 +60,17 @@ func (s *NewReturnCreator) NewNull() concept.Null {
 	return s.param.NullCreator()
 }
 
-func (s *NewReturnCreator) ToLanguage(language string, instance *NewReturn) string {
+func (s *NewReturnCreator) ToLanguage(language string, space concept.Closure, instance *NewReturn) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func NewNewReturnCreator(param *NewReturnCreatorParam) *NewReturnCreator {
 	return &NewReturnCreator{
-		Seeds: map[string]func(string, *NewReturn) string{},
+		Seeds: map[string]func(string, concept.Closure, *NewReturn) string{},
 		param: param,
 	}
 }

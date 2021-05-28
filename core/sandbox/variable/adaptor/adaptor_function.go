@@ -13,19 +13,27 @@ type AdaptorFunctionParam struct {
 type AdaptorFunction struct {
 	*AdaptorVariable
 	param               *AdaptorFunctionParam
-	languageOnCallSeeds map[string]func(concept.Function, concept.Param) string
+	languageOnCallSeeds map[string]func(concept.Function, concept.Closure, string, concept.Param) string
 }
 
 func (o *AdaptorFunction) IsFunction() bool {
 	return true
 }
 
-func (a *AdaptorFunction) GetLanguageOnCallSeed(language string) func(concept.Function, concept.Param) string {
+func (a *AdaptorFunction) GetLanguageOnCallSeed(language string) func(concept.Function, concept.Closure, string, concept.Param) string {
 	return a.languageOnCallSeeds[language]
 }
 
-func (a *AdaptorFunction) SetLanguageOnCallSeed(language string, seed func(concept.Function, concept.Param) string) {
+func (a *AdaptorFunction) SetLanguageOnCallSeed(language string, seed func(concept.Function, concept.Closure, string, concept.Param) string) {
 	a.languageOnCallSeeds[language] = seed
+}
+
+func (a *AdaptorFunction) ToCallLanguageAdaptor(funcs concept.Function, language string, space concept.Closure, self string, param concept.Param) string {
+	seed := funcs.GetLanguageOnCallSeed(language)
+	if seed == nil {
+		return funcs.ToLanguage(language, space)
+	}
+	return seed(funcs, space, self, param)
 }
 
 func (a *AdaptorFunction) AdaptorParamFormat(f concept.Function, params concept.Param) concept.Param {
@@ -60,6 +68,6 @@ func NewAdaptorFunction(param *AdaptorFunctionParam) *AdaptorFunction {
 			ExceptionCreator: param.ExceptionCreator,
 		}),
 		param:               param,
-		languageOnCallSeeds: map[string]func(concept.Function, concept.Param) string{},
+		languageOnCallSeeds: map[string]func(concept.Function, concept.Closure, string, concept.Param) string{},
 	}
 }

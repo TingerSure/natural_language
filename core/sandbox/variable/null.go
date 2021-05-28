@@ -10,7 +10,7 @@ const (
 )
 
 type NullSeed interface {
-	ToLanguage(string, *Null) string
+	ToLanguage(string, concept.Closure, *Null) string
 	Type() string
 	GetNullPointerException() concept.Exception
 }
@@ -63,8 +63,8 @@ func (o *Null) Call(specimen concept.String, param concept.Param) (concept.Param
 	return nil, o.seed.GetNullPointerException().Copy()
 }
 
-func (f *Null) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *Null) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *Null) ToString(prefix string) string {
@@ -80,7 +80,7 @@ type NullCreatorParam struct {
 }
 
 type NullCreator struct {
-	Seeds                map[string]func(string, *Null) string
+	Seeds                map[string]func(string, concept.Closure, *Null) string
 	param                *NullCreatorParam
 	onlyInstance         *Null
 	nullPointerException concept.Exception
@@ -97,12 +97,12 @@ func (s *NullCreator) New() *Null {
 	return s.onlyInstance
 }
 
-func (s *NullCreator) ToLanguage(language string, instance *Null) string {
+func (s *NullCreator) ToLanguage(language string, space concept.Closure, instance *Null) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func (s *NullCreator) Type() string {
@@ -116,7 +116,7 @@ func (s *NullCreator) GetNullPointerException() concept.Exception {
 func NewNullCreator(param *NullCreatorParam) *NullCreator {
 	instance := &NullCreator{
 		param: param,
-		Seeds: map[string]func(string, *Null) string{},
+		Seeds: map[string]func(string, concept.Closure, *Null) string{},
 	}
 
 	instance.onlyInstance = &Null{

@@ -10,7 +10,7 @@ import (
 )
 
 type NewObjectSeed interface {
-	ToLanguage(string, *NewObject) string
+	ToLanguage(string, concept.Closure, *NewObject) string
 	NewObject() concept.Object
 }
 
@@ -30,8 +30,8 @@ func (f *NewObject) SetKeyValue(keyValues []concept.Index) {
 	}
 }
 
-func (f *NewObject) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *NewObject) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *NewObject) ToString(prefix string) string {
@@ -82,7 +82,7 @@ type NewObjectCreatorParam struct {
 }
 
 type NewObjectCreator struct {
-	Seeds map[string]func(string, *NewObject) string
+	Seeds map[string]func(string, concept.Closure, *NewObject) string
 	param *NewObjectCreatorParam
 }
 
@@ -102,17 +102,17 @@ func (s *NewObjectCreator) NewObject() concept.Object {
 	return s.param.ObjectCreator()
 }
 
-func (s *NewObjectCreator) ToLanguage(language string, instance *NewObject) string {
+func (s *NewObjectCreator) ToLanguage(language string, space concept.Closure, instance *NewObject) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func NewNewObjectCreator(param *NewObjectCreatorParam) *NewObjectCreator {
 	return &NewObjectCreator{
-		Seeds: map[string]func(string, *NewObject) string{},
+		Seeds: map[string]func(string, concept.Closure, *NewObject) string{},
 		param: param,
 	}
 }

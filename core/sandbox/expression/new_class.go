@@ -11,7 +11,7 @@ import (
 )
 
 type NewClassSeed interface {
-	ToLanguage(string, *NewClass) string
+	ToLanguage(string, concept.Closure, *NewClass) string
 	NewClass() concept.Class
 	NewException(string, string) concept.Exception
 	NewString(string) concept.String
@@ -27,8 +27,8 @@ func (f *NewClass) SetLines(lines []concept.Index) {
 	f.lines = lines
 }
 
-func (f *NewClass) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *NewClass) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *NewClass) ToString(prefix string) string {
@@ -107,7 +107,7 @@ type NewClassCreatorParam struct {
 }
 
 type NewClassCreator struct {
-	Seeds map[string]func(string, *NewClass) string
+	Seeds map[string]func(string, concept.Closure, *NewClass) string
 	param *NewClassCreatorParam
 }
 
@@ -131,17 +131,17 @@ func (s *NewClassCreator) NewString(value string) concept.String {
 	return s.param.StringCreator(value)
 }
 
-func (s *NewClassCreator) ToLanguage(language string, instance *NewClass) string {
+func (s *NewClassCreator) ToLanguage(language string, space concept.Closure, instance *NewClass) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func NewNewClassCreator(param *NewClassCreatorParam) *NewClassCreator {
 	return &NewClassCreator{
-		Seeds: map[string]func(string, *NewClass) string{},
+		Seeds: map[string]func(string, concept.Closure, *NewClass) string{},
 		param: param,
 	}
 }

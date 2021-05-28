@@ -10,7 +10,7 @@ import (
 )
 
 type NewArraySeed interface {
-	ToLanguage(string, *NewArray) string
+	ToLanguage(string, concept.Closure, *NewArray) string
 	NewArray() *variable.Array
 }
 
@@ -24,8 +24,8 @@ func (f *NewArray) SetItems(items []concept.Index) {
 	f.items = items
 }
 
-func (f *NewArray) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *NewArray) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *NewArray) ToString(prefix string) string {
@@ -63,7 +63,7 @@ type NewArrayCreatorParam struct {
 }
 
 type NewArrayCreator struct {
-	Seeds map[string]func(string, *NewArray) string
+	Seeds map[string]func(string, concept.Closure, *NewArray) string
 	param *NewArrayCreatorParam
 }
 
@@ -80,17 +80,17 @@ func (s *NewArrayCreator) NewArray() *variable.Array {
 	return s.param.ArrayCreator()
 }
 
-func (s *NewArrayCreator) ToLanguage(language string, instance *NewArray) string {
+func (s *NewArrayCreator) ToLanguage(language string, space concept.Closure, instance *NewArray) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func NewNewArrayCreator(param *NewArrayCreatorParam) *NewArrayCreator {
 	return &NewArrayCreator{
-		Seeds: map[string]func(string, *NewArray) string{},
+		Seeds: map[string]func(string, concept.Closure, *NewArray) string{},
 		param: param,
 	}
 }

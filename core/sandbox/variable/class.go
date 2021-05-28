@@ -12,7 +12,7 @@ const (
 )
 
 type ClassSeed interface {
-	ToLanguage(string, *Class) string
+	ToLanguage(string, concept.Closure, *Class) string
 	Type() string
 	NewNull() concept.Null
 }
@@ -28,8 +28,8 @@ func (o *Class) Call(specimen concept.String, param concept.Param) (concept.Para
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *Class) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *Class) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (c *Class) ToString(prefix string) string {
@@ -93,7 +93,7 @@ type ClassCreatorParam struct {
 }
 
 type ClassCreator struct {
-	Seeds map[string]func(string, *Class) string
+	Seeds map[string]func(string, concept.Closure, *Class) string
 	param *ClassCreatorParam
 }
 
@@ -115,12 +115,12 @@ func (s *ClassCreator) New() *Class {
 	}
 }
 
-func (s *ClassCreator) ToLanguage(language string, instance *Class) string {
+func (s *ClassCreator) ToLanguage(language string, space concept.Closure, instance *Class) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func (s *ClassCreator) Type() string {
@@ -133,7 +133,7 @@ func (s *ClassCreator) NewNull() concept.Null {
 
 func NewClassCreator(param *ClassCreatorParam) *ClassCreator {
 	return &ClassCreator{
-		Seeds: map[string]func(string, *Class) string{},
+		Seeds: map[string]func(string, concept.Closure, *Class) string{},
 		param: param,
 	}
 }

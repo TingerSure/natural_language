@@ -13,7 +13,7 @@ const (
 )
 
 type ParamSeed interface {
-	ToLanguage(string, *Param) string
+	ToLanguage(string, concept.Closure, *Param) string
 	Type() string
 	NewNull() concept.Null
 	New() *Param
@@ -30,8 +30,8 @@ func (o *Param) Call(specimen concept.String, param concept.Param) (concept.Para
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *Param) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *Param) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *Param) ToString(prefix string) string {
@@ -102,7 +102,7 @@ type ParamCreatorParam struct {
 }
 
 type ParamCreator struct {
-	Seeds map[string]func(string, *Param) string
+	Seeds map[string]func(string, concept.Closure, *Param) string
 	param *ParamCreatorParam
 }
 
@@ -117,12 +117,12 @@ func (s *ParamCreator) New() *Param {
 	}
 }
 
-func (s *ParamCreator) ToLanguage(language string, instance *Param) string {
+func (s *ParamCreator) ToLanguage(language string, space concept.Closure, instance *Param) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func (s *ParamCreator) Type() string {
@@ -135,7 +135,7 @@ func (s *ParamCreator) NewNull() concept.Null {
 
 func NewParamCreator(param *ParamCreatorParam) *ParamCreator {
 	return &ParamCreator{
-		Seeds: map[string]func(string, *Param) string{},
+		Seeds: map[string]func(string, concept.Closure, *Param) string{},
 		param: param,
 	}
 }

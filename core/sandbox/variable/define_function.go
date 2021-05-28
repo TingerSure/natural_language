@@ -12,7 +12,7 @@ const (
 )
 
 type DefineFunctionSeed interface {
-	ToLanguage(string, *DefineFunction) string
+	ToLanguage(string, concept.Closure, *DefineFunction) string
 	Type() string
 	NewParam() concept.Param
 	NewNull() concept.Null
@@ -38,8 +38,12 @@ func (o *DefineFunction) Call(specimen concept.String, param concept.Param) (con
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *DefineFunction) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *DefineFunction) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
+}
+
+func (f *DefineFunction) ToCallLanguage(language string, space concept.Closure, self string, param concept.Param) string {
+	return f.ToCallLanguageAdaptor(f, language, space, self, param)
 }
 
 func (f *DefineFunction) AddParamName(paramNames ...concept.String) {
@@ -96,7 +100,7 @@ type DefineFunctionCreatorParam struct {
 }
 
 type DefineFunctionCreator struct {
-	Seeds map[string]func(string, *DefineFunction) string
+	Seeds map[string]func(string, concept.Closure, *DefineFunction) string
 	param *DefineFunctionCreatorParam
 }
 
@@ -111,12 +115,12 @@ func (s *DefineFunctionCreator) New() *DefineFunction {
 	}
 }
 
-func (s *DefineFunctionCreator) ToLanguage(language string, instance *DefineFunction) string {
+func (s *DefineFunctionCreator) ToLanguage(language string, space concept.Closure, instance *DefineFunction) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func (s *DefineFunctionCreator) Type() string {
@@ -137,7 +141,7 @@ func (s *DefineFunctionCreator) NewException(name string, message string) concep
 
 func NewDefineFunctionCreator(param *DefineFunctionCreatorParam) *DefineFunctionCreator {
 	return &DefineFunctionCreator{
-		Seeds: map[string]func(string, *DefineFunction) string{},
+		Seeds: map[string]func(string, concept.Closure, *DefineFunction) string{},
 		param: param,
 	}
 }

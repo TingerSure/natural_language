@@ -10,7 +10,7 @@ import (
 )
 
 type NewParamSeed interface {
-	ToLanguage(string, *NewParam) string
+	ToLanguage(string, concept.Closure, *NewParam) string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
 }
@@ -39,8 +39,8 @@ func (f *NewParam) SetKeyValue(keyValues []concept.Index) {
 	}
 }
 
-func (f *NewParam) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *NewParam) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *NewParam) ToString(prefix string) string {
@@ -119,6 +119,33 @@ func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interr
 	return nil, a.seed.NewException("system panic", fmt.Sprintf("Unknown param types in NewParam.Exec", a.types))
 }
 
+func (a *NewParam) Iterate(names []concept.String, on func(key concept.String, line concept.Index) bool) bool {
+	if a.types == concept.ParamTypeList {
+		for index, item := range a.list {
+			if index >= len(names) {
+				return false
+			}
+			if on(names[index], item) {
+				return true
+			}
+		}
+		return false
+	}
+	if a.types == concept.ParamTypeKeyValue {
+		for _, name := range names {
+			item := a.values.Get(name)
+			if item == nil {
+				continue
+			}
+			if on(name, item.(concept.Index)) {
+				return true
+			}
+		}
+		return false
+	}
+	return false
+}
+
 type NewParamCreatorParam struct {
 	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
 	ParamCreator           func() concept.Param
@@ -127,7 +154,7 @@ type NewParamCreatorParam struct {
 }
 
 type NewParamCreator struct {
-	Seeds map[string]func(string, *NewParam) string
+	Seeds map[string]func(string, concept.Closure, *NewParam) string
 	param *NewParamCreatorParam
 }
 
@@ -136,7 +163,7 @@ func (s *NewParamCreator) New() *NewParam {
 		seed: s,
 		values: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
-			EmptyValue: s.param.NullCreator(),
+			EmptyValue: nil,
 		}),
 		types: concept.ParamTypeKeyValue,
 	}
@@ -152,17 +179,17 @@ func (s *NewParamCreator) NewException(name string, message string) concept.Exce
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *NewParamCreator) ToLanguage(language string, instance *NewParam) string {
+func (s *NewParamCreator) ToLanguage(language string, space concept.Closure, instance *NewParam) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func NewNewParamCreator(param *NewParamCreatorParam) *NewParamCreator {
 	return &NewParamCreator{
-		Seeds: map[string]func(string, *NewParam) string{},
+		Seeds: map[string]func(string, concept.Closure, *NewParam) string{},
 		param: param,
 	}
 }

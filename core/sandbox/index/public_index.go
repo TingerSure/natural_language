@@ -6,7 +6,7 @@ import (
 )
 
 type PublicIndexSeed interface {
-	ToLanguage(string, *PublicIndex) string
+	ToLanguage(string, concept.Closure, *PublicIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -35,8 +35,8 @@ func (f *PublicIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *PublicIndex) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *PublicIndex) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (s *PublicIndex) ToString(prefix string) string {
@@ -71,7 +71,7 @@ type PublicIndexCreatorParam struct {
 }
 
 type PublicIndexCreator struct {
-	Seeds map[string]func(string, *PublicIndex) string
+	Seeds map[string]func(string, concept.Closure, *PublicIndex) string
 	param *PublicIndexCreatorParam
 }
 
@@ -83,12 +83,12 @@ func (s *PublicIndexCreator) New(name string, originator concept.Index) *PublicI
 	}
 }
 
-func (s *PublicIndexCreator) ToLanguage(language string, instance *PublicIndex) string {
+func (s *PublicIndexCreator) ToLanguage(language string, space concept.Closure, instance *PublicIndex) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func (s *PublicIndexCreator) Type() string {
@@ -109,7 +109,7 @@ func (s *PublicIndexCreator) NewNull() concept.Null {
 
 func NewPublicIndexCreator(param *PublicIndexCreatorParam) *PublicIndexCreator {
 	return &PublicIndexCreator{
-		Seeds: map[string]func(string, *PublicIndex) string{},
+		Seeds: map[string]func(string, concept.Closure, *PublicIndex) string{},
 		param: param,
 	}
 }

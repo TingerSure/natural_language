@@ -10,7 +10,7 @@ import (
 )
 
 type NewFunctionSeed interface {
-	ToLanguage(string, *NewFunction) string
+	ToLanguage(string, concept.Closure, *NewFunction) string
 	NewFunction(concept.Closure) *variable.Function
 }
 
@@ -46,8 +46,8 @@ func (f *NewFunction) SetSteps(steps []concept.Index) {
 	f.steps = steps
 }
 
-func (f *NewFunction) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *NewFunction) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *NewFunction) ToString(prefix string) string {
@@ -94,7 +94,7 @@ type NewFunctionCreatorParam struct {
 }
 
 type NewFunctionCreator struct {
-	Seeds map[string]func(string, *NewFunction) string
+	Seeds map[string]func(string, concept.Closure, *NewFunction) string
 	param *NewFunctionCreatorParam
 }
 
@@ -113,17 +113,17 @@ func (s *NewFunctionCreator) NewFunction(parent concept.Closure) *variable.Funct
 	return s.param.FunctionCreator(parent)
 }
 
-func (s *NewFunctionCreator) ToLanguage(language string, instance *NewFunction) string {
+func (s *NewFunctionCreator) ToLanguage(language string, space concept.Closure, instance *NewFunction) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func NewNewFunctionCreator(param *NewFunctionCreatorParam) *NewFunctionCreator {
 	return &NewFunctionCreator{
-		Seeds: map[string]func(string, *NewFunction) string{},
+		Seeds: map[string]func(string, concept.Closure, *NewFunction) string{},
 		param: param,
 	}
 }

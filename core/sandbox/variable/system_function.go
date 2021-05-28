@@ -12,7 +12,7 @@ const (
 )
 
 type SystemFunctionSeed interface {
-	ToLanguage(string, *SystemFunction) string
+	ToLanguage(string, concept.Closure, *SystemFunction) string
 	Type() string
 }
 
@@ -37,8 +37,12 @@ func (o *SystemFunction) Call(specimen concept.String, param concept.Param) (con
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *SystemFunction) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *SystemFunction) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
+}
+
+func (f *SystemFunction) ToCallLanguage(language string, space concept.Closure, self string, param concept.Param) string {
+	return f.ToCallLanguageAdaptor(f, language, space, self, param)
 }
 
 func (f *SystemFunction) AddParamName(paramNames ...concept.String) {
@@ -95,7 +99,7 @@ type SystemFunctionCreatorParam struct {
 }
 
 type SystemFunctionCreator struct {
-	Seeds map[string]func(string, *SystemFunction) string
+	Seeds map[string]func(string, concept.Closure, *SystemFunction) string
 	param *SystemFunctionCreatorParam
 }
 
@@ -119,12 +123,12 @@ func (s *SystemFunctionCreator) New(
 	}
 }
 
-func (s *SystemFunctionCreator) ToLanguage(language string, instance *SystemFunction) string {
+func (s *SystemFunctionCreator) ToLanguage(language string, space concept.Closure, instance *SystemFunction) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func (s *SystemFunctionCreator) Type() string {
@@ -133,7 +137,7 @@ func (s *SystemFunctionCreator) Type() string {
 
 func NewSystemFunctionCreator(param *SystemFunctionCreatorParam) *SystemFunctionCreator {
 	return &SystemFunctionCreator{
-		Seeds: map[string]func(string, *SystemFunction) string{},
+		Seeds: map[string]func(string, concept.Closure, *SystemFunction) string{},
 		param: param,
 	}
 }

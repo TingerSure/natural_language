@@ -90,6 +90,10 @@ func (c *Closure) InitLocal(key concept.String, defaultValue concept.Variable) {
 	c.local.Init(key, defaultValue)
 }
 
+func (c *Closure) KeyLocal(key concept.String) concept.String {
+	return c.local.Key(key)
+}
+
 func (c *Closure) PeekLocal(key concept.String) (concept.Variable, concept.Exception) {
 	if !c.local.Has(key) {
 		return nil, c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: %v.", key.ToString("")))
@@ -126,6 +130,17 @@ func (c *Closure) HasBubble(key concept.String) bool {
 		return c.parent.HasBubble(key)
 	}
 	return false
+}
+
+
+func (c *Closure) KeyBubble(key concept.String) concept.String {
+	if c.local.Has(key) {
+		return c.local.Key(key)
+	}
+	if c.parent != nil {
+		return c.parent.KeyBubble(key)
+	}
+	return key
 }
 
 func (c *Closure) PeekBubble(key concept.String) (concept.Variable, concept.Exception) {

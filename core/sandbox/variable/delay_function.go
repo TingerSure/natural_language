@@ -11,7 +11,7 @@ const (
 )
 
 type DelayFunctionSeed interface {
-	ToLanguage(string, *DelayFunction) string
+	ToLanguage(string, concept.Closure, *DelayFunction) string
 	Type() string
 }
 
@@ -80,12 +80,12 @@ func (o *DelayFunction) ToString(prefix string) string {
 	return o.funcs.ToString(prefix)
 }
 
-func (a *DelayFunction) GetLanguageOnCallSeed(language string) func(concept.Function, concept.Param) string {
+func (a *DelayFunction) GetLanguageOnCallSeed(language string) func(concept.Function, concept.Closure, string, concept.Param) string {
 	a.init()
 	return a.funcs.GetLanguageOnCallSeed(language)
 }
 
-func (a *DelayFunction) SetLanguageOnCallSeed(language string, seed func(concept.Function, concept.Param) string) {
+func (a *DelayFunction) SetLanguageOnCallSeed(language string, seed func(concept.Function, concept.Closure, string, concept.Param) string) {
 	a.init()
 	a.funcs.SetLanguageOnCallSeed(language, seed)
 }
@@ -105,9 +105,13 @@ func (f *DelayFunction) Call(specimen concept.String, param concept.Param) (conc
 	return f.funcs.Call(specimen, param)
 }
 
-func (f *DelayFunction) ToLanguage(language string) string {
+func (f *DelayFunction) ToCallLanguage(language string, space concept.Closure, self string, param concept.Param) string {
 	f.init()
-	return f.seed.ToLanguage(language, f)
+	return f.funcs.ToCallLanguage(language, space, self, param)
+}
+
+func (f *DelayFunction) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (f *DelayFunction) AddParamName(paramNames ...concept.String) {
@@ -152,7 +156,7 @@ type DelayFunctionCreatorParam struct {
 }
 
 type DelayFunctionCreator struct {
-	Seeds map[string]func(string, *DelayFunction) string
+	Seeds map[string]func(string, concept.Closure, *DelayFunction) string
 	param *DelayFunctionCreatorParam
 }
 
@@ -163,12 +167,12 @@ func (s *DelayFunctionCreator) New(create func() concept.Function) *DelayFunctio
 	}
 }
 
-func (s *DelayFunctionCreator) ToLanguage(language string, instance *DelayFunction) string {
+func (s *DelayFunctionCreator) ToLanguage(language string, space concept.Closure, instance *DelayFunction) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func (s *DelayFunctionCreator) Type() string {
@@ -177,7 +181,7 @@ func (s *DelayFunctionCreator) Type() string {
 
 func NewDelayFunctionCreator(param *DelayFunctionCreatorParam) *DelayFunctionCreator {
 	return &DelayFunctionCreator{
-		Seeds: map[string]func(string, *DelayFunction) string{},
+		Seeds: map[string]func(string, concept.Closure, *DelayFunction) string{},
 		param: param,
 	}
 }

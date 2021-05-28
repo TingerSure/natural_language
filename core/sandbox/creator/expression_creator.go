@@ -169,6 +169,7 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	})
 	instance.Call = expression.NewCallCreator(&expression.CallCreatorParam{
 		NullCreator:            param.NullCreator,
+		StringCreator:          param.StringCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 		ExceptionCreator:       param.ExceptionCreator,
 		ParamCreator:           param.ParamCreator,

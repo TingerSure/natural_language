@@ -8,7 +8,7 @@ import (
 )
 
 type ComponentSeed interface {
-	ToLanguage(string, *Component) string
+	ToLanguage(string, concept.Closure, *Component) string
 }
 
 type Component struct {
@@ -18,8 +18,8 @@ type Component struct {
 	seed   ComponentSeed
 }
 
-func (f *Component) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *Component) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *Component) ToString(prefix string) string {
@@ -60,7 +60,7 @@ type ComponentCreatorParam struct {
 }
 
 type ComponentCreator struct {
-	Seeds map[string]func(string, *Component) string
+	Seeds map[string]func(string, concept.Closure, *Component) string
 	param *ComponentCreatorParam
 }
 
@@ -74,17 +74,17 @@ func (s *ComponentCreator) New(object concept.Index, field concept.String) *Comp
 	return back
 }
 
-func (s *ComponentCreator) ToLanguage(language string, instance *Component) string {
+func (s *ComponentCreator) ToLanguage(language string, space concept.Closure, instance *Component) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func NewComponentCreator(param *ComponentCreatorParam) *ComponentCreator {
 	return &ComponentCreator{
-		Seeds: map[string]func(string, *Component) string{},
+		Seeds: map[string]func(string, concept.Closure, *Component) string{},
 		param: param,
 	}
 }

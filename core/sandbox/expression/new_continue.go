@@ -8,7 +8,7 @@ import (
 )
 
 type NewContinueSeed interface {
-	ToLanguage(string, *NewContinue) string
+	ToLanguage(string, concept.Closure, *NewContinue) string
 	NewNull() concept.Null
 	NewContinue(concept.String) *interrupt.Continue
 }
@@ -19,8 +19,8 @@ type NewContinue struct {
 	seed NewContinueSeed
 }
 
-func (f *NewContinue) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *NewContinue) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *NewContinue) ToString(prefix string) string {
@@ -42,7 +42,7 @@ type NewContinueCreatorParam struct {
 }
 
 type NewContinueCreator struct {
-	Seeds map[string]func(string, *NewContinue) string
+	Seeds map[string]func(string, concept.Closure, *NewContinue) string
 	param *NewContinueCreatorParam
 }
 
@@ -63,17 +63,17 @@ func (s *NewContinueCreator) NewNull() concept.Null {
 	return s.param.NullCreator()
 }
 
-func (s *NewContinueCreator) ToLanguage(language string, instance *NewContinue) string {
+func (s *NewContinueCreator) ToLanguage(language string, space concept.Closure, instance *NewContinue) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func NewNewContinueCreator(param *NewContinueCreatorParam) *NewContinueCreator {
 	return &NewContinueCreator{
-		Seeds: map[string]func(string, *NewContinue) string{},
+		Seeds: map[string]func(string, concept.Closure, *NewContinue) string{},
 		param: param,
 	}
 }

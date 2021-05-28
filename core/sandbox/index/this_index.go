@@ -11,7 +11,7 @@ const (
 )
 
 type ThisIndexSeed interface {
-	ToLanguage(string, *ThisIndex) string
+	ToLanguage(string, concept.Closure, *ThisIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -31,8 +31,8 @@ func (f *ThisIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *ThisIndex) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *ThisIndex) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (s *ThisIndex) ToString(prefix string) string {
@@ -80,7 +80,7 @@ type ThisIndexCreatorParam struct {
 }
 
 type ThisIndexCreator struct {
-	Seeds map[string]func(string, *ThisIndex) string
+	Seeds map[string]func(string, concept.Closure, *ThisIndex) string
 	param *ThisIndexCreatorParam
 }
 
@@ -90,12 +90,12 @@ func (s *ThisIndexCreator) New() *ThisIndex {
 	}
 }
 
-func (s *ThisIndexCreator) ToLanguage(language string, instance *ThisIndex) string {
+func (s *ThisIndexCreator) ToLanguage(language string, space concept.Closure, instance *ThisIndex) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func (s *ThisIndexCreator) Type() string {
@@ -120,7 +120,7 @@ func (s *ThisIndexCreator) NewString(value string) concept.String {
 
 func NewThisIndexCreator(param *ThisIndexCreatorParam) *ThisIndexCreator {
 	return &ThisIndexCreator{
-		Seeds: map[string]func(string, *ThisIndex) string{},
+		Seeds: map[string]func(string, concept.Closure, *ThisIndex) string{},
 		param: param,
 	}
 }

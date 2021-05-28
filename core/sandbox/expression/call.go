@@ -10,7 +10,7 @@ import (
 )
 
 type CallSeed interface {
-	ToLanguage(string, *Call) string
+	ToLanguage(string, concept.Closure, *Call) string
 	NewException(string, string) concept.Exception
 	NewNull() concept.Null
 	NewParam() concept.Param
@@ -31,8 +31,8 @@ func (c *Call) Param() *NewParam {
 	return c.param
 }
 
-func (f *Call) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *Call) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *Call) ToString(prefix string) string {
@@ -66,12 +66,13 @@ type CallCreatorParam struct {
 	ParamCreator           func() concept.Param
 	ConstIndexCreator      func(concept.Variable) *index.ConstIndex
 	NullCreator            func() concept.Null
+	StringCreator          func(string) concept.String
 	NewParamCreator        func() *NewParam
 	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
 }
 
 type CallCreator struct {
-	Seeds        map[string]func(string, *Call) string
+	Seeds        map[string]func(string, concept.Closure, *Call) string
 	param        *CallCreatorParam
 	defaultParam *NewParam
 }
@@ -89,12 +90,29 @@ func (s *CallCreator) New(funcs concept.Index, param *NewParam) *Call {
 	return back
 }
 
-func (s *CallCreator) ToLanguage(language string, instance *Call) string {
+func (s *CallCreator) toSeedLanguage(language string, space concept.Closure, instance *Call) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
+}
+
+func (s *CallCreator) ToLanguage(language string, space concept.Closure, instance *Call) string {
+	funcPre, suspend := instance.funcs.Get(space)
+	if !nl_interface.IsNil(suspend) {
+		return s.toSeedLanguage(language, space, instance)
+	}
+	funcs, yes := variable.VariableFamilyInstance.IsFunctionHome(funcPre)
+	if !yes {
+		return s.toSeedLanguage(language, space, instance)
+	}
+	param := s.param.ParamCreator()
+	instance.param.Iterate(funcs.ParamNames(), func(key concept.String, item concept.Index) bool {
+		param.Set(key, s.param.StringCreator(item.ToLanguage(language, space)))
+		return false
+	})
+	return funcs.ToCallLanguage(language, space, instance.funcs.ToLanguage(language, space), param)
 }
 
 func (s *CallCreator) NewNull() concept.Null {
@@ -111,7 +129,7 @@ func (s *CallCreator) NewException(name string, message string) concept.Exceptio
 
 func NewCallCreator(param *CallCreatorParam) *CallCreator {
 	return &CallCreator{
-		Seeds:        map[string]func(string, *Call) string{},
+		Seeds:        map[string]func(string, concept.Closure, *Call) string{},
 		param:        param,
 		defaultParam: param.NewParamCreator(),
 	}

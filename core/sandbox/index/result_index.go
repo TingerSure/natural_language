@@ -8,7 +8,7 @@ import (
 )
 
 type ResaultIndexSeed interface {
-	ToLanguage(string, *ResaultIndex) string
+	ToLanguage(string, concept.Closure, *ResaultIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -28,8 +28,8 @@ func (f *ResaultIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *ResaultIndex) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *ResaultIndex) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (s *ResaultIndex) ToString(prefix string) string {
@@ -90,7 +90,7 @@ type ResaultIndexCreatorParam struct {
 }
 
 type ResaultIndexCreator struct {
-	Seeds map[string]func(string, *ResaultIndex) string
+	Seeds map[string]func(string, concept.Closure, *ResaultIndex) string
 	param *ResaultIndexCreatorParam
 }
 
@@ -100,12 +100,12 @@ func (s *ResaultIndexCreator) New(items []concept.Matcher) *ResaultIndex {
 		seed:  s,
 	}
 }
-func (s *ResaultIndexCreator) ToLanguage(language string, instance *ResaultIndex) string {
+func (s *ResaultIndexCreator) ToLanguage(language string, space concept.Closure, instance *ResaultIndex) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func (s *ResaultIndexCreator) Type() string {
@@ -126,7 +126,7 @@ func (s *ResaultIndexCreator) NewNull() concept.Null {
 
 func NewResaultIndexCreator(param *ResaultIndexCreatorParam) *ResaultIndexCreator {
 	return &ResaultIndexCreator{
-		Seeds: map[string]func(string, *ResaultIndex) string{},
+		Seeds: map[string]func(string, concept.Closure, *ResaultIndex) string{},
 		param: param,
 	}
 }

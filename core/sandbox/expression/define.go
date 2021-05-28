@@ -8,7 +8,7 @@ import (
 )
 
 type DefineSeed interface {
-	ToLanguage(string, *Define) string
+	ToLanguage(string, concept.Closure, *Define) string
 	NewNull() concept.Null
 	NewException(string, string) concept.Exception
 }
@@ -20,8 +20,8 @@ type Define struct {
 	seed         DefineSeed
 }
 
-func (f *Define) ToLanguage(language string) string {
-	return f.seed.ToLanguage(language, f)
+func (f *Define) ToLanguage(language string, space concept.Closure) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (a *Define) ToString(prefix string) string {
@@ -61,7 +61,7 @@ type DefineCreatorParam struct {
 }
 
 type DefineCreator struct {
-	Seeds map[string]func(string, *Define) string
+	Seeds map[string]func(string, concept.Closure, *Define) string
 	param *DefineCreatorParam
 }
 
@@ -75,12 +75,12 @@ func (s *DefineCreator) New(key concept.String, defaultValue concept.Index) *Def
 	return back
 }
 
-func (s *DefineCreator) ToLanguage(language string, instance *Define) string {
+func (s *DefineCreator) ToLanguage(language string, space concept.Closure, instance *Define) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
 	}
-	return seed(language, instance)
+	return seed(language, space, instance)
 }
 
 func (s *DefineCreator) NewException(name string, message string) concept.Exception {
@@ -93,7 +93,7 @@ func (s *DefineCreator) NewNull() concept.Null {
 
 func NewDefineCreator(param *DefineCreatorParam) *DefineCreator {
 	return &DefineCreator{
-		Seeds: map[string]func(string, *Define) string{},
+		Seeds: map[string]func(string, concept.Closure, *Define) string{},
 		param: param,
 	}
 }

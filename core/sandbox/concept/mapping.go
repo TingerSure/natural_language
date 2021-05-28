@@ -66,6 +66,14 @@ func (k *Mapping) Get(specimen String) interface{} {
 	return item.value
 }
 
+func (k *Mapping) Key(specimen String) String {
+	item, yes := k.values[specimen.Value()]
+	if !yes {
+		return specimen
+	}
+	return item.key
+}
+
 func (k *Mapping) Has(specimen String) bool {
 	_, yes := k.values[specimen.Value()]
 	return yes
