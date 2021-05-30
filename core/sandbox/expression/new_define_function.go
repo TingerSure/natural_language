@@ -11,7 +11,7 @@ import (
 
 type NewDefineFunctionSeed interface {
 	ToLanguage(string, concept.Closure, *NewDefineFunction) string
-	NewDefineFunction() *variable.DefineFunction
+	NewDefineFunction([]concept.String, []concept.String) *variable.DefineFunction
 }
 
 type NewDefineFunction struct {
@@ -58,22 +58,18 @@ func (a *NewDefineFunction) ToString(prefix string) string {
 }
 
 func (a *NewDefineFunction) Anticipate(space concept.Closure) concept.Variable {
-	function := a.seed.NewDefineFunction()
-	function.AddParamName(a.params...)
-	function.AddReturnName(a.returns...)
+	function := a.seed.NewDefineFunction(a.params, a.returns)
 	return function
 }
 
 func (a *NewDefineFunction) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
-	function := a.seed.NewDefineFunction()
-	function.AddParamName(a.params...)
-	function.AddReturnName(a.returns...)
+	function := a.seed.NewDefineFunction(a.params, a.returns)
 	return function, nil
 }
 
 type NewDefineFunctionCreatorParam struct {
 	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
-	DefineFunctionCreator  func() *variable.DefineFunction
+	DefineFunctionCreator  func([]concept.String, []concept.String) *variable.DefineFunction
 }
 
 type NewDefineFunctionCreator struct {
@@ -91,8 +87,8 @@ func (s *NewDefineFunctionCreator) New() *NewDefineFunction {
 	return back
 }
 
-func (s *NewDefineFunctionCreator) NewDefineFunction() *variable.DefineFunction {
-	return s.param.DefineFunctionCreator()
+func (s *NewDefineFunctionCreator) NewDefineFunction(paramNames []concept.String, returnNames []concept.String) *variable.DefineFunction {
+	return s.param.DefineFunctionCreator(paramNames, returnNames)
 }
 
 func (s *NewDefineFunctionCreator) ToLanguage(language string, space concept.Closure, instance *NewDefineFunction) string {

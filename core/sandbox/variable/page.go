@@ -23,7 +23,7 @@ type PageSeed interface {
 type Page struct {
 	seed     PageSeed
 	publics  *concept.Mapping
-	privates *concept.Mapping
+	privates []concept.Index
 	space    concept.Closure
 }
 
@@ -63,7 +63,7 @@ func (o *Page) SetPrivate(specimen concept.String, indexes concept.Index) error 
 		}
 		return errors.New(fmt.Sprintf("An illegal interrupt \"%v\" was thrown while declaring variable : %v.", suspend.InterruptType(), specimen.ToString("")))
 	}
-	o.privates.Set(specimen, indexes)
+	o.privates = append(o.privates, indexes)
 	o.space.InitLocal(specimen, value)
 	return nil
 }
@@ -99,10 +99,9 @@ func (o *Page) Iterate(on func(concept.String, concept.Variable) bool) bool {
 
 func (o *Page) ToString(prefix string) string {
 	lines := []string{}
-	o.privates.Iterate(func(key concept.String, value interface{}) bool {
-		lines = append(lines, value.(concept.Index).ToString(prefix))
-		return false
-	})
+	for _, value := range o.privates {
+		lines = append(lines, value.ToString(prefix))
+	}
 	return strings.Join(lines, "\n")
 }
 
@@ -153,10 +152,7 @@ func (s *PageCreator) New() *Page {
 			AutoInit:   true,
 			EmptyValue: s.param.NullCreator(),
 		}),
-		privates: concept.NewMapping(&concept.MappingParam{
-			AutoInit:   true,
-			EmptyValue: s.param.NullCreator(),
-		}),
+		privates: []concept.Index{},
 	}
 }
 

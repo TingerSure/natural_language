@@ -69,8 +69,8 @@ func NewSandboxCreator() *SandboxCreator {
 		ClassCreator: func() concept.Class {
 			return instance.Variable.Class.New()
 		},
-		DefineFunctionCreator: func() *variable.DefineFunction {
-			return instance.Variable.DefineFunction.New()
+		DefineFunctionCreator: func(paramNames []concept.String, returnNames []concept.String) *variable.DefineFunction {
+			return instance.Variable.DefineFunction.New(paramNames, returnNames)
 		},
 		FunctionCreator: func(parent concept.Closure) *variable.Function {
 			return instance.Variable.Function.New(parent)

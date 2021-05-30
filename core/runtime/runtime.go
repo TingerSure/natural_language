@@ -42,6 +42,10 @@ type Runtime struct {
 	priorityErrorFormat func(*parser.Road) string
 }
 
+func (r *Runtime) GetRootSpace() *closure.Closure {
+	return r.rootSpace
+}
+
 func (r *Runtime) SetStructErrorFormat(format func(*parser.Road) string) {
 	if format == nil {
 		r.structErrorFormat = runtimeStructErrorFormatDefault

@@ -2,6 +2,7 @@ package variable
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable/adaptor"
 )
@@ -120,6 +121,31 @@ func (s *SystemFunctionCreator) New(
 		paramNames:      paramNames,
 		returnNames:     returnNames,
 		seed:            s,
+	}
+}
+
+func (s *SystemFunctionCreator) NewAutoAnticipate(
+	funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
+	paramNames []concept.String,
+	returnNames []concept.String,
+) *SystemFunction {
+	return &SystemFunction{
+		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
+			NullCreator:      s.param.NullCreator,
+			ParamCreator:     s.param.ParamCreator,
+			ExceptionCreator: s.param.ExceptionCreator,
+		}),
+		funcs: funcs,
+		anticipateFuncs: func(param concept.Param, object concept.Variable) concept.Param {
+			back, suspend := funcs(param, object)
+			if !nl_interface.IsNil(suspend) {
+				return s.param.ParamCreator()
+			}
+			return back
+		},
+		paramNames:  paramNames,
+		returnNames: returnNames,
+		seed:        s,
 	}
 }
 

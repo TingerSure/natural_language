@@ -132,7 +132,6 @@ func (c *Closure) HasBubble(key concept.String) bool {
 	return false
 }
 
-
 func (c *Closure) KeyBubble(key concept.String) concept.String {
 	if c.local.Has(key) {
 		return c.local.Key(key)

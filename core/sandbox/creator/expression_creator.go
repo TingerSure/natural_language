@@ -39,7 +39,7 @@ type ExpressionCreator struct {
 
 type ExpressionCreatorParam struct {
 	CodeBlockCreator      func() *code_block.CodeBlock
-	DefineFunctionCreator func() *variable.DefineFunction
+	DefineFunctionCreator func([]concept.String, []concept.String) *variable.DefineFunction
 	FunctionCreator       func(concept.Closure) *variable.Function
 	StringCreator         func(string) concept.String
 	BoolCreator           func(bool) concept.Bool
