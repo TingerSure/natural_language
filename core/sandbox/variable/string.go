@@ -32,14 +32,6 @@ func (f *String) ToLanguage(language string, space concept.Closure) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
-func (n *String) GetSystem() string {
-	return n.value
-}
-
-func (n *String) SetSystem(value string) {
-	n.value = value
-}
-
 func (n *String) GetLanguage(language string) string {
 	value := n.mapping[language]
 	if value == "" {

@@ -3,8 +3,6 @@ package concept
 type String interface {
 	Variable
 	Value() string
-	GetSystem() string
-	SetSystem(string)
 	GetLanguage(string) string
 	SetLanguage(string, string)
 	HasLanguage(string) bool

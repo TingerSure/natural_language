@@ -89,16 +89,6 @@ func (f *DelayString) ToLanguage(language string, space concept.Closure) string 
 	return f.seed.ToLanguage(language, space, f)
 }
 
-func (o *DelayString) GetSystem() string {
-	o.init()
-	return o.value.GetSystem()
-}
-
-func (o *DelayString) SetSystem(value string) {
-	o.init()
-	o.value.SetSystem(value)
-}
-
 func (n *DelayString) GetLanguage(language string) string {
 	n.init()
 	return n.value.GetLanguage(language)
