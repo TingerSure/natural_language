@@ -121,11 +121,7 @@ func (s *ArrayCreator) FieldSize(array *Array) func() concept.Function {
 				back.Set(backSize, s.param.NumberCreator(float64(array.Length())))
 				return back, nil
 			},
-			func(param concept.Param, _ concept.Variable) concept.Param {
-				back := s.param.ParamCreator()
-				back.Set(backSize, s.param.NumberCreator(float64(array.Length())))
-				return back
-			},
+			nil,
 			[]concept.String{},
 			[]concept.String{
 				backSize,

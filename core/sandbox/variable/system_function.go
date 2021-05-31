@@ -15,6 +15,7 @@ const (
 type SystemFunctionSeed interface {
 	ToLanguage(string, concept.Closure, *SystemFunction) string
 	Type() string
+	NewParam() concept.Param
 }
 
 type SystemFunction struct {
@@ -41,6 +42,13 @@ func (f *SystemFunction) ToString(prefix string) string {
 }
 
 func (f *SystemFunction) Anticipate(params concept.Param, object concept.Variable) concept.Param {
+	if f.anticipateFuncs == nil {
+		back, suspend := f.Exec(params, object)
+		if !nl_interface.IsNil(suspend) {
+			return f.seed.NewParam()
+		}
+		return back
+	}
 	return f.anticipateFuncs(f.paramFormat(params), object)
 }
 
@@ -114,23 +122,8 @@ func (s *SystemFunctionCreator) New(
 	return system
 }
 
-func (s *SystemFunctionCreator) NewAutoAnticipate(
-	funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
-	paramNames []concept.String,
-	returnNames []concept.String,
-) *SystemFunction {
-	return s.New(
-		funcs,
-		func(param concept.Param, object concept.Variable) concept.Param {
-			back, suspend := funcs(param, object)
-			if !nl_interface.IsNil(suspend) {
-				return s.param.ParamCreator()
-			}
-			return back
-		},
-		paramNames,
-		returnNames,
-	)
+func (s *SystemFunctionCreator) NewParam() concept.Param {
+	return s.param.ParamCreator()
 }
 
 func (s *SystemFunctionCreator) ToLanguage(language string, space concept.Closure, instance *SystemFunction) string {

@@ -14,7 +14,7 @@ func newClosureObject(libs *tree.LibraryManager, closure concept.Closure) concep
 	valueParam := libs.Sandbox.Variable.String.New("value")
 	object.SetField(
 		libs.Sandbox.Variable.String.New("GetLocal"),
-		libs.Sandbox.Variable.SystemFunction.NewAutoAnticipate(
+		libs.Sandbox.Variable.SystemFunction.New(
 			func(input concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
 				keyPre := input.Get(keyParam)
 				key, yes := variable.VariableFamilyInstance.IsStringHome(keyPre)
@@ -29,6 +29,7 @@ func newClosureObject(libs *tree.LibraryManager, closure concept.Closure) concep
 				output.Set(valueParam, back)
 				return output, nil
 			},
+			nil,
 			[]concept.String{keyParam},
 			[]concept.String{valueParam},
 		),

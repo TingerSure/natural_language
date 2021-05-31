@@ -117,15 +117,7 @@ func (s *AdaptorFunction) fieldParamList() concept.Function {
 			back.Set(backList, paramNames)
 			return back, nil
 		},
-		func(param concept.Param, _ concept.Variable) concept.Param {
-			paramNames := s.param.ArrayCreator()
-			for _, paramName := range s.ParamNames() {
-				paramNames.Append(paramName)
-			}
-			back := s.param.ParamCreator()
-			back.Set(backList, paramNames)
-			return back
-		},
+		nil,
 		[]concept.String{},
 		[]concept.String{
 			backList,
@@ -145,15 +137,7 @@ func (s *AdaptorFunction) fieldReturnList() concept.Function {
 			back.Set(backList, returnNames)
 			return back, nil
 		},
-		func(param concept.Param, _ concept.Variable) concept.Param {
-			returnNames := s.param.ArrayCreator()
-			for _, returnName := range s.ReturnNames() {
-				returnNames.Append(returnName)
-			}
-			back := s.param.ParamCreator()
-			back.Set(backList, returnNames)
-			return back
-		},
+		nil,
 		[]concept.String{},
 		[]concept.String{
 			backList,
