@@ -6,7 +6,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	// "github.com/TingerSure/natural_language/language/chinese"
 	"github.com/TingerSure/natural_language/library/system"
-	system_runtime "github.com/TingerSure/natural_language/library/system/runtime"
+	lib_runtime "github.com/TingerSure/natural_language/library/system/runtime"
 	"github.com/TingerSure/natural_language/library/system/std"
 	"os"
 	"time"
@@ -41,7 +41,7 @@ func getVM() (*runtime.Runtime, error) {
 				os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[NL]:\033[00m %v\n", value.ToLanguage(ChineseName, nil)))
 			},
 		},
-		RuntimeParam: &system_runtime.RuntimeParam{
+		RuntimeParam: &lib_runtime.RuntimeParam{
 			RootSpace: VM.GetRootSpace(),
 		},
 	})

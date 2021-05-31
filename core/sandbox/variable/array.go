@@ -129,6 +129,7 @@ func (s *ArrayCreator) FieldSize(array *Array) func() concept.Function {
 		)
 	}
 }
+
 func (s *ArrayCreator) ToLanguage(language string, space concept.Closure, instance *Array) string {
 	seed := s.Seeds[language]
 	if seed == nil {

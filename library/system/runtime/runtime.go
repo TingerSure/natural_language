@@ -31,6 +31,13 @@ func NewRuntime(libs *tree.LibraryManager, param *RuntimeParam) *Runtime {
 			libs.Sandbox.Index.ConstIndex.New(instance.rootSpace),
 		),
 	)
+	instance.SetPublic(
+		libs.Sandbox.Variable.String.New("sandbox"),
+		libs.Sandbox.Index.PublicIndex.New(
+			"sandbox",
+			libs.Sandbox.Index.ConstIndex.New(newSandboxCreator(libs)),
+		),
+	)
 
 	return instance
 }

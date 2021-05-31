@@ -92,8 +92,18 @@ func (s *String) CloneTo(instance concept.String) {
 }
 
 type StringCreatorParam struct {
-	NullCreator      func() concept.Null
-	ExceptionCreator func(string, string) concept.Exception
+	NullCreator           func() concept.Null
+	ExceptionCreator      func(string, string) concept.Exception
+	ParamCreator          func() concept.Param
+	StringCreator         func(string) concept.String
+	DelayStringCreator    func(string) concept.String
+	DelayFunctionCreator  func(func() concept.Function) concept.Function
+	SystemFunctionCreator func(
+		funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
+		anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
+		paramNames []concept.String,
+		returnNames []concept.String,
+	) concept.Function
 }
 
 type StringCreator struct {
@@ -102,7 +112,7 @@ type StringCreator struct {
 }
 
 func (s *StringCreator) New(value string) *String {
-	return &String{
+	back := &String{
 		AdaptorVariable: adaptor.NewAdaptorVariable(&adaptor.AdaptorVariableParam{
 			NullCreator:      s.param.NullCreator,
 			ExceptionCreator: s.param.ExceptionCreator,
@@ -110,6 +120,67 @@ func (s *StringCreator) New(value string) *String {
 		value:   value,
 		mapping: make(map[string]string),
 		seed:    s,
+	}
+	back.SetField(s.param.DelayStringCreator("SetLanguage"), s.param.DelayFunctionCreator(s.fieldSetLanguage(back)))
+	back.SetField(s.param.DelayStringCreator("GetLanguage"), s.param.DelayFunctionCreator(s.fieldGetLanguage(back)))
+	return back
+}
+
+func (s *StringCreator) fieldSetLanguage(target *String) func() concept.Function {
+	return func() concept.Function {
+		languageParam := s.param.StringCreator("language")
+		valueParam := s.param.StringCreator("value")
+		return s.param.SystemFunctionCreator(
+			func(param concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
+				languagePre := param.Get(languageParam)
+				language, yes := VariableFamilyInstance.IsStringHome(languagePre)
+				if !yes {
+					return nil, s.param.ExceptionCreator("type error", fmt.Sprintf("Param language is not a string: %v", languagePre))
+				}
+				valuePre := param.Get(valueParam)
+				value, yes := VariableFamilyInstance.IsStringHome(valuePre)
+				if !yes {
+					return nil, s.param.ExceptionCreator("type error", fmt.Sprintf("Param value is not a string: %v", languagePre))
+				}
+				target.SetLanguage(language.Value(), value.Value())
+				return s.param.ParamCreator(), nil
+			},
+			func(param concept.Param, _ concept.Variable) concept.Param {
+				return s.param.ParamCreator()
+			},
+			[]concept.String{
+				languageParam,
+				valueParam,
+			},
+			[]concept.String{},
+		)
+	}
+}
+
+func (s *StringCreator) fieldGetLanguage(target *String) func() concept.Function {
+	return func() concept.Function {
+		languageParam := s.param.StringCreator("language")
+		valueBack := s.param.StringCreator("value")
+		return s.param.SystemFunctionCreator(
+			func(input concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
+				languagePre := input.Get(languageParam)
+				language, yes := VariableFamilyInstance.IsStringHome(languagePre)
+				if !yes {
+					return nil, s.param.ExceptionCreator("type error", fmt.Sprintf("Param language is not a string: %v", languagePre))
+				}
+				value := target.GetLanguage(language.Value())
+				output := s.param.ParamCreator()
+				output.Set(valueBack, s.param.StringCreator(value))
+				return output, nil
+			},
+			nil,
+			[]concept.String{
+				languageParam,
+			},
+			[]concept.String{
+				valueBack,
+			},
+		)
 	}
 }
 

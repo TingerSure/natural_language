@@ -110,8 +110,6 @@ func (c *Compiler) ReadPage(path string) (concept.Index, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(page.ToString(""))
 	return page, nil
 }
 
