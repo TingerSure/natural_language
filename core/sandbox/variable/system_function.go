@@ -19,19 +19,9 @@ type SystemFunctionSeed interface {
 
 type SystemFunction struct {
 	*adaptor.AdaptorFunction
-	paramNames      []concept.String
-	returnNames     []concept.String
 	funcs           func(concept.Param, concept.Variable) (concept.Param, concept.Exception)
 	anticipateFuncs func(concept.Param, concept.Variable) concept.Param
 	seed            SystemFunctionSeed
-}
-
-func (f *SystemFunction) ParamFormat(params concept.Param) concept.Param {
-	return f.AdaptorFunction.AdaptorParamFormat(f, params)
-}
-
-func (f *SystemFunction) ReturnFormat(back concept.String) concept.String {
-	return f.AdaptorFunction.AdaptorReturnFormat(f, back)
 }
 
 func (o *SystemFunction) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
@@ -46,24 +36,8 @@ func (f *SystemFunction) ToCallLanguage(language string, space concept.Closure, 
 	return f.ToCallLanguageAdaptor(f, language, space, self, param)
 }
 
-func (f *SystemFunction) AddParamName(paramNames ...concept.String) {
-	f.paramNames = append(f.paramNames, paramNames...)
-}
-
-func (f *SystemFunction) AddReturnName(returnNames ...concept.String) {
-	f.returnNames = append(f.returnNames, returnNames...)
-}
-
-func (s *SystemFunction) ParamNames() []concept.String {
-	return s.paramNames
-}
-
-func (s *SystemFunction) ReturnNames() []concept.String {
-	return s.returnNames
-}
-
 func (f *SystemFunction) ToString(prefix string) string {
-	return fmt.Sprintf("system_function (%v) %v {}", StringJoin(f.paramNames, ", "), StringJoin(f.returnNames, ", "))
+	return fmt.Sprintf("system_function (%v) %v {}", StringJoin(f.ParamNames(), ", "), StringJoin(f.ReturnNames(), ", "))
 }
 
 func (f *SystemFunction) Anticipate(params concept.Param, object concept.Variable) concept.Param {
@@ -76,7 +50,7 @@ func (f *SystemFunction) Exec(params concept.Param, object concept.Variable) (co
 
 func (f *SystemFunction) paramFormat(params concept.Param) concept.Param {
 	if params.ParamType() == concept.ParamTypeList {
-		for index, name := range f.paramNames {
+		for index, name := range f.ParamNames() {
 			if index < params.SizeIndex() {
 				params.Set(name, params.GetIndex(index))
 			}
@@ -94,9 +68,19 @@ func (s *SystemFunction) FunctionType() string {
 }
 
 type SystemFunctionCreatorParam struct {
-	NullCreator      func() concept.Null
-	ParamCreator     func() concept.Param
-	ExceptionCreator func(string, string) concept.Exception
+	NullCreator           func() concept.Null
+	ParamCreator          func() concept.Param
+	ExceptionCreator      func(string, string) concept.Exception
+	StringCreator         func(string) concept.String
+	DelayStringCreator    func(string) concept.String
+	DelayFunctionCreator  func(func() concept.Function) concept.Function
+	ArrayCreator          func() concept.Array
+	SystemFunctionCreator func(
+		funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
+		anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
+		paramNames []concept.String,
+		returnNames []concept.String,
+	) concept.Function
 }
 
 type SystemFunctionCreator struct {
@@ -110,18 +94,24 @@ func (s *SystemFunctionCreator) New(
 	paramNames []concept.String,
 	returnNames []concept.String,
 ) *SystemFunction {
-	return &SystemFunction{
+	system := &SystemFunction{
 		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
-			NullCreator:      s.param.NullCreator,
-			ParamCreator:     s.param.ParamCreator,
-			ExceptionCreator: s.param.ExceptionCreator,
+			NullCreator:           s.param.NullCreator,
+			ParamCreator:          s.param.ParamCreator,
+			ExceptionCreator:      s.param.ExceptionCreator,
+			SystemFunctionCreator: s.param.SystemFunctionCreator,
+			ArrayCreator:          s.param.ArrayCreator,
+			DelayFunctionCreator:  s.param.DelayFunctionCreator,
+			DelayStringCreator:    s.param.DelayStringCreator,
+			StringCreator:         s.param.StringCreator,
 		}),
 		funcs:           funcs,
 		anticipateFuncs: anticipateFuncs,
-		paramNames:      paramNames,
-		returnNames:     returnNames,
 		seed:            s,
 	}
+	system.AddParamName(paramNames...)
+	system.AddReturnName(returnNames...)
+	return system
 }
 
 func (s *SystemFunctionCreator) NewAutoAnticipate(
@@ -129,24 +119,18 @@ func (s *SystemFunctionCreator) NewAutoAnticipate(
 	paramNames []concept.String,
 	returnNames []concept.String,
 ) *SystemFunction {
-	return &SystemFunction{
-		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
-			NullCreator:      s.param.NullCreator,
-			ParamCreator:     s.param.ParamCreator,
-			ExceptionCreator: s.param.ExceptionCreator,
-		}),
-		funcs: funcs,
-		anticipateFuncs: func(param concept.Param, object concept.Variable) concept.Param {
+	return s.New(
+		funcs,
+		func(param concept.Param, object concept.Variable) concept.Param {
 			back, suspend := funcs(param, object)
 			if !nl_interface.IsNil(suspend) {
 				return s.param.ParamCreator()
 			}
 			return back
 		},
-		paramNames:  paramNames,
-		returnNames: returnNames,
-		seed:        s,
-	}
+		paramNames,
+		returnNames,
+	)
 }
 
 func (s *SystemFunctionCreator) ToLanguage(language string, space concept.Closure, instance *SystemFunction) string {

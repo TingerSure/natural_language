@@ -21,17 +21,7 @@ type DefineFunctionSeed interface {
 
 type DefineFunction struct {
 	*adaptor.AdaptorFunction
-	paramNames  []concept.String
-	returnNames []concept.String
-	seed        DefineFunctionSeed
-}
-
-func (f *DefineFunction) ParamFormat(params concept.Param) concept.Param {
-	return f.AdaptorFunction.AdaptorParamFormat(f, params)
-}
-
-func (f *DefineFunction) ReturnFormat(back concept.String) concept.String {
-	return f.AdaptorFunction.AdaptorReturnFormat(f, back)
+	seed DefineFunctionSeed
 }
 
 func (o *DefineFunction) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
@@ -46,24 +36,8 @@ func (f *DefineFunction) ToCallLanguage(language string, space concept.Closure, 
 	return f.ToCallLanguageAdaptor(f, language, space, self, param)
 }
 
-func (f *DefineFunction) AddParamName(paramNames ...concept.String) {
-	f.paramNames = append(f.paramNames, paramNames...)
-}
-
-func (f *DefineFunction) AddReturnName(returnNames ...concept.String) {
-	f.returnNames = append(f.returnNames, returnNames...)
-}
-
-func (s *DefineFunction) ParamNames() []concept.String {
-	return s.paramNames
-}
-
-func (s *DefineFunction) ReturnNames() []concept.String {
-	return s.returnNames
-}
-
 func (f *DefineFunction) ToString(prefix string) string {
-	return fmt.Sprintf("function (%v) %v", StringJoin(f.paramNames, ", "), StringJoin(f.returnNames, ", "))
+	return fmt.Sprintf("function (%v) %v", StringJoin(f.ParamNames(), ", "), StringJoin(f.ReturnNames(), ", "))
 }
 
 func (f *DefineFunction) Anticipate(params concept.Param, object concept.Variable) concept.Param {
@@ -72,17 +46,6 @@ func (f *DefineFunction) Anticipate(params concept.Param, object concept.Variabl
 
 func (f *DefineFunction) Exec(params concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 	return nil, f.seed.NewException("runtime err", "define_function cannot be executed directly.")
-}
-
-func (f *DefineFunction) paramFormat(params concept.Param) concept.Param {
-	if params.ParamType() == concept.ParamTypeList {
-		for index, name := range f.paramNames {
-			if index < params.SizeIndex() {
-				params.Set(name, params.GetIndex(index))
-			}
-		}
-	}
-	return params
 }
 
 func (s *DefineFunction) Type() string {
@@ -94,9 +57,19 @@ func (s *DefineFunction) FunctionType() string {
 }
 
 type DefineFunctionCreatorParam struct {
-	NullCreator      func() concept.Null
-	ParamCreator     func() concept.Param
-	ExceptionCreator func(string, string) concept.Exception
+	NullCreator           func() concept.Null
+	ParamCreator          func() concept.Param
+	ExceptionCreator      func(string, string) concept.Exception
+	StringCreator         func(string) concept.String
+	DelayStringCreator    func(string) concept.String
+	DelayFunctionCreator  func(func() concept.Function) concept.Function
+	ArrayCreator          func() concept.Array
+	SystemFunctionCreator func(
+		funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
+		anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
+		paramNames []concept.String,
+		returnNames []concept.String,
+	) concept.Function
 }
 
 type DefineFunctionCreator struct {
@@ -105,16 +78,24 @@ type DefineFunctionCreator struct {
 }
 
 func (s *DefineFunctionCreator) New(paramNames []concept.String, returnNames []concept.String) *DefineFunction {
-	return &DefineFunction{
+	define := &DefineFunction{
 		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
-			NullCreator:      s.param.NullCreator,
-			ParamCreator:     s.param.ParamCreator,
-			ExceptionCreator: s.param.ExceptionCreator,
+			NullCreator:           s.param.NullCreator,
+			ParamCreator:          s.param.ParamCreator,
+			ExceptionCreator:      s.param.ExceptionCreator,
+			SystemFunctionCreator: s.param.SystemFunctionCreator,
+			ArrayCreator:          s.param.ArrayCreator,
+			DelayFunctionCreator:  s.param.DelayFunctionCreator,
+			DelayStringCreator:    s.param.DelayStringCreator,
+			StringCreator:         s.param.StringCreator,
 		}),
-		paramNames:  paramNames,
-		returnNames: returnNames,
-		seed:        s,
+		seed: s,
 	}
+
+	define.AddParamName(paramNames...)
+	define.AddReturnName(returnNames...)
+
+	return define
 }
 
 func (s *DefineFunctionCreator) ToLanguage(language string, space concept.Closure, instance *DefineFunction) string {

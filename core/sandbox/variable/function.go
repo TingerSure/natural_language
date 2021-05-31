@@ -29,18 +29,8 @@ type Function struct {
 	*adaptor.AdaptorFunction
 	body           *code_block.CodeBlock
 	anticipateBody *code_block.CodeBlock
-	paramNames     []concept.String
-	returnNames    []concept.String
 	parent         concept.Closure
 	seed           FunctionSeed
-}
-
-func (f *Function) ParamFormat(params concept.Param) concept.Param {
-	return f.AdaptorFunction.AdaptorParamFormat(f, params)
-}
-
-func (f *Function) ReturnFormat(back concept.String) concept.String {
-	return f.AdaptorFunction.AdaptorReturnFormat(f, back)
 }
 
 func (o *Function) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
@@ -55,28 +45,12 @@ func (f *Function) ToCallLanguage(language string, space concept.Closure, self s
 	return f.ToCallLanguageAdaptor(f, language, space, self, param)
 }
 
-func (s *Function) ParamNames() []concept.String {
-	return s.paramNames
-}
-
-func (s *Function) ReturnNames() []concept.String {
-	return s.returnNames
-}
-
 func (s *Function) FunctionType() string {
 	return FunctionFunctionType
 }
 
 func (f *Function) ToString(prefix string) string {
-	return fmt.Sprintf("function (%v) %v %v", StringJoin(f.paramNames, ", "), StringJoin(f.returnNames, ", "), f.body.ToString(prefix))
-}
-
-func (f *Function) AddParamName(paramNames ...concept.String) {
-	f.paramNames = append(f.paramNames, paramNames...)
-}
-
-func (f *Function) AddReturnName(returnNames ...concept.String) {
-	f.returnNames = append(f.returnNames, returnNames...)
+	return fmt.Sprintf("function (%v) %v %v", StringJoin(f.ParamNames(), ", "), StringJoin(f.ReturnNames(), ", "), f.body.ToString(prefix))
 }
 
 func (f *Function) AnticipateBody() *code_block.CodeBlock {
@@ -88,7 +62,7 @@ func (f *Function) Anticipate(params concept.Param, object concept.Variable) con
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
 		if params.ParamType() == concept.ParamTypeList {
-			for index, name := range f.paramNames {
+			for index, name := range f.ParamNames() {
 				if index < params.SizeIndex() {
 					space.InitLocal(name, params.GetIndex(index))
 				} else {
@@ -97,11 +71,11 @@ func (f *Function) Anticipate(params concept.Param, object concept.Variable) con
 			}
 		}
 		if params.ParamType() == concept.ParamTypeKeyValue {
-			for _, name := range f.paramNames {
+			for _, name := range f.ParamNames() {
 				space.InitLocal(name, params.Get(name))
 			}
 		}
-		for _, name := range f.returnNames {
+		for _, name := range f.ReturnNames() {
 			space.InitLocal(name, f.seed.NewNull())
 		}
 		return nil
@@ -119,7 +93,7 @@ func (f *Function) Anticipate(params concept.Param, object concept.Variable) con
 		}
 	}
 	returnParams := f.seed.NewParam()
-	for _, name := range f.returnNames {
+	for _, name := range f.ReturnNames() {
 		value, _ := space.PeekLocal(name)
 		returnParams.Set(name, value)
 	}
@@ -135,7 +109,7 @@ func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
 		if params.ParamType() == concept.ParamTypeList {
-			for index, name := range f.paramNames {
+			for index, name := range f.ParamNames() {
 				if index < params.SizeIndex() {
 					space.InitLocal(name, params.GetIndex(index))
 				} else {
@@ -144,11 +118,11 @@ func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.
 			}
 		}
 		if params.ParamType() == concept.ParamTypeKeyValue {
-			for _, name := range f.paramNames {
+			for _, name := range f.ParamNames() {
 				space.InitLocal(name, params.Get(name))
 			}
 		}
-		for _, name := range f.returnNames {
+		for _, name := range f.ReturnNames() {
 			space.InitLocal(name, f.seed.NewNull())
 		}
 		return nil
@@ -170,7 +144,7 @@ func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.
 		}
 	}
 	returnParams := f.seed.NewParam()
-	for _, name := range f.returnNames {
+	for _, name := range f.ReturnNames() {
 		value, returnSuspend := space.PeekLocal(name)
 		if !nl_interface.IsNil(returnSuspend) {
 			return nil, returnSuspend
@@ -192,7 +166,7 @@ type FunctionCreatorParam struct {
 	NullCreator           func() concept.Null
 	DelayStringCreator    func(string) concept.String
 	DelayFunctionCreator  func(func() concept.Function) concept.Function
-	ArrayCreator          func() *Array
+	ArrayCreator          func() concept.Array
 	SystemFunctionCreator func(
 		funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
 		anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
@@ -209,9 +183,14 @@ type FunctionCreator struct {
 func (s *FunctionCreator) New(parent concept.Closure) *Function {
 	funcs := &Function{
 		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
-			NullCreator:      s.param.NullCreator,
-			ExceptionCreator: s.param.ExceptionCreator,
-			ParamCreator:     s.param.ParamCreator,
+			NullCreator:           s.param.NullCreator,
+			ExceptionCreator:      s.param.ExceptionCreator,
+			ParamCreator:          s.param.ParamCreator,
+			SystemFunctionCreator: s.param.SystemFunctionCreator,
+			ArrayCreator:          s.param.ArrayCreator,
+			DelayFunctionCreator:  s.param.DelayFunctionCreator,
+			DelayStringCreator:    s.param.DelayStringCreator,
+			StringCreator:         s.param.StringCreator,
 		}),
 		parent:         parent,
 		body:           s.param.CodeBlockCreator(),
@@ -219,69 +198,7 @@ func (s *FunctionCreator) New(parent concept.Closure) *Function {
 		seed:           s,
 	}
 
-	funcs.SetField(s.param.DelayStringCreator("paramList"), s.param.DelayFunctionCreator(s.FieldParamList(funcs)))
-	funcs.SetField(s.param.DelayStringCreator("returnList"), s.param.DelayFunctionCreator(s.FieldReturnList(funcs)))
 	return funcs
-}
-
-func (s *FunctionCreator) FieldParamList(funcs concept.Function) func() concept.Function {
-	return func() concept.Function {
-		backList := s.param.StringCreator("list")
-		return s.param.SystemFunctionCreator(
-			func(param concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
-				paramNames := s.param.ArrayCreator()
-				for _, paramName := range funcs.ParamNames() {
-					paramNames.Append(paramName)
-				}
-				back := s.param.ParamCreator()
-				back.Set(backList, paramNames)
-				return back, nil
-			},
-			func(param concept.Param, _ concept.Variable) concept.Param {
-				paramNames := s.param.ArrayCreator()
-				for _, paramName := range funcs.ParamNames() {
-					paramNames.Append(paramName)
-				}
-				back := s.param.ParamCreator()
-				back.Set(backList, paramNames)
-				return back
-			},
-			[]concept.String{},
-			[]concept.String{
-				backList,
-			},
-		)
-	}
-}
-
-func (s *FunctionCreator) FieldReturnList(funcs concept.Function) func() concept.Function {
-	return func() concept.Function {
-		backList := s.param.StringCreator("list")
-		return s.param.SystemFunctionCreator(
-			func(param concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
-				returnNames := s.param.ArrayCreator()
-				for _, returnName := range funcs.ReturnNames() {
-					returnNames.Append(returnName)
-				}
-				back := s.param.ParamCreator()
-				back.Set(backList, returnNames)
-				return back, nil
-			},
-			func(param concept.Param, _ concept.Variable) concept.Param {
-				returnNames := s.param.ArrayCreator()
-				for _, returnName := range funcs.ReturnNames() {
-					returnNames.Append(returnName)
-				}
-				back := s.param.ParamCreator()
-				back.Set(backList, returnNames)
-				return back
-			},
-			[]concept.String{},
-			[]concept.String{
-				backList,
-			},
-		)
-	}
 }
 
 func (s *FunctionCreator) ToLanguage(language string, space concept.Closure, instance *Function) string {

@@ -48,6 +48,26 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		NullCreator: func() concept.Null {
 			return instance.Null.New()
 		},
+		DelayStringCreator: func(original string) concept.String {
+			return instance.DelayString.New(original)
+		},
+		DelayFunctionCreator: func(create func() concept.Function) concept.Function {
+			return instance.DelayFunction.New(create)
+		},
+		SystemFunctionCreator: func(
+			funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
+			anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
+			paramNames []concept.String,
+			returnNames []concept.String,
+		) concept.Function {
+			return instance.SystemFunction.New(funcs, anticipateFuncs, paramNames, returnNames)
+		},
+		ArrayCreator: func() concept.Array {
+			return instance.Array.New()
+		},
+		StringCreator: func(value string) concept.String {
+			return instance.String.New(value)
+		},
 	})
 	instance.Exception = variable.NewExceptionCreator(&variable.ExceptionCreatorParam{
 		StringCreator: func(value string) concept.String {
@@ -80,6 +100,26 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		},
 		ParamCreator: func() concept.Param {
 			return instance.Param.New()
+		},
+		DelayStringCreator: func(original string) concept.String {
+			return instance.DelayString.New(original)
+		},
+		DelayFunctionCreator: func(create func() concept.Function) concept.Function {
+			return instance.DelayFunction.New(create)
+		},
+		SystemFunctionCreator: func(
+			funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
+			anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
+			paramNames []concept.String,
+			returnNames []concept.String,
+		) concept.Function {
+			return instance.SystemFunction.New(funcs, anticipateFuncs, paramNames, returnNames)
+		},
+		ArrayCreator: func() concept.Array {
+			return instance.Array.New()
+		},
+		StringCreator: func(value string) concept.String {
+			return instance.String.New(value)
 		},
 	})
 	instance.Bool = variable.NewBoolCreator(&variable.BoolCreatorParam{
@@ -139,7 +179,7 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		) concept.Function {
 			return instance.SystemFunction.New(funcs, anticipateFuncs, paramNames, returnNames)
 		},
-		ArrayCreator: func() *variable.Array {
+		ArrayCreator: func() concept.Array {
 			return instance.Array.New()
 		},
 		StringCreator: func(value string) concept.String {
