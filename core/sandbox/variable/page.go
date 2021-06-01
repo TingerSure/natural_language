@@ -112,18 +112,6 @@ func (o *Page) Type() string {
 	return o.seed.Type()
 }
 
-func (o *Page) GetSource() concept.Variable {
-	return nil
-}
-
-func (o *Page) GetClass() concept.Class {
-	return nil
-}
-
-func (o *Page) GetMapping() *concept.Mapping {
-	return nil
-}
-
 func (o *Page) IsFunction() bool {
 	return false
 }

@@ -27,21 +27,6 @@ func (o *DelayFunction) init() {
 	}
 }
 
-func (o *DelayFunction) GetSource() concept.Variable {
-	o.init()
-	return o.funcs.GetSource()
-}
-
-func (o *DelayFunction) GetClass() concept.Class {
-	o.init()
-	return o.funcs.GetClass()
-}
-
-func (o *DelayFunction) GetMapping() *concept.Mapping {
-	o.init()
-	return o.funcs.GetMapping()
-}
-
 func (o *DelayFunction) IsFunction() bool {
 	return true
 }

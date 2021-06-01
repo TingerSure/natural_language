@@ -27,21 +27,6 @@ func (o *DelayString) init() {
 	}
 }
 
-func (o *DelayString) GetSource() concept.Variable {
-	o.init()
-	return o.value.GetSource()
-}
-
-func (o *DelayString) GetClass() concept.Class {
-	o.init()
-	return o.value.GetClass()
-}
-
-func (o *DelayString) GetMapping() *concept.Mapping {
-	o.init()
-	return o.value.GetMapping()
-}
-
 func (o *DelayString) IsFunction() bool {
 	return false
 }

@@ -27,18 +27,6 @@ func (o *Null) IsNull() bool {
 	return true
 }
 
-func (o *Null) GetSource() concept.Variable {
-	return nil
-}
-
-func (m *Null) GetClass() concept.Class {
-	return nil
-}
-
-func (m *Null) GetMapping() *concept.Mapping {
-	return nil
-}
-
 func (o *Null) SetField(specimen concept.String, value concept.Variable) concept.Exception {
 	return o.seed.GetNullPointerException().Copy()
 }

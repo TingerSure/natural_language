@@ -7,9 +7,6 @@ type Variable interface {
 	SizeField() int
 	Iterate(func(String, Variable) bool) bool
 	Call(String, Param) (Param, Exception)
-	GetClass() Class
-	GetMapping() *Mapping
-	GetSource() Variable
 	IsFunction() bool
 	IsNull() bool
 	Type() string

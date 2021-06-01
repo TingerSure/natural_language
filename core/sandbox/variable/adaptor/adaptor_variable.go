@@ -17,18 +17,6 @@ type AdaptorVariable struct {
 	param  *AdaptorVariableParam
 }
 
-func (o *AdaptorVariable) GetSource() concept.Variable {
-	return nil
-}
-
-func (o *AdaptorVariable) GetClass() concept.Class {
-	return nil
-}
-
-func (o *AdaptorVariable) GetMapping() *concept.Mapping {
-	return nil
-}
-
 func (o *AdaptorVariable) IsFunction() bool {
 	return false
 }
