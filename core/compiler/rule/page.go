@@ -1,7 +1,6 @@
 package rule
 
 import (
-	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/compiler/grammar"
@@ -56,7 +55,7 @@ var (
 					}
 					continue
 				}
-				return nil, errors.New(fmt.Sprintf("Unsupport index to be set: %v", item.ToString("")))
+				return nil, fmt.Errorf("Unsupport index to be set: %v", item.ToString(""))
 			}
 			return []concept.Index{
 				context.GetLibraryManager().Sandbox.Index.ConstIndex.New(page),
@@ -149,11 +148,11 @@ var (
 			}
 			page, exception := pageIndex.Get(nil)
 			if !nl_interface.IsNil(exception) {
-				return nil, errors.New(fmt.Sprintf(
+				return nil, fmt.Errorf(
 					"Page index error: \"%v\"(\"%v\") is not an index without closure, cannot be used as a page index.",
 					path,
 					pageIndex.Type(),
-				))
+				)
 			}
 
 			return []concept.Index{

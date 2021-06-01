@@ -49,7 +49,7 @@ func NewSandbox(param *SandboxParam) *Sandbox {
 		case variable.ExceptionInterruptType:
 			param.OnError(errors.New(suspend.(concept.Exception).ToString("")))
 		default:
-			param.OnError(errors.New(fmt.Sprintf("Illegel interrupt in the root loop: %v.", suspend.InterruptType())))
+			param.OnError(fmt.Errorf("Illegel interrupt in the root loop: %v.", suspend.InterruptType()))
 		}
 	})
 

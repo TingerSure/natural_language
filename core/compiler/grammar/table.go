@@ -241,7 +241,7 @@ func (g *Table) actionConfictError(left, right *TableAction, closure *TableClosu
 	for project, _ := range right.Projects() {
 		rightNames = append(rightNames, project.ToString())
 	}
-	return errors.New(fmt.Sprintf("Rule conflict between (%v) and (%v), status: %v, lookahead: %v.", strings.Join(leftNames, " , "), strings.Join(rightNames, " , "), closure.Id(), lookahead.Name()))
+	return fmt.Errorf("Rule conflict between (%v) and (%v), status: %v, lookahead: %v.", strings.Join(leftNames, " , "), strings.Join(rightNames, " , "), closure.Id(), lookahead.Name())
 }
 
 func (g *Table) moveClosure(froms []*TableClosure, to *TableClosure) {
@@ -390,11 +390,11 @@ func (g *Table) checkKeys() error {
 	var err error
 	if g.nonterminalKeys.Iterate(func(key Symbol) bool {
 		if key.Type() < 0 {
-			err = errors.New(fmt.Sprintf("Illegal nonterminal type, must be greater than 0. nonterminal: %v, type : %v", key.Name(), key.Type()))
+			err = fmt.Errorf("Illegal nonterminal type, must be greater than 0. nonterminal: %v, type : %v", key.Name(), key.Type())
 			return true
 		}
 		if !g.rules.HasByResult(key) {
-			err = errors.New(fmt.Sprintf("No rule can polymerize nonterminal: %v", key.Name()))
+			err = fmt.Errorf("No rule can polymerize nonterminal: %v", key.Name())
 			return true
 		}
 		return false
@@ -403,7 +403,7 @@ func (g *Table) checkKeys() error {
 	}
 	if g.terminalKeys.Iterate(func(key Symbol) bool {
 		if key.Type() < 0 {
-			err = errors.New(fmt.Sprintf("Illegal terminal type, must be greater than 0. terminal: %v, type : %v", key.Name(), key.Type()))
+			err = fmt.Errorf("Illegal terminal type, must be greater than 0. terminal: %v, type : %v", key.Name(), key.Type())
 			return true
 		}
 		return false

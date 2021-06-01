@@ -1,7 +1,6 @@
 package variable
 
 import (
-	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
@@ -61,7 +60,7 @@ func (o *Page) SetPrivate(specimen concept.String, indexes concept.Index) error 
 		if yes {
 			return exception.(concept.Exception)
 		}
-		return errors.New(fmt.Sprintf("An illegal interrupt \"%v\" was thrown while declaring variable : %v.", suspend.InterruptType(), specimen.ToString("")))
+		return fmt.Errorf("An illegal interrupt \"%v\" was thrown while declaring variable : %v.", suspend.InterruptType(), specimen.ToString(""))
 	}
 	o.privates = append(o.privates, indexes)
 	o.space.InitLocal(specimen, value)

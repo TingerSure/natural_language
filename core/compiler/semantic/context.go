@@ -48,7 +48,7 @@ func (c *Context) GetRule(phrase grammar.Phrase) (*Rule, error) {
 	}
 	rule := c.rules[phrase.GetRule()]
 	if rule == nil {
-		return nil, errors.New(fmt.Sprintf("No semantic rule match grammar rule : %v", phrase.GetRule().ToString()))
+		return nil, fmt.Errorf("No semantic rule match grammar rule : %v", phrase.GetRule().ToString())
 	}
 	return rule, nil
 }

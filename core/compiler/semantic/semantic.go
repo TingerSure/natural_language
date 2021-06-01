@@ -36,7 +36,7 @@ func (s *Semantic) Read(phrase grammar.Phrase) (concept.Index, error) {
 
 func (s *Semantic) AddRule(rule *Rule) error {
 	if s.rules[rule.GetSource()] != nil {
-		return errors.New(fmt.Sprintf("Semantic rule (%v) repeated.", rule.GetSource()))
+		return fmt.Errorf("Semantic rule (%v) repeated.", rule.GetSource())
 	}
 	s.rules[rule.GetSource()] = rule
 	return nil

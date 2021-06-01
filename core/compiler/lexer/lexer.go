@@ -1,7 +1,6 @@
 package lexer
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -58,7 +57,7 @@ func (l *Lexer) Read(source *os.File, path string) (*TokenList, error) {
 	for cursor < size {
 		token := l.next(content, cursor)
 		if token == nil {
-			return nil, errors.New(fmt.Sprintf("invalid character: '%v'\n%v", string(content[cursor]), token.ToLineStatic(path, row, col, cursor, content)))
+			return nil, fmt.Errorf("invalid character: '%v'\n%v", string(content[cursor]), token.ToLineStatic(path, row, col, cursor, content))
 		}
 		token.SetPath(path)
 		token.SetContent(content)

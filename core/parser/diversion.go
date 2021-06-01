@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/closure"
 	"github.com/TingerSure/natural_language/core/tree"
@@ -25,7 +24,7 @@ func (d *Diversion) Match(value tree.Phrase) (string, error) {
 			return rule.Create(wanted), nil
 		}
 	}
-	return "", errors.New(fmt.Sprintf("This Phrase has no DutyRule to match!\nphrase : %v\nanticipate : %v", value.ToString(), wanted.ToString("")))
+	return "", fmt.Errorf("This Phrase has no DutyRule to match!\nphrase : %v\nanticipate : %v", value.ToString(), wanted.ToString(""))
 }
 
 func (a *Diversion) AddRule(rules []*tree.DutyRule) {

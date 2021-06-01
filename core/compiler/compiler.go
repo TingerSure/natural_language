@@ -1,7 +1,6 @@
 package compiler
 
 import (
-	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/compiler/grammar"
@@ -65,7 +64,7 @@ func (c *Compiler) GetPage(path string) (concept.Index, error) {
 		return page, nil
 	}
 	if c.reading[path] {
-		return nil, errors.New(fmt.Sprintf("Import cycle: \"%v\".", path))
+		return nil, fmt.Errorf("Import cycle: \"%v\".", path)
 	}
 	c.reading[path] = true
 	page, err := c.ReadPage(path)
@@ -86,7 +85,7 @@ func (c *Compiler) open(path string) (*os.File, error) {
 		}
 		return os.Open(fullPath)
 	}
-	return nil, errors.New(fmt.Sprintf("Path \"%v\" not found in all roots:\n%v", path, strings.Join(c.roots, "\n")))
+	return nil, fmt.Errorf("Path \"%v\" not found in all roots:\n%v", path, strings.Join(c.roots, "\n"))
 }
 
 func (c *Compiler) ReadPage(path string) (concept.Index, error) {
@@ -117,7 +116,7 @@ func (c *Compiler) initPage(pageIndex concept.Index, path string) error {
 	initKey := c.libs.Sandbox.Variable.String.New("init")
 	page, exception := pageIndex.Get(nil)
 	if !nl_interface.IsNil(exception) {
-		return errors.New(fmt.Sprintf("Page index error: \"%v\"(\"%v\") is not an index without closure, cannot be used as a page index.", path, pageIndex.Type()))
+		return fmt.Errorf("Page index error: \"%v\"(\"%v\") is not an index without closure, cannot be used as a page index.", path, pageIndex.Type())
 	}
 	init, exception := page.GetField(initKey)
 	if !nl_interface.IsNil(exception) {
@@ -130,7 +129,7 @@ func (c *Compiler) initPage(pageIndex concept.Index, path string) error {
 	}
 	_, yes = variable.VariableFamilyInstance.IsFunctionHome(init)
 	if !yes {
-		return errors.New(fmt.Sprintf("\"%v\".init exist but not a function.", path))
+		return fmt.Errorf("\"%v\".init exist but not a function.", path)
 	}
 	_, exception = page.Call(initKey, c.libs.Sandbox.Variable.Param.New())
 	if !nl_interface.IsNil(exception) {

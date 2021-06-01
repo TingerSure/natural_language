@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/tree"
@@ -41,7 +40,7 @@ func (r *Section) Check(word *tree.Vocabulary) ([]*tree.VocabularyRule, error) {
 	}
 
 	if count == 0 {
-		return nil, errors.New(fmt.Sprintf("This vocabulary has no rules to parse! ( %v )", word.ToString()))
+		return nil, fmt.Errorf("This vocabulary has no rules to parse! ( %v )", word.ToString())
 	}
 	return backs, nil
 }
