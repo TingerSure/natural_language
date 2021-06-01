@@ -20,7 +20,7 @@ func OperatorBindLanguage(libs *tree.LibraryManager, language string) {
 
 	AdditionFunc.Name().SetLanguage(language, "相加")
 
-	AdditionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
+	AdditionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *nl_interface.Mapping) string {
 		left := param.Get(AdditionLeft).(concept.ToString)
 		right := param.Get(AdditionRight).(concept.ToString)
 		return fmt.Sprintf("%v加上%v", left.ToLanguage(language), right.ToLanguage(language))
@@ -37,7 +37,7 @@ func OperatorBindLanguage(libs *tree.LibraryManager, language string) {
 
 	SubtractionFunc.Name().SetLanguage(language, "相减")
 
-	SubtractionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
+	SubtractionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *nl_interface.Mapping) string {
 		left := param.Get(SubtractionLeft).(concept.ToString)
 		right := param.Get(SubtractionRight).(concept.ToString)
 		return fmt.Sprintf("%v减去%v", left.ToLanguage(language), right.ToLanguage(language))
@@ -54,7 +54,7 @@ func OperatorBindLanguage(libs *tree.LibraryManager, language string) {
 
 	MultiplicationFunc.Name().SetLanguage(language, "相乘")
 
-	MultiplicationFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
+	MultiplicationFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *nl_interface.Mapping) string {
 		left := param.Get(MultiplicationLeft).(concept.ToString)
 		right := param.Get(MultiplicationRight).(concept.ToString)
 		return fmt.Sprintf("%v乘以%v", left.ToLanguage(language), right.ToLanguage(language))
@@ -71,7 +71,7 @@ func OperatorBindLanguage(libs *tree.LibraryManager, language string) {
 
 	DivisionFunc.Name().SetLanguage(language, "相除")
 
-	DivisionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
+	DivisionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *nl_interface.Mapping) string {
 		left := param.Get(DivisionLeft).(concept.ToString)
 		right := param.Get(DivisionRight).(concept.ToString)
 		return fmt.Sprintf("%v除以%v", left.ToLanguage(language), right.ToLanguage(language))

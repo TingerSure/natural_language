@@ -1,19 +1,26 @@
-package code_block
+package expression
 
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/expression/adaptor"
 	"strings"
 )
 
 type CodeBlockSeed interface {
+	ToLanguage(string, concept.Pool, *CodeBlock) string
 	NewPool(concept.Pool) concept.Pool
 }
 
 type CodeBlock struct {
+	*adaptor.ExpressionIndex
 	flow []concept.Pipe
 	seed CodeBlockSeed
+}
+
+func (f *CodeBlock) ToLanguage(language string, space concept.Pool) string {
+	return f.seed.ToLanguage(language, space, f)
 }
 
 func (c *CodeBlock) Size() int {
@@ -48,7 +55,15 @@ func (c *CodeBlock) AddStep(steps ...concept.Pipe) {
 	c.flow = append(c.flow, steps...)
 }
 
-func (f *CodeBlock) Exec(
+func (a *CodeBlock) Anticipate(space concept.Pool) concept.Variable {
+	return a.seed.NewPool(space)
+}
+
+func (a *CodeBlock) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
+	return a.ExecWithInit(space, nil)
+}
+
+func (f *CodeBlock) ExecWithInit(
 	parent concept.Pool,
 	init func(concept.Pool) concept.Interrupt,
 ) (concept.Pool, concept.Interrupt) {
@@ -70,7 +85,8 @@ func (f *CodeBlock) Exec(
 }
 
 type CodeBlockCreatorParam struct {
-	PoolCreator func(concept.Pool) concept.Pool
+	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
+	PoolCreator            func(concept.Pool) concept.Pool
 }
 
 type CodeBlockCreator struct {
@@ -79,9 +95,11 @@ type CodeBlockCreator struct {
 }
 
 func (s *CodeBlockCreator) New() *CodeBlock {
-	return &CodeBlock{
+	back := &CodeBlock{
 		seed: s,
 	}
+	back.ExpressionIndex = s.param.ExpressionIndexCreator(back)
+	return back
 }
 
 func (s *CodeBlockCreator) ToLanguage(language string, space concept.Pool, instance *CodeBlock) string {

@@ -73,6 +73,10 @@ func (n *String) Value() string {
 	return n.value
 }
 
+func (n *String) MapKey() string {
+	return n.value
+}
+
 func (s *String) Type() string {
 	return s.seed.Type()
 }

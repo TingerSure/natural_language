@@ -1,6 +1,7 @@
 package concept
 
 type Pool interface {
+	Variable
 	SetParent(Pool)
 	InitLocal(String, Variable)
 	KeyLocal(String) String

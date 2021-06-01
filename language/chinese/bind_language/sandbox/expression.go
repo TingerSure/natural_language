@@ -46,7 +46,7 @@ func ExpressionBindLanguage(libs *tree.LibraryManager, language string) {
 	libs.Sandbox.Expression.Call.Seeds[language] = func(language string, instance *expression.Call) string {
 
 		var funcs concept.Function = nil
-		param := concept.NewMapping(&concept.MappingParam{
+		param := nl_interface.NewMapping(&nl_interface.MappingParam{
 			AutoInit:   true,
 			EmptyValue: libs.Sandbox.Variable.Null.New(),
 		})
@@ -93,8 +93,8 @@ func ExpressionBindLanguage(libs *tree.LibraryManager, language string) {
 		}
 
 		items := []string{}
-		param.Iterate(func(key concept.String, value interface{}) bool {
-			items = append(items, fmt.Sprintf("%v作为%v", value.(concept.ToString).ToLanguage(language), key.ToLanguage(language)))
+		param.Iterate(func(key nl_interface.Key, value interface{}) bool {
+			items = append(items, fmt.Sprintf("%v作为%v", value.(concept.ToString).ToLanguage(language), key.(concept.String).ToLanguage(language)))
 			return false
 		})
 

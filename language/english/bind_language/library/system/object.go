@@ -23,7 +23,7 @@ func ObjectBindlanguage(libs *tree.LibraryManager, language string) {
 	GetFieldKey.SetLanguage(language, "field")
 	GetFieldValue.SetLanguage(language, "value")
 	GetField.Name().SetLanguage(language, "get field")
-	GetField.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
+	GetField.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *nl_interface.Mapping) string {
 		content := param.Get(GetFieldContent).(concept.ToString)
 		key := param.Get(GetFieldKey).(concept.ToString)
 		return fmt.Sprintf("the %v of %v", key.ToLanguage(language), content.ToLanguage(language))

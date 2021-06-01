@@ -3,7 +3,6 @@ package expression
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/sandbox/code_block"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/expression/adaptor"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
@@ -19,8 +18,8 @@ type IfSeed interface {
 type If struct {
 	*adaptor.ExpressionIndex
 	condition concept.Pipe
-	primary   *code_block.CodeBlock
-	secondary *code_block.CodeBlock
+	primary   concept.CodeBlock
+	secondary concept.CodeBlock
 	seed      IfSeed
 }
 
@@ -56,14 +55,14 @@ func (f *If) Exec(parent concept.Pool) (concept.Variable, concept.Interrupt) {
 		return nil, f.seed.NewException("type error", "Only bool can be judged.")
 	}
 
-	var active *code_block.CodeBlock
+	var active concept.CodeBlock
 	if condition.Value() {
 		active = f.primary
 	} else {
 		active = f.secondary
 	}
 
-	space, suspend := active.Exec(initSpace, nil)
+	space, suspend := active.ExecWithInit(initSpace, nil)
 	defer space.Clear()
 	return f.seed.NewNull(), suspend
 }
@@ -72,17 +71,17 @@ func (f *If) SetCondition(condition concept.Pipe) {
 	f.condition = condition
 }
 
-func (f *If) Primary() *code_block.CodeBlock {
+func (f *If) Primary() concept.CodeBlock {
 	return f.primary
 }
 
-func (f *If) Secondary() *code_block.CodeBlock {
+func (f *If) Secondary() concept.CodeBlock {
 	return f.secondary
 }
 
 type IfCreatorParam struct {
 	ExceptionCreator       func(string, string) concept.Exception
-	CodeBlockCreator       func() *code_block.CodeBlock
+	CodeBlockCreator       func() concept.CodeBlock
 	PoolCreator            func(concept.Pool) concept.Pool
 	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
 	NullCreator            func() concept.Null

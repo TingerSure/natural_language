@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"github.com/TingerSure/natural_language/core/sandbox/pool"
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
@@ -13,10 +13,10 @@ type Parser struct {
 	grammar   *Grammar
 	types     *Types
 	diversion *Diversion
-	rootSpace *pool.Pool
+	rootSpace concept.Pool
 }
 
-func NewParser(rootSpace *pool.Pool) *Parser {
+func NewParser(rootSpace concept.Pool) *Parser {
 	types := NewTypes()
 	section := NewSection()
 	barricade := NewBarricade()

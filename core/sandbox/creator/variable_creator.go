@@ -1,7 +1,6 @@
 package creator
 
 import (
-	"github.com/TingerSure/natural_language/core/sandbox/code_block"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
@@ -22,16 +21,24 @@ type VariableCreator struct {
 	Page           *variable.PageCreator
 	DefineFunction *variable.DefineFunctionCreator
 	DelayFunction  *variable.DelayFunctionCreator
+	Pool           *variable.PoolCreator
 	DelayString    *variable.DelayStringCreator
 }
 
 type VariableCreatorParam struct {
-	CodeBlockCreator func() *code_block.CodeBlock
-	PoolCreator      func(concept.Pool) concept.Pool
+	CodeBlockCreator func() concept.CodeBlock
 }
 
 func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 	instance := &VariableCreator{}
+	instance.Pool = variable.NewPoolCreator(&variable.PoolCreatorParam{
+		EmptyCreator: func() concept.Null {
+			return instance.Null.New()
+		},
+		ExceptionCreator: func(name string, message string) concept.Exception {
+			return instance.Exception.NewOriginal(name, message)
+		},
+	})
 	instance.DelayString = variable.NewDelayStringCreator(&variable.DelayStringCreatorParam{
 		StringCreator: func(value string) concept.String {
 			return instance.String.New(value)
@@ -84,7 +91,9 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		ExceptionCreator: func(name string, message string) concept.Exception {
 			return instance.Exception.NewOriginal(name, message)
 		},
-		PoolCreator: param.PoolCreator,
+		PoolCreator: func(parent concept.Pool) concept.Pool {
+			return instance.Pool.New(parent)
+		},
 	})
 	instance.Null = variable.NewNullCreator(&variable.NullCreatorParam{
 		ExceptionCreator: func(name string, message string) concept.Exception {

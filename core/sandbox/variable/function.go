@@ -3,7 +3,6 @@ package variable
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/sandbox/code_block"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
 	"github.com/TingerSure/natural_language/core/sandbox/variable/adaptor"
@@ -27,8 +26,8 @@ type FunctionSeed interface {
 
 type Function struct {
 	*adaptor.AdaptorFunction
-	body           *code_block.CodeBlock
-	anticipateBody *code_block.CodeBlock
+	body           concept.CodeBlock
+	anticipateBody concept.CodeBlock
 	parent         concept.Pool
 	seed           FunctionSeed
 }
@@ -53,12 +52,12 @@ func (f *Function) ToString(prefix string) string {
 	return fmt.Sprintf("function (%v) %v %v", StringJoin(f.ParamNames(), ", "), StringJoin(f.ReturnNames(), ", "), f.body.ToString(prefix))
 }
 
-func (f *Function) AnticipateBody() *code_block.CodeBlock {
+func (f *Function) AnticipateBody() concept.CodeBlock {
 	return f.anticipateBody
 }
 
 func (f *Function) Anticipate(params concept.Param, object concept.Variable) concept.Param {
-	space, suspend := f.anticipateBody.Exec(f.parent, func(space concept.Pool) concept.Interrupt {
+	space, suspend := f.anticipateBody.ExecWithInit(f.parent, func(space concept.Pool) concept.Interrupt {
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
 		if params.ParamType() == concept.ParamTypeList {
@@ -100,12 +99,12 @@ func (f *Function) Anticipate(params concept.Param, object concept.Variable) con
 	return returnParams
 }
 
-func (f *Function) Body() *code_block.CodeBlock {
+func (f *Function) Body() concept.CodeBlock {
 	return f.body
 }
 
 func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
-	space, suspend := f.body.Exec(f.parent, func(space concept.Pool) concept.Interrupt {
+	space, suspend := f.body.ExecWithInit(f.parent, func(space concept.Pool) concept.Interrupt {
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
 		if params.ParamType() == concept.ParamTypeList {
@@ -159,7 +158,7 @@ func (s *Function) Type() string {
 }
 
 type FunctionCreatorParam struct {
-	CodeBlockCreator      func() *code_block.CodeBlock
+	CodeBlockCreator      func() concept.CodeBlock
 	StringCreator         func(string) concept.String
 	ParamCreator          func() concept.Param
 	ExceptionCreator      func(string, string) concept.Exception

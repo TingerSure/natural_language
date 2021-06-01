@@ -108,6 +108,10 @@ func (n *DelayString) Value() string {
 	return n.original
 }
 
+func (n *DelayString) MapKey() string {
+	return n.original
+}
+
 func (s *DelayString) Type() string {
 	return s.seed.Type()
 }

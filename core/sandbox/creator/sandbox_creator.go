@@ -1,11 +1,9 @@
 package creator
 
 import (
-	"github.com/TingerSure/natural_language/core/sandbox/code_block"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
-	"github.com/TingerSure/natural_language/core/sandbox/pool"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
@@ -14,29 +12,12 @@ type SandboxCreator struct {
 	Index      *IndexCreator
 	Interrupt  *InterruptCreator
 	Expression *ExpressionCreator
-	Pool       *pool.PoolCreator
-	CodeBlock  *code_block.CodeBlockCreator
 }
 
 func NewSandboxCreator() *SandboxCreator {
 	instance := &SandboxCreator{}
 
 	instance.Interrupt = NewInterruptCreator(&InterruptCreatorParam{})
-
-	instance.Pool = pool.NewPoolCreator(&pool.PoolCreatorParam{
-		EmptyCreator: func() concept.Null {
-			return instance.Variable.Null.New()
-		},
-		ExceptionCreator: func(name string, message string) concept.Exception {
-			return instance.Variable.Exception.NewOriginal(name, message)
-		},
-	})
-
-	instance.CodeBlock = code_block.NewCodeBlockCreator(&code_block.CodeBlockCreatorParam{
-		PoolCreator: func(parent concept.Pool) concept.Pool {
-			return instance.Pool.New(parent)
-		},
-	})
 
 	instance.Index = NewIndexCreator(&IndexCreatorParam{
 		ExceptionCreator: func(name string, message string) concept.Exception {
@@ -54,11 +35,8 @@ func NewSandboxCreator() *SandboxCreator {
 	})
 
 	instance.Variable = NewVariableCreator(&VariableCreatorParam{
-		CodeBlockCreator: func() *code_block.CodeBlock {
-			return instance.CodeBlock.New()
-		},
-		PoolCreator: func(parent concept.Pool) concept.Pool {
-			return instance.Pool.New(parent)
+		CodeBlockCreator: func() concept.CodeBlock {
+			return instance.Expression.CodeBlock.New()
 		},
 	})
 
@@ -75,8 +53,8 @@ func NewSandboxCreator() *SandboxCreator {
 		FunctionCreator: func(parent concept.Pool) *variable.Function {
 			return instance.Variable.Function.New(parent)
 		},
-		CodeBlockCreator: func() *code_block.CodeBlock {
-			return instance.CodeBlock.New()
+		CodeBlockCreator: func() concept.CodeBlock {
+			return instance.Expression.CodeBlock.New()
 		},
 		ExceptionCreator: func(name string, message string) concept.Exception {
 			return instance.Variable.Exception.NewOriginal(name, message)
@@ -103,7 +81,7 @@ func NewSandboxCreator() *SandboxCreator {
 			return instance.Interrupt.Return.New()
 		},
 		PoolCreator: func(parent concept.Pool) concept.Pool {
-			return instance.Pool.New(parent)
+			return instance.Variable.Pool.New(parent)
 		},
 		ObjectCreator: func() concept.Object {
 			return instance.Variable.Object.New()

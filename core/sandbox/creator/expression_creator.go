@@ -1,7 +1,6 @@
 package creator
 
 import (
-	"github.com/TingerSure/natural_language/core/sandbox/code_block"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/expression"
 	"github.com/TingerSure/natural_language/core/sandbox/expression/adaptor"
@@ -35,10 +34,11 @@ type ExpressionCreator struct {
 	NewArray          *expression.NewArrayCreator
 	IndexComponent    *expression.IndexComponentCreator
 	Append            *expression.AppendCreator
+	CodeBlock         *expression.CodeBlockCreator
 }
 
 type ExpressionCreatorParam struct {
-	CodeBlockCreator      func() *code_block.CodeBlock
+	CodeBlockCreator      func() concept.CodeBlock
 	DefineFunctionCreator func([]concept.String, []concept.String) *variable.DefineFunction
 	FunctionCreator       func(concept.Pool) *variable.Function
 	StringCreator         func(string) concept.String
@@ -63,6 +63,10 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	instance.ExpressionIndex = adaptor.NewExpressionIndexCreator(&adaptor.ExpressionIndexCreatorParam{
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,
+	})
+	instance.CodeBlock = expression.NewCodeBlockCreator(&expression.CodeBlockCreatorParam{
+		ExpressionIndexCreator: instance.ExpressionIndex.New,
+		PoolCreator:            param.PoolCreator,
 	})
 	instance.Append = expression.NewAppendCreator(&expression.AppendCreatorParam{
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
@@ -150,19 +154,23 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	})
 	instance.If = expression.NewIfCreator(&expression.IfCreatorParam{
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
-		CodeBlockCreator:       param.CodeBlockCreator,
-		ExceptionCreator:       param.ExceptionCreator,
-		NullCreator:            param.NullCreator,
-		PoolCreator:            param.PoolCreator,
+		CodeBlockCreator: func() concept.CodeBlock {
+			return instance.CodeBlock.New()
+		},
+		ExceptionCreator: param.ExceptionCreator,
+		NullCreator:      param.NullCreator,
+		PoolCreator:      param.PoolCreator,
 	})
 	instance.For = expression.NewForCreator(&expression.ForCreatorParam{
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 		StringCreator:          param.StringCreator,
 		BoolCreator:            param.BoolCreator,
-		CodeBlockCreator:       param.CodeBlockCreator,
-		ExceptionCreator:       param.ExceptionCreator,
-		ConstIndexCreator:      param.ConstIndexCreator,
-		NullCreator:            param.NullCreator,
+		CodeBlockCreator: func() concept.CodeBlock {
+			return instance.CodeBlock.New()
+		},
+		ExceptionCreator:  param.ExceptionCreator,
+		ConstIndexCreator: param.ConstIndexCreator,
+		NullCreator:       param.NullCreator,
 	})
 	instance.Assignment = expression.NewAssignmentCreator(&expression.AssignmentCreatorParam{
 		ExpressionIndexCreator: instance.ExpressionIndex.New,

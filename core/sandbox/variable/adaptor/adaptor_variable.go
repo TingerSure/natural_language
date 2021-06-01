@@ -13,7 +13,7 @@ type AdaptorVariableParam struct {
 }
 
 type AdaptorVariable struct {
-	fields *concept.Mapping
+	fields *nl_interface.Mapping
 	param  *AdaptorVariableParam
 }
 
@@ -57,8 +57,8 @@ func (o *AdaptorVariable) SizeField() int {
 }
 
 func (o *AdaptorVariable) Iterate(on func(concept.String, concept.Variable) bool) bool {
-	return o.fields.Iterate(func(key concept.String, value interface{}) bool {
-		return on(key, value.(concept.Variable))
+	return o.fields.Iterate(func(key nl_interface.Key, value interface{}) bool {
+		return on(key.(concept.String), value.(concept.Variable))
 	})
 }
 
@@ -71,8 +71,8 @@ func (a *AdaptorVariable) ToString(prefix string) string {
 
 	paramsToString := make([]string, 0, a.fields.Size())
 	if a.fields != nil {
-		a.fields.Iterate(func(key concept.String, value interface{}) bool {
-			paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.Value(), value.(concept.ToString).ToString(subPrefix)))
+		a.fields.Iterate(func(key nl_interface.Key, value interface{}) bool {
+			paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.(concept.String).Value(), value.(concept.ToString).ToString(subPrefix)))
 			return false
 		})
 	}
@@ -81,7 +81,7 @@ func (a *AdaptorVariable) ToString(prefix string) string {
 
 func (o *AdaptorVariable) initFields() {
 	if o.fields == nil {
-		o.fields = concept.NewMapping(&concept.MappingParam{
+		o.fields = nl_interface.NewMapping(&nl_interface.MappingParam{
 			AutoInit:   true,
 			EmptyValue: o.param.NullCreator(),
 		})

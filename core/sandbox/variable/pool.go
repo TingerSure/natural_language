@@ -1,9 +1,10 @@
-package pool
+package variable
 
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/variable/pool"
 )
 
 const (
@@ -11,16 +12,22 @@ const (
 	historyTypeBubble = 2
 )
 
+const (
+	VariablePoolType = "pool"
+)
+
 type PoolSeed interface {
 	NewException(string, string) concept.Exception
 	NewNull() concept.Null
+	ToLanguage(string, concept.Pool, *Pool) string
+	Type() string
 }
 
 type Pool struct {
-	local     *concept.Mapping
+	local     *nl_interface.Mapping
 	parent    concept.Pool
-	history   *History
-	extempore *Extempore
+	history   *pool.History
+	extempore *pool.Extempore
 	seed      PoolSeed
 }
 
@@ -53,9 +60,9 @@ func (c *Pool) IterateExtempore(match func(concept.Pipe, concept.Variable) bool)
 }
 
 func (c *Pool) IterateLocal(match func(concept.String, concept.Variable) bool) bool {
-	return c.local.Iterate(func(key concept.String, value interface{}) bool {
-		if match(key, value.(concept.Variable)) {
-			c.history.Set(key, historyTypeLocal)
+	return c.local.Iterate(func(key nl_interface.Key, value interface{}) bool {
+		if match(key.(concept.String), value.(concept.Variable)) {
+			c.history.Set(key.(concept.String), historyTypeLocal)
 			return true
 		}
 		return false
@@ -91,7 +98,7 @@ func (c *Pool) InitLocal(key concept.String, defaultValue concept.Variable) {
 }
 
 func (c *Pool) KeyLocal(key concept.String) concept.String {
-	return c.local.Key(key)
+	return c.local.Key(key).(concept.String)
 }
 
 func (c *Pool) PeekLocal(key concept.String) (concept.Variable, concept.Exception) {
@@ -134,7 +141,7 @@ func (c *Pool) HasBubble(key concept.String) bool {
 
 func (c *Pool) KeyBubble(key concept.String) concept.String {
 	if c.local.Has(key) {
-		return c.local.Key(key)
+		return c.KeyLocal(key)
 	}
 	if c.parent != nil {
 		return c.parent.KeyBubble(key)
@@ -187,12 +194,67 @@ func (c *Pool) SetBubble(key concept.String, value concept.Variable) concept.Exc
 func (c *Pool) Clear() {
 }
 
+func (o *Pool) IsFunction() bool {
+	return false
+}
+
+func (o *Pool) IsNull() bool {
+	return false
+}
+
+func (o *Pool) SetField(specimen concept.String, value concept.Variable) concept.Exception {
+	return o.SetBubble(specimen, value)
+}
+
+func (o *Pool) GetField(specimen concept.String) (concept.Variable, concept.Exception) {
+	return o.GetBubble(specimen)
+}
+
+func (o *Pool) HasField(specimen concept.String) bool {
+	return o.HasBubble(specimen)
+}
+
+func (o *Pool) SizeField() int {
+	return 0
+}
+
+func (o *Pool) Iterate(on func(concept.String, concept.Variable) bool) bool {
+	return o.IterateBubble(on)
+}
+
+func (o *Pool) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
+	value, exception := o.GetField(specimen)
+	if !nl_interface.IsNil(exception) {
+		return nil, exception
+	}
+	if !value.IsFunction() {
+		return nil, o.seed.NewException("runtime error", fmt.Sprintf("There is no function called \"%v\" to be called in pool.", specimen.ToString("")))
+	}
+	return value.(concept.Function).Exec(param, nil)
+}
+
+func (a *Pool) ToString(prefix string) string {
+	if nl_interface.IsNil(a.parent) {
+		return fmt.Sprintf("%v", a.local.ToString(prefix))
+	}
+	return fmt.Sprintf("%v > %v", a.local.ToString(prefix), a.parent.ToString(prefix))
+}
+
+func (f *Pool) ToLanguage(language string, space concept.Pool) string {
+	return f.seed.ToLanguage(language, space, f)
+}
+
+func (o *Pool) Type() string {
+	return o.seed.Type()
+}
+
 type PoolCreatorParam struct {
 	ExceptionCreator func(string, string) concept.Exception
 	EmptyCreator     func() concept.Null
 }
 
 type PoolCreator struct {
+	Seeds map[string]func(string, concept.Pool, *Pool) string
 	param *PoolCreatorParam
 }
 
@@ -207,14 +269,26 @@ func (s *PoolCreator) NewNull() concept.Null {
 func (s *PoolCreator) New(parent concept.Pool) *Pool {
 	return &Pool{
 		parent:    parent,
-		history:   NewHistory(),
-		extempore: NewExtempore(),
-		local: concept.NewMapping(&concept.MappingParam{
+		history:   pool.NewHistory(),
+		extempore: pool.NewExtempore(),
+		local: nl_interface.NewMapping(&nl_interface.MappingParam{
 			AutoInit:   false,
 			EmptyValue: s.NewNull(),
 		}),
 		seed: s,
 	}
+}
+
+func (s *PoolCreator) ToLanguage(language string, space concept.Pool, instance *Pool) string {
+	seed := s.Seeds[language]
+	if seed == nil {
+		return instance.ToString("")
+	}
+	return seed(language, space, instance)
+}
+
+func (s *PoolCreator) Type() string {
+	return VariablePoolType
 }
 
 func NewPoolCreator(param *PoolCreatorParam) *PoolCreator {

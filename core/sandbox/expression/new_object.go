@@ -16,7 +16,7 @@ type NewObjectSeed interface {
 
 type NewObject struct {
 	*adaptor.ExpressionIndex
-	fields *concept.Mapping
+	fields *nl_interface.Mapping
 	seed   NewObjectSeed
 }
 
@@ -41,8 +41,8 @@ func (a *NewObject) ToString(prefix string) string {
 		return "{}"
 	}
 	paramsToString := make([]string, 0, a.fields.Size())
-	a.fields.Iterate(func(key concept.String, value interface{}) bool {
-		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.Value(), value.(concept.ToString).ToString(subPrefix)))
+	a.fields.Iterate(func(key nl_interface.Key, value interface{}) bool {
+		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.(concept.String).Value(), value.(concept.ToString).ToString(subPrefix)))
 		return false
 	})
 	return fmt.Sprintf("{%v\n%v\n%v}", prefix, strings.Join(paramsToString, ",\n"), prefix)
@@ -51,8 +51,8 @@ func (a *NewObject) ToString(prefix string) string {
 
 func (a *NewObject) Anticipate(space concept.Pool) concept.Variable {
 	object := a.seed.NewObject()
-	a.fields.Iterate(func(key concept.String, value interface{}) bool {
-		return !nl_interface.IsNil(object.SetField(key, value.(concept.Pipe).Anticipate(space)))
+	a.fields.Iterate(func(key nl_interface.Key, value interface{}) bool {
+		return !nl_interface.IsNil(object.SetField(key.(concept.String), value.(concept.Pipe).Anticipate(space)))
 	})
 	return object
 }
@@ -61,12 +61,12 @@ func (a *NewObject) Exec(space concept.Pool) (concept.Variable, concept.Interrup
 	object := a.seed.NewObject()
 	var suspend concept.Interrupt = nil
 	var value concept.Variable = nil
-	if a.fields.Iterate(func(key concept.String, item interface{}) bool {
+	if a.fields.Iterate(func(key nl_interface.Key, item interface{}) bool {
 		value, suspend = item.(concept.Pipe).Get(space)
 		if !nl_interface.IsNil(suspend) {
 			return true
 		}
-		suspend = object.SetField(key, value)
+		suspend = object.SetField(key.(concept.String), value)
 		return !nl_interface.IsNil(suspend)
 
 	}) {
@@ -89,7 +89,7 @@ type NewObjectCreator struct {
 func (s *NewObjectCreator) New() *NewObject {
 	back := &NewObject{
 		seed: s,
-		fields: concept.NewMapping(&concept.MappingParam{
+		fields: nl_interface.NewMapping(&nl_interface.MappingParam{
 			AutoInit:   true,
 			EmptyValue: s.param.NullCreator(),
 		}),

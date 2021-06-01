@@ -21,7 +21,7 @@ type PageSeed interface {
 
 type Page struct {
 	seed     PageSeed
-	publics  *concept.Mapping
+	publics  *nl_interface.Mapping
 	privates []concept.Pipe
 	space    concept.Pool
 }
@@ -90,9 +90,9 @@ func (o *Page) SizeField() int {
 }
 
 func (o *Page) Iterate(on func(concept.String, concept.Variable) bool) bool {
-	return o.publics.Iterate(func(key concept.String, _ interface{}) bool {
-		value, _ := o.space.GetLocal(key)
-		return on(key, value)
+	return o.publics.Iterate(func(key nl_interface.Key, _ interface{}) bool {
+		value, _ := o.space.GetLocal(key.(concept.String))
+		return on(key.(concept.String), value)
 	})
 }
 
@@ -135,7 +135,7 @@ func (s *PageCreator) New() *Page {
 	return &Page{
 		seed:  s,
 		space: s.param.PoolCreator(nil),
-		publics: concept.NewMapping(&concept.MappingParam{
+		publics: nl_interface.NewMapping(&nl_interface.MappingParam{
 			AutoInit:   true,
 			EmptyValue: s.param.NullCreator(),
 		}),

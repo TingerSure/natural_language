@@ -1,6 +1,11 @@
 package concept
 
+import (
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+)
+
 type String interface {
+	nl_interface.Key
 	Variable
 	Value() string
 	GetLanguage(string) string

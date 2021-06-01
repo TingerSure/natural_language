@@ -16,7 +16,7 @@ func QuestionBindLanguage(libs *tree.LibraryManager, language string) {
 	HowManyParam.SetLanguage(language, "content")
 	HowManyResult.SetLanguage(language, "result")
 	HowMany.Name().SetLanguage(language, "how many")
-	HowMany.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
+	HowMany.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *nl_interface.Mapping) string {
 		content := param.Get(HowManyParam).(concept.ToString)
 		return fmt.Sprintf("how many are %v", content.ToLanguage(language))
 
@@ -29,7 +29,7 @@ func QuestionBindLanguage(libs *tree.LibraryManager, language string) {
 	WhatParam.SetLanguage(language, "content")
 	WhatResult.SetLanguage(language, "result")
 	What.Name().SetLanguage(language, "what")
-	What.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
+	What.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *nl_interface.Mapping) string {
 		content := param.Get(WhatParam).(concept.ToString)
 		return fmt.Sprintf("what is %v", content.ToLanguage(language))
 

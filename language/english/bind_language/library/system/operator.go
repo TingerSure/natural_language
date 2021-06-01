@@ -20,7 +20,7 @@ func OperatorBindLanguage(libs *tree.LibraryManager, language string) {
 
 	AdditionFunc.Name().SetLanguage(language, "add")
 
-	AdditionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
+	AdditionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *nl_interface.Mapping) string {
 		left := param.Get(AdditionLeft).(concept.ToString)
 		right := param.Get(AdditionRight).(concept.ToString)
 		return fmt.Sprintf("%v plus %v", left.ToLanguage(language), right.ToLanguage(language))
@@ -37,7 +37,7 @@ func OperatorBindLanguage(libs *tree.LibraryManager, language string) {
 
 	SubtractionFunc.Name().SetLanguage(language, "subtract")
 
-	SubtractionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
+	SubtractionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *nl_interface.Mapping) string {
 		left := param.Get(SubtractionLeft).(concept.ToString)
 		right := param.Get(SubtractionRight).(concept.ToString)
 		return fmt.Sprintf("%v minus %v", left.ToLanguage(language), right.ToLanguage(language))
@@ -54,7 +54,7 @@ func OperatorBindLanguage(libs *tree.LibraryManager, language string) {
 
 	MultiplicationFunc.Name().SetLanguage(language, "multiply")
 
-	MultiplicationFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
+	MultiplicationFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *nl_interface.Mapping) string {
 		left := param.Get(MultiplicationLeft).(concept.ToString)
 		right := param.Get(MultiplicationRight).(concept.ToString)
 		return fmt.Sprintf("%v times %v", left.ToLanguage(language), right.ToLanguage(language))
@@ -71,7 +71,7 @@ func OperatorBindLanguage(libs *tree.LibraryManager, language string) {
 
 	DivisionFunc.Name().SetLanguage(language, "divide")
 
-	DivisionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
+	DivisionFunc.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *nl_interface.Mapping) string {
 		left := param.Get(DivisionLeft).(concept.ToString)
 		right := param.Get(DivisionRight).(concept.ToString)
 		return fmt.Sprintf("%v divided by %v", left.ToLanguage(language), right.ToLanguage(language))

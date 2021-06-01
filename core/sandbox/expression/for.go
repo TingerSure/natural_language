@@ -3,7 +3,6 @@ package expression
 import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
-	"github.com/TingerSure/natural_language/core/sandbox/code_block"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/expression/adaptor"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
@@ -23,9 +22,9 @@ type For struct {
 	*adaptor.ExpressionIndex
 	tag       concept.String
 	condition concept.Pipe
-	init      *code_block.CodeBlock
-	end       *code_block.CodeBlock
-	body      *code_block.CodeBlock
+	init      concept.CodeBlock
+	end       concept.CodeBlock
+	body      concept.CodeBlock
 	seed      ForSeed
 }
 
@@ -58,7 +57,7 @@ func (f *For) Exec(parent concept.Pool) (concept.Variable, concept.Interrupt) {
 		f.condition = f.seed.GetDefaultCondition()
 	}
 
-	initSpace, suspend := f.init.Exec(parent, nil)
+	initSpace, suspend := f.init.ExecWithInit(parent, nil)
 	defer initSpace.Clear()
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
@@ -80,7 +79,7 @@ body:
 			break body
 		}
 
-		space, suspend := f.body.Exec(initSpace, nil)
+		space, suspend := f.body.ExecWithInit(initSpace, nil)
 		defer space.Clear()
 		if !nl_interface.IsNil(suspend) {
 			switch suspend.InterruptType() {
@@ -105,7 +104,7 @@ body:
 				return nil, suspend
 			}
 		}
-		endSpace, suspend := f.end.Exec(initSpace, nil)
+		endSpace, suspend := f.end.ExecWithInit(initSpace, nil)
 		defer endSpace.Clear()
 		if !nl_interface.IsNil(suspend) {
 			return nil, suspend
@@ -132,13 +131,13 @@ func (f *For) IsMyTag(tag concept.String) bool {
 func (f *For) SetCondition(condition concept.Pipe) {
 	f.condition = condition
 }
-func (f *For) Body() *code_block.CodeBlock {
+func (f *For) Body() concept.CodeBlock {
 	return f.body
 }
-func (f *For) Init() *code_block.CodeBlock {
+func (f *For) Init() concept.CodeBlock {
 	return f.init
 }
-func (f *For) End() *code_block.CodeBlock {
+func (f *For) End() concept.CodeBlock {
 	return f.end
 }
 
@@ -146,7 +145,7 @@ type ForCreatorParam struct {
 	ExceptionCreator       func(string, string) concept.Exception
 	StringCreator          func(string) concept.String
 	BoolCreator            func(bool) concept.Bool
-	CodeBlockCreator       func() *code_block.CodeBlock
+	CodeBlockCreator       func() concept.CodeBlock
 	ConstIndexCreator      func(concept.Variable) *index.ConstIndex
 	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
 	NullCreator            func() concept.Null

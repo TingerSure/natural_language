@@ -23,7 +23,7 @@ func ObjectBindlanguage(libs *tree.LibraryManager, language string) {
 	GetFieldKey.SetLanguage(language, "属性")
 	GetFieldValue.SetLanguage(language, "值")
 	GetField.Name().SetLanguage(language, "取值")
-	GetField.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *concept.Mapping) string {
+	GetField.SetLanguageOnCallSeed(language, func(funcs concept.Function, param *nl_interface.Mapping) string {
 		content := param.Get(GetFieldContent).(concept.ToString)
 		key := param.Get(GetFieldKey).(concept.ToString)
 		return fmt.Sprintf("%v的%v", content.ToLanguage(language), key.ToLanguage(language))

@@ -2,6 +2,7 @@ package variable
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"strings"
 )
@@ -18,7 +19,7 @@ type MappingObjectSeed interface {
 }
 
 type MappingObject struct {
-	mapping *concept.Mapping
+	mapping *nl_interface.Mapping
 	class   concept.Class
 	object  concept.Variable
 	seed    MappingObjectSeed
@@ -66,7 +67,7 @@ func (m *MappingObject) GetClass() concept.Class {
 	return m.class
 }
 
-func (m *MappingObject) GetMapping() *concept.Mapping {
+func (m *MappingObject) GetMapping() *nl_interface.Mapping {
 	return m.mapping
 }
 
@@ -80,8 +81,8 @@ func (a *MappingObject) ToString(prefix string) string {
 		return fmt.Sprintf("%v -> %v", a.object.ToString(prefix), a.class.ToString(prefix))
 	}
 	keykey := []string{}
-	a.mapping.Iterate(func(key concept.String, value interface{}) bool {
-		keykey = append(keykey, fmt.Sprintf("%v%v : %v", subprefix, key.Value(), value.(concept.String).Value()))
+	a.mapping.Iterate(func(key nl_interface.Key, value interface{}) bool {
+		keykey = append(keykey, fmt.Sprintf("%v%v : %v", subprefix, key.(concept.String).Value(), value.(concept.String).Value()))
 		return false
 	})
 	return fmt.Sprintf("%v -> %v {\n%v\n%v}",
@@ -148,7 +149,7 @@ func (s *MappingObjectCreator) NewNull() concept.Null {
 
 func (s *MappingObjectCreator) New(object concept.Variable, classInstance concept.Class) *MappingObject {
 	return &MappingObject{
-		mapping: concept.NewMapping(&concept.MappingParam{
+		mapping: nl_interface.NewMapping(&nl_interface.MappingParam{
 			AutoInit:   true,
 			EmptyValue: s.param.NullCreator(),
 		}),

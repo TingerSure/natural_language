@@ -2,6 +2,7 @@ package variable
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable/adaptor"
 	"strings"
@@ -19,8 +20,8 @@ type ClassSeed interface {
 
 type Class struct {
 	*adaptor.AdaptorVariable
-	provide *concept.Mapping
-	require *concept.Mapping
+	provide *nl_interface.Mapping
+	require *nl_interface.Mapping
 	seed    ClassSeed
 }
 
@@ -36,12 +37,12 @@ func (c *Class) ToString(prefix string) string {
 	subprefix := fmt.Sprintf("%v\t", prefix)
 
 	items := []string{}
-	c.require.Iterate(func(key concept.String, value interface{}) bool {
-		items = append(items, fmt.Sprintf("%vrequire %v = %v", subprefix, key.Value(), value.(concept.ToString).ToString(subprefix)))
+	c.require.Iterate(func(key nl_interface.Key, value interface{}) bool {
+		items = append(items, fmt.Sprintf("%vrequire %v = %v", subprefix, key.(concept.String).Value(), value.(concept.ToString).ToString(subprefix)))
 		return false
 	})
-	c.provide.Iterate(func(key concept.String, value interface{}) bool {
-		items = append(items, fmt.Sprintf("%vprovide %v = %v", subprefix, key.Value(), value.(concept.ToString).ToString(subprefix)))
+	c.provide.Iterate(func(key nl_interface.Key, value interface{}) bool {
+		items = append(items, fmt.Sprintf("%vprovide %v = %v", subprefix, key.(concept.String).Value(), value.(concept.ToString).ToString(subprefix)))
 		return false
 	})
 	return fmt.Sprintf("class {\n%v\n%v}", strings.Join(items, "\n"), prefix)
@@ -64,8 +65,8 @@ func (c *Class) HasProvide(specimen concept.String) bool {
 }
 
 func (c *Class) IterateProvide(on func(key concept.String, value concept.Function) bool) bool {
-	return c.provide.Iterate(func(key concept.String, value interface{}) bool {
-		return on(key, value.(concept.Function))
+	return c.provide.Iterate(func(key nl_interface.Key, value interface{}) bool {
+		return on(key.(concept.String), value.(concept.Function))
 	})
 }
 
@@ -82,8 +83,8 @@ func (c *Class) HasRequire(specimen concept.String) bool {
 }
 
 func (c *Class) IterateRequire(on func(key concept.String, value concept.Function) bool) bool {
-	return c.require.Iterate(func(key concept.String, value interface{}) bool {
-		return on(key, value.(concept.Function))
+	return c.require.Iterate(func(key nl_interface.Key, value interface{}) bool {
+		return on(key.(concept.String), value.(concept.Function))
 	})
 }
 
@@ -103,11 +104,11 @@ func (s *ClassCreator) New() *Class {
 			NullCreator:      s.param.NullCreator,
 			ExceptionCreator: s.param.ExceptionCreator,
 		}),
-		provide: concept.NewMapping(&concept.MappingParam{
+		provide: nl_interface.NewMapping(&nl_interface.MappingParam{
 			AutoInit:   true,
 			EmptyValue: s.NewNull(),
 		}),
-		require: concept.NewMapping(&concept.MappingParam{
+		require: nl_interface.NewMapping(&nl_interface.MappingParam{
 			AutoInit:   true,
 			EmptyValue: nil,
 		}),

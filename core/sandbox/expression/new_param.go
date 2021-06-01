@@ -17,7 +17,7 @@ type NewParamSeed interface {
 
 type NewParam struct {
 	*adaptor.ExpressionIndex
-	values *concept.Mapping
+	values *nl_interface.Mapping
 	list   []concept.Pipe
 	types  int
 	seed   NewParamSeed
@@ -60,8 +60,8 @@ func (a *NewParam) ToString(prefix string) string {
 			return ""
 		}
 		paramsToString := make([]string, 0, a.values.Size())
-		a.values.Iterate(func(key concept.String, value interface{}) bool {
-			paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.Value(), value.(concept.ToString).ToString(subPrefix)))
+		a.values.Iterate(func(key nl_interface.Key, value interface{}) bool {
+			paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.(concept.String).Value(), value.(concept.ToString).ToString(subPrefix)))
 			return false
 		})
 		return fmt.Sprintf("%v\n%v\n%v", prefix, strings.Join(paramsToString, ",\n"), prefix)
@@ -78,8 +78,8 @@ func (a *NewParam) Anticipate(space concept.Pool) concept.Variable {
 		return param
 	}
 	if a.types == concept.ParamTypeKeyValue {
-		a.values.Iterate(func(key concept.String, value interface{}) bool {
-			param.Set(key, value.(concept.Pipe).Anticipate(space))
+		a.values.Iterate(func(key nl_interface.Key, value interface{}) bool {
+			param.Set(key.(concept.String), value.(concept.Pipe).Anticipate(space))
 			return false
 		})
 		return param
@@ -104,12 +104,12 @@ func (a *NewParam) Exec(space concept.Pool) (concept.Variable, concept.Interrupt
 	}
 
 	if a.types == concept.ParamTypeKeyValue {
-		if a.values.Iterate(func(key concept.String, item interface{}) bool {
+		if a.values.Iterate(func(key nl_interface.Key, item interface{}) bool {
 			value, suspend = item.(concept.Pipe).Get(space)
 			if !nl_interface.IsNil(suspend) {
 				return true
 			}
-			param.Set(key, value)
+			param.Set(key.(concept.String), value)
 			return false
 		}) {
 			return nil, suspend
@@ -161,7 +161,7 @@ type NewParamCreator struct {
 func (s *NewParamCreator) New() *NewParam {
 	back := &NewParam{
 		seed: s,
-		values: concept.NewMapping(&concept.MappingParam{
+		values: nl_interface.NewMapping(&nl_interface.MappingParam{
 			AutoInit:   true,
 			EmptyValue: nil,
 		}),

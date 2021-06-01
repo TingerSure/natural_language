@@ -1,8 +1,13 @@
-package concept
+package nl_interface
 
 import (
-	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"fmt"
+	"strings"
 )
+
+type Key interface {
+	MapKey() string
+}
 
 type Mapping struct {
 	param  *MappingParam
@@ -10,7 +15,7 @@ type Mapping struct {
 }
 
 type MappingItem struct {
-	key   String
+	key   Key
 	value interface{}
 }
 
@@ -22,13 +27,13 @@ func (k *Mapping) Size() int {
 	return len(k.values)
 }
 
-func (k *Mapping) Init(specimen String, defaultValue interface{}) bool {
-	_, yes := k.values[specimen.Value()]
+func (k *Mapping) Init(specimen Key, defaultValue interface{}) bool {
+	_, yes := k.values[specimen.MapKey()]
 	if !yes {
-		if nl_interface.IsNil(defaultValue) {
+		if IsNil(defaultValue) {
 			defaultValue = k.param.EmptyValue
 		}
-		k.values[specimen.Value()] = &MappingItem{
+		k.values[specimen.MapKey()] = &MappingItem{
 			key:   specimen,
 			value: defaultValue,
 		}
@@ -36,21 +41,21 @@ func (k *Mapping) Init(specimen String, defaultValue interface{}) bool {
 	return yes
 }
 
-func (k *Mapping) Remove(specimen String) {
-	delete(k.values, specimen.Value())
+func (k *Mapping) Remove(specimen Key) {
+	delete(k.values, specimen.MapKey())
 }
 
-func (k *Mapping) Set(specimen String, value interface{}) bool {
-	if nl_interface.IsNil(value) {
+func (k *Mapping) Set(specimen Key, value interface{}) bool {
+	if IsNil(value) {
 		value = k.param.EmptyValue
 	}
-	item, yes := k.values[specimen.Value()]
+	item, yes := k.values[specimen.MapKey()]
 	if yes {
 		item.value = value
 		return true
 	}
 	if k.param.AutoInit {
-		k.values[specimen.Value()] = &MappingItem{
+		k.values[specimen.MapKey()] = &MappingItem{
 			key:   specimen,
 			value: value,
 		}
@@ -58,24 +63,24 @@ func (k *Mapping) Set(specimen String, value interface{}) bool {
 	return false
 }
 
-func (k *Mapping) Get(specimen String) interface{} {
-	item, yes := k.values[specimen.Value()]
+func (k *Mapping) Get(specimen Key) interface{} {
+	item, yes := k.values[specimen.MapKey()]
 	if !yes {
 		return k.param.EmptyValue
 	}
 	return item.value
 }
 
-func (k *Mapping) Key(specimen String) String {
-	item, yes := k.values[specimen.Value()]
+func (k *Mapping) Key(specimen Key) Key {
+	item, yes := k.values[specimen.MapKey()]
 	if !yes {
 		return specimen
 	}
 	return item.key
 }
 
-func (k *Mapping) Has(specimen String) bool {
-	_, yes := k.values[specimen.Value()]
+func (k *Mapping) Has(specimen Key) bool {
+	_, yes := k.values[specimen.MapKey()]
 	return yes
 }
 
@@ -88,13 +93,21 @@ func (k *Mapping) iterate(on func(item *MappingItem) bool) bool {
 	return false
 }
 
-func (k *Mapping) Iterate(on func(key String, value interface{}) bool) bool {
+func (k *Mapping) Iterate(on func(key Key, value interface{}) bool) bool {
 	for _, item := range k.values {
 		if on(item.key, item.value) {
 			return true
 		}
 	}
 	return false
+}
+
+func (k *Mapping) ToString(prefix string) string {
+	keys := []string{}
+	for key, _ := range k.values {
+		keys = append(keys, key)
+	}
+	return fmt.Sprintf("{{%v}}", strings.Join(keys, ", "))
 }
 
 type MappingParam struct {
