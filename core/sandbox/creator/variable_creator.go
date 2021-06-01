@@ -27,7 +27,7 @@ type VariableCreator struct {
 
 type VariableCreatorParam struct {
 	CodeBlockCreator func() *code_block.CodeBlock
-	PoolCreator   func(concept.Pool) concept.Pool
+	PoolCreator      func(concept.Pool) concept.Pool
 }
 
 func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {

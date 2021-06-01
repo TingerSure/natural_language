@@ -1,4 +1,4 @@
-package runtime
+package bind
 
 import (
 	"fmt"
@@ -6,14 +6,15 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
+	"github.com/TingerSure/natural_language/library/system/runtime"
 )
 
-func newStringCreator(libs *tree.LibraryManager) concept.Object {
-	creator := libs.Sandbox.Variable.Object.New()
+func newVariableCreator(libs *tree.LibraryManager) concept.Object {
+	variables := libs.Sandbox.Variable.Object.New()
 	seedParam := libs.Sandbox.Variable.String.New("seed")
 	languageParam := libs.Sandbox.Variable.String.New("language")
-	creator.SetField(
-		libs.Sandbox.Variable.String.New("BindSeed"),
+	variables.SetField(
+		libs.Sandbox.Variable.String.New("stringBind"),
 		libs.Sandbox.Variable.SystemFunction.New(
 			func(input concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 				languagePre := input.Get(languageParam)
@@ -28,7 +29,7 @@ func newStringCreator(libs *tree.LibraryManager) concept.Object {
 				}
 				libs.Sandbox.Variable.String.Seeds[language.Value()] = func(_ string, pool concept.Pool, instance *variable.String) string {
 					seedInput := libs.Sandbox.Variable.Param.New()
-					seedInput.Set(libs.Sandbox.Variable.String.New("pool"), newPoolObject(libs, pool))
+					seedInput.Set(libs.Sandbox.Variable.String.New("pool"), runtime.NewPoolObject(libs, pool))
 					seedInput.Set(libs.Sandbox.Variable.String.New("instance"), instance)
 					seedOutput, suspend := seed.Exec(seedInput, nil)
 					if !nl_interface.IsNil(suspend) {
@@ -53,5 +54,5 @@ func newStringCreator(libs *tree.LibraryManager) concept.Object {
 			[]concept.String{},
 		),
 	)
-	return creator
+	return variables
 }

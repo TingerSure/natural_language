@@ -1,11 +1,11 @@
 package creator
 
 import (
-	"github.com/TingerSure/natural_language/core/sandbox/pool"
 	"github.com/TingerSure/natural_language/core/sandbox/code_block"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/index"
 	"github.com/TingerSure/natural_language/core/sandbox/interrupt"
+	"github.com/TingerSure/natural_language/core/sandbox/pool"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 )
 
@@ -14,7 +14,7 @@ type SandboxCreator struct {
 	Index      *IndexCreator
 	Interrupt  *InterruptCreator
 	Expression *ExpressionCreator
-	Pool    *pool.PoolCreator
+	Pool       *pool.PoolCreator
 	CodeBlock  *code_block.CodeBlockCreator
 }
 

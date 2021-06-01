@@ -8,7 +8,7 @@ import (
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
-func newPoolObject(libs *tree.LibraryManager, pool concept.Pool) concept.Object {
+func NewPoolObject(libs *tree.LibraryManager, pool concept.Pool) concept.Object {
 	object := libs.Sandbox.Variable.Object.New()
 	keyParam := libs.Sandbox.Variable.String.New("key")
 	valueParam := libs.Sandbox.Variable.String.New("value")

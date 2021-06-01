@@ -6,8 +6,8 @@ import (
 	"github.com/TingerSure/natural_language/core/compiler"
 	"github.com/TingerSure/natural_language/core/parser"
 	"github.com/TingerSure/natural_language/core/sandbox"
-	"github.com/TingerSure/natural_language/core/sandbox/pool"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/pool"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 

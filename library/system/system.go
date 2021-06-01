@@ -2,6 +2,7 @@ package system
 
 import (
 	"github.com/TingerSure/natural_language/core/tree"
+	"github.com/TingerSure/natural_language/library/system/bind"
 	"github.com/TingerSure/natural_language/library/system/operator"
 	"github.com/TingerSure/natural_language/library/system/runtime"
 	"github.com/TingerSure/natural_language/library/system/std"
@@ -18,4 +19,6 @@ func BindSystem(libs *tree.LibraryManager, param *SystemLibraryParam) {
 	libs.AddPage("system/operator", libs.Sandbox.Index.ConstIndex.New(operator.NewOperator(libs)))
 
 	libs.AddPage("system/runtime", libs.Sandbox.Index.ConstIndex.New(runtime.NewRuntime(libs, param.RuntimeParam)))
+
+	libs.AddPage("system/bind", libs.Sandbox.Index.ConstIndex.New(bind.NewBind(libs)))
 }

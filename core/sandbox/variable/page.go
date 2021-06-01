@@ -123,7 +123,7 @@ func (o *Page) IsNull() bool {
 type PageCreatorParam struct {
 	NullCreator      func() concept.Null
 	ExceptionCreator func(string, string) concept.Exception
-	PoolCreator   func(concept.Pool) concept.Pool
+	PoolCreator      func(concept.Pool) concept.Pool
 }
 
 type PageCreator struct {

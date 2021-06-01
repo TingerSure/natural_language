@@ -83,7 +83,7 @@ func (f *If) Secondary() *code_block.CodeBlock {
 type IfCreatorParam struct {
 	ExceptionCreator       func(string, string) concept.Exception
 	CodeBlockCreator       func() *code_block.CodeBlock
-	PoolCreator         func(concept.Pool) concept.Pool
+	PoolCreator            func(concept.Pool) concept.Pool
 	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
 	NullCreator            func() concept.Null
 }

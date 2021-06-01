@@ -21,7 +21,7 @@ func NewRuntime(libs *tree.LibraryManager, param *RuntimeParam) *Runtime {
 		libs:      libs,
 		param:     param,
 		Page:      libs.Sandbox.Variable.Page.New(),
-		rootSpace: newPoolObject(libs, param.RootSpace),
+		rootSpace: NewPoolObject(libs, param.RootSpace),
 	}
 
 	instance.SetPublic(
@@ -29,13 +29,6 @@ func NewRuntime(libs *tree.LibraryManager, param *RuntimeParam) *Runtime {
 		libs.Sandbox.Index.PublicIndex.New(
 			"rootSpace",
 			libs.Sandbox.Index.ConstIndex.New(instance.rootSpace),
-		),
-	)
-	instance.SetPublic(
-		libs.Sandbox.Variable.String.New("sandbox"),
-		libs.Sandbox.Index.PublicIndex.New(
-			"sandbox",
-			libs.Sandbox.Index.ConstIndex.New(newSandboxCreator(libs)),
 		),
 	)
 
