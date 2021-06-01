@@ -9,18 +9,18 @@ import (
 )
 
 type AppendSeed interface {
-	ToLanguage(string, concept.Closure, *Append) string
+	ToLanguage(string, concept.Pool, *Append) string
 	NewException(string, string) concept.Exception
 }
 
 type Append struct {
 	*adaptor.ExpressionIndex
-	array concept.Index
-	item  concept.Index
+	array concept.Pipe
+	item  concept.Pipe
 	seed  AppendSeed
 }
 
-func (f *Append) ToLanguage(language string, space concept.Closure) string {
+func (f *Append) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -28,11 +28,11 @@ func (a *Append) ToString(prefix string) string {
 	return fmt.Sprintf("%v <- %v", a.array.ToString(prefix), a.item.ToString(prefix))
 }
 
-func (e *Append) Anticipate(space concept.Closure) concept.Variable {
+func (e *Append) Anticipate(space concept.Pool) concept.Variable {
 	return e.array.Anticipate(space)
 }
 
-func (a *Append) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *Append) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	item, suspend := a.item.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
@@ -55,11 +55,11 @@ type AppendCreatorParam struct {
 }
 
 type AppendCreator struct {
-	Seeds map[string]func(string, concept.Closure, *Append) string
+	Seeds map[string]func(string, concept.Pool, *Append) string
 	param *AppendCreatorParam
 }
 
-func (s *AppendCreator) New(array concept.Index, item concept.Index) *Append {
+func (s *AppendCreator) New(array concept.Pipe, item concept.Pipe) *Append {
 	back := &Append{
 		array: array,
 		item:  item,
@@ -73,7 +73,7 @@ func (s *AppendCreator) NewException(name string, message string) concept.Except
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *AppendCreator) ToLanguage(language string, space concept.Closure, instance *Append) string {
+func (s *AppendCreator) ToLanguage(language string, space concept.Pool, instance *Append) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -83,7 +83,7 @@ func (s *AppendCreator) ToLanguage(language string, space concept.Closure, insta
 
 func NewAppendCreator(param *AppendCreatorParam) *AppendCreator {
 	return &AppendCreator{
-		Seeds: map[string]func(string, concept.Closure, *Append) string{},
+		Seeds: map[string]func(string, concept.Pool, *Append) string{},
 		param: param,
 	}
 }

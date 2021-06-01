@@ -6,7 +6,7 @@ import (
 )
 
 type PrivateIndexSeed interface {
-	ToLanguage(string, concept.Closure, *PrivateIndex) string
+	ToLanguage(string, concept.Pool, *PrivateIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -14,7 +14,7 @@ type PrivateIndexSeed interface {
 }
 
 type PrivateIndex struct {
-	originator concept.Index
+	originator concept.Pipe
 	name       string
 	seed       PrivateIndexSeed
 }
@@ -27,7 +27,7 @@ func (f *PrivateIndex) Name() string {
 	return f.name
 }
 
-func (f *PrivateIndex) Originator() concept.Index {
+func (f *PrivateIndex) Originator() concept.Pipe {
 	return f.originator
 }
 
@@ -35,7 +35,7 @@ func (f *PrivateIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *PrivateIndex) ToLanguage(language string, space concept.Closure) string {
+func (f *PrivateIndex) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -43,23 +43,23 @@ func (s *PrivateIndex) ToString(prefix string) string {
 	return fmt.Sprintf("private %v = %v", s.name, s.originator.ToString(prefix))
 }
 
-func (s *PrivateIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+func (s *PrivateIndex) Call(space concept.Pool, param concept.Param) (concept.Param, concept.Exception) {
 	return nil, s.seed.NewException("runtime error", "PrivateIndex cannot be called.")
 }
 
-func (s *PrivateIndex) CallAnticipate(space concept.Closure, param concept.Param) concept.Param {
+func (s *PrivateIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
 	return s.seed.NewParam()
 }
 
-func (s *PrivateIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (s *PrivateIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return s.originator.Get(space)
 }
 
-func (s *PrivateIndex) Anticipate(space concept.Closure) concept.Variable {
+func (s *PrivateIndex) Anticipate(space concept.Pool) concept.Variable {
 	return s.originator.Anticipate(space)
 }
 
-func (s *PrivateIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
+func (s *PrivateIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {
 	return s.seed.NewException("runtime error", "PrivateIndex cannot be changed.")
 }
 
@@ -70,11 +70,11 @@ type PrivateIndexCreatorParam struct {
 }
 
 type PrivateIndexCreator struct {
-	Seeds map[string]func(string, concept.Closure, *PrivateIndex) string
+	Seeds map[string]func(string, concept.Pool, *PrivateIndex) string
 	param *PrivateIndexCreatorParam
 }
 
-func (s *PrivateIndexCreator) New(name string, originator concept.Index) *PrivateIndex {
+func (s *PrivateIndexCreator) New(name string, originator concept.Pipe) *PrivateIndex {
 	return &PrivateIndex{
 		name:       name,
 		originator: originator,
@@ -82,7 +82,7 @@ func (s *PrivateIndexCreator) New(name string, originator concept.Index) *Privat
 	}
 }
 
-func (s *PrivateIndexCreator) ToLanguage(language string, space concept.Closure, instance *PrivateIndex) string {
+func (s *PrivateIndexCreator) ToLanguage(language string, space concept.Pool, instance *PrivateIndex) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -108,7 +108,7 @@ func (s *PrivateIndexCreator) NewNull() concept.Null {
 
 func NewPrivateIndexCreator(param *PrivateIndexCreatorParam) *PrivateIndexCreator {
 	return &PrivateIndexCreator{
-		Seeds: map[string]func(string, concept.Closure, *PrivateIndex) string{},
+		Seeds: map[string]func(string, concept.Pool, *PrivateIndex) string{},
 		param: param,
 	}
 }

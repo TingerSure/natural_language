@@ -24,7 +24,6 @@ import (
 	Identifier
 	Eof
 	String
-	Page
 	Import
 	Public
 	Private
@@ -33,8 +32,6 @@ import (
 	Provide
 	Return
 	Function
-	Get
-	Set
 	True
 	False
 	Null
@@ -68,7 +65,6 @@ var (
 	SymbolEof              = grammar.NewTerminal(TypeEof, KeyEof)
 	SymbolString           = grammar.NewTerminal(TypeString, KeyString)
 	SymbolComment          = grammar.NewTerminal(TypeComment, KeyComment)
-	SymbolPage             = grammar.NewTerminal(TypePage, KeyPage)
 	SymbolImport           = grammar.NewTerminal(TypeImport, KeyImport)
 	SymbolPublic           = grammar.NewTerminal(TypePublic, KeyPublic)
 	SymbolPrivate          = grammar.NewTerminal(TypePrivate, KeyPrivate)
@@ -77,8 +73,6 @@ var (
 	SymbolProvide          = grammar.NewTerminal(TypeProvide, KeyProvide)
 	SymbolReturn           = grammar.NewTerminal(TypeReturn, KeyReturn)
 	SymbolFunction         = grammar.NewTerminal(TypeFunction, KeyFunction)
-	SymbolGet              = grammar.NewTerminal(TypeGet, KeyGet)
-	SymbolSet              = grammar.NewTerminal(TypeSet, KeySet)
 	SymbolTrue             = grammar.NewTerminal(TypeTrue, KeyTrue)
 	SymbolFalse            = grammar.NewTerminal(TypeFalse, KeyFalse)
 	SymbolNull             = grammar.NewTerminal(TypeNull, KeyNull)

@@ -10,7 +10,7 @@ import (
 )
 
 type NewParamSeed interface {
-	ToLanguage(string, concept.Closure, *NewParam) string
+	ToLanguage(string, concept.Pool, *NewParam) string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
 }
@@ -18,17 +18,17 @@ type NewParamSeed interface {
 type NewParam struct {
 	*adaptor.ExpressionIndex
 	values *concept.Mapping
-	list   []concept.Index
+	list   []concept.Pipe
 	types  int
 	seed   NewParamSeed
 }
 
-func (f *NewParam) SetArray(list []concept.Index) {
+func (f *NewParam) SetArray(list []concept.Pipe) {
 	f.types = concept.ParamTypeList
 	f.list = list
 }
 
-func (f *NewParam) SetKeyValue(keyValues []concept.Index) {
+func (f *NewParam) SetKeyValue(keyValues []concept.Pipe) {
 	f.types = concept.ParamTypeKeyValue
 	for _, keyValuePre := range keyValues {
 		keyValue, yes := index.IndexFamilyInstance.IsKeyValueIndex(keyValuePre)
@@ -39,7 +39,7 @@ func (f *NewParam) SetKeyValue(keyValues []concept.Index) {
 	}
 }
 
-func (f *NewParam) ToLanguage(language string, space concept.Closure) string {
+func (f *NewParam) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -69,7 +69,7 @@ func (a *NewParam) ToString(prefix string) string {
 	return ""
 }
 
-func (a *NewParam) Anticipate(space concept.Closure) concept.Variable {
+func (a *NewParam) Anticipate(space concept.Pool) concept.Variable {
 	param := a.seed.NewParam()
 	if a.types == concept.ParamTypeList {
 		for _, item := range a.list {
@@ -79,7 +79,7 @@ func (a *NewParam) Anticipate(space concept.Closure) concept.Variable {
 	}
 	if a.types == concept.ParamTypeKeyValue {
 		a.values.Iterate(func(key concept.String, value interface{}) bool {
-			param.Set(key, value.(concept.Index).Anticipate(space))
+			param.Set(key, value.(concept.Pipe).Anticipate(space))
 			return false
 		})
 		return param
@@ -87,7 +87,7 @@ func (a *NewParam) Anticipate(space concept.Closure) concept.Variable {
 	return param
 }
 
-func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *NewParam) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	param := a.seed.NewParam()
 	var suspend concept.Interrupt = nil
 	var value concept.Variable = nil
@@ -105,7 +105,7 @@ func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interr
 
 	if a.types == concept.ParamTypeKeyValue {
 		if a.values.Iterate(func(key concept.String, item interface{}) bool {
-			value, suspend = item.(concept.Index).Get(space)
+			value, suspend = item.(concept.Pipe).Get(space)
 			if !nl_interface.IsNil(suspend) {
 				return true
 			}
@@ -119,7 +119,7 @@ func (a *NewParam) Exec(space concept.Closure) (concept.Variable, concept.Interr
 	return nil, a.seed.NewException("system panic", fmt.Sprintf("Unknown param types in NewParam.Exec", a.types))
 }
 
-func (a *NewParam) Iterate(names []concept.String, on func(key concept.String, line concept.Index) bool) bool {
+func (a *NewParam) Iterate(names []concept.String, on func(key concept.String, line concept.Pipe) bool) bool {
 	if a.types == concept.ParamTypeList {
 		for index, item := range a.list {
 			if index >= len(names) {
@@ -137,7 +137,7 @@ func (a *NewParam) Iterate(names []concept.String, on func(key concept.String, l
 			if item == nil {
 				continue
 			}
-			if on(name, item.(concept.Index)) {
+			if on(name, item.(concept.Pipe)) {
 				return true
 			}
 		}
@@ -154,7 +154,7 @@ type NewParamCreatorParam struct {
 }
 
 type NewParamCreator struct {
-	Seeds map[string]func(string, concept.Closure, *NewParam) string
+	Seeds map[string]func(string, concept.Pool, *NewParam) string
 	param *NewParamCreatorParam
 }
 
@@ -179,7 +179,7 @@ func (s *NewParamCreator) NewException(name string, message string) concept.Exce
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *NewParamCreator) ToLanguage(language string, space concept.Closure, instance *NewParam) string {
+func (s *NewParamCreator) ToLanguage(language string, space concept.Pool, instance *NewParam) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -189,7 +189,7 @@ func (s *NewParamCreator) ToLanguage(language string, space concept.Closure, ins
 
 func NewNewParamCreator(param *NewParamCreatorParam) *NewParamCreator {
 	return &NewParamCreator{
-		Seeds: map[string]func(string, concept.Closure, *NewParam) string{},
+		Seeds: map[string]func(string, concept.Pool, *NewParam) string{},
 		param: param,
 	}
 }

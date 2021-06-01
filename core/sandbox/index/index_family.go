@@ -15,7 +15,7 @@ func newIndexFamily() *IndexFamily {
 type IndexFamily struct {
 }
 
-func (v *IndexFamily) IsKeyIndex(value concept.Index) (*KeyIndex, bool) {
+func (v *IndexFamily) IsKeyIndex(value concept.Pipe) (*KeyIndex, bool) {
 	if value == nil {
 		return nil, false
 	}
@@ -26,7 +26,7 @@ func (v *IndexFamily) IsKeyIndex(value concept.Index) (*KeyIndex, bool) {
 	return nil, false
 }
 
-func (v *IndexFamily) IsKeyKeyIndex(value concept.Index) (*KeyKeyIndex, bool) {
+func (v *IndexFamily) IsKeyKeyIndex(value concept.Pipe) (*KeyKeyIndex, bool) {
 	if value == nil {
 		return nil, false
 	}
@@ -37,7 +37,7 @@ func (v *IndexFamily) IsKeyKeyIndex(value concept.Index) (*KeyKeyIndex, bool) {
 	return nil, false
 }
 
-func (v *IndexFamily) IsKeyValueIndex(value concept.Index) (*KeyValueIndex, bool) {
+func (v *IndexFamily) IsKeyValueIndex(value concept.Pipe) (*KeyValueIndex, bool) {
 	if value == nil {
 		return nil, false
 	}
@@ -48,7 +48,7 @@ func (v *IndexFamily) IsKeyValueIndex(value concept.Index) (*KeyValueIndex, bool
 	return nil, false
 }
 
-func (v *IndexFamily) IsConstIndex(value concept.Index) (*ConstIndex, bool) {
+func (v *IndexFamily) IsConstIndex(value concept.Pipe) (*ConstIndex, bool) {
 	if value == nil {
 		return nil, false
 	}
@@ -59,7 +59,7 @@ func (v *IndexFamily) IsConstIndex(value concept.Index) (*ConstIndex, bool) {
 	return nil, false
 }
 
-func (v *IndexFamily) IsImportIndex(value concept.Index) (*ImportIndex, bool) {
+func (v *IndexFamily) IsImportIndex(value concept.Pipe) (*ImportIndex, bool) {
 	if value == nil {
 		return nil, false
 	}
@@ -70,7 +70,7 @@ func (v *IndexFamily) IsImportIndex(value concept.Index) (*ImportIndex, bool) {
 	return nil, false
 }
 
-func (v *IndexFamily) IsPrivateIndex(value concept.Index) (*PrivateIndex, bool) {
+func (v *IndexFamily) IsPrivateIndex(value concept.Pipe) (*PrivateIndex, bool) {
 	if value == nil {
 		return nil, false
 	}
@@ -81,7 +81,7 @@ func (v *IndexFamily) IsPrivateIndex(value concept.Index) (*PrivateIndex, bool) 
 	return nil, false
 }
 
-func (v *IndexFamily) IsPublicIndex(value concept.Index) (*PublicIndex, bool) {
+func (v *IndexFamily) IsPublicIndex(value concept.Pipe) (*PublicIndex, bool) {
 	if value == nil {
 		return nil, false
 	}
@@ -91,7 +91,7 @@ func (v *IndexFamily) IsPublicIndex(value concept.Index) (*PublicIndex, bool) {
 	}
 	return nil, false
 }
-func (v *IndexFamily) IsProvideIndex(value concept.Index) (*ProvideIndex, bool) {
+func (v *IndexFamily) IsProvideIndex(value concept.Pipe) (*ProvideIndex, bool) {
 	if value == nil {
 		return nil, false
 	}
@@ -102,7 +102,7 @@ func (v *IndexFamily) IsProvideIndex(value concept.Index) (*ProvideIndex, bool) 
 	return nil, false
 }
 
-func (v *IndexFamily) IsRequireIndex(value concept.Index) (*RequireIndex, bool) {
+func (v *IndexFamily) IsRequireIndex(value concept.Pipe) (*RequireIndex, bool) {
 	if value == nil {
 		return nil, false
 	}

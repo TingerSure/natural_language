@@ -7,7 +7,7 @@ import (
 )
 
 type PhraseVocabularyParam struct {
-	Index   func() concept.Index
+	Index   func() concept.Pipe
 	Content *Vocabulary
 	Types   string
 	From    string
@@ -18,7 +18,7 @@ type PhraseVocabulary struct {
 	types string
 }
 
-func (p *PhraseVocabulary) Index() concept.Index {
+func (p *PhraseVocabulary) Index() concept.Pipe {
 	return p.param.Index()
 }
 

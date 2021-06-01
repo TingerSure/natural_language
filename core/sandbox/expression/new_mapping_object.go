@@ -11,32 +11,32 @@ import (
 )
 
 type NewMappingObjectSeed interface {
-	ToLanguage(string, concept.Closure, *NewMappingObject) string
+	ToLanguage(string, concept.Pool, *NewMappingObject) string
 	NewException(string, string) concept.Exception
 	NewMappingObject(concept.Variable, concept.Class) *variable.MappingObject
 }
 
 type NewMappingObject struct {
 	*adaptor.ExpressionIndex
-	object  concept.Index
-	class   concept.Index
-	mapping []concept.Index
+	object  concept.Pipe
+	class   concept.Pipe
+	mapping []concept.Pipe
 	seed    NewMappingObjectSeed
 }
 
-func (f *NewMappingObject) SetMapping(mapping []concept.Index) {
+func (f *NewMappingObject) SetMapping(mapping []concept.Pipe) {
 	f.mapping = mapping
 }
 
-func (f *NewMappingObject) SetObject(object concept.Index) {
+func (f *NewMappingObject) SetObject(object concept.Pipe) {
 	f.object = object
 }
 
-func (f *NewMappingObject) SetClass(class concept.Index) {
+func (f *NewMappingObject) SetClass(class concept.Pipe) {
 	f.class = class
 }
 
-func (f *NewMappingObject) ToLanguage(language string, space concept.Closure) string {
+func (f *NewMappingObject) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -57,7 +57,7 @@ func (a *NewMappingObject) ToString(prefix string) string {
 	)
 }
 
-func (a *NewMappingObject) Anticipate(space concept.Closure) concept.Variable {
+func (a *NewMappingObject) Anticipate(space concept.Pool) concept.Variable {
 	object := a.object.Anticipate(space)
 	class, _ := variable.VariableFamilyInstance.IsClass(a.class.Anticipate(space))
 	mappingObject := a.seed.NewMappingObject(object, class)
@@ -68,7 +68,7 @@ func (a *NewMappingObject) Anticipate(space concept.Closure) concept.Variable {
 	return mappingObject
 }
 
-func (a *NewMappingObject) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *NewMappingObject) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	object, suspend := a.object.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
@@ -99,7 +99,7 @@ type NewMappingObjectCreatorParam struct {
 }
 
 type NewMappingObjectCreator struct {
-	Seeds map[string]func(string, concept.Closure, *NewMappingObject) string
+	Seeds map[string]func(string, concept.Pool, *NewMappingObject) string
 	param *NewMappingObjectCreatorParam
 }
 
@@ -119,7 +119,7 @@ func (s *NewMappingObjectCreator) NewException(name string, message string) conc
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *NewMappingObjectCreator) ToLanguage(language string, space concept.Closure, instance *NewMappingObject) string {
+func (s *NewMappingObjectCreator) ToLanguage(language string, space concept.Pool, instance *NewMappingObject) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -129,7 +129,7 @@ func (s *NewMappingObjectCreator) ToLanguage(language string, space concept.Clos
 
 func NewNewMappingObjectCreator(param *NewMappingObjectCreatorParam) *NewMappingObjectCreator {
 	return &NewMappingObjectCreator{
-		Seeds: map[string]func(string, concept.Closure, *NewMappingObject) string{},
+		Seeds: map[string]func(string, concept.Pool, *NewMappingObject) string{},
 		param: param,
 	}
 }

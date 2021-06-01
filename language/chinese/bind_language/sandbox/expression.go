@@ -15,7 +15,7 @@ func ExpressionBindLanguage(libs *tree.LibraryManager, language string) {
 	libs.Sandbox.Expression.NewParam.Seeds[language] = func(language string, instance *expression.NewParam) string {
 		items := []string{}
 
-		instance.Iterate(func(key concept.String, value concept.Index) bool {
+		instance.Iterate(func(key concept.String, value concept.Pipe) bool {
 			items = append(items, fmt.Sprintf("%v作为%v", value.ToLanguage(language), key.ToLanguage(language)))
 			return false
 		})
@@ -73,7 +73,7 @@ func ExpressionBindLanguage(libs *tree.LibraryManager, language string) {
 			newParamIndex, yesNewParamIndex := instance.Param().(*expression.NewParam)
 			if yesNewParamIndex {
 				paramCanUse = true
-				newParamIndex.Iterate(func(key concept.String, value concept.Index) bool {
+				newParamIndex.Iterate(func(key concept.String, value concept.Pipe) bool {
 					param.Set(key, value)
 					return false
 				})

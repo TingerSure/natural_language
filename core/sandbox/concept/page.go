@@ -2,7 +2,7 @@ package concept
 
 type Page interface {
 	Variable
-	SetImport(String, Index) error
-	SetPublic(String, Index) error
-	SetPrivate(String, Index) error
+	SetImport(String, Pipe) error
+	SetPublic(String, Pipe) error
+	SetPrivate(String, Pipe) error
 }

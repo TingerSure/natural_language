@@ -1,4 +1,4 @@
-package closure
+package pool
 
 import (
 	"fmt"
@@ -11,20 +11,20 @@ const (
 	historyTypeBubble = 2
 )
 
-type ClosureSeed interface {
+type PoolSeed interface {
 	NewException(string, string) concept.Exception
 	NewNull() concept.Null
 }
 
-type Closure struct {
+type Pool struct {
 	local     *concept.Mapping
-	parent    concept.Closure
+	parent    concept.Pool
 	history   *History
 	extempore *Extempore
-	seed      ClosureSeed
+	seed      PoolSeed
 }
 
-func (c *Closure) IterateHistory(match func(concept.String, concept.Variable) bool) bool {
+func (c *Pool) IterateHistory(match func(concept.String, concept.Variable) bool) bool {
 	return c.history.Iterate(func(key concept.String, types int) bool {
 		var value concept.Variable
 		var suspend concept.Exception
@@ -48,11 +48,11 @@ func (c *Closure) IterateHistory(match func(concept.String, concept.Variable) bo
 	})
 }
 
-func (c *Closure) IterateExtempore(match func(concept.Index, concept.Variable) bool) bool {
+func (c *Pool) IterateExtempore(match func(concept.Pipe, concept.Variable) bool) bool {
 	return c.extempore.Iterate(match)
 }
 
-func (c *Closure) IterateLocal(match func(concept.String, concept.Variable) bool) bool {
+func (c *Pool) IterateLocal(match func(concept.String, concept.Variable) bool) bool {
 	return c.local.Iterate(func(key concept.String, value interface{}) bool {
 		if match(key, value.(concept.Variable)) {
 			c.history.Set(key, historyTypeLocal)
@@ -62,7 +62,7 @@ func (c *Closure) IterateLocal(match func(concept.String, concept.Variable) bool
 	})
 }
 
-func (c *Closure) IterateBubble(match func(concept.String, concept.Variable) bool) bool {
+func (c *Pool) IterateBubble(match func(concept.String, concept.Variable) bool) bool {
 	if c.IterateLocal(match) {
 		return true
 	}
@@ -78,34 +78,34 @@ func (c *Closure) IterateBubble(match func(concept.String, concept.Variable) boo
 	})
 }
 
-func (c *Closure) SetParent(parent concept.Closure) {
+func (c *Pool) SetParent(parent concept.Pool) {
 	c.parent = parent
 }
 
-func (c *Closure) AddExtempore(index concept.Index, value concept.Variable) {
+func (c *Pool) AddExtempore(index concept.Pipe, value concept.Variable) {
 	c.extempore.Add(index, value)
 }
 
-func (c *Closure) InitLocal(key concept.String, defaultValue concept.Variable) {
+func (c *Pool) InitLocal(key concept.String, defaultValue concept.Variable) {
 	c.local.Init(key, defaultValue)
 }
 
-func (c *Closure) KeyLocal(key concept.String) concept.String {
+func (c *Pool) KeyLocal(key concept.String) concept.String {
 	return c.local.Key(key)
 }
 
-func (c *Closure) PeekLocal(key concept.String) (concept.Variable, concept.Exception) {
+func (c *Pool) PeekLocal(key concept.String) (concept.Variable, concept.Exception) {
 	if !c.local.Has(key) {
 		return nil, c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: %v.", key.ToString("")))
 	}
 	return c.local.Get(key).(concept.Variable), nil
 }
 
-func (c *Closure) HasLocal(key concept.String) bool {
+func (c *Pool) HasLocal(key concept.String) bool {
 	return c.local.Has(key)
 }
 
-func (c *Closure) GetLocal(key concept.String) (concept.Variable, concept.Exception) {
+func (c *Pool) GetLocal(key concept.String) (concept.Variable, concept.Exception) {
 	if !c.local.Has(key) {
 		return nil, c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: %v.", key.ToString("")))
 	}
@@ -113,7 +113,7 @@ func (c *Closure) GetLocal(key concept.String) (concept.Variable, concept.Except
 	return c.local.Get(key).(concept.Variable), nil
 }
 
-func (c *Closure) SetLocal(key concept.String, value concept.Variable) concept.Exception {
+func (c *Pool) SetLocal(key concept.String, value concept.Variable) concept.Exception {
 	if !c.local.Set(key, value) {
 		return c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: %v.", key.ToString("")))
 	}
@@ -121,7 +121,7 @@ func (c *Closure) SetLocal(key concept.String, value concept.Variable) concept.E
 	return nil
 }
 
-func (c *Closure) HasBubble(key concept.String) bool {
+func (c *Pool) HasBubble(key concept.String) bool {
 	yes := c.HasLocal(key)
 	if yes {
 		return true
@@ -132,7 +132,7 @@ func (c *Closure) HasBubble(key concept.String) bool {
 	return false
 }
 
-func (c *Closure) KeyBubble(key concept.String) concept.String {
+func (c *Pool) KeyBubble(key concept.String) concept.String {
 	if c.local.Has(key) {
 		return c.local.Key(key)
 	}
@@ -142,7 +142,7 @@ func (c *Closure) KeyBubble(key concept.String) concept.String {
 	return key
 }
 
-func (c *Closure) PeekBubble(key concept.String) (concept.Variable, concept.Exception) {
+func (c *Pool) PeekBubble(key concept.String) (concept.Variable, concept.Exception) {
 	value, suspend := c.PeekLocal(key)
 	if nl_interface.IsNil(suspend) {
 		return value, nil
@@ -153,7 +153,7 @@ func (c *Closure) PeekBubble(key concept.String) (concept.Variable, concept.Exce
 	return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: %v.", key.ToString("")))
 }
 
-func (c *Closure) GetBubble(key concept.String) (concept.Variable, concept.Exception) {
+func (c *Pool) GetBubble(key concept.String) (concept.Variable, concept.Exception) {
 	value, suspend := c.GetLocal(key)
 	if nl_interface.IsNil(suspend) {
 		c.history.Set(key, historyTypeBubble)
@@ -169,7 +169,7 @@ func (c *Closure) GetBubble(key concept.String) (concept.Variable, concept.Excep
 	return c.seed.NewNull(), c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: %v.", key.ToString("")))
 }
 
-func (c *Closure) SetBubble(key concept.String, value concept.Variable) concept.Exception {
+func (c *Pool) SetBubble(key concept.String, value concept.Variable) concept.Exception {
 	suspend := c.SetLocal(key, value)
 	if nl_interface.IsNil(suspend) {
 		return nil
@@ -184,28 +184,28 @@ func (c *Closure) SetBubble(key concept.String, value concept.Variable) concept.
 	return c.seed.NewException("none pionter", fmt.Sprintf("Undefined variable: %v.", key.ToString("")))
 }
 
-func (c *Closure) Clear() {
+func (c *Pool) Clear() {
 }
 
-type ClosureCreatorParam struct {
+type PoolCreatorParam struct {
 	ExceptionCreator func(string, string) concept.Exception
 	EmptyCreator     func() concept.Null
 }
 
-type ClosureCreator struct {
-	param *ClosureCreatorParam
+type PoolCreator struct {
+	param *PoolCreatorParam
 }
 
-func (s *ClosureCreator) NewException(name string, message string) concept.Exception {
+func (s *PoolCreator) NewException(name string, message string) concept.Exception {
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *ClosureCreator) NewNull() concept.Null {
+func (s *PoolCreator) NewNull() concept.Null {
 	return s.param.EmptyCreator()
 }
 
-func (s *ClosureCreator) New(parent concept.Closure) *Closure {
-	return &Closure{
+func (s *PoolCreator) New(parent concept.Pool) *Pool {
+	return &Pool{
 		parent:    parent,
 		history:   NewHistory(),
 		extempore: NewExtempore(),
@@ -217,8 +217,8 @@ func (s *ClosureCreator) New(parent concept.Closure) *Closure {
 	}
 }
 
-func NewClosureCreator(param *ClosureCreatorParam) *ClosureCreator {
-	return &ClosureCreator{
+func NewPoolCreator(param *PoolCreatorParam) *PoolCreator {
+	return &PoolCreator{
 		param: param,
 	}
 }

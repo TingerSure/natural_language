@@ -1,6 +1,6 @@
 package concept
 
 type Expression interface {
-	Index
-	Exec(Closure) (Variable, Interrupt)
+	Pipe
+	Exec(Pool) (Variable, Interrupt)
 }

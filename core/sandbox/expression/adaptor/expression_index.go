@@ -24,7 +24,7 @@ func (e *ExpressionIndex) Type() string {
 	return e.seed.Type()
 }
 
-func (s *ExpressionIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+func (s *ExpressionIndex) Call(space concept.Pool, param concept.Param) (concept.Param, concept.Exception) {
 	funcs, interrupt := s.Get(space)
 	if !nl_interface.IsNil(interrupt) {
 		return nil, interrupt.(concept.Exception)
@@ -35,7 +35,7 @@ func (s *ExpressionIndex) Call(space concept.Closure, param concept.Param) (conc
 	return funcs.(concept.Function).Exec(param, nil)
 }
 
-func (s *ExpressionIndex) CallAnticipate(space concept.Closure, param concept.Param) concept.Param {
+func (s *ExpressionIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
 	funcs := s.expression.Anticipate(space)
 	if !funcs.IsFunction() {
 		return s.seed.NewParam()
@@ -43,11 +43,11 @@ func (s *ExpressionIndex) CallAnticipate(space concept.Closure, param concept.Pa
 	return funcs.(concept.Function).Anticipate(param, nil)
 }
 
-func (e *ExpressionIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (e *ExpressionIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return e.expression.Exec(space)
 }
 
-func (e *ExpressionIndex) Set(concept.Closure, concept.Variable) concept.Interrupt {
+func (e *ExpressionIndex) Set(concept.Pool, concept.Variable) concept.Interrupt {
 	return e.seed.NewException("read only", "Expression result does not need to be changed.")
 }
 

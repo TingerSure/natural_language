@@ -7,8 +7,6 @@ import (
 
 type IndexCreator struct {
 	ConstIndex    *index.ConstIndexCreator
-	ResaultIndex  *index.ResaultIndexCreator
-	SearchIndex   *index.SearchIndexCreator
 	ThisIndex     *index.ThisIndexCreator
 	SelfIndex     *index.SelfIndexCreator
 	BubbleIndex   *index.BubbleIndexCreator
@@ -89,16 +87,6 @@ func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,
 		StringCreator:    param.StringCreator,
-		NullCreator:      param.NullCreator,
-	})
-	instance.SearchIndex = index.NewSearchIndexCreator(&index.SearchIndexCreatorParam{
-		ExceptionCreator: param.ExceptionCreator,
-		ParamCreator:     param.ParamCreator,
-		NullCreator:      param.NullCreator,
-	})
-	instance.ResaultIndex = index.NewResaultIndexCreator(&index.ResaultIndexCreatorParam{
-		ExceptionCreator: param.ExceptionCreator,
-		ParamCreator:     param.ParamCreator,
 		NullCreator:      param.NullCreator,
 	})
 	instance.ConstIndex = index.NewConstIndexCreator(&index.ConstIndexCreatorParam{

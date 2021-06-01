@@ -6,7 +6,7 @@ import (
 )
 
 type RequireIndexSeed interface {
-	ToLanguage(string, concept.Closure, *RequireIndex) string
+	ToLanguage(string, concept.Pool, *RequireIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -14,7 +14,7 @@ type RequireIndexSeed interface {
 }
 
 type RequireIndex struct {
-	originator concept.Index
+	originator concept.Pipe
 	name       string
 	seed       RequireIndexSeed
 }
@@ -27,7 +27,7 @@ func (f *RequireIndex) Name() string {
 	return f.name
 }
 
-func (f *RequireIndex) Originator() concept.Index {
+func (f *RequireIndex) Originator() concept.Pipe {
 	return f.originator
 }
 
@@ -35,7 +35,7 @@ func (f *RequireIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *RequireIndex) ToLanguage(language string, space concept.Closure) string {
+func (f *RequireIndex) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -43,24 +43,24 @@ func (s *RequireIndex) ToString(prefix string) string {
 	return fmt.Sprintf("require %v = %v", s.name, s.originator.ToString(prefix))
 }
 
-func (s *RequireIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+func (s *RequireIndex) Call(space concept.Pool, param concept.Param) (concept.Param, concept.Exception) {
 	return nil, s.seed.NewException("runtime error", "RequireIndex cannot be called.")
 
 }
 
-func (s *RequireIndex) CallAnticipate(space concept.Closure, param concept.Param) concept.Param {
+func (s *RequireIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
 	return s.seed.NewParam()
 }
 
-func (s *RequireIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (s *RequireIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return s.originator.Get(space)
 }
 
-func (s *RequireIndex) Anticipate(space concept.Closure) concept.Variable {
+func (s *RequireIndex) Anticipate(space concept.Pool) concept.Variable {
 	return s.originator.Anticipate(space)
 }
 
-func (s *RequireIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
+func (s *RequireIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {
 	return s.seed.NewException("runtime error", "RequireIndex cannot be changed.")
 }
 
@@ -71,11 +71,11 @@ type RequireIndexCreatorParam struct {
 }
 
 type RequireIndexCreator struct {
-	Seeds map[string]func(string, concept.Closure, *RequireIndex) string
+	Seeds map[string]func(string, concept.Pool, *RequireIndex) string
 	param *RequireIndexCreatorParam
 }
 
-func (s *RequireIndexCreator) New(name string, originator concept.Index) *RequireIndex {
+func (s *RequireIndexCreator) New(name string, originator concept.Pipe) *RequireIndex {
 	return &RequireIndex{
 		name:       name,
 		originator: originator,
@@ -83,7 +83,7 @@ func (s *RequireIndexCreator) New(name string, originator concept.Index) *Requir
 	}
 }
 
-func (s *RequireIndexCreator) ToLanguage(language string, space concept.Closure, instance *RequireIndex) string {
+func (s *RequireIndexCreator) ToLanguage(language string, space concept.Pool, instance *RequireIndex) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -109,7 +109,7 @@ func (s *RequireIndexCreator) NewNull() concept.Null {
 
 func NewRequireIndexCreator(param *RequireIndexCreatorParam) *RequireIndexCreator {
 	return &RequireIndexCreator{
-		Seeds: map[string]func(string, concept.Closure, *RequireIndex) string{},
+		Seeds: map[string]func(string, concept.Pool, *RequireIndex) string{},
 		param: param,
 	}
 }

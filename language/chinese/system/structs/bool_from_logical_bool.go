@@ -28,11 +28,11 @@ func (p *BoolFromLogicalBool) GetStructRules() []*tree.StructRule {
 		tree.NewStructRule(&tree.StructRuleParam{
 			Create: func() tree.Phrase {
 				return tree.NewPhraseStruct(&tree.PhraseStructParam{
-					Index: func(phrase []tree.Phrase) concept.Index {
+					Index: func(phrase []tree.Phrase) concept.Pipe {
 						return p.Libs.Sandbox.Expression.ParamGet.New(
 							p.Libs.Sandbox.Expression.Call.New(
 								phrase[0].Index(),
-								p.Libs.Sandbox.Expression.NewParam.New().Init(map[concept.String]concept.Index{
+								p.Libs.Sandbox.Expression.NewParam.New().Init(map[concept.String]concept.Pipe{
 									p.Libs.Sandbox.Variable.String.New(ItemRight): phrase[1].Index(),
 								}),
 							),

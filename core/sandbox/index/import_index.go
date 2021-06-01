@@ -6,7 +6,7 @@ import (
 )
 
 type ImportIndexSeed interface {
-	ToLanguage(string, concept.Closure, *ImportIndex) string
+	ToLanguage(string, concept.Pool, *ImportIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -40,7 +40,7 @@ func (f *ImportIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *ImportIndex) ToLanguage(language string, space concept.Closure) string {
+func (f *ImportIndex) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -48,24 +48,24 @@ func (s *ImportIndex) ToString(prefix string) string {
 	return fmt.Sprintf("import %v \"%v\"", s.name, s.path)
 }
 
-func (s *ImportIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+func (s *ImportIndex) Call(space concept.Pool, param concept.Param) (concept.Param, concept.Exception) {
 	return nil, s.seed.NewException("runtime error", "ImportIndex cannot be called.")
 
 }
 
-func (s *ImportIndex) CallAnticipate(space concept.Closure, param concept.Param) concept.Param {
+func (s *ImportIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
 	return s.seed.NewParam()
 }
 
-func (s *ImportIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (s *ImportIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return s.page, nil
 }
 
-func (s *ImportIndex) Anticipate(space concept.Closure) concept.Variable {
+func (s *ImportIndex) Anticipate(space concept.Pool) concept.Variable {
 	return s.page
 }
 
-func (s *ImportIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
+func (s *ImportIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {
 	return s.seed.NewException("runtime error", "Import cannot be changed.")
 }
 
@@ -76,7 +76,7 @@ type ImportIndexCreatorParam struct {
 }
 
 type ImportIndexCreator struct {
-	Seeds map[string]func(string, concept.Closure, *ImportIndex) string
+	Seeds map[string]func(string, concept.Pool, *ImportIndex) string
 	param *ImportIndexCreatorParam
 }
 
@@ -89,7 +89,7 @@ func (s *ImportIndexCreator) New(name string, path string, page concept.Variable
 	}
 }
 
-func (s *ImportIndexCreator) ToLanguage(language string, space concept.Closure, instance *ImportIndex) string {
+func (s *ImportIndexCreator) ToLanguage(language string, space concept.Pool, instance *ImportIndex) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -115,7 +115,7 @@ func (s *ImportIndexCreator) NewNull() concept.Null {
 
 func NewImportIndexCreator(param *ImportIndexCreatorParam) *ImportIndexCreator {
 	return &ImportIndexCreator{
-		Seeds: map[string]func(string, concept.Closure, *ImportIndex) string{},
+		Seeds: map[string]func(string, concept.Pool, *ImportIndex) string{},
 		param: param,
 	}
 }

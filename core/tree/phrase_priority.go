@@ -10,7 +10,7 @@ type PhrasePriority struct {
 	values []Phrase
 }
 
-func (p *PhrasePriority) Index() concept.Index {
+func (p *PhrasePriority) Index() concept.Pipe {
 	return p.values[0].Index()
 }
 

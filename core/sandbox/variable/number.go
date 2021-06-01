@@ -11,7 +11,7 @@ const (
 )
 
 type NumberSeed interface {
-	ToLanguage(string, concept.Closure, *Number) string
+	ToLanguage(string, concept.Pool, *Number) string
 	Type() string
 }
 
@@ -25,7 +25,7 @@ func (o *Number) Call(specimen concept.String, param concept.Param) (concept.Par
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *Number) ToLanguage(language string, space concept.Closure) string {
+func (f *Number) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -48,7 +48,7 @@ type NumberCreatorParam struct {
 
 type NumberCreator struct {
 	param *NumberCreatorParam
-	Seeds map[string]func(string, concept.Closure, *Number) string
+	Seeds map[string]func(string, concept.Pool, *Number) string
 }
 
 func (s *NumberCreator) New(value float64) *Number {
@@ -62,7 +62,7 @@ func (s *NumberCreator) New(value float64) *Number {
 	}
 }
 
-func (s *NumberCreator) ToLanguage(language string, space concept.Closure, instance *Number) string {
+func (s *NumberCreator) ToLanguage(language string, space concept.Pool, instance *Number) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -77,6 +77,6 @@ func (s *NumberCreator) Type() string {
 func NewNumberCreator(param *NumberCreatorParam) *NumberCreator {
 	return &NumberCreator{
 		param: param,
-		Seeds: map[string]func(string, concept.Closure, *Number) string{},
+		Seeds: map[string]func(string, concept.Pool, *Number) string{},
 	}
 }

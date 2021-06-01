@@ -12,7 +12,7 @@ type SandboxParam struct {
 	OnError   func(error)
 	OnClose   func()
 	OnPrint   func(concept.Variable)
-	Root      concept.Closure
+	Root      concept.Pool
 	EventSize int
 }
 
@@ -25,7 +25,7 @@ func (s *Sandbox) GetEventLoop() *loop.Loop {
 	return s.eventLoop
 }
 
-func (s *Sandbox) Exec(index concept.Index) {
+func (s *Sandbox) Exec(index concept.Pipe) {
 	s.eventLoop.Append(loop.NewEvent(index, s.param.Root))
 }
 

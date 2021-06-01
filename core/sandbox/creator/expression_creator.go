@@ -40,7 +40,7 @@ type ExpressionCreator struct {
 type ExpressionCreatorParam struct {
 	CodeBlockCreator      func() *code_block.CodeBlock
 	DefineFunctionCreator func([]concept.String, []concept.String) *variable.DefineFunction
-	FunctionCreator       func(concept.Closure) *variable.Function
+	FunctionCreator       func(concept.Pool) *variable.Function
 	StringCreator         func(string) concept.String
 	BoolCreator           func(bool) concept.Bool
 	NumberCreator         func(float64) concept.Number
@@ -48,7 +48,7 @@ type ExpressionCreatorParam struct {
 	ReturnCreator         func() *interrupt.Return
 	ParamCreator          func() concept.Param
 	ConstIndexCreator     func(concept.Variable) *index.ConstIndex
-	ClosureCreator        func(concept.Closure) concept.Closure
+	PoolCreator        func(concept.Pool) concept.Pool
 	NullCreator           func() concept.Null
 	ObjectCreator         func() concept.Object
 	MappingObjectCreator  func(concept.Variable, concept.Class) *variable.MappingObject
@@ -153,7 +153,7 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 		CodeBlockCreator:       param.CodeBlockCreator,
 		ExceptionCreator:       param.ExceptionCreator,
 		NullCreator:            param.NullCreator,
-		ClosureCreator:         param.ClosureCreator,
+		PoolCreator:         param.PoolCreator,
 	})
 	instance.For = expression.NewForCreator(&expression.ForCreatorParam{
 		ExpressionIndexCreator: instance.ExpressionIndex.New,

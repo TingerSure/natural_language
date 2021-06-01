@@ -10,21 +10,21 @@ import (
 )
 
 type IfSeed interface {
-	ToLanguage(string, concept.Closure, *If) string
+	ToLanguage(string, concept.Pool, *If) string
 	NewException(string, string) concept.Exception
 	NewNull() concept.Null
-	NewClosure(concept.Closure) concept.Closure
+	NewPool(concept.Pool) concept.Pool
 }
 
 type If struct {
 	*adaptor.ExpressionIndex
-	condition concept.Index
+	condition concept.Pipe
 	primary   *code_block.CodeBlock
 	secondary *code_block.CodeBlock
 	seed      IfSeed
 }
 
-func (f *If) ToLanguage(language string, space concept.Closure) string {
+func (f *If) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -35,15 +35,15 @@ func (f *If) ToString(prefix string) string {
 	}
 	return fmt.Sprintf("%v else %v", primaryToString, f.secondary.ToString(prefix))
 }
-func (e *If) Anticipate(space concept.Closure) concept.Variable {
+func (e *If) Anticipate(space concept.Pool) concept.Variable {
 	return e.seed.NewNull()
 }
-func (f *If) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) {
+func (f *If) Exec(parent concept.Pool) (concept.Variable, concept.Interrupt) {
 
 	if nl_interface.IsNil(f.condition) {
 		return nil, f.seed.NewException("system error", "No condition for judgment.")
 	}
-	initSpace := f.seed.NewClosure(parent)
+	initSpace := f.seed.NewPool(parent)
 	defer initSpace.Clear()
 
 	preCondition, suspend := f.condition.Get(initSpace)
@@ -68,7 +68,7 @@ func (f *If) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) 
 	return f.seed.NewNull(), suspend
 }
 
-func (f *If) SetCondition(condition concept.Index) {
+func (f *If) SetCondition(condition concept.Pipe) {
 	f.condition = condition
 }
 
@@ -83,15 +83,15 @@ func (f *If) Secondary() *code_block.CodeBlock {
 type IfCreatorParam struct {
 	ExceptionCreator       func(string, string) concept.Exception
 	CodeBlockCreator       func() *code_block.CodeBlock
-	ClosureCreator         func(concept.Closure) concept.Closure
+	PoolCreator         func(concept.Pool) concept.Pool
 	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
 	NullCreator            func() concept.Null
 }
 
 type IfCreator struct {
-	Seeds            map[string]func(string, concept.Closure, *If) string
+	Seeds            map[string]func(string, concept.Pool, *If) string
 	param            *IfCreatorParam
-	defaultCondition concept.Index
+	defaultCondition concept.Pipe
 	defaultTag       concept.String
 }
 
@@ -105,7 +105,7 @@ func (s *IfCreator) New() *If {
 	return back
 }
 
-func (s *IfCreator) ToLanguage(language string, space concept.Closure, instance *If) string {
+func (s *IfCreator) ToLanguage(language string, space concept.Pool, instance *If) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -113,8 +113,8 @@ func (s *IfCreator) ToLanguage(language string, space concept.Closure, instance 
 	return seed(language, space, instance)
 }
 
-func (s *IfCreator) NewClosure(parent concept.Closure) concept.Closure {
-	return s.param.ClosureCreator(parent)
+func (s *IfCreator) NewPool(parent concept.Pool) concept.Pool {
+	return s.param.PoolCreator(parent)
 }
 
 func (s *IfCreator) NewNull() concept.Null {
@@ -127,7 +127,7 @@ func (s *IfCreator) NewException(name string, message string) concept.Exception 
 
 func NewIfCreator(param *IfCreatorParam) *IfCreator {
 	return &IfCreator{
-		Seeds: map[string]func(string, concept.Closure, *If) string{},
+		Seeds: map[string]func(string, concept.Pool, *If) string{},
 		param: param,
 	}
 }

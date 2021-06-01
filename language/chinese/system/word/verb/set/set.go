@@ -41,7 +41,7 @@ func (s *Set) GetVocabularyRules() []*tree.VocabularyRule {
 				}
 
 				return tree.NewPhraseVocabulary(&tree.PhraseVocabularyParam{
-					Index: func() concept.Index {
+					Index: func() concept.Pipe {
 						return s.Libs.Sandbox.Index.ConstIndex.New(set)
 					},
 					Content: treasure,

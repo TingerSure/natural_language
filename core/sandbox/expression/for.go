@@ -12,8 +12,8 @@ import (
 )
 
 type ForSeed interface {
-	ToLanguage(string, concept.Closure, *For) string
-	GetDefaultCondition() concept.Index
+	ToLanguage(string, concept.Pool, *For) string
+	GetDefaultCondition() concept.Pipe
 	GetDefaultTag() concept.String
 	NewException(string, string) concept.Exception
 	NewNull() concept.Null
@@ -22,14 +22,14 @@ type ForSeed interface {
 type For struct {
 	*adaptor.ExpressionIndex
 	tag       concept.String
-	condition concept.Index
+	condition concept.Pipe
 	init      *code_block.CodeBlock
 	end       *code_block.CodeBlock
 	body      *code_block.CodeBlock
 	seed      ForSeed
 }
 
-func (f *For) ToLanguage(language string, space concept.Closure) string {
+func (f *For) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -48,11 +48,11 @@ func (f *For) ToString(prefix string) string {
 	return fmt.Sprintf("%v %v", back, f.body.ToString(prefix))
 }
 
-func (e *For) Anticipate(space concept.Closure) concept.Variable {
+func (e *For) Anticipate(space concept.Pool) concept.Variable {
 	return e.seed.NewNull()
 }
 
-func (f *For) Exec(parent concept.Closure) (concept.Variable, concept.Interrupt) {
+func (f *For) Exec(parent concept.Pool) (concept.Variable, concept.Interrupt) {
 
 	if nl_interface.IsNil(f.condition) {
 		f.condition = f.seed.GetDefaultCondition()
@@ -129,7 +129,7 @@ func (f *For) IsMyTag(tag concept.String) bool {
 	return false
 }
 
-func (f *For) SetCondition(condition concept.Index) {
+func (f *For) SetCondition(condition concept.Pipe) {
 	f.condition = condition
 }
 func (f *For) Body() *code_block.CodeBlock {
@@ -153,9 +153,9 @@ type ForCreatorParam struct {
 }
 
 type ForCreator struct {
-	Seeds            map[string]func(string, concept.Closure, *For) string
+	Seeds            map[string]func(string, concept.Pool, *For) string
 	param            *ForCreatorParam
-	defaultCondition concept.Index
+	defaultCondition concept.Pipe
 	defaultTag       concept.String
 }
 
@@ -171,7 +171,7 @@ func (s *ForCreator) New() *For {
 	return back
 }
 
-func (s *ForCreator) ToLanguage(language string, space concept.Closure, instance *For) string {
+func (s *ForCreator) ToLanguage(language string, space concept.Pool, instance *For) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -179,7 +179,7 @@ func (s *ForCreator) ToLanguage(language string, space concept.Closure, instance
 	return seed(language, space, instance)
 }
 
-func (s *ForCreator) GetDefaultCondition() concept.Index {
+func (s *ForCreator) GetDefaultCondition() concept.Pipe {
 	return s.defaultCondition
 }
 
@@ -197,7 +197,7 @@ func (s *ForCreator) NewException(name string, message string) concept.Exception
 
 func NewForCreator(param *ForCreatorParam) *ForCreator {
 	return &ForCreator{
-		Seeds:            map[string]func(string, concept.Closure, *For) string{},
+		Seeds:            map[string]func(string, concept.Pool, *For) string{},
 		param:            param,
 		defaultCondition: param.ConstIndexCreator(param.BoolCreator(true)),
 		defaultTag:       param.StringCreator(""),

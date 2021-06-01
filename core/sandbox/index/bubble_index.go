@@ -7,7 +7,7 @@ import (
 )
 
 type BubbleIndexSeed interface {
-	ToLanguage(string, concept.Closure, *BubbleIndex) string
+	ToLanguage(string, concept.Pool, *BubbleIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -27,7 +27,7 @@ func (f *BubbleIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *BubbleIndex) ToLanguage(language string, space concept.Closure) string {
+func (f *BubbleIndex) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 
 }
@@ -40,7 +40,7 @@ func (s *BubbleIndex) Key() concept.String {
 	return s.key
 }
 
-func (s *BubbleIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+func (s *BubbleIndex) Call(space concept.Pool, param concept.Param) (concept.Param, concept.Exception) {
 	funcs, interrupt := s.Get(space)
 	if !nl_interface.IsNil(interrupt) {
 		return nil, interrupt.(concept.Exception)
@@ -51,7 +51,7 @@ func (s *BubbleIndex) Call(space concept.Closure, param concept.Param) (concept.
 	return funcs.(concept.Function).Exec(param, nil)
 }
 
-func (s *BubbleIndex) CallAnticipate(space concept.Closure, param concept.Param) concept.Param {
+func (s *BubbleIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
 	funcs := s.Anticipate(space)
 	if !funcs.IsFunction() {
 		return s.seed.NewParam()
@@ -59,16 +59,16 @@ func (s *BubbleIndex) CallAnticipate(space concept.Closure, param concept.Param)
 	return funcs.(concept.Function).Anticipate(param, nil)
 }
 
-func (s *BubbleIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (s *BubbleIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return space.GetBubble(s.key)
 }
 
-func (s *BubbleIndex) Anticipate(space concept.Closure) concept.Variable {
+func (s *BubbleIndex) Anticipate(space concept.Pool) concept.Variable {
 	value, _ := space.PeekBubble(s.key)
 	return value
 }
 
-func (s *BubbleIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
+func (s *BubbleIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {
 	return space.SetBubble(s.key, value)
 }
 
@@ -79,7 +79,7 @@ type BubbleIndexCreatorParam struct {
 }
 
 type BubbleIndexCreator struct {
-	Seeds map[string]func(string, concept.Closure, *BubbleIndex) string
+	Seeds map[string]func(string, concept.Pool, *BubbleIndex) string
 	param *BubbleIndexCreatorParam
 }
 
@@ -102,7 +102,7 @@ func (s *BubbleIndexCreator) NewNull() concept.Null {
 	return s.param.NullCreator()
 }
 
-func (s *BubbleIndexCreator) ToLanguage(language string, space concept.Closure, instance *BubbleIndex) string {
+func (s *BubbleIndexCreator) ToLanguage(language string, space concept.Pool, instance *BubbleIndex) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -116,7 +116,7 @@ func (s *BubbleIndexCreator) Type() string {
 
 func NewBubbleIndexCreator(param *BubbleIndexCreatorParam) *BubbleIndexCreator {
 	return &BubbleIndexCreator{
-		Seeds: map[string]func(string, concept.Closure, *BubbleIndex) string{},
+		Seeds: map[string]func(string, concept.Pool, *BubbleIndex) string{},
 		param: param,
 	}
 }

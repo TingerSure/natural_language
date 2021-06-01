@@ -15,15 +15,15 @@ const (
 type PageSeed interface {
 	NewNull() concept.Null
 	NewException(string, string) concept.Exception
-	ToLanguage(string, concept.Closure, *Page) string
+	ToLanguage(string, concept.Pool, *Page) string
 	Type() string
 }
 
 type Page struct {
 	seed     PageSeed
 	publics  *concept.Mapping
-	privates []concept.Index
-	space    concept.Closure
+	privates []concept.Pipe
+	space    concept.Pool
 }
 
 func (o *Page) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
@@ -37,11 +37,11 @@ func (o *Page) Call(specimen concept.String, param concept.Param) (concept.Param
 	return value.(concept.Function).Exec(param, nil)
 }
 
-func (o *Page) SetImport(specimen concept.String, indexes concept.Index) error {
+func (o *Page) SetImport(specimen concept.String, indexes concept.Pipe) error {
 	return o.SetPrivate(specimen, indexes)
 }
 
-func (o *Page) SetPublic(specimen concept.String, indexes concept.Index) error {
+func (o *Page) SetPublic(specimen concept.String, indexes concept.Pipe) error {
 	err := o.SetPrivate(specimen, indexes)
 	if err != nil {
 		return err
@@ -50,7 +50,7 @@ func (o *Page) SetPublic(specimen concept.String, indexes concept.Index) error {
 	return nil
 }
 
-func (o *Page) SetPrivate(specimen concept.String, indexes concept.Index) error {
+func (o *Page) SetPrivate(specimen concept.String, indexes concept.Pipe) error {
 	if o.space.HasLocal(specimen) {
 		return o.seed.NewException("runtime error", fmt.Sprintf("Duplicate identifier: %v.", specimen.ToString("")))
 	}
@@ -104,7 +104,7 @@ func (o *Page) ToString(prefix string) string {
 	return strings.Join(lines, "\n")
 }
 
-func (f *Page) ToLanguage(language string, space concept.Closure) string {
+func (f *Page) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -135,23 +135,23 @@ func (o *Page) IsNull() bool {
 type PageCreatorParam struct {
 	NullCreator      func() concept.Null
 	ExceptionCreator func(string, string) concept.Exception
-	ClosureCreator   func(concept.Closure) concept.Closure
+	PoolCreator   func(concept.Pool) concept.Pool
 }
 
 type PageCreator struct {
-	Seeds map[string]func(string, concept.Closure, *Page) string
+	Seeds map[string]func(string, concept.Pool, *Page) string
 	param *PageCreatorParam
 }
 
 func (s *PageCreator) New() *Page {
 	return &Page{
 		seed:  s,
-		space: s.param.ClosureCreator(nil),
+		space: s.param.PoolCreator(nil),
 		publics: concept.NewMapping(&concept.MappingParam{
 			AutoInit:   true,
 			EmptyValue: s.param.NullCreator(),
 		}),
-		privates: []concept.Index{},
+		privates: []concept.Pipe{},
 	}
 }
 
@@ -163,7 +163,7 @@ func (s *PageCreator) NewException(name string, message string) concept.Exceptio
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *PageCreator) ToLanguage(language string, space concept.Closure, instance *Page) string {
+func (s *PageCreator) ToLanguage(language string, space concept.Pool, instance *Page) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -177,7 +177,7 @@ func (s *PageCreator) Type() string {
 
 func NewPageCreator(param *PageCreatorParam) *PageCreator {
 	return &PageCreator{
-		Seeds: map[string]func(string, concept.Closure, *Page) string{},
+		Seeds: map[string]func(string, concept.Pool, *Page) string{},
 		param: param,
 	}
 }

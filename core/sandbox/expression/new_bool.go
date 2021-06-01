@@ -7,7 +7,7 @@ import (
 )
 
 type NewBoolSeed interface {
-	ToLanguage(string, concept.Closure, *NewBool) string
+	ToLanguage(string, concept.Pool, *NewBool) string
 	NewBool(bool) concept.Bool
 }
 
@@ -17,7 +17,7 @@ type NewBool struct {
 	seed  NewBoolSeed
 }
 
-func (f *NewBool) ToLanguage(language string, space concept.Closure) string {
+func (f *NewBool) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -25,11 +25,11 @@ func (a *NewBool) ToString(prefix string) string {
 	return fmt.Sprintf("%v", a.value)
 }
 
-func (a *NewBool) Anticipate(space concept.Closure) concept.Variable {
+func (a *NewBool) Anticipate(space concept.Pool) concept.Variable {
 	return a.seed.NewBool(a.value)
 }
 
-func (a *NewBool) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *NewBool) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return a.seed.NewBool(a.value), nil
 }
 
@@ -39,7 +39,7 @@ type NewBoolCreatorParam struct {
 }
 
 type NewBoolCreator struct {
-	Seeds map[string]func(string, concept.Closure, *NewBool) string
+	Seeds map[string]func(string, concept.Pool, *NewBool) string
 	param *NewBoolCreatorParam
 }
 
@@ -56,7 +56,7 @@ func (s *NewBoolCreator) NewBool(value bool) concept.Bool {
 	return s.param.BoolCreator(value)
 }
 
-func (s *NewBoolCreator) ToLanguage(language string, space concept.Closure, instance *NewBool) string {
+func (s *NewBoolCreator) ToLanguage(language string, space concept.Pool, instance *NewBool) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -66,7 +66,7 @@ func (s *NewBoolCreator) ToLanguage(language string, space concept.Closure, inst
 
 func NewNewBoolCreator(param *NewBoolCreatorParam) *NewBoolCreator {
 	return &NewBoolCreator{
-		Seeds: map[string]func(string, concept.Closure, *NewBool) string{},
+		Seeds: map[string]func(string, concept.Pool, *NewBool) string{},
 		param: param,
 	}
 }

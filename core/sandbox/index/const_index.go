@@ -6,7 +6,7 @@ import (
 )
 
 type ConstIndexSeed interface {
-	ToLanguage(string, concept.Closure, *ConstIndex) string
+	ToLanguage(string, concept.Pool, *ConstIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -26,7 +26,7 @@ func (f *ConstIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *ConstIndex) ToLanguage(language string, space concept.Closure) string {
+func (f *ConstIndex) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -38,29 +38,29 @@ func (s *ConstIndex) Value() concept.Variable {
 	return s.value
 }
 
-func (s *ConstIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+func (s *ConstIndex) Call(space concept.Pool, param concept.Param) (concept.Param, concept.Exception) {
 	if !s.value.IsFunction() {
 		return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString("")))
 	}
 	return s.value.(concept.Function).Exec(param, nil)
 }
 
-func (s *ConstIndex) CallAnticipate(space concept.Closure, param concept.Param) concept.Param {
+func (s *ConstIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
 	if !s.value.IsFunction() {
 		return s.seed.NewParam()
 	}
 	return s.value.(concept.Function).Anticipate(param, nil)
 }
 
-func (s *ConstIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (s *ConstIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return s.value, nil
 }
 
-func (s *ConstIndex) Anticipate(space concept.Closure) concept.Variable {
+func (s *ConstIndex) Anticipate(space concept.Pool) concept.Variable {
 	return s.value
 }
 
-func (s *ConstIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
+func (s *ConstIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {
 	return s.seed.NewException("read only", "Constants cannot be changed.")
 }
 
@@ -71,7 +71,7 @@ type ConstIndexCreatorParam struct {
 }
 
 type ConstIndexCreator struct {
-	Seeds map[string]func(string, concept.Closure, *ConstIndex) string
+	Seeds map[string]func(string, concept.Pool, *ConstIndex) string
 	param *ConstIndexCreatorParam
 }
 
@@ -81,7 +81,7 @@ func (s *ConstIndexCreator) New(value concept.Variable) *ConstIndex {
 		seed:  s,
 	}
 }
-func (s *ConstIndexCreator) ToLanguage(language string, space concept.Closure, instance *ConstIndex) string {
+func (s *ConstIndexCreator) ToLanguage(language string, space concept.Pool, instance *ConstIndex) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -107,7 +107,7 @@ func (s *ConstIndexCreator) NewNull() concept.Null {
 
 func NewConstIndexCreator(param *ConstIndexCreatorParam) *ConstIndexCreator {
 	return &ConstIndexCreator{
-		Seeds: map[string]func(string, concept.Closure, *ConstIndex) string{},
+		Seeds: map[string]func(string, concept.Pool, *ConstIndex) string{},
 		param: param,
 	}
 }

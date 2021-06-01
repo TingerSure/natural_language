@@ -28,7 +28,7 @@ func (p *Unknown) GetVocabularyRules() []*tree.VocabularyRule {
 			},
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabulary(&tree.PhraseVocabularyParam{
-					Index: func() concept.Index {
+					Index: func() concept.Pipe {
 						return p.Libs.Sandbox.Index.ConstIndex.New(p.Libs.Sandbox.Variable.String.New(treasure.GetContext()))
 					},
 					Content: treasure,

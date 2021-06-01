@@ -6,7 +6,7 @@ import (
 )
 
 type NewNullSeed interface {
-	ToLanguage(string, concept.Closure, *NewNull) string
+	ToLanguage(string, concept.Pool, *NewNull) string
 	NewNull() concept.Null
 }
 
@@ -15,7 +15,7 @@ type NewNull struct {
 	seed NewNullSeed
 }
 
-func (f *NewNull) ToLanguage(language string, space concept.Closure) string {
+func (f *NewNull) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -23,11 +23,11 @@ func (a *NewNull) ToString(prefix string) string {
 	return "null"
 }
 
-func (a *NewNull) Anticipate(space concept.Closure) concept.Variable {
+func (a *NewNull) Anticipate(space concept.Pool) concept.Variable {
 	return a.seed.NewNull()
 }
 
-func (a *NewNull) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *NewNull) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return a.seed.NewNull(), nil
 }
 
@@ -37,7 +37,7 @@ type NewNullCreatorParam struct {
 }
 
 type NewNullCreator struct {
-	Seeds map[string]func(string, concept.Closure, *NewNull) string
+	Seeds map[string]func(string, concept.Pool, *NewNull) string
 	param *NewNullCreatorParam
 }
 
@@ -53,7 +53,7 @@ func (s *NewNullCreator) NewNull() concept.Null {
 	return s.param.NullCreator()
 }
 
-func (s *NewNullCreator) ToLanguage(language string, space concept.Closure, instance *NewNull) string {
+func (s *NewNullCreator) ToLanguage(language string, space concept.Pool, instance *NewNull) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -63,7 +63,7 @@ func (s *NewNullCreator) ToLanguage(language string, space concept.Closure, inst
 
 func NewNewNullCreator(param *NewNullCreatorParam) *NewNullCreator {
 	return &NewNullCreator{
-		Seeds: map[string]func(string, concept.Closure, *NewNull) string{},
+		Seeds: map[string]func(string, concept.Pool, *NewNull) string{},
 		param: param,
 	}
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type RuntimeParam struct {
-	RootSpace concept.Closure
+	RootSpace concept.Pool
 }
 
 type Runtime struct {
@@ -21,7 +21,7 @@ func NewRuntime(libs *tree.LibraryManager, param *RuntimeParam) *Runtime {
 		libs:      libs,
 		param:     param,
 		Page:      libs.Sandbox.Variable.Page.New(),
-		rootSpace: newClosureObject(libs, param.RootSpace),
+		rootSpace: newPoolObject(libs, param.RootSpace),
 	}
 
 	instance.SetPublic(

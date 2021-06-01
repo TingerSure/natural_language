@@ -1,4 +1,4 @@
-package closure
+package pool
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"

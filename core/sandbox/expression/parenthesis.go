@@ -7,16 +7,16 @@ import (
 )
 
 type ParenthesisSeed interface {
-	ToLanguage(string, concept.Closure, *Parenthesis) string
+	ToLanguage(string, concept.Pool, *Parenthesis) string
 }
 
 type Parenthesis struct {
 	*adaptor.ExpressionIndex
-	target concept.Index
+	target concept.Pipe
 	seed   ParenthesisSeed
 }
 
-func (f *Parenthesis) ToLanguage(language string, space concept.Closure) string {
+func (f *Parenthesis) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -24,19 +24,19 @@ func (a *Parenthesis) ToString(prefix string) string {
 	return fmt.Sprintf("(%v)", a.target.ToString(prefix))
 }
 
-func (a *Parenthesis) Anticipate(space concept.Closure) concept.Variable {
+func (a *Parenthesis) Anticipate(space concept.Pool) concept.Variable {
 	return a.target.Anticipate(space)
 }
 
-func (a *Parenthesis) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *Parenthesis) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return a.target.Get(space)
 }
 
-func (a *Parenthesis) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
+func (a *Parenthesis) Set(space concept.Pool, value concept.Variable) concept.Interrupt {
 	return a.target.Set(space, value)
 }
 
-func (a *Parenthesis) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+func (a *Parenthesis) Call(space concept.Pool, param concept.Param) (concept.Param, concept.Exception) {
 	return a.target.Call(space, param)
 }
 
@@ -45,11 +45,11 @@ type ParenthesisCreatorParam struct {
 }
 
 type ParenthesisCreator struct {
-	Seeds map[string]func(string, concept.Closure, *Parenthesis) string
+	Seeds map[string]func(string, concept.Pool, *Parenthesis) string
 	param *ParenthesisCreatorParam
 }
 
-func (s *ParenthesisCreator) New(target concept.Index) *Parenthesis {
+func (s *ParenthesisCreator) New(target concept.Pipe) *Parenthesis {
 	back := &Parenthesis{
 		target: target,
 		seed:   s,
@@ -58,7 +58,7 @@ func (s *ParenthesisCreator) New(target concept.Index) *Parenthesis {
 	return back
 }
 
-func (s *ParenthesisCreator) ToLanguage(language string, space concept.Closure, instance *Parenthesis) string {
+func (s *ParenthesisCreator) ToLanguage(language string, space concept.Pool, instance *Parenthesis) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -68,7 +68,7 @@ func (s *ParenthesisCreator) ToLanguage(language string, space concept.Closure, 
 
 func NewParenthesisCreator(param *ParenthesisCreatorParam) *ParenthesisCreator {
 	return &ParenthesisCreator{
-		Seeds: map[string]func(string, concept.Closure, *Parenthesis) string{},
+		Seeds: map[string]func(string, concept.Pool, *Parenthesis) string{},
 		param: param,
 	}
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/TingerSure/natural_language/core/compiler"
 	"github.com/TingerSure/natural_language/core/parser"
 	"github.com/TingerSure/natural_language/core/sandbox"
-	"github.com/TingerSure/natural_language/core/sandbox/closure"
+	"github.com/TingerSure/natural_language/core/sandbox/pool"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
 )
@@ -36,13 +36,13 @@ type Runtime struct {
 	compiler            *compiler.Compiler
 	libs                *tree.LibraryManager
 	box                 *sandbox.Sandbox
-	rootSpace           *closure.Closure
+	rootSpace           *pool.Pool
 	defaultLanguage     string
 	structErrorFormat   func(*parser.Road) string
 	priorityErrorFormat func(*parser.Road) string
 }
 
-func (r *Runtime) GetRootSpace() *closure.Closure {
+func (r *Runtime) GetRootSpace() *pool.Pool {
 	return r.rootSpace
 }
 
@@ -78,7 +78,7 @@ func (r *Runtime) Bind() {
 	}
 }
 
-func (r *Runtime) Deal(sentence string) (concept.Index, error) {
+func (r *Runtime) Deal(sentence string) (concept.Pipe, error) {
 	road, err := r.parser.Instance(sentence)
 
 	if err != nil {
@@ -112,7 +112,7 @@ func (r *Runtime) Stop() error {
 	return r.box.Stop()
 }
 
-func (r *Runtime) Exec(hand concept.Index) {
+func (r *Runtime) Exec(hand concept.Pipe) {
 	r.box.Exec(hand)
 }
 
@@ -133,7 +133,7 @@ func NewRuntime(param *RuntimeParam) *Runtime {
 	runtime.compiler = compiler.NewCompiler(runtime.libs)
 	runtime.compiler.AddRoots(param.SourceRoots...)
 	runtime.compiler.SetExtension(param.SourceExtension)
-	runtime.rootSpace = runtime.libs.Sandbox.Closure.New(nil)
+	runtime.rootSpace = runtime.libs.Sandbox.Pool.New(nil)
 	runtime.parser = parser.NewParser(runtime.rootSpace)
 	runtime.box = sandbox.NewSandbox(&sandbox.SandboxParam{
 		Root:      runtime.rootSpace,

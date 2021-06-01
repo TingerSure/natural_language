@@ -10,21 +10,21 @@ import (
 )
 
 type NewArraySeed interface {
-	ToLanguage(string, concept.Closure, *NewArray) string
+	ToLanguage(string, concept.Pool, *NewArray) string
 	NewArray() *variable.Array
 }
 
 type NewArray struct {
 	*adaptor.ExpressionIndex
-	items []concept.Index
+	items []concept.Pipe
 	seed  NewArraySeed
 }
 
-func (f *NewArray) SetItems(items []concept.Index) {
+func (f *NewArray) SetItems(items []concept.Pipe) {
 	f.items = items
 }
 
-func (f *NewArray) ToLanguage(language string, space concept.Closure) string {
+func (f *NewArray) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -37,7 +37,7 @@ func (a *NewArray) ToString(prefix string) string {
 	return fmt.Sprintf("[ %v ]", strings.Join(items, ", "))
 }
 
-func (a *NewArray) Anticipate(space concept.Closure) concept.Variable {
+func (a *NewArray) Anticipate(space concept.Pool) concept.Variable {
 	array := a.seed.NewArray()
 	for _, item := range a.items {
 		array.Append(item.Anticipate(space))
@@ -45,7 +45,7 @@ func (a *NewArray) Anticipate(space concept.Closure) concept.Variable {
 	return array
 }
 
-func (a *NewArray) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *NewArray) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	array := a.seed.NewArray()
 	for _, item := range a.items {
 		value, suspend := item.Get(space)
@@ -63,14 +63,14 @@ type NewArrayCreatorParam struct {
 }
 
 type NewArrayCreator struct {
-	Seeds map[string]func(string, concept.Closure, *NewArray) string
+	Seeds map[string]func(string, concept.Pool, *NewArray) string
 	param *NewArrayCreatorParam
 }
 
 func (s *NewArrayCreator) New() *NewArray {
 	back := &NewArray{
 		seed:  s,
-		items: []concept.Index{},
+		items: []concept.Pipe{},
 	}
 	back.ExpressionIndex = s.param.ExpressionIndexCreator(back)
 	return back
@@ -80,7 +80,7 @@ func (s *NewArrayCreator) NewArray() *variable.Array {
 	return s.param.ArrayCreator()
 }
 
-func (s *NewArrayCreator) ToLanguage(language string, space concept.Closure, instance *NewArray) string {
+func (s *NewArrayCreator) ToLanguage(language string, space concept.Pool, instance *NewArray) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -90,7 +90,7 @@ func (s *NewArrayCreator) ToLanguage(language string, space concept.Closure, ins
 
 func NewNewArrayCreator(param *NewArrayCreatorParam) *NewArrayCreator {
 	return &NewArrayCreator{
-		Seeds: map[string]func(string, concept.Closure, *NewArray) string{},
+		Seeds: map[string]func(string, concept.Pool, *NewArray) string{},
 		param: param,
 	}
 }

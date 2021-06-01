@@ -36,7 +36,7 @@ func (p *Belong) GetVocabularyRules() []*tree.VocabularyRule {
 			},
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabulary(&tree.PhraseVocabularyParam{
-					Index: func() concept.Index {
+					Index: func() concept.Pipe {
 						return p.Libs.Sandbox.Index.ConstIndex.New(p.Libs.Sandbox.Variable.String.New(BelongTo))
 					},
 					Content: treasure,

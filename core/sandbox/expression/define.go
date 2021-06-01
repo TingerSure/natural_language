@@ -8,19 +8,19 @@ import (
 )
 
 type DefineSeed interface {
-	ToLanguage(string, concept.Closure, *Define) string
+	ToLanguage(string, concept.Pool, *Define) string
 	NewNull() concept.Null
 	NewException(string, string) concept.Exception
 }
 
 type Define struct {
 	*adaptor.ExpressionIndex
-	defaultValue concept.Index
+	defaultValue concept.Pipe
 	key          concept.String
 	seed         DefineSeed
 }
 
-func (f *Define) ToLanguage(language string, space concept.Closure) string {
+func (f *Define) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -31,11 +31,11 @@ func (a *Define) ToString(prefix string) string {
 	return fmt.Sprintf("var %v = %v", a.key.Value(), a.defaultValue.ToString(prefix))
 }
 
-func (e *Define) Anticipate(space concept.Closure) concept.Variable {
+func (e *Define) Anticipate(space concept.Pool) concept.Variable {
 	return e.defaultValue.Anticipate(space)
 }
 
-func (a *Define) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *Define) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	if space.HasLocal(a.key) {
 		return nil, a.seed.NewException("semantic error", fmt.Sprintf("Duplicate local definition : %v", a.key.Value()))
 	}
@@ -61,11 +61,11 @@ type DefineCreatorParam struct {
 }
 
 type DefineCreator struct {
-	Seeds map[string]func(string, concept.Closure, *Define) string
+	Seeds map[string]func(string, concept.Pool, *Define) string
 	param *DefineCreatorParam
 }
 
-func (s *DefineCreator) New(key concept.String, defaultValue concept.Index) *Define {
+func (s *DefineCreator) New(key concept.String, defaultValue concept.Pipe) *Define {
 	back := &Define{
 		defaultValue: defaultValue,
 		key:          key,
@@ -75,7 +75,7 @@ func (s *DefineCreator) New(key concept.String, defaultValue concept.Index) *Def
 	return back
 }
 
-func (s *DefineCreator) ToLanguage(language string, space concept.Closure, instance *Define) string {
+func (s *DefineCreator) ToLanguage(language string, space concept.Pool, instance *Define) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -93,7 +93,7 @@ func (s *DefineCreator) NewNull() concept.Null {
 
 func NewDefineCreator(param *DefineCreatorParam) *DefineCreator {
 	return &DefineCreator{
-		Seeds: map[string]func(string, concept.Closure, *Define) string{},
+		Seeds: map[string]func(string, concept.Pool, *Define) string{},
 		param: param,
 	}
 }

@@ -32,11 +32,11 @@ func (p *AnticipateFromEntityBelongNoun) GetStructRules() []*tree.StructRule {
 		tree.NewStructRule(&tree.StructRuleParam{
 			Create: func() tree.Phrase {
 				return tree.NewPhraseStruct(&tree.PhraseStructParam{
-					Index: func(phrase []tree.Phrase) concept.Index {
+					Index: func(phrase []tree.Phrase) concept.Pipe {
 						return p.Libs.Sandbox.Expression.ParamGet.New(
 							p.Libs.Sandbox.Expression.Call.New(
 								p.Libs.Sandbox.Index.ConstIndex.New(p.GetField),
-								p.Libs.Sandbox.Expression.NewParam.New().Init(map[concept.String]concept.Index{
+								p.Libs.Sandbox.Expression.NewParam.New().Init(map[concept.String]concept.Pipe{
 									p.GetFieldContent: phrase[0].Index(),
 									p.GetFieldKey:     phrase[2].Index(),
 								}),

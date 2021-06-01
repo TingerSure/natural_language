@@ -8,11 +8,11 @@ import (
 )
 
 type CodeBlockSeed interface {
-	NewClosure(concept.Closure) concept.Closure
+	NewPool(concept.Pool) concept.Pool
 }
 
 type CodeBlock struct {
-	flow []concept.Index
+	flow []concept.Pipe
 	seed CodeBlockSeed
 }
 
@@ -44,15 +44,15 @@ func (c *CodeBlock) ToString(prefix string) string {
 	}
 	return fmt.Sprintf("{\n%v\n%v}", strings.Join(flowToStrings, "\n"), prefix)
 }
-func (c *CodeBlock) AddStep(steps ...concept.Index) {
+func (c *CodeBlock) AddStep(steps ...concept.Pipe) {
 	c.flow = append(c.flow, steps...)
 }
 
 func (f *CodeBlock) Exec(
-	parent concept.Closure,
-	init func(concept.Closure) concept.Interrupt,
-) (concept.Closure, concept.Interrupt) {
-	space := f.seed.NewClosure(parent)
+	parent concept.Pool,
+	init func(concept.Pool) concept.Interrupt,
+) (concept.Pool, concept.Interrupt) {
+	space := f.seed.NewPool(parent)
 	if init != nil {
 		suspend := init(space)
 		if !nl_interface.IsNil(suspend) {
@@ -70,11 +70,11 @@ func (f *CodeBlock) Exec(
 }
 
 type CodeBlockCreatorParam struct {
-	ClosureCreator func(concept.Closure) concept.Closure
+	PoolCreator func(concept.Pool) concept.Pool
 }
 
 type CodeBlockCreator struct {
-	Seeds map[string]func(string, concept.Closure, *CodeBlock) string
+	Seeds map[string]func(string, concept.Pool, *CodeBlock) string
 	param *CodeBlockCreatorParam
 }
 
@@ -84,7 +84,7 @@ func (s *CodeBlockCreator) New() *CodeBlock {
 	}
 }
 
-func (s *CodeBlockCreator) ToLanguage(language string, space concept.Closure, instance *CodeBlock) string {
+func (s *CodeBlockCreator) ToLanguage(language string, space concept.Pool, instance *CodeBlock) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -92,13 +92,13 @@ func (s *CodeBlockCreator) ToLanguage(language string, space concept.Closure, in
 	return seed(language, space, instance)
 }
 
-func (s *CodeBlockCreator) NewClosure(parent concept.Closure) concept.Closure {
-	return s.param.ClosureCreator(parent)
+func (s *CodeBlockCreator) NewPool(parent concept.Pool) concept.Pool {
+	return s.param.PoolCreator(parent)
 }
 
 func NewCodeBlockCreator(param *CodeBlockCreatorParam) *CodeBlockCreator {
 	return &CodeBlockCreator{
-		Seeds: map[string]func(string, concept.Closure, *CodeBlock) string{},
+		Seeds: map[string]func(string, concept.Pool, *CodeBlock) string{},
 		param: param,
 	}
 }

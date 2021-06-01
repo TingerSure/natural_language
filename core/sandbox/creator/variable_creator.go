@@ -27,7 +27,7 @@ type VariableCreator struct {
 
 type VariableCreatorParam struct {
 	CodeBlockCreator func() *code_block.CodeBlock
-	ClosureCreator   func(concept.Closure) concept.Closure
+	PoolCreator   func(concept.Pool) concept.Pool
 }
 
 func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
@@ -84,7 +84,7 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		ExceptionCreator: func(name string, message string) concept.Exception {
 			return instance.Exception.NewOriginal(name, message)
 		},
-		ClosureCreator: param.ClosureCreator,
+		PoolCreator: param.PoolCreator,
 	})
 	instance.Null = variable.NewNullCreator(&variable.NullCreatorParam{
 		ExceptionCreator: func(name string, message string) concept.Exception {

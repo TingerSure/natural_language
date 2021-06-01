@@ -8,7 +8,7 @@ import (
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
-func newClosureObject(libs *tree.LibraryManager, closure concept.Closure) concept.Object {
+func newPoolObject(libs *tree.LibraryManager, pool concept.Pool) concept.Object {
 	object := libs.Sandbox.Variable.Object.New()
 	keyParam := libs.Sandbox.Variable.String.New("key")
 	valueParam := libs.Sandbox.Variable.String.New("value")
@@ -21,7 +21,7 @@ func newClosureObject(libs *tree.LibraryManager, closure concept.Closure) concep
 				if !yes {
 					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Key is not a string: %v", keyPre.ToString("")))
 				}
-				back, suspend := closure.GetLocal(key)
+				back, suspend := pool.GetLocal(key)
 				if !nl_interface.IsNil(suspend) {
 					return nil, suspend
 				}

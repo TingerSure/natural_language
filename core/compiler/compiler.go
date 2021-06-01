@@ -46,7 +46,7 @@ func NewCompiler(libs *tree.LibraryManager) *Compiler {
 	if err != nil {
 		panic(err.Error())
 	}
-	instance.semantic = semantic.NewSemantic(libs, func(path string) (concept.Index, error) {
+	instance.semantic = semantic.NewSemantic(libs, func(path string) (concept.Pipe, error) {
 		return instance.GetPage(path)
 	})
 	for _, rule := range rule.SemanticRules {
@@ -58,7 +58,7 @@ func NewCompiler(libs *tree.LibraryManager) *Compiler {
 	return instance
 }
 
-func (c *Compiler) GetPage(path string) (concept.Index, error) {
+func (c *Compiler) GetPage(path string) (concept.Pipe, error) {
 	page := c.libs.GetPage(path)
 	if !nl_interface.IsNil(page) {
 		return page, nil
@@ -88,7 +88,7 @@ func (c *Compiler) open(path string) (*os.File, error) {
 	return nil, fmt.Errorf("Path \"%v\" not found in all roots:\n%v", path, strings.Join(c.roots, "\n"))
 }
 
-func (c *Compiler) ReadPage(path string) (concept.Index, error) {
+func (c *Compiler) ReadPage(path string) (concept.Pipe, error) {
 	source, err := c.open(path)
 	if err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ func (c *Compiler) ReadPage(path string) (concept.Index, error) {
 	return page, nil
 }
 
-func (c *Compiler) initPage(pageIndex concept.Index, path string) error {
+func (c *Compiler) initPage(pageIndex concept.Pipe, path string) error {
 	initKey := c.libs.Sandbox.Variable.String.New("init")
 	page, exception := pageIndex.Get(nil)
 	if !nl_interface.IsNil(exception) {

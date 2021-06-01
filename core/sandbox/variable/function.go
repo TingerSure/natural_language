@@ -17,7 +17,7 @@ const (
 )
 
 type FunctionSeed interface {
-	ToLanguage(string, concept.Closure, *Function) string
+	ToLanguage(string, concept.Pool, *Function) string
 	Type() string
 	NewString(string) concept.String
 	NewException(string, string) concept.Exception
@@ -29,7 +29,7 @@ type Function struct {
 	*adaptor.AdaptorFunction
 	body           *code_block.CodeBlock
 	anticipateBody *code_block.CodeBlock
-	parent         concept.Closure
+	parent         concept.Pool
 	seed           FunctionSeed
 }
 
@@ -37,11 +37,11 @@ func (o *Function) Call(specimen concept.String, param concept.Param) (concept.P
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *Function) ToLanguage(language string, space concept.Closure) string {
+func (f *Function) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
-func (f *Function) ToCallLanguage(language string, space concept.Closure, self string, param concept.Param) string {
+func (f *Function) ToCallLanguage(language string, space concept.Pool, self string, param concept.Param) string {
 	return f.ToCallLanguageAdaptor(f, language, space, self, param)
 }
 
@@ -58,7 +58,7 @@ func (f *Function) AnticipateBody() *code_block.CodeBlock {
 }
 
 func (f *Function) Anticipate(params concept.Param, object concept.Variable) concept.Param {
-	space, suspend := f.anticipateBody.Exec(f.parent, func(space concept.Closure) concept.Interrupt {
+	space, suspend := f.anticipateBody.Exec(f.parent, func(space concept.Pool) concept.Interrupt {
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
 		if params.ParamType() == concept.ParamTypeList {
@@ -105,7 +105,7 @@ func (f *Function) Body() *code_block.CodeBlock {
 }
 
 func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
-	space, suspend := f.body.Exec(f.parent, func(space concept.Closure) concept.Interrupt {
+	space, suspend := f.body.Exec(f.parent, func(space concept.Pool) concept.Interrupt {
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
 		if params.ParamType() == concept.ParamTypeList {
@@ -176,11 +176,11 @@ type FunctionCreatorParam struct {
 }
 
 type FunctionCreator struct {
-	Seeds map[string]func(string, concept.Closure, *Function) string
+	Seeds map[string]func(string, concept.Pool, *Function) string
 	param *FunctionCreatorParam
 }
 
-func (s *FunctionCreator) New(parent concept.Closure) *Function {
+func (s *FunctionCreator) New(parent concept.Pool) *Function {
 	funcs := &Function{
 		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
 			NullCreator:           s.param.NullCreator,
@@ -201,7 +201,7 @@ func (s *FunctionCreator) New(parent concept.Closure) *Function {
 	return funcs
 }
 
-func (s *FunctionCreator) ToLanguage(language string, space concept.Closure, instance *Function) string {
+func (s *FunctionCreator) ToLanguage(language string, space concept.Pool, instance *Function) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -231,7 +231,7 @@ func (s *FunctionCreator) NewException(name string, message string) concept.Exce
 
 func NewFunctionCreator(param *FunctionCreatorParam) *FunctionCreator {
 	return &FunctionCreator{
-		Seeds: map[string]func(string, concept.Closure, *Function) string{},
+		Seeds: map[string]func(string, concept.Pool, *Function) string{},
 		param: param,
 	}
 }

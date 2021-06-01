@@ -2,16 +2,16 @@ package parser
 
 import (
 	"fmt"
-	"github.com/TingerSure/natural_language/core/sandbox/closure"
+	"github.com/TingerSure/natural_language/core/sandbox/pool"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type Diversion struct {
 	rules     []*tree.DutyRule
-	rootSpace *closure.Closure
+	rootSpace *pool.Pool
 }
 
-func NewDiversion(rootSpace *closure.Closure) *Diversion {
+func NewDiversion(rootSpace *pool.Pool) *Diversion {
 	return &Diversion{
 		rootSpace: rootSpace,
 	}

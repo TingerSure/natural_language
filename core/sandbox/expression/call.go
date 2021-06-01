@@ -10,7 +10,7 @@ import (
 )
 
 type CallSeed interface {
-	ToLanguage(string, concept.Closure, *Call) string
+	ToLanguage(string, concept.Pool, *Call) string
 	NewException(string, string) concept.Exception
 	NewNull() concept.Null
 	NewParam() concept.Param
@@ -18,12 +18,12 @@ type CallSeed interface {
 
 type Call struct {
 	*adaptor.ExpressionIndex
-	funcs concept.Index
+	funcs concept.Pipe
 	param *NewParam
 	seed  CallSeed
 }
 
-func (c *Call) Function() concept.Index {
+func (c *Call) Function() concept.Pipe {
 	return c.funcs
 }
 
@@ -31,7 +31,7 @@ func (c *Call) Param() *NewParam {
 	return c.param
 }
 
-func (f *Call) ToLanguage(language string, space concept.Closure) string {
+func (f *Call) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -39,7 +39,7 @@ func (a *Call) ToString(prefix string) string {
 	return fmt.Sprintf("%v(%v)", a.funcs.ToString(prefix), a.param.ToString(prefix))
 }
 
-func (a *Call) Anticipate(space concept.Closure) concept.Variable {
+func (a *Call) Anticipate(space concept.Pool) concept.Variable {
 	preParam := a.param.Anticipate(space)
 	param, yesParam := variable.VariableFamilyInstance.IsParam(preParam)
 	if !yesParam {
@@ -48,7 +48,7 @@ func (a *Call) Anticipate(space concept.Closure) concept.Variable {
 	return a.funcs.CallAnticipate(space, param)
 }
 
-func (a *Call) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *Call) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	preParam, suspend := a.param.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
@@ -72,12 +72,12 @@ type CallCreatorParam struct {
 }
 
 type CallCreator struct {
-	Seeds        map[string]func(string, concept.Closure, *Call) string
+	Seeds        map[string]func(string, concept.Pool, *Call) string
 	param        *CallCreatorParam
 	defaultParam *NewParam
 }
 
-func (s *CallCreator) New(funcs concept.Index, param *NewParam) *Call {
+func (s *CallCreator) New(funcs concept.Pipe, param *NewParam) *Call {
 	if nl_interface.IsNil(param) {
 		param = s.defaultParam
 	}
@@ -90,7 +90,7 @@ func (s *CallCreator) New(funcs concept.Index, param *NewParam) *Call {
 	return back
 }
 
-func (s *CallCreator) toSeedLanguage(language string, space concept.Closure, instance *Call) string {
+func (s *CallCreator) toSeedLanguage(language string, space concept.Pool, instance *Call) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -98,7 +98,7 @@ func (s *CallCreator) toSeedLanguage(language string, space concept.Closure, ins
 	return seed(language, space, instance)
 }
 
-func (s *CallCreator) ToLanguage(language string, space concept.Closure, instance *Call) string {
+func (s *CallCreator) ToLanguage(language string, space concept.Pool, instance *Call) string {
 	funcPre, suspend := instance.funcs.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return s.toSeedLanguage(language, space, instance)
@@ -108,7 +108,7 @@ func (s *CallCreator) ToLanguage(language string, space concept.Closure, instanc
 		return s.toSeedLanguage(language, space, instance)
 	}
 	param := s.param.ParamCreator()
-	instance.param.Iterate(funcs.ParamNames(), func(key concept.String, item concept.Index) bool {
+	instance.param.Iterate(funcs.ParamNames(), func(key concept.String, item concept.Pipe) bool {
 		param.Set(key, s.param.StringCreator(item.ToLanguage(language, space)))
 		return false
 	})
@@ -129,7 +129,7 @@ func (s *CallCreator) NewException(name string, message string) concept.Exceptio
 
 func NewCallCreator(param *CallCreatorParam) *CallCreator {
 	return &CallCreator{
-		Seeds:        map[string]func(string, concept.Closure, *Call) string{},
+		Seeds:        map[string]func(string, concept.Pool, *Call) string{},
 		param:        param,
 		defaultParam: param.NewParamCreator(),
 	}

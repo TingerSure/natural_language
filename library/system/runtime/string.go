@@ -26,9 +26,9 @@ func newStringCreator(libs *tree.LibraryManager) concept.Object {
 				if !yes {
 					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param seed is not a function: %v", seedPre))
 				}
-				libs.Sandbox.Variable.String.Seeds[language.Value()] = func(_ string, closure concept.Closure, instance *variable.String) string {
+				libs.Sandbox.Variable.String.Seeds[language.Value()] = func(_ string, pool concept.Pool, instance *variable.String) string {
 					seedInput := libs.Sandbox.Variable.Param.New()
-					seedInput.Set(libs.Sandbox.Variable.String.New("closure"), newClosureObject(libs, closure))
+					seedInput.Set(libs.Sandbox.Variable.String.New("pool"), newPoolObject(libs, pool))
 					seedInput.Set(libs.Sandbox.Variable.String.New("instance"), instance)
 					seedOutput, suspend := seed.Exec(seedInput, nil)
 					if !nl_interface.IsNil(suspend) {

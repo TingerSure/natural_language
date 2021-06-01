@@ -11,7 +11,7 @@ import (
 )
 
 type NewClassSeed interface {
-	ToLanguage(string, concept.Closure, *NewClass) string
+	ToLanguage(string, concept.Pool, *NewClass) string
 	NewClass() concept.Class
 	NewException(string, string) concept.Exception
 	NewString(string) concept.String
@@ -19,15 +19,15 @@ type NewClassSeed interface {
 
 type NewClass struct {
 	*adaptor.ExpressionIndex
-	lines []concept.Index
+	lines []concept.Pipe
 	seed  NewClassSeed
 }
 
-func (f *NewClass) SetLines(lines []concept.Index) {
+func (f *NewClass) SetLines(lines []concept.Pipe) {
 	f.lines = lines
 }
 
-func (f *NewClass) ToLanguage(language string, space concept.Closure) string {
+func (f *NewClass) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -40,7 +40,7 @@ func (a *NewClass) ToString(prefix string) string {
 	return fmt.Sprintf("class {\n%v\n%v}", strings.Join(lines, "\n"), prefix)
 }
 
-func (a *NewClass) Anticipate(space concept.Closure) concept.Variable {
+func (a *NewClass) Anticipate(space concept.Pool) concept.Variable {
 	class := a.seed.NewClass()
 	for _, linePre := range a.lines {
 		lineProvide, yes := index.IndexFamilyInstance.IsProvideIndex(linePre)
@@ -65,7 +65,7 @@ func (a *NewClass) Anticipate(space concept.Closure) concept.Variable {
 	return class
 }
 
-func (a *NewClass) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *NewClass) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	class := a.seed.NewClass()
 	for _, linePre := range a.lines {
 		lineProvide, yes := index.IndexFamilyInstance.IsProvideIndex(linePre)
@@ -107,7 +107,7 @@ type NewClassCreatorParam struct {
 }
 
 type NewClassCreator struct {
-	Seeds map[string]func(string, concept.Closure, *NewClass) string
+	Seeds map[string]func(string, concept.Pool, *NewClass) string
 	param *NewClassCreatorParam
 }
 
@@ -131,7 +131,7 @@ func (s *NewClassCreator) NewString(value string) concept.String {
 	return s.param.StringCreator(value)
 }
 
-func (s *NewClassCreator) ToLanguage(language string, space concept.Closure, instance *NewClass) string {
+func (s *NewClassCreator) ToLanguage(language string, space concept.Pool, instance *NewClass) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -141,7 +141,7 @@ func (s *NewClassCreator) ToLanguage(language string, space concept.Closure, ins
 
 func NewNewClassCreator(param *NewClassCreatorParam) *NewClassCreator {
 	return &NewClassCreator{
-		Seeds: map[string]func(string, concept.Closure, *NewClass) string{},
+		Seeds: map[string]func(string, concept.Pool, *NewClass) string{},
 		param: param,
 	}
 }

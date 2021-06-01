@@ -41,7 +41,7 @@ func (p *Number) GetVocabularyRules() []*tree.VocabularyRule {
 			},
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabulary(&tree.PhraseVocabularyParam{
-					Index: func() concept.Index {
+					Index: func() concept.Pipe {
 						value, err := strconv.ParseFloat(treasure.GetContext(), 64)
 						if err != nil {
 							panic(err)

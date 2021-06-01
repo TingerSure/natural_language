@@ -15,7 +15,7 @@ const (
 
 type Result struct {
 	*adaptor.SourceAdaptor
-	ResultIndex concept.Index
+	ResultIndex concept.Pipe
 	instances   []*tree.Vocabulary
 }
 
@@ -35,7 +35,7 @@ func (p *Result) GetVocabularyRules() []*tree.VocabularyRule {
 			},
 			Create: func(treasure *tree.Vocabulary) tree.Phrase {
 				return tree.NewPhraseVocabulary(&tree.PhraseVocabularyParam{
-					Index: func() concept.Index {
+					Index: func() concept.Pipe {
 						return p.ResultIndex
 					},
 					Content: treasure,

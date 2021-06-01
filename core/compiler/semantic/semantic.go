@@ -10,11 +10,11 @@ import (
 
 type Semantic struct {
 	rules   map[*grammar.Rule]*Rule
-	getPage func(path string) (concept.Index, error)
+	getPage func(path string) (concept.Pipe, error)
 	libs    *tree.LibraryManager
 }
 
-func NewSemantic(libs *tree.LibraryManager, getPage func(path string) (concept.Index, error)) *Semantic {
+func NewSemantic(libs *tree.LibraryManager, getPage func(path string) (concept.Pipe, error)) *Semantic {
 	return &Semantic{
 		rules:   map[*grammar.Rule]*Rule{},
 		getPage: getPage,
@@ -22,7 +22,7 @@ func NewSemantic(libs *tree.LibraryManager, getPage func(path string) (concept.I
 	}
 }
 
-func (s *Semantic) Read(phrase grammar.Phrase) (concept.Index, error) {
+func (s *Semantic) Read(phrase grammar.Phrase) (concept.Pipe, error) {
 	context := NewContext(s.libs, s.getPage, s.rules)
 	pageIndex, err := context.Deal(phrase)
 	if err != nil {

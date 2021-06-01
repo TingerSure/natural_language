@@ -12,7 +12,7 @@ const (
 )
 
 type ExceptionSeed interface {
-	ToLanguage(string, concept.Closure, *Exception) string
+	ToLanguage(string, concept.Pool, *Exception) string
 	Type() string
 	InterruptType() string
 	New(concept.String, concept.String) concept.Exception
@@ -30,7 +30,7 @@ func (o *Exception) Call(specimen concept.String, param concept.Param) (concept.
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *Exception) ToLanguage(language string, space concept.Closure) string {
+func (f *Exception) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -87,7 +87,7 @@ type ExceptionCreatorParam struct {
 }
 
 type ExceptionCreator struct {
-	Seeds map[string]func(string, concept.Closure, *Exception) string
+	Seeds map[string]func(string, concept.Pool, *Exception) string
 	param *ExceptionCreatorParam
 }
 
@@ -117,7 +117,7 @@ func (s *ExceptionCreator) New(name concept.String, message concept.String) conc
 	}
 }
 
-func (s *ExceptionCreator) ToLanguage(language string, space concept.Closure, instance *Exception) string {
+func (s *ExceptionCreator) ToLanguage(language string, space concept.Pool, instance *Exception) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -135,7 +135,7 @@ func (s *ExceptionCreator) Type() string {
 
 func NewExceptionCreator(param *ExceptionCreatorParam) *ExceptionCreator {
 	return &ExceptionCreator{
-		Seeds: map[string]func(string, concept.Closure, *Exception) string{},
+		Seeds: map[string]func(string, concept.Pool, *Exception) string{},
 		param: param,
 	}
 }

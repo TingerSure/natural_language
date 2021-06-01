@@ -6,8 +6,8 @@ import (
 )
 
 type Event struct {
-	index concept.Index
-	space concept.Closure
+	index concept.Pipe
+	space concept.Pool
 }
 
 func (e *Event) Exec() concept.Interrupt {
@@ -19,7 +19,7 @@ func (e *Event) Exec() concept.Interrupt {
 	return suspend
 }
 
-func NewEvent(index concept.Index, space concept.Closure) *Event {
+func NewEvent(index concept.Pipe, space concept.Pool) *Event {
 
 	return &Event{
 		index: index,

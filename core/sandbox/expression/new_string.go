@@ -7,7 +7,7 @@ import (
 )
 
 type NewStringSeed interface {
-	ToLanguage(string, concept.Closure, *NewString) string
+	ToLanguage(string, concept.Pool, *NewString) string
 	NewString(string) concept.String
 }
 
@@ -17,7 +17,7 @@ type NewString struct {
 	seed  NewStringSeed
 }
 
-func (f *NewString) ToLanguage(language string, space concept.Closure) string {
+func (f *NewString) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -25,11 +25,11 @@ func (a *NewString) ToString(prefix string) string {
 	return fmt.Sprintf("\"%v\"", a.value)
 }
 
-func (a *NewString) Anticipate(space concept.Closure) concept.Variable {
+func (a *NewString) Anticipate(space concept.Pool) concept.Variable {
 	return a.seed.NewString(a.value)
 }
 
-func (a *NewString) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *NewString) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return a.seed.NewString(a.value), nil
 }
 
@@ -39,7 +39,7 @@ type NewStringCreatorParam struct {
 }
 
 type NewStringCreator struct {
-	Seeds map[string]func(string, concept.Closure, *NewString) string
+	Seeds map[string]func(string, concept.Pool, *NewString) string
 	param *NewStringCreatorParam
 }
 
@@ -56,7 +56,7 @@ func (s *NewStringCreator) NewString(value string) concept.String {
 	return s.param.StringCreator(value)
 }
 
-func (s *NewStringCreator) ToLanguage(language string, space concept.Closure, instance *NewString) string {
+func (s *NewStringCreator) ToLanguage(language string, space concept.Pool, instance *NewString) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -66,7 +66,7 @@ func (s *NewStringCreator) ToLanguage(language string, space concept.Closure, in
 
 func NewNewStringCreator(param *NewStringCreatorParam) *NewStringCreator {
 	return &NewStringCreator{
-		Seeds: map[string]func(string, concept.Closure, *NewString) string{},
+		Seeds: map[string]func(string, concept.Pool, *NewString) string{},
 		param: param,
 	}
 }

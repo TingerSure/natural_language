@@ -11,7 +11,7 @@ const (
 )
 
 type ThisIndexSeed interface {
-	ToLanguage(string, concept.Closure, *ThisIndex) string
+	ToLanguage(string, concept.Pool, *ThisIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -31,7 +31,7 @@ func (f *ThisIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *ThisIndex) ToLanguage(language string, space concept.Closure) string {
+func (f *ThisIndex) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -39,7 +39,7 @@ func (s *ThisIndex) ToString(prefix string) string {
 	return thisIndexKey
 }
 
-func (s *ThisIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+func (s *ThisIndex) Call(space concept.Pool, param concept.Param) (concept.Param, concept.Exception) {
 	funcs, interrupt := s.Get(space)
 	if !nl_interface.IsNil(interrupt) {
 		return nil, interrupt.(concept.Exception)
@@ -50,7 +50,7 @@ func (s *ThisIndex) Call(space concept.Closure, param concept.Param) (concept.Pa
 	return funcs.(concept.Function).Exec(param, nil)
 }
 
-func (s *ThisIndex) CallAnticipate(space concept.Closure, param concept.Param) concept.Param {
+func (s *ThisIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
 	funcs := s.Anticipate(space)
 	if !funcs.IsFunction() {
 		return s.seed.NewParam()
@@ -58,16 +58,16 @@ func (s *ThisIndex) CallAnticipate(space concept.Closure, param concept.Param) c
 	return funcs.(concept.Function).Anticipate(param, nil)
 }
 
-func (s *ThisIndex) Anticipate(space concept.Closure) concept.Variable {
+func (s *ThisIndex) Anticipate(space concept.Pool) concept.Variable {
 	value, _ := space.PeekBubble(s.seed.NewString(thisIndexKey))
 	return value
 }
 
-func (s *ThisIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (s *ThisIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return space.GetBubble(s.seed.NewString(thisIndexKey))
 }
 
-func (s *ThisIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
+func (s *ThisIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {
 	return s.seed.NewException("read only", "This cannot be changed.")
 
 }
@@ -80,7 +80,7 @@ type ThisIndexCreatorParam struct {
 }
 
 type ThisIndexCreator struct {
-	Seeds map[string]func(string, concept.Closure, *ThisIndex) string
+	Seeds map[string]func(string, concept.Pool, *ThisIndex) string
 	param *ThisIndexCreatorParam
 }
 
@@ -90,7 +90,7 @@ func (s *ThisIndexCreator) New() *ThisIndex {
 	}
 }
 
-func (s *ThisIndexCreator) ToLanguage(language string, space concept.Closure, instance *ThisIndex) string {
+func (s *ThisIndexCreator) ToLanguage(language string, space concept.Pool, instance *ThisIndex) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -120,7 +120,7 @@ func (s *ThisIndexCreator) NewString(value string) concept.String {
 
 func NewThisIndexCreator(param *ThisIndexCreatorParam) *ThisIndexCreator {
 	return &ThisIndexCreator{
-		Seeds: map[string]func(string, concept.Closure, *ThisIndex) string{},
+		Seeds: map[string]func(string, concept.Pool, *ThisIndex) string{},
 		param: param,
 	}
 }

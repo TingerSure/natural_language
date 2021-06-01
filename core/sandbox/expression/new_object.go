@@ -10,7 +10,7 @@ import (
 )
 
 type NewObjectSeed interface {
-	ToLanguage(string, concept.Closure, *NewObject) string
+	ToLanguage(string, concept.Pool, *NewObject) string
 	NewObject() concept.Object
 }
 
@@ -20,7 +20,7 @@ type NewObject struct {
 	seed   NewObjectSeed
 }
 
-func (f *NewObject) SetKeyValue(keyValues []concept.Index) {
+func (f *NewObject) SetKeyValue(keyValues []concept.Pipe) {
 	for _, keyValuePre := range keyValues {
 		keyValue, yes := index.IndexFamilyInstance.IsKeyValueIndex(keyValuePre)
 		if !yes {
@@ -30,7 +30,7 @@ func (f *NewObject) SetKeyValue(keyValues []concept.Index) {
 	}
 }
 
-func (f *NewObject) ToLanguage(language string, space concept.Closure) string {
+func (f *NewObject) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -49,20 +49,20 @@ func (a *NewObject) ToString(prefix string) string {
 
 }
 
-func (a *NewObject) Anticipate(space concept.Closure) concept.Variable {
+func (a *NewObject) Anticipate(space concept.Pool) concept.Variable {
 	object := a.seed.NewObject()
 	a.fields.Iterate(func(key concept.String, value interface{}) bool {
-		return !nl_interface.IsNil(object.SetField(key, value.(concept.Index).Anticipate(space)))
+		return !nl_interface.IsNil(object.SetField(key, value.(concept.Pipe).Anticipate(space)))
 	})
 	return object
 }
 
-func (a *NewObject) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *NewObject) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	object := a.seed.NewObject()
 	var suspend concept.Interrupt = nil
 	var value concept.Variable = nil
 	if a.fields.Iterate(func(key concept.String, item interface{}) bool {
-		value, suspend = item.(concept.Index).Get(space)
+		value, suspend = item.(concept.Pipe).Get(space)
 		if !nl_interface.IsNil(suspend) {
 			return true
 		}
@@ -82,7 +82,7 @@ type NewObjectCreatorParam struct {
 }
 
 type NewObjectCreator struct {
-	Seeds map[string]func(string, concept.Closure, *NewObject) string
+	Seeds map[string]func(string, concept.Pool, *NewObject) string
 	param *NewObjectCreatorParam
 }
 
@@ -102,7 +102,7 @@ func (s *NewObjectCreator) NewObject() concept.Object {
 	return s.param.ObjectCreator()
 }
 
-func (s *NewObjectCreator) ToLanguage(language string, space concept.Closure, instance *NewObject) string {
+func (s *NewObjectCreator) ToLanguage(language string, space concept.Pool, instance *NewObject) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -112,7 +112,7 @@ func (s *NewObjectCreator) ToLanguage(language string, space concept.Closure, in
 
 func NewNewObjectCreator(param *NewObjectCreatorParam) *NewObjectCreator {
 	return &NewObjectCreator{
-		Seeds: map[string]func(string, concept.Closure, *NewObject) string{},
+		Seeds: map[string]func(string, concept.Pool, *NewObject) string{},
 		param: param,
 	}
 }

@@ -24,7 +24,6 @@ const (
 	TypeEof                     // [:eof:]
 	TypeIdentifier              // [:identifier:]
 	TypeComment                 // [:comment:]
-	TypePage                    // page
 	TypeImport                  // import
 	TypePublic                  // public
 	TypePrivate                 // private
@@ -33,8 +32,6 @@ const (
 	TypeProvide                 // provide
 	TypeReturn                  // return
 	TypeFunction                // function
-	TypeGet                     // get
-	TypeSet                     // set
 	TypeTrue                    // true
 	TypeFalse                   // false
 	TypeNull                    // null
@@ -68,7 +65,6 @@ const (
 	KeyEof              = "eof"
 	KeyIdentifier       = "identifier"
 	KeyComment          = "comment"
-	KeyPage             = "page"
 	KeyImport           = "import"
 	KeyPublic           = "public"
 	KeyPrivate          = "private"
@@ -77,8 +73,6 @@ const (
 	KeyProvide          = "provide"
 	KeyReturn           = "return"
 	KeyFunction         = "function"
-	KeyGet              = "get"
-	KeySet              = "set"
 	KeyTrue             = "true"
 	KeyFalse            = "false"
 	KeyNull             = "null"
@@ -164,8 +158,6 @@ var (
 		lexer.NewRule("[a-zA-Z_][a-zA-Z0-9_]*", func(value []byte) *lexer.Token {
 			valueIdentifier := string(value)
 			switch valueIdentifier {
-			case KeyPage:
-				return lexer.NewToken(TypePage, KeyPage, KeyPage)
 			case KeyImport:
 				return lexer.NewToken(TypeImport, KeyImport, KeyImport)
 			case KeyPublic:
@@ -182,10 +174,6 @@ var (
 				return lexer.NewToken(TypeReturn, KeyReturn, KeyReturn)
 			case KeyFunction:
 				return lexer.NewToken(TypeFunction, KeyFunction, KeyFunction)
-			case KeyGet:
-				return lexer.NewToken(TypeGet, KeyGet, KeyGet)
-			case KeySet:
-				return lexer.NewToken(TypeSet, KeySet, KeySet)
 			case KeyTrue:
 				return lexer.NewToken(TypeTrue, KeyTrue, KeyTrue)
 			case KeyFalse:

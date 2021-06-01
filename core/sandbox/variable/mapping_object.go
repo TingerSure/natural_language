@@ -11,7 +11,7 @@ const (
 )
 
 type MappingObjectSeed interface {
-	ToLanguage(string, concept.Closure, *MappingObject) string
+	ToLanguage(string, concept.Pool, *MappingObject) string
 	Type() string
 	NewNull() concept.Null
 	NewException(string, string) concept.Exception
@@ -54,7 +54,7 @@ func (o *MappingObject) callProvide(specimen concept.String, param concept.Param
 	return o.class.GetProvide(specimen).Exec(param, o)
 }
 
-func (f *MappingObject) ToLanguage(language string, space concept.Closure) string {
+func (f *MappingObject) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -122,11 +122,11 @@ type MappingObjectCreatorParam struct {
 }
 
 type MappingObjectCreator struct {
-	Seeds map[string]func(string, concept.Closure, *MappingObject) string
+	Seeds map[string]func(string, concept.Pool, *MappingObject) string
 	param *MappingObjectCreatorParam
 }
 
-func (s *MappingObjectCreator) ToLanguage(language string, space concept.Closure, instance *MappingObject) string {
+func (s *MappingObjectCreator) ToLanguage(language string, space concept.Pool, instance *MappingObject) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -160,7 +160,7 @@ func (s *MappingObjectCreator) New(object concept.Variable, classInstance concep
 
 func NewMappingObjectCreator(param *MappingObjectCreatorParam) *MappingObjectCreator {
 	return &MappingObjectCreator{
-		Seeds: map[string]func(string, concept.Closure, *MappingObject) string{},
+		Seeds: map[string]func(string, concept.Pool, *MappingObject) string{},
 		param: param,
 	}
 }

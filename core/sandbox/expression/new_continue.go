@@ -8,7 +8,7 @@ import (
 )
 
 type NewContinueSeed interface {
-	ToLanguage(string, concept.Closure, *NewContinue) string
+	ToLanguage(string, concept.Pool, *NewContinue) string
 	NewNull() concept.Null
 	NewContinue(concept.String) *interrupt.Continue
 }
@@ -19,7 +19,7 @@ type NewContinue struct {
 	seed NewContinueSeed
 }
 
-func (f *NewContinue) ToLanguage(language string, space concept.Closure) string {
+func (f *NewContinue) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -27,11 +27,11 @@ func (a *NewContinue) ToString(prefix string) string {
 	return fmt.Sprintf("continue %v", a.tag.Value())
 }
 
-func (a *NewContinue) Anticipate(space concept.Closure) concept.Variable {
+func (a *NewContinue) Anticipate(space concept.Pool) concept.Variable {
 	return a.seed.NewNull()
 }
 
-func (a *NewContinue) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *NewContinue) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return nil, a.seed.NewContinue(a.tag)
 }
 
@@ -42,7 +42,7 @@ type NewContinueCreatorParam struct {
 }
 
 type NewContinueCreator struct {
-	Seeds map[string]func(string, concept.Closure, *NewContinue) string
+	Seeds map[string]func(string, concept.Pool, *NewContinue) string
 	param *NewContinueCreatorParam
 }
 
@@ -63,7 +63,7 @@ func (s *NewContinueCreator) NewNull() concept.Null {
 	return s.param.NullCreator()
 }
 
-func (s *NewContinueCreator) ToLanguage(language string, space concept.Closure, instance *NewContinue) string {
+func (s *NewContinueCreator) ToLanguage(language string, space concept.Pool, instance *NewContinue) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -73,7 +73,7 @@ func (s *NewContinueCreator) ToLanguage(language string, space concept.Closure, 
 
 func NewNewContinueCreator(param *NewContinueCreatorParam) *NewContinueCreator {
 	return &NewContinueCreator{
-		Seeds: map[string]func(string, concept.Closure, *NewContinue) string{},
+		Seeds: map[string]func(string, concept.Pool, *NewContinue) string{},
 		param: param,
 	}
 }

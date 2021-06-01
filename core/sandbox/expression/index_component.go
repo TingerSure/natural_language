@@ -10,17 +10,17 @@ import (
 
 type IndexComponentSeed interface {
 	NewException(string, string) concept.Exception
-	ToLanguage(string, concept.Closure, *IndexComponent) string
+	ToLanguage(string, concept.Pool, *IndexComponent) string
 }
 
 type IndexComponent struct {
 	*adaptor.ExpressionIndex
-	field  concept.Index
-	object concept.Index
+	field  concept.Pipe
+	object concept.Pipe
 	seed   IndexComponentSeed
 }
 
-func (f *IndexComponent) ToLanguage(language string, space concept.Closure) string {
+func (f *IndexComponent) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -28,7 +28,7 @@ func (a *IndexComponent) ToString(prefix string) string {
 	return fmt.Sprintf("%v[%v]", a.object.ToString(prefix), a.field.ToString(prefix))
 }
 
-func (a *IndexComponent) Anticipate(space concept.Closure) concept.Variable {
+func (a *IndexComponent) Anticipate(space concept.Pool) concept.Variable {
 	fieldPre := a.field.Anticipate(space)
 	fieldNumber, yes := variable.VariableFamilyInstance.IsNumber(fieldPre)
 	if yes {
@@ -41,13 +41,13 @@ func (a *IndexComponent) Anticipate(space concept.Closure) concept.Variable {
 	return nil
 }
 
-func (a *IndexComponent) stringAnticipate(space concept.Closure, field concept.String) concept.Variable {
+func (a *IndexComponent) stringAnticipate(space concept.Pool, field concept.String) concept.Variable {
 	object := a.object.Anticipate(space)
 	value, _ := object.GetField(field)
 	return value
 }
 
-func (a *IndexComponent) indexAnticipate(space concept.Closure, field concept.Number) concept.Variable {
+func (a *IndexComponent) indexAnticipate(space concept.Pool, field concept.Number) concept.Variable {
 	arrayPre := a.object.Anticipate(space)
 	array, yes := variable.VariableFamilyInstance.IsArray(arrayPre)
 	if !yes {
@@ -57,7 +57,7 @@ func (a *IndexComponent) indexAnticipate(space concept.Closure, field concept.Nu
 	return value
 }
 
-func (a *IndexComponent) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *IndexComponent) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	fieldPre, suspend := a.field.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
@@ -73,7 +73,7 @@ func (a *IndexComponent) Exec(space concept.Closure) (concept.Variable, concept.
 	return nil, a.seed.NewException("runtime error", fmt.Sprintf("%v is not a string or number.", a.field.ToString("")))
 }
 
-func (a *IndexComponent) stringGet(space concept.Closure, field concept.String) (concept.Variable, concept.Interrupt) {
+func (a *IndexComponent) stringGet(space concept.Pool, field concept.String) (concept.Variable, concept.Interrupt) {
 	object, suspend := a.object.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
@@ -81,7 +81,7 @@ func (a *IndexComponent) stringGet(space concept.Closure, field concept.String) 
 	return object.GetField(field)
 }
 
-func (a *IndexComponent) indexGet(space concept.Closure, field concept.Number) (concept.Variable, concept.Interrupt) {
+func (a *IndexComponent) indexGet(space concept.Pool, field concept.Number) (concept.Variable, concept.Interrupt) {
 	arrayPre, suspend := a.object.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
@@ -93,7 +93,7 @@ func (a *IndexComponent) indexGet(space concept.Closure, field concept.Number) (
 	return array.Get(int(field.Value()))
 }
 
-func (a *IndexComponent) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
+func (a *IndexComponent) Set(space concept.Pool, value concept.Variable) concept.Interrupt {
 	fieldPre, suspend := a.field.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return suspend
@@ -109,7 +109,7 @@ func (a *IndexComponent) Set(space concept.Closure, value concept.Variable) conc
 	return a.seed.NewException("runtime error", fmt.Sprintf("%v is not a string or number.", a.field.ToString("")))
 }
 
-func (a *IndexComponent) stringSet(space concept.Closure, field concept.String, value concept.Variable) concept.Interrupt {
+func (a *IndexComponent) stringSet(space concept.Pool, field concept.String, value concept.Variable) concept.Interrupt {
 	object, suspend := a.object.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return suspend
@@ -117,7 +117,7 @@ func (a *IndexComponent) stringSet(space concept.Closure, field concept.String, 
 	return object.SetField(field, value)
 }
 
-func (a *IndexComponent) indexSet(space concept.Closure, field concept.Number, value concept.Variable) concept.Interrupt {
+func (a *IndexComponent) indexSet(space concept.Pool, field concept.Number, value concept.Variable) concept.Interrupt {
 	arrayPre, suspend := a.object.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return suspend
@@ -129,7 +129,7 @@ func (a *IndexComponent) indexSet(space concept.Closure, field concept.Number, v
 	return array.Set(int(field.Value()), value)
 }
 
-func (a *IndexComponent) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+func (a *IndexComponent) Call(space concept.Pool, param concept.Param) (concept.Param, concept.Exception) {
 	fieldPre, suspend := a.field.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend.(concept.Exception)
@@ -145,7 +145,7 @@ func (a *IndexComponent) Call(space concept.Closure, param concept.Param) (conce
 	return nil, a.seed.NewException("runtime error", fmt.Sprintf("%v is not a string or number.", a.field.ToString("")))
 }
 
-func (a *IndexComponent) stringCall(space concept.Closure, field concept.String, param concept.Param) (concept.Param, concept.Exception) {
+func (a *IndexComponent) stringCall(space concept.Pool, field concept.String, param concept.Param) (concept.Param, concept.Exception) {
 	object, suspend := a.object.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend.(concept.Exception)
@@ -153,7 +153,7 @@ func (a *IndexComponent) stringCall(space concept.Closure, field concept.String,
 	return object.Call(field, param)
 }
 
-func (a *IndexComponent) indexCall(space concept.Closure, field concept.Number, param concept.Param) (concept.Param, concept.Exception) {
+func (a *IndexComponent) indexCall(space concept.Pool, field concept.Number, param concept.Param) (concept.Param, concept.Exception) {
 	arrayPre, suspend := a.object.Get(space)
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend.(concept.Exception)
@@ -179,11 +179,11 @@ type IndexComponentCreatorParam struct {
 }
 
 type IndexComponentCreator struct {
-	Seeds map[string]func(string, concept.Closure, *IndexComponent) string
+	Seeds map[string]func(string, concept.Pool, *IndexComponent) string
 	param *IndexComponentCreatorParam
 }
 
-func (s *IndexComponentCreator) New(object concept.Index, field concept.Index) *IndexComponent {
+func (s *IndexComponentCreator) New(object concept.Pipe, field concept.Pipe) *IndexComponent {
 	back := &IndexComponent{
 		field:  field,
 		object: object,
@@ -197,7 +197,7 @@ func (s *IndexComponentCreator) NewException(name string, message string) concep
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *IndexComponentCreator) ToLanguage(language string, space concept.Closure, instance *IndexComponent) string {
+func (s *IndexComponentCreator) ToLanguage(language string, space concept.Pool, instance *IndexComponent) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -207,7 +207,7 @@ func (s *IndexComponentCreator) ToLanguage(language string, space concept.Closur
 
 func NewIndexComponentCreator(param *IndexComponentCreatorParam) *IndexComponentCreator {
 	return &IndexComponentCreator{
-		Seeds: map[string]func(string, concept.Closure, *IndexComponent) string{},
+		Seeds: map[string]func(string, concept.Pool, *IndexComponent) string{},
 		param: param,
 	}
 }

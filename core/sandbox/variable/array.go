@@ -12,7 +12,7 @@ const (
 )
 
 type ArraySeed interface {
-	ToLanguage(string, concept.Closure, *Array) string
+	ToLanguage(string, concept.Pool, *Array) string
 	Type() string
 	NewException(string, string) concept.Exception
 }
@@ -27,7 +27,7 @@ func (o *Array) Call(specimen concept.String, param concept.Param) (concept.Para
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *Array) ToLanguage(language string, space concept.Closure) string {
+func (f *Array) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -95,7 +95,7 @@ type ArrayCreatorParam struct {
 }
 
 type ArrayCreator struct {
-	Seeds map[string]func(string, concept.Closure, *Array) string
+	Seeds map[string]func(string, concept.Pool, *Array) string
 	param *ArrayCreatorParam
 }
 
@@ -130,7 +130,7 @@ func (s *ArrayCreator) FieldSize(array *Array) func() concept.Function {
 	}
 }
 
-func (s *ArrayCreator) ToLanguage(language string, space concept.Closure, instance *Array) string {
+func (s *ArrayCreator) ToLanguage(language string, space concept.Pool, instance *Array) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -148,7 +148,7 @@ func (s *ArrayCreator) NewException(name string, message string) concept.Excepti
 
 func NewArrayCreator(param *ArrayCreatorParam) *ArrayCreator {
 	return &ArrayCreator{
-		Seeds: map[string]func(string, concept.Closure, *Array) string{},
+		Seeds: map[string]func(string, concept.Pool, *Array) string{},
 		param: param,
 	}
 }

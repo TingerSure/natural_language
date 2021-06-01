@@ -16,7 +16,7 @@ type Phrase interface {
 	ToString() string
 	ToContent() string
 	ToStringOffset(index int) string
-	Index() concept.Index
+	Index() concept.Pipe
 	From() string
 	HasPriority() bool
 	DependencyCheckValue() Phrase

@@ -6,7 +6,7 @@ import (
 )
 
 type KeyIndexSeed interface {
-	ToLanguage(string, concept.Closure, *KeyIndex) string
+	ToLanguage(string, concept.Pool, *KeyIndex) string
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -30,7 +30,7 @@ func (f *KeyIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *KeyIndex) ToLanguage(language string, space concept.Closure) string {
+func (f *KeyIndex) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -38,23 +38,23 @@ func (s *KeyIndex) ToString(prefix string) string {
 	return fmt.Sprintf("%v", s.key.ToString(""))
 }
 
-func (s *KeyIndex) Call(space concept.Closure, param concept.Param) (concept.Param, concept.Exception) {
+func (s *KeyIndex) Call(space concept.Pool, param concept.Param) (concept.Param, concept.Exception) {
 	return nil, s.seed.NewException("runtime error", "KeyIndex cannot be called.")
 }
 
-func (s *KeyIndex) CallAnticipate(space concept.Closure, param concept.Param) concept.Param {
+func (s *KeyIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
 	return s.seed.NewParam()
 }
 
-func (s *KeyIndex) Get(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (s *KeyIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return s.seed.NewNull(), nil
 }
 
-func (s *KeyIndex) Anticipate(space concept.Closure) concept.Variable {
+func (s *KeyIndex) Anticipate(space concept.Pool) concept.Variable {
 	return s.seed.NewNull()
 }
 
-func (s *KeyIndex) Set(space concept.Closure, value concept.Variable) concept.Interrupt {
+func (s *KeyIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {
 	return s.seed.NewException("runtime error", "KeyIndex cannot be changed.")
 }
 
@@ -65,7 +65,7 @@ type KeyIndexCreatorParam struct {
 }
 
 type KeyIndexCreator struct {
-	Seeds map[string]func(string, concept.Closure, *KeyIndex) string
+	Seeds map[string]func(string, concept.Pool, *KeyIndex) string
 	param *KeyIndexCreatorParam
 }
 
@@ -76,7 +76,7 @@ func (s *KeyIndexCreator) New(key concept.String) *KeyIndex {
 	}
 }
 
-func (s *KeyIndexCreator) ToLanguage(language string, space concept.Closure, instance *KeyIndex) string {
+func (s *KeyIndexCreator) ToLanguage(language string, space concept.Pool, instance *KeyIndex) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -102,7 +102,7 @@ func (s *KeyIndexCreator) NewNull() concept.Null {
 
 func NewKeyIndexCreator(param *KeyIndexCreatorParam) *KeyIndexCreator {
 	return &KeyIndexCreator{
-		Seeds: map[string]func(string, concept.Closure, *KeyIndex) string{},
+		Seeds: map[string]func(string, concept.Pool, *KeyIndex) string{},
 		param: param,
 	}
 }

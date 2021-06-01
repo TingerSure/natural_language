@@ -10,19 +10,19 @@ import (
 )
 
 type NewFunctionSeed interface {
-	ToLanguage(string, concept.Closure, *NewFunction) string
-	NewFunction(concept.Closure) *variable.Function
+	ToLanguage(string, concept.Pool, *NewFunction) string
+	NewFunction(concept.Pool) *variable.Function
 }
 
 type NewFunction struct {
 	*adaptor.ExpressionIndex
-	steps   []concept.Index
+	steps   []concept.Pipe
 	params  []concept.String
 	returns []concept.String
 	seed    NewFunctionSeed
 }
 
-func (f *NewFunction) SetReturns(returns []concept.Index) {
+func (f *NewFunction) SetReturns(returns []concept.Pipe) {
 	for _, keyPre := range returns {
 		key, yes := index.IndexFamilyInstance.IsKeyIndex(keyPre)
 		if !yes {
@@ -32,7 +32,7 @@ func (f *NewFunction) SetReturns(returns []concept.Index) {
 	}
 }
 
-func (f *NewFunction) SetParams(params []concept.Index) {
+func (f *NewFunction) SetParams(params []concept.Pipe) {
 	for _, keyPre := range params {
 		key, yes := index.IndexFamilyInstance.IsKeyIndex(keyPre)
 		if !yes {
@@ -42,11 +42,11 @@ func (f *NewFunction) SetParams(params []concept.Index) {
 	}
 }
 
-func (f *NewFunction) SetSteps(steps []concept.Index) {
+func (f *NewFunction) SetSteps(steps []concept.Pipe) {
 	f.steps = steps
 }
 
-func (f *NewFunction) ToLanguage(language string, space concept.Closure) string {
+func (f *NewFunction) ToLanguage(language string, space concept.Pool) string {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -72,7 +72,7 @@ func (a *NewFunction) ToString(prefix string) string {
 	)
 }
 
-func (a *NewFunction) Anticipate(space concept.Closure) concept.Variable {
+func (a *NewFunction) Anticipate(space concept.Pool) concept.Variable {
 	function := a.seed.NewFunction(space)
 	function.AddParamName(a.params...)
 	function.AddReturnName(a.returns...)
@@ -80,7 +80,7 @@ func (a *NewFunction) Anticipate(space concept.Closure) concept.Variable {
 	return function
 }
 
-func (a *NewFunction) Exec(space concept.Closure) (concept.Variable, concept.Interrupt) {
+func (a *NewFunction) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	function := a.seed.NewFunction(space)
 	function.AddParamName(a.params...)
 	function.AddReturnName(a.returns...)
@@ -90,18 +90,18 @@ func (a *NewFunction) Exec(space concept.Closure) (concept.Variable, concept.Int
 
 type NewFunctionCreatorParam struct {
 	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
-	FunctionCreator        func(concept.Closure) *variable.Function
+	FunctionCreator        func(concept.Pool) *variable.Function
 }
 
 type NewFunctionCreator struct {
-	Seeds map[string]func(string, concept.Closure, *NewFunction) string
+	Seeds map[string]func(string, concept.Pool, *NewFunction) string
 	param *NewFunctionCreatorParam
 }
 
 func (s *NewFunctionCreator) New() *NewFunction {
 	back := &NewFunction{
 		seed:    s,
-		steps:   []concept.Index{},
+		steps:   []concept.Pipe{},
 		params:  []concept.String{},
 		returns: []concept.String{},
 	}
@@ -109,11 +109,11 @@ func (s *NewFunctionCreator) New() *NewFunction {
 	return back
 }
 
-func (s *NewFunctionCreator) NewFunction(parent concept.Closure) *variable.Function {
+func (s *NewFunctionCreator) NewFunction(parent concept.Pool) *variable.Function {
 	return s.param.FunctionCreator(parent)
 }
 
-func (s *NewFunctionCreator) ToLanguage(language string, space concept.Closure, instance *NewFunction) string {
+func (s *NewFunctionCreator) ToLanguage(language string, space concept.Pool, instance *NewFunction) string {
 	seed := s.Seeds[language]
 	if seed == nil {
 		return instance.ToString("")
@@ -123,7 +123,7 @@ func (s *NewFunctionCreator) ToLanguage(language string, space concept.Closure, 
 
 func NewNewFunctionCreator(param *NewFunctionCreatorParam) *NewFunctionCreator {
 	return &NewFunctionCreator{
-		Seeds: map[string]func(string, concept.Closure, *NewFunction) string{},
+		Seeds: map[string]func(string, concept.Pool, *NewFunction) string{},
 		param: param,
 	}
 }
