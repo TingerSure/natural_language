@@ -93,6 +93,7 @@ type SystemFunctionCreatorParam struct {
 
 type SystemFunctionCreator struct {
 	Seeds map[string]func(string, concept.Pool, *SystemFunction) string
+	Inits []func(*SystemFunction)
 	param *SystemFunctionCreatorParam
 }
 
@@ -119,6 +120,11 @@ func (s *SystemFunctionCreator) New(
 	}
 	system.AddParamName(paramNames...)
 	system.AddReturnName(returnNames...)
+
+	for _, init := range s.Inits {
+		init(system)
+	}
+
 	return system
 }
 

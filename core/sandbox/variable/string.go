@@ -112,6 +112,7 @@ type StringCreatorParam struct {
 
 type StringCreator struct {
 	Seeds map[string]func(string, concept.Pool, *String) string
+	Inits []func(*String)
 	param *StringCreatorParam
 }
 
@@ -125,67 +126,10 @@ func (s *StringCreator) New(value string) *String {
 		mapping: make(map[string]string),
 		seed:    s,
 	}
-	back.SetField(s.param.DelayStringCreator("SetLanguage"), s.param.DelayFunctionCreator(s.fieldSetLanguage(back)))
-	back.SetField(s.param.DelayStringCreator("GetLanguage"), s.param.DelayFunctionCreator(s.fieldGetLanguage(back)))
+	for _, init := range s.Inits {
+		init(back)
+	}
 	return back
-}
-
-func (s *StringCreator) fieldSetLanguage(target *String) func() concept.Function {
-	return func() concept.Function {
-		languageParam := s.param.StringCreator("language")
-		valueParam := s.param.StringCreator("value")
-		return s.param.SystemFunctionCreator(
-			func(param concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
-				languagePre := param.Get(languageParam)
-				language, yes := VariableFamilyInstance.IsStringHome(languagePre)
-				if !yes {
-					return nil, s.param.ExceptionCreator("type error", fmt.Sprintf("Param language is not a string: %v", languagePre))
-				}
-				valuePre := param.Get(valueParam)
-				value, yes := VariableFamilyInstance.IsStringHome(valuePre)
-				if !yes {
-					return nil, s.param.ExceptionCreator("type error", fmt.Sprintf("Param value is not a string: %v", languagePre))
-				}
-				target.SetLanguage(language.Value(), value.Value())
-				return s.param.ParamCreator(), nil
-			},
-			func(param concept.Param, _ concept.Variable) concept.Param {
-				return s.param.ParamCreator()
-			},
-			[]concept.String{
-				languageParam,
-				valueParam,
-			},
-			[]concept.String{},
-		)
-	}
-}
-
-func (s *StringCreator) fieldGetLanguage(target *String) func() concept.Function {
-	return func() concept.Function {
-		languageParam := s.param.StringCreator("language")
-		valueBack := s.param.StringCreator("value")
-		return s.param.SystemFunctionCreator(
-			func(input concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
-				languagePre := input.Get(languageParam)
-				language, yes := VariableFamilyInstance.IsStringHome(languagePre)
-				if !yes {
-					return nil, s.param.ExceptionCreator("type error", fmt.Sprintf("Param language is not a string: %v", languagePre))
-				}
-				value := target.GetLanguage(language.Value())
-				output := s.param.ParamCreator()
-				output.Set(valueBack, s.param.StringCreator(value))
-				return output, nil
-			},
-			nil,
-			[]concept.String{
-				languageParam,
-			},
-			[]concept.String{
-				valueBack,
-			},
-		)
-	}
 }
 
 func (s *StringCreator) ToLanguage(language string, space concept.Pool, instance *String) string {

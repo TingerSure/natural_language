@@ -255,6 +255,7 @@ type PoolCreatorParam struct {
 
 type PoolCreator struct {
 	Seeds map[string]func(string, concept.Pool, *Pool) string
+	Inits []func(*Pool)
 	param *PoolCreatorParam
 }
 
@@ -267,7 +268,7 @@ func (s *PoolCreator) NewNull() concept.Null {
 }
 
 func (s *PoolCreator) New(parent concept.Pool) *Pool {
-	return &Pool{
+	pool := &Pool{
 		parent:    parent,
 		history:   pool.NewHistory(),
 		extempore: pool.NewExtempore(),
@@ -277,6 +278,11 @@ func (s *PoolCreator) New(parent concept.Pool) *Pool {
 		}),
 		seed: s,
 	}
+	for _, init := range s.Inits {
+		init(pool)
+	}
+
+	return pool
 }
 
 func (s *PoolCreator) ToLanguage(language string, space concept.Pool, instance *Pool) string {

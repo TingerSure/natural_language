@@ -98,49 +98,5 @@ func NewAdaptorFunction(param *AdaptorFunctionParam) *AdaptorFunction {
 		param:               param,
 		languageOnCallSeeds: map[string]func(concept.Function, concept.Pool, string, concept.Param) string{},
 	}
-
-	instance.SetField(param.DelayStringCreator("paramList"), param.DelayFunctionCreator(instance.fieldParamList))
-	instance.SetField(param.DelayStringCreator("returnList"), param.DelayFunctionCreator(instance.fieldReturnList))
-
 	return instance
-}
-
-func (s *AdaptorFunction) fieldParamList() concept.Function {
-	backList := s.param.StringCreator("list")
-	return s.param.SystemFunctionCreator(
-		func(param concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
-			paramNames := s.param.ArrayCreator()
-			for _, paramName := range s.ParamNames() {
-				paramNames.Append(paramName)
-			}
-			back := s.param.ParamCreator()
-			back.Set(backList, paramNames)
-			return back, nil
-		},
-		nil,
-		[]concept.String{},
-		[]concept.String{
-			backList,
-		},
-	)
-}
-
-func (s *AdaptorFunction) fieldReturnList() concept.Function {
-	backList := s.param.StringCreator("list")
-	return s.param.SystemFunctionCreator(
-		func(param concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
-			returnNames := s.param.ArrayCreator()
-			for _, returnName := range s.ReturnNames() {
-				returnNames.Append(returnName)
-			}
-			back := s.param.ParamCreator()
-			back.Set(backList, returnNames)
-			return back, nil
-		},
-		nil,
-		[]concept.String{},
-		[]concept.String{
-			backList,
-		},
-	)
 }

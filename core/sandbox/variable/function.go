@@ -176,6 +176,7 @@ type FunctionCreatorParam struct {
 
 type FunctionCreator struct {
 	Seeds map[string]func(string, concept.Pool, *Function) string
+	Inits []func(*Function)
 	param *FunctionCreatorParam
 }
 
@@ -195,6 +196,10 @@ func (s *FunctionCreator) New(parent concept.Pool) *Function {
 		body:           s.param.CodeBlockCreator(),
 		anticipateBody: s.param.CodeBlockCreator(),
 		seed:           s,
+	}
+
+	for _, init := range s.Inits {
+		init(funcs)
 	}
 
 	return funcs

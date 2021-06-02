@@ -6,7 +6,6 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
-	"github.com/TingerSure/natural_language/library/system/runtime"
 )
 
 func newVariableCreator(libs *tree.LibraryManager) concept.Object {
@@ -29,7 +28,7 @@ func newVariableCreator(libs *tree.LibraryManager) concept.Object {
 				}
 				libs.Sandbox.Variable.String.Seeds[language.Value()] = func(_ string, pool concept.Pool, instance *variable.String) string {
 					seedInput := libs.Sandbox.Variable.Param.New()
-					seedInput.Set(libs.Sandbox.Variable.String.New("pool"), runtime.NewPoolObject(libs, pool))
+					seedInput.Set(libs.Sandbox.Variable.String.New("pool"), pool)
 					seedInput.Set(libs.Sandbox.Variable.String.New("instance"), instance)
 					seedOutput, suspend := seed.Exec(seedInput, nil)
 					if !nl_interface.IsNil(suspend) {

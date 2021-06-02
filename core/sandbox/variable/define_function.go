@@ -74,6 +74,7 @@ type DefineFunctionCreatorParam struct {
 
 type DefineFunctionCreator struct {
 	Seeds map[string]func(string, concept.Pool, *DefineFunction) string
+	Inits []func(*DefineFunction)
 	param *DefineFunctionCreatorParam
 }
 
@@ -94,7 +95,9 @@ func (s *DefineFunctionCreator) New(paramNames []concept.String, returnNames []c
 
 	define.AddParamName(paramNames...)
 	define.AddReturnName(returnNames...)
-
+	for _, init := range s.Inits {
+		init(define)
+	}
 	return define
 }
 

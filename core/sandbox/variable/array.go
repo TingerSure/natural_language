@@ -96,6 +96,7 @@ type ArrayCreatorParam struct {
 
 type ArrayCreator struct {
 	Seeds map[string]func(string, concept.Pool, *Array) string
+	Inits []func(*Array)
 	param *ArrayCreatorParam
 }
 
@@ -108,26 +109,10 @@ func (s *ArrayCreator) New() *Array {
 		values: make([]concept.Variable, 0),
 		seed:   s,
 	}
-	array.SetField(s.param.DelayStringCreator("size"), s.param.DelayFunctionCreator(s.FieldSize(array)))
-	return array
-}
-
-func (s *ArrayCreator) FieldSize(array *Array) func() concept.Function {
-	return func() concept.Function {
-		backSize := s.param.StringCreator("size")
-		return s.param.SystemFunctionCreator(
-			func(param concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
-				back := s.param.ParamCreator()
-				back.Set(backSize, s.param.NumberCreator(float64(array.Length())))
-				return back, nil
-			},
-			nil,
-			[]concept.String{},
-			[]concept.String{
-				backSize,
-			},
-		)
+	for _, init := range s.Inits {
+		init(array)
 	}
+	return array
 }
 
 func (s *ArrayCreator) ToLanguage(language string, space concept.Pool, instance *Array) string {

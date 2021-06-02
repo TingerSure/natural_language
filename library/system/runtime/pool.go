@@ -8,20 +8,25 @@ import (
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
-func NewPoolObject(libs *tree.LibraryManager, pool concept.Pool) concept.Object {
-	object := libs.Sandbox.Variable.Object.New()
-	keyParam := libs.Sandbox.Variable.String.New("key")
-	valueParam := libs.Sandbox.Variable.String.New("value")
-	object.SetField(
-		libs.Sandbox.Variable.String.New("GetLocal"),
-		libs.Sandbox.Variable.SystemFunction.New(
+func PoolInit(libs *tree.LibraryManager, instance *variable.Pool) {
+	instance.SetField(
+		libs.Sandbox.Variable.DelayString.New("GetLocal"),
+		libs.Sandbox.Variable.DelayFunction.New(PoolGetLocal(libs, instance)),
+	)
+}
+
+func PoolGetLocal(libs *tree.LibraryManager, instance *variable.Pool) func() concept.Function {
+	return func() concept.Function {
+		keyParam := libs.Sandbox.Variable.String.New("key")
+		valueParam := libs.Sandbox.Variable.String.New("value")
+		return libs.Sandbox.Variable.SystemFunction.New(
 			func(input concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
 				keyPre := input.Get(keyParam)
 				key, yes := variable.VariableFamilyInstance.IsStringHome(keyPre)
 				if !yes {
 					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Key is not a string: %v", keyPre.ToString("")))
 				}
-				back, suspend := pool.GetLocal(key)
+				back, suspend := instance.GetLocal(key)
 				if !nl_interface.IsNil(suspend) {
 					return nil, suspend
 				}
@@ -32,7 +37,6 @@ func NewPoolObject(libs *tree.LibraryManager, pool concept.Pool) concept.Object 
 			nil,
 			[]concept.String{keyParam},
 			[]concept.String{valueParam},
-		),
-	)
-	return object
+		)
+	}
 }
