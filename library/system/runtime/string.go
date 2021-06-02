@@ -16,7 +16,36 @@ func StringInit(libs *tree.LibraryManager, instance *variable.String) {
 		libs.Sandbox.Variable.DelayString.New("getLanguage"),
 		libs.Sandbox.Variable.DelayFunction.New(StringGetLanguage(libs, instance)),
 	)
+	instance.SetField(
+		libs.Sandbox.Variable.DelayString.New("append"),
+		libs.Sandbox.Variable.DelayFunction.New(StringAppend(libs, instance)),
+	)
+}
 
+func StringAppend(libs *tree.LibraryManager, instance *variable.String) func() concept.Function {
+	return func() concept.Function {
+		subStringParam := libs.Sandbox.Variable.String.New("subString")
+		valueBack := libs.Sandbox.Variable.String.New("value")
+		return libs.Sandbox.Variable.SystemFunction.New(
+			func(input concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
+				subStringPre := input.Get(subStringParam)
+				subString, yes := variable.VariableFamilyInstance.IsStringHome(subStringPre)
+				if !yes {
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param subString is not a string: %v", subStringPre))
+				}
+				output := libs.Sandbox.Variable.Param.New()
+				output.Set(valueBack, libs.Sandbox.Variable.String.New(instance.Value()+subString.Value()))
+				return output, nil
+			},
+			nil,
+			[]concept.String{
+				subStringParam,
+			},
+			[]concept.String{
+				valueBack,
+			},
+		)
+	}
 }
 
 func StringSetLanguage(libs *tree.LibraryManager, instance *variable.String) func() concept.Function {

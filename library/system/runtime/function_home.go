@@ -1,7 +1,10 @@
 package runtime
 
 import (
+	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
@@ -14,6 +17,57 @@ func FunctionHomeInit(libs *tree.LibraryManager, instance concept.Function) {
 		libs.Sandbox.Variable.DelayString.New("returnList"),
 		libs.Sandbox.Variable.DelayFunction.New(FunctionHomeReturnList(libs, instance)),
 	)
+	instance.SetField(
+		libs.Sandbox.Variable.DelayString.New("setLanguageOnCallSeed"),
+		libs.Sandbox.Variable.DelayFunction.New(FunctionHomeSetLanguageOnCallSeed(libs, instance)),
+	)
+}
+
+func FunctionHomeSetLanguageOnCallSeed(libs *tree.LibraryManager, instance concept.Function) func() concept.Function {
+	return func() concept.Function {
+		seedParam := libs.Sandbox.Variable.String.New("seed")
+		languageParam := libs.Sandbox.Variable.String.New("language")
+		return libs.Sandbox.Variable.SystemFunction.New(
+			func(input concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
+				languagePre := input.Get(languageParam)
+				language, yes := variable.VariableFamilyInstance.IsStringHome(languagePre)
+				if !yes {
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param language is not a string: %v", languagePre))
+				}
+				seedPre := input.Get(seedParam)
+				seed, yes := variable.VariableFamilyInstance.IsFunctionHome(seedPre)
+				if !yes {
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param seed is not a function: %v", seedPre))
+				}
+				instance.SetLanguageOnCallSeed(language.Value(), func(_ concept.Function, pool concept.Pool, name string, params concept.Param) string {
+					seedInput := libs.Sandbox.Variable.Param.New()
+					seedInput.Set(libs.Sandbox.Variable.String.New("pool"), pool)
+					seedInput.Set(libs.Sandbox.Variable.String.New("instance"), instance)
+					seedInput.Set(libs.Sandbox.Variable.String.New("name"), libs.Sandbox.Variable.String.New(name))
+					seedInput.Set(libs.Sandbox.Variable.String.New("params"), params)
+					seedOutput, suspend := seed.Exec(seedInput, nil)
+					if !nl_interface.IsNil(suspend) {
+						return instance.ToString("")
+					}
+					valuePre := seedOutput.Get(libs.Sandbox.Variable.String.New("value"))
+					value, yes := variable.VariableFamilyInstance.IsStringHome(valuePre)
+					if !yes {
+						return instance.ToString("")
+					}
+					return value.Value()
+				})
+				return libs.Sandbox.Variable.Param.New(), nil
+			},
+			func(input concept.Param, object concept.Variable) concept.Param {
+				return libs.Sandbox.Variable.Param.New()
+			},
+			[]concept.String{
+				languageParam,
+				seedParam,
+			},
+			[]concept.String{},
+		)
+	}
 }
 
 func FunctionHomeParamList(libs *tree.LibraryManager, instance concept.Function) func() concept.Function {
