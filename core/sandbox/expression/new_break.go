@@ -8,7 +8,7 @@ import (
 )
 
 type NewBreakSeed interface {
-	ToLanguage(string, concept.Pool, *NewBreak) string
+	ToLanguage(string, concept.Pool, *NewBreak) (string, concept.Exception)
 	NewNull() concept.Null
 	NewBreak(concept.String) *interrupt.Break
 }
@@ -19,7 +19,7 @@ type NewBreak struct {
 	seed NewBreakSeed
 }
 
-func (f *NewBreak) ToLanguage(language string, space concept.Pool) string {
+func (f *NewBreak) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -42,7 +42,7 @@ type NewBreakCreatorParam struct {
 }
 
 type NewBreakCreator struct {
-	Seeds map[string]func(string, concept.Pool, *NewBreak) string
+	Seeds map[string]func(concept.Pool, *NewBreak) (string, concept.Exception)
 	param *NewBreakCreatorParam
 }
 
@@ -63,17 +63,17 @@ func (s *NewBreakCreator) NewNull() concept.Null {
 	return s.param.NullCreator()
 }
 
-func (s *NewBreakCreator) ToLanguage(language string, space concept.Pool, instance *NewBreak) string {
+func (s *NewBreakCreator) ToLanguage(language string, space concept.Pool, instance *NewBreak) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func NewNewBreakCreator(param *NewBreakCreatorParam) *NewBreakCreator {
 	return &NewBreakCreator{
-		Seeds: map[string]func(string, concept.Pool, *NewBreak) string{},
+		Seeds: map[string]func(concept.Pool, *NewBreak) (string, concept.Exception){},
 		param: param,
 	}
 }

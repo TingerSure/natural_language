@@ -25,7 +25,7 @@ type AdaptorFunction struct {
 	param               *AdaptorFunctionParam
 	paramNames          []concept.String
 	returnNames         []concept.String
-	languageOnCallSeeds map[string]func(concept.Function, concept.Pool, string, concept.Param) string
+	languageOnCallSeeds map[string]func(concept.Function, concept.Pool, string, concept.Param) (string, concept.Exception)
 }
 
 func (s *AdaptorFunction) ParamNames() []concept.String {
@@ -48,15 +48,15 @@ func (o *AdaptorFunction) IsFunction() bool {
 	return true
 }
 
-func (a *AdaptorFunction) GetLanguageOnCallSeed(language string) func(concept.Function, concept.Pool, string, concept.Param) string {
+func (a *AdaptorFunction) GetLanguageOnCallSeed(language string) func(concept.Function, concept.Pool, string, concept.Param) (string, concept.Exception) {
 	return a.languageOnCallSeeds[language]
 }
 
-func (a *AdaptorFunction) SetLanguageOnCallSeed(language string, seed func(concept.Function, concept.Pool, string, concept.Param) string) {
+func (a *AdaptorFunction) SetLanguageOnCallSeed(language string, seed func(concept.Function, concept.Pool, string, concept.Param) (string, concept.Exception)) {
 	a.languageOnCallSeeds[language] = seed
 }
 
-func (a *AdaptorFunction) ToCallLanguageAdaptor(funcs concept.Function, language string, space concept.Pool, self string, param concept.Param) string {
+func (a *AdaptorFunction) ToCallLanguageAdaptor(funcs concept.Function, language string, space concept.Pool, self string, param concept.Param) (string, concept.Exception) {
 	seed := funcs.GetLanguageOnCallSeed(language)
 	if seed == nil {
 		return funcs.ToLanguage(language, space)
@@ -96,7 +96,7 @@ func NewAdaptorFunction(param *AdaptorFunctionParam) *AdaptorFunction {
 			ExceptionCreator: param.ExceptionCreator,
 		}),
 		param:               param,
-		languageOnCallSeeds: map[string]func(concept.Function, concept.Pool, string, concept.Param) string{},
+		languageOnCallSeeds: map[string]func(concept.Function, concept.Pool, string, concept.Param) (string, concept.Exception){},
 	}
 	return instance
 }

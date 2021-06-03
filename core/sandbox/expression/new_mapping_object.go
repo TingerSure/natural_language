@@ -11,7 +11,7 @@ import (
 )
 
 type NewMappingObjectSeed interface {
-	ToLanguage(string, concept.Pool, *NewMappingObject) string
+	ToLanguage(string, concept.Pool, *NewMappingObject) (string, concept.Exception)
 	NewException(string, string) concept.Exception
 	NewMappingObject(concept.Variable, concept.Class) *variable.MappingObject
 }
@@ -36,7 +36,7 @@ func (f *NewMappingObject) SetClass(class concept.Pipe) {
 	f.class = class
 }
 
-func (f *NewMappingObject) ToLanguage(language string, space concept.Pool) string {
+func (f *NewMappingObject) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -99,7 +99,7 @@ type NewMappingObjectCreatorParam struct {
 }
 
 type NewMappingObjectCreator struct {
-	Seeds map[string]func(string, concept.Pool, *NewMappingObject) string
+	Seeds map[string]func(concept.Pool, *NewMappingObject) (string, concept.Exception)
 	param *NewMappingObjectCreatorParam
 }
 
@@ -119,17 +119,17 @@ func (s *NewMappingObjectCreator) NewException(name string, message string) conc
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *NewMappingObjectCreator) ToLanguage(language string, space concept.Pool, instance *NewMappingObject) string {
+func (s *NewMappingObjectCreator) ToLanguage(language string, space concept.Pool, instance *NewMappingObject) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func NewNewMappingObjectCreator(param *NewMappingObjectCreatorParam) *NewMappingObjectCreator {
 	return &NewMappingObjectCreator{
-		Seeds: map[string]func(string, concept.Pool, *NewMappingObject) string{},
+		Seeds: map[string]func(concept.Pool, *NewMappingObject) (string, concept.Exception){},
 		param: param,
 	}
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type PrivateIndexSeed interface {
-	ToLanguage(string, concept.Pool, *PrivateIndex) string
+	ToLanguage(string, concept.Pool, *PrivateIndex) (string, concept.Exception)
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -35,7 +35,7 @@ func (f *PrivateIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *PrivateIndex) ToLanguage(language string, space concept.Pool) string {
+func (f *PrivateIndex) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -70,7 +70,7 @@ type PrivateIndexCreatorParam struct {
 }
 
 type PrivateIndexCreator struct {
-	Seeds map[string]func(string, concept.Pool, *PrivateIndex) string
+	Seeds map[string]func(concept.Pool, *PrivateIndex) (string, concept.Exception)
 	param *PrivateIndexCreatorParam
 }
 
@@ -82,12 +82,12 @@ func (s *PrivateIndexCreator) New(name string, originator concept.Pipe) *Private
 	}
 }
 
-func (s *PrivateIndexCreator) ToLanguage(language string, space concept.Pool, instance *PrivateIndex) string {
+func (s *PrivateIndexCreator) ToLanguage(language string, space concept.Pool, instance *PrivateIndex) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *PrivateIndexCreator) Type() string {
@@ -108,7 +108,7 @@ func (s *PrivateIndexCreator) NewNull() concept.Null {
 
 func NewPrivateIndexCreator(param *PrivateIndexCreatorParam) *PrivateIndexCreator {
 	return &PrivateIndexCreator{
-		Seeds: map[string]func(string, concept.Pool, *PrivateIndex) string{},
+		Seeds: map[string]func(concept.Pool, *PrivateIndex) (string, concept.Exception){},
 		param: param,
 	}
 }

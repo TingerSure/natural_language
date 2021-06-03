@@ -11,7 +11,7 @@ const (
 )
 
 type BoolSeed interface {
-	ToLanguage(string, concept.Pool, *Bool) string
+	ToLanguage(string, concept.Pool, *Bool) (string, concept.Exception)
 	Type() string
 }
 
@@ -25,7 +25,7 @@ func (o *Bool) Call(specimen concept.String, param concept.Param) (concept.Param
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *Bool) ToLanguage(language string, space concept.Pool) string {
+func (f *Bool) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -48,7 +48,7 @@ type BoolCreatorParam struct {
 
 type BoolCreator struct {
 	param *BoolCreatorParam
-	Seeds map[string]func(string, concept.Pool, *Bool) string
+	Seeds map[string]func(concept.Pool, *Bool) (string, concept.Exception)
 }
 
 func (s *BoolCreator) New(value bool) *Bool {
@@ -62,12 +62,12 @@ func (s *BoolCreator) New(value bool) *Bool {
 	}
 }
 
-func (s *BoolCreator) ToLanguage(language string, space concept.Pool, instance *Bool) string {
+func (s *BoolCreator) ToLanguage(language string, space concept.Pool, instance *Bool) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *BoolCreator) Type() string {
@@ -77,6 +77,6 @@ func (s *BoolCreator) Type() string {
 func NewBoolCreator(param *BoolCreatorParam) *BoolCreator {
 	return &BoolCreator{
 		param: param,
-		Seeds: map[string]func(string, concept.Pool, *Bool) string{},
+		Seeds: map[string]func(concept.Pool, *Bool) (string, concept.Exception){},
 	}
 }

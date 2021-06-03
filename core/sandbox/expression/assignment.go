@@ -8,7 +8,7 @@ import (
 )
 
 type AssignmentSeed interface {
-	ToLanguage(string, concept.Pool, *Assignment) string
+	ToLanguage(string, concept.Pool, *Assignment) (string, concept.Exception)
 }
 
 type Assignment struct {
@@ -18,7 +18,7 @@ type Assignment struct {
 	seed AssignmentSeed
 }
 
-func (f *Assignment) ToLanguage(language string, space concept.Pool) string {
+func (f *Assignment) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -43,7 +43,7 @@ type AssignmentCreatorParam struct {
 }
 
 type AssignmentCreator struct {
-	Seeds map[string]func(string, concept.Pool, *Assignment) string
+	Seeds map[string]func(concept.Pool, *Assignment) (string, concept.Exception)
 	param *AssignmentCreatorParam
 }
 
@@ -57,17 +57,17 @@ func (s *AssignmentCreator) New(from concept.Pipe, to concept.Pipe) *Assignment 
 	return back
 }
 
-func (s *AssignmentCreator) ToLanguage(language string, space concept.Pool, instance *Assignment) string {
+func (s *AssignmentCreator) ToLanguage(language string, space concept.Pool, instance *Assignment) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func NewAssignmentCreator(param *AssignmentCreatorParam) *AssignmentCreator {
 	return &AssignmentCreator{
-		Seeds: map[string]func(string, concept.Pool, *Assignment) string{},
+		Seeds: map[string]func(concept.Pool, *Assignment) (string, concept.Exception){},
 		param: param,
 	}
 }

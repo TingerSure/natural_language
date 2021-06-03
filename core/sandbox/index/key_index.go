@@ -6,7 +6,7 @@ import (
 )
 
 type KeyIndexSeed interface {
-	ToLanguage(string, concept.Pool, *KeyIndex) string
+	ToLanguage(string, concept.Pool, *KeyIndex) (string, concept.Exception)
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -30,7 +30,7 @@ func (f *KeyIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *KeyIndex) ToLanguage(language string, space concept.Pool) string {
+func (f *KeyIndex) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -65,7 +65,7 @@ type KeyIndexCreatorParam struct {
 }
 
 type KeyIndexCreator struct {
-	Seeds map[string]func(string, concept.Pool, *KeyIndex) string
+	Seeds map[string]func(concept.Pool, *KeyIndex) (string, concept.Exception)
 	param *KeyIndexCreatorParam
 }
 
@@ -76,12 +76,12 @@ func (s *KeyIndexCreator) New(key concept.String) *KeyIndex {
 	}
 }
 
-func (s *KeyIndexCreator) ToLanguage(language string, space concept.Pool, instance *KeyIndex) string {
+func (s *KeyIndexCreator) ToLanguage(language string, space concept.Pool, instance *KeyIndex) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *KeyIndexCreator) Type() string {
@@ -102,7 +102,7 @@ func (s *KeyIndexCreator) NewNull() concept.Null {
 
 func NewKeyIndexCreator(param *KeyIndexCreatorParam) *KeyIndexCreator {
 	return &KeyIndexCreator{
-		Seeds: map[string]func(string, concept.Pool, *KeyIndex) string{},
+		Seeds: map[string]func(concept.Pool, *KeyIndex) (string, concept.Exception){},
 		param: param,
 	}
 }

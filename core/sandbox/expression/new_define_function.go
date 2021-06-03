@@ -10,7 +10,7 @@ import (
 )
 
 type NewDefineFunctionSeed interface {
-	ToLanguage(string, concept.Pool, *NewDefineFunction) string
+	ToLanguage(string, concept.Pool, *NewDefineFunction) (string, concept.Exception)
 	NewDefineFunction([]concept.String, []concept.String) *variable.DefineFunction
 }
 
@@ -41,7 +41,7 @@ func (f *NewDefineFunction) SetParams(params []concept.Pipe) {
 	}
 }
 
-func (f *NewDefineFunction) ToLanguage(language string, space concept.Pool) string {
+func (f *NewDefineFunction) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -73,7 +73,7 @@ type NewDefineFunctionCreatorParam struct {
 }
 
 type NewDefineFunctionCreator struct {
-	Seeds map[string]func(string, concept.Pool, *NewDefineFunction) string
+	Seeds map[string]func(concept.Pool, *NewDefineFunction) (string, concept.Exception)
 	param *NewDefineFunctionCreatorParam
 }
 
@@ -91,17 +91,17 @@ func (s *NewDefineFunctionCreator) NewDefineFunction(paramNames []concept.String
 	return s.param.DefineFunctionCreator(paramNames, returnNames)
 }
 
-func (s *NewDefineFunctionCreator) ToLanguage(language string, space concept.Pool, instance *NewDefineFunction) string {
+func (s *NewDefineFunctionCreator) ToLanguage(language string, space concept.Pool, instance *NewDefineFunction) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func NewNewDefineFunctionCreator(param *NewDefineFunctionCreatorParam) *NewDefineFunctionCreator {
 	return &NewDefineFunctionCreator{
-		Seeds: map[string]func(string, concept.Pool, *NewDefineFunction) string{},
+		Seeds: map[string]func(concept.Pool, *NewDefineFunction) (string, concept.Exception){},
 		param: param,
 	}
 }

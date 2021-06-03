@@ -7,7 +7,7 @@ import (
 )
 
 type BubbleIndexSeed interface {
-	ToLanguage(string, concept.Pool, *BubbleIndex) string
+	ToLanguage(string, concept.Pool, *BubbleIndex) (string, concept.Exception)
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -27,7 +27,7 @@ func (f *BubbleIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *BubbleIndex) ToLanguage(language string, space concept.Pool) string {
+func (f *BubbleIndex) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 
 }
@@ -79,7 +79,7 @@ type BubbleIndexCreatorParam struct {
 }
 
 type BubbleIndexCreator struct {
-	Seeds map[string]func(string, concept.Pool, *BubbleIndex) string
+	Seeds map[string]func(concept.Pool, *BubbleIndex) (string, concept.Exception)
 	param *BubbleIndexCreatorParam
 }
 
@@ -102,12 +102,12 @@ func (s *BubbleIndexCreator) NewNull() concept.Null {
 	return s.param.NullCreator()
 }
 
-func (s *BubbleIndexCreator) ToLanguage(language string, space concept.Pool, instance *BubbleIndex) string {
+func (s *BubbleIndexCreator) ToLanguage(language string, space concept.Pool, instance *BubbleIndex) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *BubbleIndexCreator) Type() string {
@@ -116,7 +116,7 @@ func (s *BubbleIndexCreator) Type() string {
 
 func NewBubbleIndexCreator(param *BubbleIndexCreatorParam) *BubbleIndexCreator {
 	return &BubbleIndexCreator{
-		Seeds: map[string]func(string, concept.Pool, *BubbleIndex) string{},
+		Seeds: map[string]func(concept.Pool, *BubbleIndex) (string, concept.Exception){},
 		param: param,
 	}
 }

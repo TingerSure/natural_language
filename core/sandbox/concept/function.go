@@ -10,9 +10,9 @@ type Function interface {
 	AddReturnName(...String)
 	ParamNames() []String
 	ReturnNames() []String
-	GetLanguageOnCallSeed(string) func(Function, Pool, string, Param) string
-	SetLanguageOnCallSeed(string, func(Function, Pool, string, Param) string)
-	ToCallLanguage(string, Pool, string, Param) string
+	GetLanguageOnCallSeed(string) func(Function, Pool, string, Param) (string, Exception)
+	SetLanguageOnCallSeed(string, func(Function, Pool, string, Param) (string, Exception))
+	ToCallLanguage(string, Pool, string, Param) (string, Exception)
 	ParamFormat(Param) Param
 	ReturnFormat(String) String
 }

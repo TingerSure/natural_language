@@ -7,7 +7,7 @@ import (
 )
 
 type NewStringSeed interface {
-	ToLanguage(string, concept.Pool, *NewString) string
+	ToLanguage(string, concept.Pool, *NewString) (string, concept.Exception)
 	NewString(string) concept.String
 }
 
@@ -17,7 +17,7 @@ type NewString struct {
 	seed  NewStringSeed
 }
 
-func (f *NewString) ToLanguage(language string, space concept.Pool) string {
+func (f *NewString) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -39,7 +39,7 @@ type NewStringCreatorParam struct {
 }
 
 type NewStringCreator struct {
-	Seeds map[string]func(string, concept.Pool, *NewString) string
+	Seeds map[string]func(concept.Pool, *NewString) (string, concept.Exception)
 	param *NewStringCreatorParam
 }
 
@@ -56,17 +56,17 @@ func (s *NewStringCreator) NewString(value string) concept.String {
 	return s.param.StringCreator(value)
 }
 
-func (s *NewStringCreator) ToLanguage(language string, space concept.Pool, instance *NewString) string {
+func (s *NewStringCreator) ToLanguage(language string, space concept.Pool, instance *NewString) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func NewNewStringCreator(param *NewStringCreatorParam) *NewStringCreator {
 	return &NewStringCreator{
-		Seeds: map[string]func(string, concept.Pool, *NewString) string{},
+		Seeds: map[string]func(concept.Pool, *NewString) (string, concept.Exception){},
 		param: param,
 	}
 }

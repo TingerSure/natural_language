@@ -23,7 +23,7 @@ func VariableHomeToString(libs *tree.LibraryManager, instance concept.Variable) 
 				prefixPre := input.Get(prefixParam)
 				prefix, yes := variable.VariableFamilyInstance.IsStringHome(prefixPre)
 				if !yes {
-					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param prefix is not a string: %v", prefixPre))
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param prefix is not a string: %v", prefixPre.ToString("")))
 				}
 				output := libs.Sandbox.Variable.Param.New()
 				output.Set(valueParam, libs.Sandbox.Variable.String.New(instance.ToString(prefix.Value())))

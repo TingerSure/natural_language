@@ -13,7 +13,7 @@ const (
 )
 
 type ParamSeed interface {
-	ToLanguage(string, concept.Pool, *Param) string
+	ToLanguage(string, concept.Pool, *Param) (string, concept.Exception)
 	Type() string
 	NewNull() concept.Null
 	New() *Param
@@ -30,7 +30,7 @@ func (o *Param) Call(specimen concept.String, param concept.Param) (concept.Para
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *Param) ToLanguage(language string, space concept.Pool) string {
+func (f *Param) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -102,7 +102,7 @@ type ParamCreatorParam struct {
 }
 
 type ParamCreator struct {
-	Seeds map[string]func(string, concept.Pool, *Param) string
+	Seeds map[string]func(concept.Pool, *Param) (string, concept.Exception)
 	param *ParamCreatorParam
 }
 
@@ -117,12 +117,12 @@ func (s *ParamCreator) New() *Param {
 	}
 }
 
-func (s *ParamCreator) ToLanguage(language string, space concept.Pool, instance *Param) string {
+func (s *ParamCreator) ToLanguage(language string, space concept.Pool, instance *Param) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *ParamCreator) Type() string {
@@ -135,7 +135,7 @@ func (s *ParamCreator) NewNull() concept.Null {
 
 func NewParamCreator(param *ParamCreatorParam) *ParamCreator {
 	return &ParamCreator{
-		Seeds: map[string]func(string, concept.Pool, *Param) string{},
+		Seeds: map[string]func(concept.Pool, *Param) (string, concept.Exception){},
 		param: param,
 	}
 }

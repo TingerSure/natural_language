@@ -10,7 +10,7 @@ const (
 )
 
 type DelayStringSeed interface {
-	ToLanguage(string, concept.Pool, *DelayString) string
+	ToLanguage(string, concept.Pool, *DelayString) (string, concept.Exception)
 	Type() string
 	NewString(string) concept.String
 }
@@ -70,7 +70,7 @@ func (o *DelayString) Call(specimen concept.String, param concept.Param) (concep
 	return o.value.Call(specimen, param)
 }
 
-func (f *DelayString) ToLanguage(language string, space concept.Pool) string {
+func (f *DelayString) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -131,7 +131,7 @@ type DelayStringCreatorParam struct {
 }
 
 type DelayStringCreator struct {
-	Seeds map[string]func(string, concept.Pool, *DelayString) string
+	Seeds map[string]func(concept.Pool, *DelayString) (string, concept.Exception)
 	param *DelayStringCreatorParam
 }
 
@@ -146,12 +146,12 @@ func (s *DelayStringCreator) NewString(value string) concept.String {
 	return s.param.StringCreator(value)
 }
 
-func (s *DelayStringCreator) ToLanguage(language string, space concept.Pool, instance *DelayString) string {
+func (s *DelayStringCreator) ToLanguage(language string, space concept.Pool, instance *DelayString) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *DelayStringCreator) Type() string {
@@ -160,7 +160,7 @@ func (s *DelayStringCreator) Type() string {
 
 func NewDelayStringCreator(param *DelayStringCreatorParam) *DelayStringCreator {
 	return &DelayStringCreator{
-		Seeds: map[string]func(string, concept.Pool, *DelayString) string{},
+		Seeds: map[string]func(concept.Pool, *DelayString) (string, concept.Exception){},
 		param: param,
 	}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 type IfSeed interface {
-	ToLanguage(string, concept.Pool, *If) string
+	ToLanguage(string, concept.Pool, *If) (string, concept.Exception)
 	NewException(string, string) concept.Exception
 	NewNull() concept.Null
 	NewPool(concept.Pool) concept.Pool
@@ -23,7 +23,7 @@ type If struct {
 	seed      IfSeed
 }
 
-func (f *If) ToLanguage(language string, space concept.Pool) string {
+func (f *If) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -88,7 +88,7 @@ type IfCreatorParam struct {
 }
 
 type IfCreator struct {
-	Seeds            map[string]func(string, concept.Pool, *If) string
+	Seeds            map[string]func(concept.Pool, *If) (string, concept.Exception)
 	param            *IfCreatorParam
 	defaultCondition concept.Pipe
 	defaultTag       concept.String
@@ -104,12 +104,12 @@ func (s *IfCreator) New() *If {
 	return back
 }
 
-func (s *IfCreator) ToLanguage(language string, space concept.Pool, instance *If) string {
+func (s *IfCreator) ToLanguage(language string, space concept.Pool, instance *If) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *IfCreator) NewPool(parent concept.Pool) concept.Pool {
@@ -126,7 +126,7 @@ func (s *IfCreator) NewException(name string, message string) concept.Exception 
 
 func NewIfCreator(param *IfCreatorParam) *IfCreator {
 	return &IfCreator{
-		Seeds: map[string]func(string, concept.Pool, *If) string{},
+		Seeds: map[string]func(concept.Pool, *If) (string, concept.Exception){},
 		param: param,
 	}
 }

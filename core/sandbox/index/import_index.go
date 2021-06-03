@@ -6,7 +6,7 @@ import (
 )
 
 type ImportIndexSeed interface {
-	ToLanguage(string, concept.Pool, *ImportIndex) string
+	ToLanguage(string, concept.Pool, *ImportIndex) (string, concept.Exception)
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -40,7 +40,7 @@ func (f *ImportIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *ImportIndex) ToLanguage(language string, space concept.Pool) string {
+func (f *ImportIndex) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -76,7 +76,7 @@ type ImportIndexCreatorParam struct {
 }
 
 type ImportIndexCreator struct {
-	Seeds map[string]func(string, concept.Pool, *ImportIndex) string
+	Seeds map[string]func(concept.Pool, *ImportIndex) (string, concept.Exception)
 	param *ImportIndexCreatorParam
 }
 
@@ -89,12 +89,12 @@ func (s *ImportIndexCreator) New(name string, path string, page concept.Variable
 	}
 }
 
-func (s *ImportIndexCreator) ToLanguage(language string, space concept.Pool, instance *ImportIndex) string {
+func (s *ImportIndexCreator) ToLanguage(language string, space concept.Pool, instance *ImportIndex) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *ImportIndexCreator) Type() string {
@@ -115,7 +115,7 @@ func (s *ImportIndexCreator) NewNull() concept.Null {
 
 func NewImportIndexCreator(param *ImportIndexCreatorParam) *ImportIndexCreator {
 	return &ImportIndexCreator{
-		Seeds: map[string]func(string, concept.Pool, *ImportIndex) string{},
+		Seeds: map[string]func(concept.Pool, *ImportIndex) (string, concept.Exception){},
 		param: param,
 	}
 }

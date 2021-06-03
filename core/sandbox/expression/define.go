@@ -8,7 +8,7 @@ import (
 )
 
 type DefineSeed interface {
-	ToLanguage(string, concept.Pool, *Define) string
+	ToLanguage(string, concept.Pool, *Define) (string, concept.Exception)
 	NewNull() concept.Null
 	NewException(string, string) concept.Exception
 }
@@ -20,7 +20,7 @@ type Define struct {
 	seed         DefineSeed
 }
 
-func (f *Define) ToLanguage(language string, space concept.Pool) string {
+func (f *Define) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -61,7 +61,7 @@ type DefineCreatorParam struct {
 }
 
 type DefineCreator struct {
-	Seeds map[string]func(string, concept.Pool, *Define) string
+	Seeds map[string]func(concept.Pool, *Define) (string, concept.Exception)
 	param *DefineCreatorParam
 }
 
@@ -75,12 +75,12 @@ func (s *DefineCreator) New(key concept.String, defaultValue concept.Pipe) *Defi
 	return back
 }
 
-func (s *DefineCreator) ToLanguage(language string, space concept.Pool, instance *Define) string {
+func (s *DefineCreator) ToLanguage(language string, space concept.Pool, instance *Define) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *DefineCreator) NewException(name string, message string) concept.Exception {
@@ -93,7 +93,7 @@ func (s *DefineCreator) NewNull() concept.Null {
 
 func NewDefineCreator(param *DefineCreatorParam) *DefineCreator {
 	return &DefineCreator{
-		Seeds: map[string]func(string, concept.Pool, *Define) string{},
+		Seeds: map[string]func(concept.Pool, *Define) (string, concept.Exception){},
 		param: param,
 	}
 }

@@ -10,7 +10,7 @@ import (
 )
 
 type NewParamSeed interface {
-	ToLanguage(string, concept.Pool, *NewParam) string
+	ToLanguage(string, concept.Pool, *NewParam) (string, concept.Exception)
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
 }
@@ -39,7 +39,7 @@ func (f *NewParam) SetKeyValue(keyValues []concept.Pipe) {
 	}
 }
 
-func (f *NewParam) ToLanguage(language string, space concept.Pool) string {
+func (f *NewParam) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -154,7 +154,7 @@ type NewParamCreatorParam struct {
 }
 
 type NewParamCreator struct {
-	Seeds map[string]func(string, concept.Pool, *NewParam) string
+	Seeds map[string]func(concept.Pool, *NewParam) (string, concept.Exception)
 	param *NewParamCreatorParam
 }
 
@@ -179,17 +179,17 @@ func (s *NewParamCreator) NewException(name string, message string) concept.Exce
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *NewParamCreator) ToLanguage(language string, space concept.Pool, instance *NewParam) string {
+func (s *NewParamCreator) ToLanguage(language string, space concept.Pool, instance *NewParam) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func NewNewParamCreator(param *NewParamCreatorParam) *NewParamCreator {
 	return &NewParamCreator{
-		Seeds: map[string]func(string, concept.Pool, *NewParam) string{},
+		Seeds: map[string]func(concept.Pool, *NewParam) (string, concept.Exception){},
 		param: param,
 	}
 }

@@ -11,7 +11,7 @@ import (
 )
 
 type ForSeed interface {
-	ToLanguage(string, concept.Pool, *For) string
+	ToLanguage(string, concept.Pool, *For) (string, concept.Exception)
 	GetDefaultCondition() concept.Pipe
 	GetDefaultTag() concept.String
 	NewException(string, string) concept.Exception
@@ -28,7 +28,7 @@ type For struct {
 	seed      ForSeed
 }
 
-func (f *For) ToLanguage(language string, space concept.Pool) string {
+func (f *For) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -152,7 +152,7 @@ type ForCreatorParam struct {
 }
 
 type ForCreator struct {
-	Seeds            map[string]func(string, concept.Pool, *For) string
+	Seeds            map[string]func(concept.Pool, *For) (string, concept.Exception)
 	param            *ForCreatorParam
 	defaultCondition concept.Pipe
 	defaultTag       concept.String
@@ -170,12 +170,12 @@ func (s *ForCreator) New() *For {
 	return back
 }
 
-func (s *ForCreator) ToLanguage(language string, space concept.Pool, instance *For) string {
+func (s *ForCreator) ToLanguage(language string, space concept.Pool, instance *For) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *ForCreator) GetDefaultCondition() concept.Pipe {
@@ -196,7 +196,7 @@ func (s *ForCreator) NewException(name string, message string) concept.Exception
 
 func NewForCreator(param *ForCreatorParam) *ForCreator {
 	return &ForCreator{
-		Seeds:            map[string]func(string, concept.Pool, *For) string{},
+		Seeds:            map[string]func(concept.Pool, *For) (string, concept.Exception){},
 		param:            param,
 		defaultCondition: param.ConstIndexCreator(param.BoolCreator(true)),
 		defaultTag:       param.StringCreator(""),

@@ -10,7 +10,7 @@ const (
 )
 
 type ObjectSeed interface {
-	ToLanguage(string, concept.Pool, *Object) string
+	ToLanguage(string, concept.Pool, *Object) (string, concept.Exception)
 	Type() string
 }
 
@@ -23,7 +23,7 @@ func (o *Object) Call(specimen concept.String, param concept.Param) (concept.Par
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *Object) ToLanguage(language string, space concept.Pool) string {
+func (f *Object) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -37,7 +37,7 @@ type ObjectCreatorParam struct {
 }
 
 type ObjectCreator struct {
-	Seeds map[string]func(string, concept.Pool, *Object) string
+	Seeds map[string]func(concept.Pool, *Object) (string, concept.Exception)
 	param *ObjectCreatorParam
 }
 
@@ -51,12 +51,12 @@ func (s *ObjectCreator) New() *Object {
 	}
 }
 
-func (s *ObjectCreator) ToLanguage(language string, space concept.Pool, instance *Object) string {
+func (s *ObjectCreator) ToLanguage(language string, space concept.Pool, instance *Object) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *ObjectCreator) Type() string {
@@ -65,7 +65,7 @@ func (s *ObjectCreator) Type() string {
 
 func NewObjectCreator(param *ObjectCreatorParam) *ObjectCreator {
 	return &ObjectCreator{
-		Seeds: map[string]func(string, concept.Pool, *Object) string{},
+		Seeds: map[string]func(concept.Pool, *Object) (string, concept.Exception){},
 		param: param,
 	}
 }

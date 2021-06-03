@@ -2,5 +2,5 @@ package concept
 
 type ToString interface {
 	ToString(prefix string) string
-	ToLanguage(language string, space Pool) string
+	ToLanguage(language string, space Pool) (string, Exception)
 }

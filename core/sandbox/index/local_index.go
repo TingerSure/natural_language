@@ -7,7 +7,7 @@ import (
 )
 
 type LocalIndexSeed interface {
-	ToLanguage(string, concept.Pool, *LocalIndex) string
+	ToLanguage(string, concept.Pool, *LocalIndex) (string, concept.Exception)
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -27,7 +27,7 @@ func (f *LocalIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *LocalIndex) ToLanguage(language string, space concept.Pool) string {
+func (f *LocalIndex) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -78,7 +78,7 @@ type LocalIndexCreatorParam struct {
 }
 
 type LocalIndexCreator struct {
-	Seeds map[string]func(string, concept.Pool, *LocalIndex) string
+	Seeds map[string]func(concept.Pool, *LocalIndex) (string, concept.Exception)
 	param *LocalIndexCreatorParam
 }
 
@@ -101,12 +101,12 @@ func (s *LocalIndexCreator) NewNull() concept.Null {
 	return s.param.NullCreator()
 }
 
-func (s *LocalIndexCreator) ToLanguage(language string, space concept.Pool, instance *LocalIndex) string {
+func (s *LocalIndexCreator) ToLanguage(language string, space concept.Pool, instance *LocalIndex) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *LocalIndexCreator) Type() string {
@@ -115,7 +115,7 @@ func (s *LocalIndexCreator) Type() string {
 
 func NewLocalIndexCreator(param *LocalIndexCreatorParam) *LocalIndexCreator {
 	return &LocalIndexCreator{
-		Seeds: map[string]func(string, concept.Pool, *LocalIndex) string{},
+		Seeds: map[string]func(concept.Pool, *LocalIndex) (string, concept.Exception){},
 		param: param,
 	}
 }

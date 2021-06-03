@@ -24,27 +24,26 @@ func variableStringBind(libs *tree.LibraryManager, variables concept.Object) {
 				languagePre := input.Get(languageParam)
 				language, yes := variable.VariableFamilyInstance.IsStringHome(languagePre)
 				if !yes {
-					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param language is not a string: %v", languagePre))
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param language is not a string: %v", languagePre.ToString("")))
 				}
 				seedPre := input.Get(seedParam)
 				seed, yes := variable.VariableFamilyInstance.IsFunctionHome(seedPre)
 				if !yes {
-					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param seed is not a function: %v", seedPre))
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param seed is not a function: %v", seedPre.ToString("")))
 				}
-				libs.Sandbox.Variable.String.Seeds[language.Value()] = func(_ string, pool concept.Pool, instance *variable.String) string {
+				libs.Sandbox.Variable.String.Seeds[language.Value()] = func(pool concept.Pool, instance *variable.String) (string, concept.Exception) {
 					seedInput := libs.Sandbox.Variable.Param.New()
-					seedInput.Set(libs.Sandbox.Variable.String.New("pool"), pool)
 					seedInput.Set(libs.Sandbox.Variable.String.New("instance"), instance)
 					seedOutput, suspend := seed.Exec(seedInput, nil)
 					if !nl_interface.IsNil(suspend) {
-						return instance.ToString("")
+						return "", suspend
 					}
 					valuePre := seedOutput.Get(libs.Sandbox.Variable.String.New("value"))
 					value, yes := variable.VariableFamilyInstance.IsStringHome(valuePre)
 					if !yes {
-						return instance.ToString("")
+						return "", libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param value is not a string: %v", valuePre.ToString("")))
 					}
-					return value.Value()
+					return value.Value(), nil
 				}
 				return libs.Sandbox.Variable.Param.New(), nil
 			},

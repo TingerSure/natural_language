@@ -13,7 +13,7 @@ const (
 )
 
 type SystemFunctionSeed interface {
-	ToLanguage(string, concept.Pool, *SystemFunction) string
+	ToLanguage(string, concept.Pool, *SystemFunction) (string, concept.Exception)
 	Type() string
 	NewParam() concept.Param
 }
@@ -29,11 +29,11 @@ func (o *SystemFunction) Call(specimen concept.String, param concept.Param) (con
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *SystemFunction) ToLanguage(language string, space concept.Pool) string {
+func (f *SystemFunction) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
-func (f *SystemFunction) ToCallLanguage(language string, space concept.Pool, self string, param concept.Param) string {
+func (f *SystemFunction) ToCallLanguage(language string, space concept.Pool, self string, param concept.Param) (string, concept.Exception) {
 	return f.ToCallLanguageAdaptor(f, language, space, self, param)
 }
 
@@ -92,7 +92,7 @@ type SystemFunctionCreatorParam struct {
 }
 
 type SystemFunctionCreator struct {
-	Seeds map[string]func(string, concept.Pool, *SystemFunction) string
+	Seeds map[string]func(concept.Pool, *SystemFunction) (string, concept.Exception)
 	Inits []func(*SystemFunction)
 	param *SystemFunctionCreatorParam
 }
@@ -132,12 +132,12 @@ func (s *SystemFunctionCreator) NewParam() concept.Param {
 	return s.param.ParamCreator()
 }
 
-func (s *SystemFunctionCreator) ToLanguage(language string, space concept.Pool, instance *SystemFunction) string {
+func (s *SystemFunctionCreator) ToLanguage(language string, space concept.Pool, instance *SystemFunction) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *SystemFunctionCreator) Type() string {
@@ -146,7 +146,7 @@ func (s *SystemFunctionCreator) Type() string {
 
 func NewSystemFunctionCreator(param *SystemFunctionCreatorParam) *SystemFunctionCreator {
 	return &SystemFunctionCreator{
-		Seeds: map[string]func(string, concept.Pool, *SystemFunction) string{},
+		Seeds: map[string]func(concept.Pool, *SystemFunction) (string, concept.Exception){},
 		param: param,
 	}
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type ProvideIndexSeed interface {
-	ToLanguage(string, concept.Pool, *ProvideIndex) string
+	ToLanguage(string, concept.Pool, *ProvideIndex) (string, concept.Exception)
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -35,7 +35,7 @@ func (f *ProvideIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *ProvideIndex) ToLanguage(language string, space concept.Pool) string {
+func (f *ProvideIndex) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -71,7 +71,7 @@ type ProvideIndexCreatorParam struct {
 }
 
 type ProvideIndexCreator struct {
-	Seeds map[string]func(string, concept.Pool, *ProvideIndex) string
+	Seeds map[string]func(concept.Pool, *ProvideIndex) (string, concept.Exception)
 	param *ProvideIndexCreatorParam
 }
 
@@ -83,12 +83,12 @@ func (s *ProvideIndexCreator) New(name string, originator concept.Pipe) *Provide
 	}
 }
 
-func (s *ProvideIndexCreator) ToLanguage(language string, space concept.Pool, instance *ProvideIndex) string {
+func (s *ProvideIndexCreator) ToLanguage(language string, space concept.Pool, instance *ProvideIndex) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *ProvideIndexCreator) Type() string {
@@ -109,7 +109,7 @@ func (s *ProvideIndexCreator) NewNull() concept.Null {
 
 func NewProvideIndexCreator(param *ProvideIndexCreatorParam) *ProvideIndexCreator {
 	return &ProvideIndexCreator{
-		Seeds: map[string]func(string, concept.Pool, *ProvideIndex) string{},
+		Seeds: map[string]func(concept.Pool, *ProvideIndex) (string, concept.Exception){},
 		param: param,
 	}
 }

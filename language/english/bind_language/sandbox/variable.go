@@ -17,7 +17,7 @@ func VariableBindLanguage(libs *tree.LibraryManager, language string) {
 		return fmt.Sprintf("%v", instance.Value())
 	}
 
-	libs.Sandbox.Variable.Function.Seeds[language] = func(language string, instance *variable.Function) string {
+	libs.Sandbox.Variable.Function.Seeds[language] = func(language string, instance *variable.Function) (string, concept.Exception) {
 		return instance.Name().ToLanguage(language)
 	}
 

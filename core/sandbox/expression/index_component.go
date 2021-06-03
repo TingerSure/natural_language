@@ -10,7 +10,7 @@ import (
 
 type IndexComponentSeed interface {
 	NewException(string, string) concept.Exception
-	ToLanguage(string, concept.Pool, *IndexComponent) string
+	ToLanguage(string, concept.Pool, *IndexComponent) (string, concept.Exception)
 }
 
 type IndexComponent struct {
@@ -20,7 +20,7 @@ type IndexComponent struct {
 	seed   IndexComponentSeed
 }
 
-func (f *IndexComponent) ToLanguage(language string, space concept.Pool) string {
+func (f *IndexComponent) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -179,7 +179,7 @@ type IndexComponentCreatorParam struct {
 }
 
 type IndexComponentCreator struct {
-	Seeds map[string]func(string, concept.Pool, *IndexComponent) string
+	Seeds map[string]func(concept.Pool, *IndexComponent) (string, concept.Exception)
 	param *IndexComponentCreatorParam
 }
 
@@ -197,17 +197,17 @@ func (s *IndexComponentCreator) NewException(name string, message string) concep
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *IndexComponentCreator) ToLanguage(language string, space concept.Pool, instance *IndexComponent) string {
+func (s *IndexComponentCreator) ToLanguage(language string, space concept.Pool, instance *IndexComponent) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func NewIndexComponentCreator(param *IndexComponentCreatorParam) *IndexComponentCreator {
 	return &IndexComponentCreator{
-		Seeds: map[string]func(string, concept.Pool, *IndexComponent) string{},
+		Seeds: map[string]func(concept.Pool, *IndexComponent) (string, concept.Exception){},
 		param: param,
 	}
 }

@@ -10,7 +10,7 @@ import (
 )
 
 type NewArraySeed interface {
-	ToLanguage(string, concept.Pool, *NewArray) string
+	ToLanguage(string, concept.Pool, *NewArray) (string, concept.Exception)
 	NewArray() *variable.Array
 }
 
@@ -24,7 +24,7 @@ func (f *NewArray) SetItems(items []concept.Pipe) {
 	f.items = items
 }
 
-func (f *NewArray) ToLanguage(language string, space concept.Pool) string {
+func (f *NewArray) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -63,7 +63,7 @@ type NewArrayCreatorParam struct {
 }
 
 type NewArrayCreator struct {
-	Seeds map[string]func(string, concept.Pool, *NewArray) string
+	Seeds map[string]func(concept.Pool, *NewArray) (string, concept.Exception)
 	param *NewArrayCreatorParam
 }
 
@@ -80,17 +80,17 @@ func (s *NewArrayCreator) NewArray() *variable.Array {
 	return s.param.ArrayCreator()
 }
 
-func (s *NewArrayCreator) ToLanguage(language string, space concept.Pool, instance *NewArray) string {
+func (s *NewArrayCreator) ToLanguage(language string, space concept.Pool, instance *NewArray) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func NewNewArrayCreator(param *NewArrayCreatorParam) *NewArrayCreator {
 	return &NewArrayCreator{
-		Seeds: map[string]func(string, concept.Pool, *NewArray) string{},
+		Seeds: map[string]func(concept.Pool, *NewArray) (string, concept.Exception){},
 		param: param,
 	}
 }

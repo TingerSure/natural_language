@@ -5,6 +5,7 @@ import (
 	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	// "github.com/TingerSure/natural_language/language/chinese"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/library/system"
 	lib_runtime "github.com/TingerSure/natural_language/library/system/runtime"
 	"github.com/TingerSure/natural_language/library/system/std"
@@ -17,7 +18,7 @@ const (
 )
 
 func getVM() (*runtime.Runtime, error) {
-	VM := runtime.NewRuntime(&runtime.RuntimeParam{
+	VMParam := &runtime.RuntimeParam{
 		OnError: func(err error) {
 			os.Stdout.WriteString(fmt.Sprintf("\033[1;35m[NL]:\033[00m %v\n", err.Error()))
 		},
@@ -30,15 +31,26 @@ func getVM() (*runtime.Runtime, error) {
 			"../../library/second/",
 		},
 		SourceExtension: ".nl",
-	})
+	}
+	VM := runtime.NewRuntime(VMParam)
 
 	system.BindSystem(VM.GetLibraryManager(), &system.SystemLibraryParam{
 		StdParam: &std.StdParam{
 			Error: func(value concept.Variable) {
-				os.Stdout.WriteString(fmt.Sprintf("\033[1;35m[NL]:\033[00m %v\n", value.ToLanguage(ChineseName, nil)))
+				message, suspend := value.ToLanguage(ChineseName, nil)
+				if !nl_interface.IsNil(suspend) {
+					VMParam.OnError(suspend)
+					return
+				}
+				os.Stdout.WriteString(fmt.Sprintf("\033[1;35m[NL]:\033[00m %v\n", message))
 			},
 			Print: func(value concept.Variable) {
-				os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[NL]:\033[00m %v\n", value.ToLanguage(ChineseName, nil)))
+				message, suspend := value.ToLanguage(ChineseName, nil)
+				if !nl_interface.IsNil(suspend) {
+					VMParam.OnError(suspend)
+					return
+				}
+				os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[NL]:\033[00m %v\n", message))
 			},
 		},
 		RuntimeParam: &lib_runtime.RuntimeParam{

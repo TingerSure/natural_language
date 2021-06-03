@@ -8,7 +8,7 @@ import (
 )
 
 type ComponentSeed interface {
-	ToLanguage(string, concept.Pool, *Component) string
+	ToLanguage(string, concept.Pool, *Component) (string, concept.Exception)
 }
 
 type Component struct {
@@ -18,7 +18,7 @@ type Component struct {
 	seed   ComponentSeed
 }
 
-func (f *Component) ToLanguage(language string, space concept.Pool) string {
+func (f *Component) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -60,7 +60,7 @@ type ComponentCreatorParam struct {
 }
 
 type ComponentCreator struct {
-	Seeds map[string]func(string, concept.Pool, *Component) string
+	Seeds map[string]func(concept.Pool, *Component) (string, concept.Exception)
 	param *ComponentCreatorParam
 }
 
@@ -74,17 +74,17 @@ func (s *ComponentCreator) New(object concept.Pipe, field concept.String) *Compo
 	return back
 }
 
-func (s *ComponentCreator) ToLanguage(language string, space concept.Pool, instance *Component) string {
+func (s *ComponentCreator) ToLanguage(language string, space concept.Pool, instance *Component) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func NewComponentCreator(param *ComponentCreatorParam) *ComponentCreator {
 	return &ComponentCreator{
-		Seeds: map[string]func(string, concept.Pool, *Component) string{},
+		Seeds: map[string]func(concept.Pool, *Component) (string, concept.Exception){},
 		param: param,
 	}
 }

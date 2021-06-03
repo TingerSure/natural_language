@@ -6,23 +6,23 @@ import (
 )
 
 func IndexBindLanguage(libs *tree.LibraryManager, language string) {
-	libs.Sandbox.Index.ConstIndex.Seeds[language] = func(language string, instance *index.ConstIndex) string {
+	libs.Sandbox.Index.ConstIndex.Seeds[language] = func(language string, instance *index.ConstIndex) (string, concept.Exception) {
 		return instance.Value().ToLanguage(language)
 	}
 
-	libs.Sandbox.Index.LocalIndex.Seeds[language] = func(language string, instance *index.LocalIndex) string {
+	libs.Sandbox.Index.LocalIndex.Seeds[language] = func(language string, instance *index.LocalIndex) (string, concept.Exception) {
 		return instance.Key().ToLanguage(language)
 	}
 
-	libs.Sandbox.Index.BubbleIndex.Seeds[language] = func(language string, instance *index.BubbleIndex) string {
+	libs.Sandbox.Index.BubbleIndex.Seeds[language] = func(language string, instance *index.BubbleIndex) (string, concept.Exception) {
 		return instance.Key().ToLanguage(language)
 	}
 
-	libs.Sandbox.Index.SelfIndex.Seeds[language] = func(language string, instance *index.SelfIndex) string {
+	libs.Sandbox.Index.SelfIndex.Seeds[language] = func(language string, instance *index.SelfIndex) (string, concept.Exception) {
 		return "self"
 	}
 
-	libs.Sandbox.Index.ThisIndex.Seeds[language] = func(language string, instance *index.ThisIndex) string {
+	libs.Sandbox.Index.ThisIndex.Seeds[language] = func(language string, instance *index.ThisIndex) (string, concept.Exception) {
 		return "this"
 	}
 

@@ -11,7 +11,7 @@ const (
 )
 
 type SelfIndexSeed interface {
-	ToLanguage(string, concept.Pool, *SelfIndex) string
+	ToLanguage(string, concept.Pool, *SelfIndex) (string, concept.Exception)
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -31,7 +31,7 @@ func (f *SelfIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *SelfIndex) ToLanguage(language string, space concept.Pool) string {
+func (f *SelfIndex) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -79,7 +79,7 @@ type SelfIndexCreatorParam struct {
 }
 
 type SelfIndexCreator struct {
-	Seeds map[string]func(string, concept.Pool, *SelfIndex) string
+	Seeds map[string]func(concept.Pool, *SelfIndex) (string, concept.Exception)
 	param *SelfIndexCreatorParam
 }
 
@@ -89,12 +89,12 @@ func (s *SelfIndexCreator) New() *SelfIndex {
 	}
 }
 
-func (s *SelfIndexCreator) ToLanguage(language string, space concept.Pool, instance *SelfIndex) string {
+func (s *SelfIndexCreator) ToLanguage(language string, space concept.Pool, instance *SelfIndex) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *SelfIndexCreator) Type() string {
@@ -119,7 +119,7 @@ func (s *SelfIndexCreator) NewString(value string) concept.String {
 
 func NewSelfIndexCreator(param *SelfIndexCreatorParam) *SelfIndexCreator {
 	return &SelfIndexCreator{
-		Seeds: map[string]func(string, concept.Pool, *SelfIndex) string{},
+		Seeds: map[string]func(concept.Pool, *SelfIndex) (string, concept.Exception){},
 		param: param,
 	}
 }

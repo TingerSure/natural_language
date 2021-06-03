@@ -15,7 +15,7 @@ const (
 type PageSeed interface {
 	NewNull() concept.Null
 	NewException(string, string) concept.Exception
-	ToLanguage(string, concept.Pool, *Page) string
+	ToLanguage(string, concept.Pool, *Page) (string, concept.Exception)
 	Type() string
 }
 
@@ -104,7 +104,7 @@ func (o *Page) ToString(prefix string) string {
 	return strings.Join(lines, "\n")
 }
 
-func (f *Page) ToLanguage(language string, space concept.Pool) string {
+func (f *Page) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -127,7 +127,7 @@ type PageCreatorParam struct {
 }
 
 type PageCreator struct {
-	Seeds map[string]func(string, concept.Pool, *Page) string
+	Seeds map[string]func(concept.Pool, *Page) (string, concept.Exception)
 	param *PageCreatorParam
 }
 
@@ -151,12 +151,12 @@ func (s *PageCreator) NewException(name string, message string) concept.Exceptio
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *PageCreator) ToLanguage(language string, space concept.Pool, instance *Page) string {
+func (s *PageCreator) ToLanguage(language string, space concept.Pool, instance *Page) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *PageCreator) Type() string {
@@ -165,7 +165,7 @@ func (s *PageCreator) Type() string {
 
 func NewPageCreator(param *PageCreatorParam) *PageCreator {
 	return &PageCreator{
-		Seeds: map[string]func(string, concept.Pool, *Page) string{},
+		Seeds: map[string]func(concept.Pool, *Page) (string, concept.Exception){},
 		param: param,
 	}
 }

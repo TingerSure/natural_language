@@ -12,7 +12,7 @@ const (
 )
 
 type StringSeed interface {
-	ToLanguage(string, concept.Pool, *String) string
+	ToLanguage(string, concept.Pool, *String) (string, concept.Exception)
 	Type() string
 	New(string) *String
 }
@@ -28,7 +28,7 @@ func (o *String) Call(specimen concept.String, param concept.Param) (concept.Par
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *String) ToLanguage(language string, space concept.Pool) string {
+func (f *String) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -111,7 +111,7 @@ type StringCreatorParam struct {
 }
 
 type StringCreator struct {
-	Seeds map[string]func(string, concept.Pool, *String) string
+	Seeds map[string]func(concept.Pool, *String) (string, concept.Exception)
 	Inits []func(*String)
 	param *StringCreatorParam
 }
@@ -132,12 +132,12 @@ func (s *StringCreator) New(value string) *String {
 	return back
 }
 
-func (s *StringCreator) ToLanguage(language string, space concept.Pool, instance *String) string {
+func (s *StringCreator) ToLanguage(language string, space concept.Pool, instance *String) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *StringCreator) Type() string {
@@ -146,7 +146,7 @@ func (s *StringCreator) Type() string {
 
 func NewStringCreator(param *StringCreatorParam) *StringCreator {
 	return &StringCreator{
-		Seeds: map[string]func(string, concept.Pool, *String) string{},
+		Seeds: map[string]func(concept.Pool, *String) (string, concept.Exception){},
 		param: param,
 	}
 }

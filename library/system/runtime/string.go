@@ -31,7 +31,7 @@ func StringAppend(libs *tree.LibraryManager, instance *variable.String) func() c
 				subStringPre := input.Get(subStringParam)
 				subString, yes := variable.VariableFamilyInstance.IsStringHome(subStringPre)
 				if !yes {
-					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param subString is not a string: %v", subStringPre))
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param subString is not a string: %v", subStringPre.ToString("")))
 				}
 				output := libs.Sandbox.Variable.Param.New()
 				output.Set(valueBack, libs.Sandbox.Variable.String.New(instance.Value()+subString.Value()))
@@ -57,12 +57,12 @@ func StringSetLanguage(libs *tree.LibraryManager, instance *variable.String) fun
 				languagePre := param.Get(languageParam)
 				language, yes := variable.VariableFamilyInstance.IsStringHome(languagePre)
 				if !yes {
-					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param language is not a string: %v", languagePre))
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param language is not a string: %v", languagePre.ToString("")))
 				}
 				valuePre := param.Get(valueParam)
 				value, yes := variable.VariableFamilyInstance.IsStringHome(valuePre)
 				if !yes {
-					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param value is not a string: %v", languagePre))
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param value is not a string: %v", languagePre.ToString("")))
 				}
 				instance.SetLanguage(language.Value(), value.Value())
 				return libs.Sandbox.Variable.Param.New(), nil
@@ -88,7 +88,7 @@ func StringGetLanguage(libs *tree.LibraryManager, instance *variable.String) fun
 				languagePre := input.Get(languageParam)
 				language, yes := variable.VariableFamilyInstance.IsStringHome(languagePre)
 				if !yes {
-					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param language is not a string: %v", languagePre))
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param language is not a string: %v", languagePre.ToString("")))
 				}
 				value := instance.GetLanguage(language.Value())
 				output := libs.Sandbox.Variable.Param.New()

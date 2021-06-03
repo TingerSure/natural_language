@@ -6,7 +6,7 @@ import (
 )
 
 type ConstIndexSeed interface {
-	ToLanguage(string, concept.Pool, *ConstIndex) string
+	ToLanguage(string, concept.Pool, *ConstIndex) (string, concept.Exception)
 	Type() string
 	NewException(string, string) concept.Exception
 	NewParam() concept.Param
@@ -26,7 +26,7 @@ func (f *ConstIndex) Type() string {
 	return f.seed.Type()
 }
 
-func (f *ConstIndex) ToLanguage(language string, space concept.Pool) string {
+func (f *ConstIndex) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -71,7 +71,7 @@ type ConstIndexCreatorParam struct {
 }
 
 type ConstIndexCreator struct {
-	Seeds map[string]func(string, concept.Pool, *ConstIndex) string
+	Seeds map[string]func(concept.Pool, *ConstIndex) (string, concept.Exception)
 	param *ConstIndexCreatorParam
 }
 
@@ -81,12 +81,12 @@ func (s *ConstIndexCreator) New(value concept.Variable) *ConstIndex {
 		seed:  s,
 	}
 }
-func (s *ConstIndexCreator) ToLanguage(language string, space concept.Pool, instance *ConstIndex) string {
+func (s *ConstIndexCreator) ToLanguage(language string, space concept.Pool, instance *ConstIndex) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *ConstIndexCreator) Type() string {
@@ -107,7 +107,7 @@ func (s *ConstIndexCreator) NewNull() concept.Null {
 
 func NewConstIndexCreator(param *ConstIndexCreatorParam) *ConstIndexCreator {
 	return &ConstIndexCreator{
-		Seeds: map[string]func(string, concept.Pool, *ConstIndex) string{},
+		Seeds: map[string]func(concept.Pool, *ConstIndex) (string, concept.Exception){},
 		param: param,
 	}
 }

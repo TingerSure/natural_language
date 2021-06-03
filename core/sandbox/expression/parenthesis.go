@@ -7,7 +7,7 @@ import (
 )
 
 type ParenthesisSeed interface {
-	ToLanguage(string, concept.Pool, *Parenthesis) string
+	ToLanguage(string, concept.Pool, *Parenthesis) (string, concept.Exception)
 }
 
 type Parenthesis struct {
@@ -16,7 +16,7 @@ type Parenthesis struct {
 	seed   ParenthesisSeed
 }
 
-func (f *Parenthesis) ToLanguage(language string, space concept.Pool) string {
+func (f *Parenthesis) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -45,7 +45,7 @@ type ParenthesisCreatorParam struct {
 }
 
 type ParenthesisCreator struct {
-	Seeds map[string]func(string, concept.Pool, *Parenthesis) string
+	Seeds map[string]func(concept.Pool, *Parenthesis) (string, concept.Exception)
 	param *ParenthesisCreatorParam
 }
 
@@ -58,17 +58,17 @@ func (s *ParenthesisCreator) New(target concept.Pipe) *Parenthesis {
 	return back
 }
 
-func (s *ParenthesisCreator) ToLanguage(language string, space concept.Pool, instance *Parenthesis) string {
+func (s *ParenthesisCreator) ToLanguage(language string, space concept.Pool, instance *Parenthesis) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func NewParenthesisCreator(param *ParenthesisCreatorParam) *ParenthesisCreator {
 	return &ParenthesisCreator{
-		Seeds: map[string]func(string, concept.Pool, *Parenthesis) string{},
+		Seeds: map[string]func(concept.Pool, *Parenthesis) (string, concept.Exception){},
 		param: param,
 	}
 }

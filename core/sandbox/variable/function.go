@@ -16,7 +16,7 @@ const (
 )
 
 type FunctionSeed interface {
-	ToLanguage(string, concept.Pool, *Function) string
+	ToLanguage(string, concept.Pool, *Function) (string, concept.Exception)
 	Type() string
 	NewString(string) concept.String
 	NewException(string, string) concept.Exception
@@ -36,11 +36,11 @@ func (o *Function) Call(specimen concept.String, param concept.Param) (concept.P
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *Function) ToLanguage(language string, space concept.Pool) string {
+func (f *Function) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.body.ToLanguage(language, f.parent)
 }
 
-func (f *Function) ToCallLanguage(language string, space concept.Pool, self string, param concept.Param) string {
+func (f *Function) ToCallLanguage(language string, space concept.Pool, self string, param concept.Param) (string, concept.Exception) {
 	return f.ToCallLanguageAdaptor(f, language, space, self, param)
 }
 
@@ -175,7 +175,7 @@ type FunctionCreatorParam struct {
 }
 
 type FunctionCreator struct {
-	Seeds map[string]func(string, concept.Pool, *Function) string
+	Seeds map[string]func(concept.Pool, *Function) (string, concept.Exception)
 	Inits []func(*Function)
 	param *FunctionCreatorParam
 }
@@ -205,12 +205,12 @@ func (s *FunctionCreator) New(parent concept.Pool) *Function {
 	return funcs
 }
 
-func (s *FunctionCreator) ToLanguage(language string, space concept.Pool, instance *Function) string {
+func (s *FunctionCreator) ToLanguage(language string, space concept.Pool, instance *Function) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *FunctionCreator) Type() string {
@@ -235,7 +235,7 @@ func (s *FunctionCreator) NewException(name string, message string) concept.Exce
 
 func NewFunctionCreator(param *FunctionCreatorParam) *FunctionCreator {
 	return &FunctionCreator{
-		Seeds: map[string]func(string, concept.Pool, *Function) string{},
+		Seeds: map[string]func(concept.Pool, *Function) (string, concept.Exception){},
 		param: param,
 	}
 }

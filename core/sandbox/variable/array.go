@@ -12,7 +12,7 @@ const (
 )
 
 type ArraySeed interface {
-	ToLanguage(string, concept.Pool, *Array) string
+	ToLanguage(string, concept.Pool, *Array) (string, concept.Exception)
 	Type() string
 	NewException(string, string) concept.Exception
 }
@@ -27,7 +27,7 @@ func (o *Array) Call(specimen concept.String, param concept.Param) (concept.Para
 	return o.CallAdaptor(specimen, param, o)
 }
 
-func (f *Array) ToLanguage(language string, space concept.Pool) string {
+func (f *Array) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -95,7 +95,7 @@ type ArrayCreatorParam struct {
 }
 
 type ArrayCreator struct {
-	Seeds map[string]func(string, concept.Pool, *Array) string
+	Seeds map[string]func(concept.Pool, *Array) (string, concept.Exception)
 	Inits []func(*Array)
 	param *ArrayCreatorParam
 }
@@ -115,12 +115,12 @@ func (s *ArrayCreator) New() *Array {
 	return array
 }
 
-func (s *ArrayCreator) ToLanguage(language string, space concept.Pool, instance *Array) string {
+func (s *ArrayCreator) ToLanguage(language string, space concept.Pool, instance *Array) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *ArrayCreator) Type() string {
@@ -133,7 +133,7 @@ func (s *ArrayCreator) NewException(name string, message string) concept.Excepti
 
 func NewArrayCreator(param *ArrayCreatorParam) *ArrayCreator {
 	return &ArrayCreator{
-		Seeds: map[string]func(string, concept.Pool, *Array) string{},
+		Seeds: map[string]func(concept.Pool, *Array) (string, concept.Exception){},
 		param: param,
 	}
 }

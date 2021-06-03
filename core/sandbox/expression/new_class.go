@@ -11,7 +11,7 @@ import (
 )
 
 type NewClassSeed interface {
-	ToLanguage(string, concept.Pool, *NewClass) string
+	ToLanguage(string, concept.Pool, *NewClass) (string, concept.Exception)
 	NewClass() concept.Class
 	NewException(string, string) concept.Exception
 	NewString(string) concept.String
@@ -27,7 +27,7 @@ func (f *NewClass) SetLines(lines []concept.Pipe) {
 	f.lines = lines
 }
 
-func (f *NewClass) ToLanguage(language string, space concept.Pool) string {
+func (f *NewClass) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -107,7 +107,7 @@ type NewClassCreatorParam struct {
 }
 
 type NewClassCreator struct {
-	Seeds map[string]func(string, concept.Pool, *NewClass) string
+	Seeds map[string]func(concept.Pool, *NewClass) (string, concept.Exception)
 	param *NewClassCreatorParam
 }
 
@@ -131,17 +131,17 @@ func (s *NewClassCreator) NewString(value string) concept.String {
 	return s.param.StringCreator(value)
 }
 
-func (s *NewClassCreator) ToLanguage(language string, space concept.Pool, instance *NewClass) string {
+func (s *NewClassCreator) ToLanguage(language string, space concept.Pool, instance *NewClass) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func NewNewClassCreator(param *NewClassCreatorParam) *NewClassCreator {
 	return &NewClassCreator{
-		Seeds: map[string]func(string, concept.Pool, *NewClass) string{},
+		Seeds: map[string]func(concept.Pool, *NewClass) (string, concept.Exception){},
 		param: param,
 	}
 }

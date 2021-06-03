@@ -26,27 +26,30 @@ func indexConstBind(libs *tree.LibraryManager, indexes concept.Object) {
 				languagePre := input.Get(languageParam)
 				language, yes := variable.VariableFamilyInstance.IsStringHome(languagePre)
 				if !yes {
-					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param language is not a string: %v", languagePre))
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param language is not a string: %v", languagePre.ToString("")))
 				}
 				seedPre := input.Get(seedParam)
 				seed, yes := variable.VariableFamilyInstance.IsFunctionHome(seedPre)
 				if !yes {
-					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param seed is not a function: %v", seedPre))
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param seed is not a function: %v", seedPre.ToString("")))
 				}
-				libs.Sandbox.Index.ConstIndex.Seeds[language.Value()] = func(_ string, pool concept.Pool, instance *index.ConstIndex) string {
+				libs.Sandbox.Index.ConstIndex.Seeds[language.Value()] = func(pool concept.Pool, instance *index.ConstIndex) (string, concept.Exception) {
 					seedInput := libs.Sandbox.Variable.Param.New()
-					seedInput.Set(libs.Sandbox.Variable.String.New("pool"), pool)
-					seedInput.Set(libs.Sandbox.Variable.String.New("value"), libs.Sandbox.Variable.String.New(instance.Value().ToLanguage(language.Value(), pool)))
+					inputValue, suspend := instance.Value().ToLanguage(language.Value(), pool)
+					if !nl_interface.IsNil(suspend) {
+						return "", suspend
+					}
+					seedInput.Set(libs.Sandbox.Variable.String.New("value"), libs.Sandbox.Variable.String.New(inputValue))
 					seedOutput, suspend := seed.Exec(seedInput, nil)
 					if !nl_interface.IsNil(suspend) {
-						return instance.ToString("")
+						return "", suspend
 					}
 					valuePre := seedOutput.Get(libs.Sandbox.Variable.String.New("value"))
 					value, yes := variable.VariableFamilyInstance.IsStringHome(valuePre)
 					if !yes {
-						return instance.ToString("")
+						return "", libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param value is not a string: %v", valuePre.ToString("")))
 					}
-					return value.Value()
+					return value.Value(), nil
 				}
 				return libs.Sandbox.Variable.Param.New(), nil
 			},
@@ -72,31 +75,34 @@ func indexBubbleBind(libs *tree.LibraryManager, indexes concept.Object) {
 				languagePre := input.Get(languageParam)
 				language, yes := variable.VariableFamilyInstance.IsStringHome(languagePre)
 				if !yes {
-					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param language is not a string: %v", languagePre))
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param language is not a string: %v", languagePre.ToString("")))
 				}
 				seedPre := input.Get(seedParam)
 				seed, yes := variable.VariableFamilyInstance.IsFunctionHome(seedPre)
 				if !yes {
-					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param seed is not a function: %v", seedPre))
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param seed is not a function: %v", seedPre.ToString("")))
 				}
-				libs.Sandbox.Index.BubbleIndex.Seeds[language.Value()] = func(_ string, pool concept.Pool, instance *index.BubbleIndex) string {
+				libs.Sandbox.Index.BubbleIndex.Seeds[language.Value()] = func(pool concept.Pool, instance *index.BubbleIndex) (string, concept.Exception) {
 					seedInput := libs.Sandbox.Variable.Param.New()
-					seedInput.Set(libs.Sandbox.Variable.String.New("pool"), pool)
 					bubble, suspend := instance.Get(pool)
 					if !nl_interface.IsNil(suspend) {
-						return instance.ToString("")
+						return "", suspend.(concept.Exception)
 					}
-					seedInput.Set(libs.Sandbox.Variable.String.New("value"), libs.Sandbox.Variable.String.New(bubble.ToLanguage(language.Value(), pool)))
-					seedOutput, suspend := seed.Exec(seedInput, nil)
-					if !nl_interface.IsNil(suspend) {
-						return instance.ToString("")
+					bubbleValue, exception := bubble.ToLanguage(language.Value(), pool)
+					if !nl_interface.IsNil(exception) {
+						return "", exception
+					}
+					seedInput.Set(libs.Sandbox.Variable.String.New("value"), libs.Sandbox.Variable.String.New(bubbleValue))
+					seedOutput, exception := seed.Exec(seedInput, nil)
+					if !nl_interface.IsNil(exception) {
+						return "", exception
 					}
 					valuePre := seedOutput.Get(libs.Sandbox.Variable.String.New("value"))
 					value, yes := variable.VariableFamilyInstance.IsStringHome(valuePre)
 					if !yes {
-						return instance.ToString("")
+						return "", libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param value is not a string: %v", valuePre.ToString("")))
 					}
-					return value.Value()
+					return value.Value(), nil
 				}
 				return libs.Sandbox.Variable.Param.New(), nil
 			},

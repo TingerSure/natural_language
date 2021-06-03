@@ -9,7 +9,7 @@ import (
 )
 
 type AppendSeed interface {
-	ToLanguage(string, concept.Pool, *Append) string
+	ToLanguage(string, concept.Pool, *Append) (string, concept.Exception)
 	NewException(string, string) concept.Exception
 }
 
@@ -20,7 +20,7 @@ type Append struct {
 	seed  AppendSeed
 }
 
-func (f *Append) ToLanguage(language string, space concept.Pool) string {
+func (f *Append) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -55,7 +55,7 @@ type AppendCreatorParam struct {
 }
 
 type AppendCreator struct {
-	Seeds map[string]func(string, concept.Pool, *Append) string
+	Seeds map[string]func(concept.Pool, *Append) (string, concept.Exception)
 	param *AppendCreatorParam
 }
 
@@ -73,17 +73,17 @@ func (s *AppendCreator) NewException(name string, message string) concept.Except
 	return s.param.ExceptionCreator(name, message)
 }
 
-func (s *AppendCreator) ToLanguage(language string, space concept.Pool, instance *Append) string {
+func (s *AppendCreator) ToLanguage(language string, space concept.Pool, instance *Append) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func NewAppendCreator(param *AppendCreatorParam) *AppendCreator {
 	return &AppendCreator{
-		Seeds: map[string]func(string, concept.Pool, *Append) string{},
+		Seeds: map[string]func(concept.Pool, *Append) (string, concept.Exception){},
 		param: param,
 	}
 }

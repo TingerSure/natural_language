@@ -9,7 +9,7 @@ import (
 )
 
 type CodeBlockSeed interface {
-	ToLanguage(string, concept.Pool, *CodeBlock) string
+	ToLanguage(string, concept.Pool, *CodeBlock) (string, concept.Exception)
 	NewPool(concept.Pool) concept.Pool
 }
 
@@ -19,7 +19,7 @@ type CodeBlock struct {
 	seed CodeBlockSeed
 }
 
-func (f *CodeBlock) ToLanguage(language string, space concept.Pool) string {
+func (f *CodeBlock) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -95,7 +95,7 @@ type CodeBlockCreatorParam struct {
 }
 
 type CodeBlockCreator struct {
-	Seeds map[string]func(string, concept.Pool, *CodeBlock) string
+	Seeds map[string]func(concept.Pool, *CodeBlock) (string, concept.Exception)
 	param *CodeBlockCreatorParam
 }
 
@@ -107,12 +107,12 @@ func (s *CodeBlockCreator) New() *CodeBlock {
 	return back
 }
 
-func (s *CodeBlockCreator) ToLanguage(language string, space concept.Pool, instance *CodeBlock) string {
+func (s *CodeBlockCreator) ToLanguage(language string, space concept.Pool, instance *CodeBlock) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *CodeBlockCreator) NewPool(parent concept.Pool) concept.Pool {
@@ -121,7 +121,7 @@ func (s *CodeBlockCreator) NewPool(parent concept.Pool) concept.Pool {
 
 func NewCodeBlockCreator(param *CodeBlockCreatorParam) *CodeBlockCreator {
 	return &CodeBlockCreator{
-		Seeds: map[string]func(string, concept.Pool, *CodeBlock) string{},
+		Seeds: map[string]func(concept.Pool, *CodeBlock) (string, concept.Exception){},
 		param: param,
 	}
 }

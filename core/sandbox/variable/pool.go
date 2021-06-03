@@ -19,7 +19,7 @@ const (
 type PoolSeed interface {
 	NewException(string, string) concept.Exception
 	NewNull() concept.Null
-	ToLanguage(string, concept.Pool, *Pool) string
+	ToLanguage(string, concept.Pool, *Pool) (string, concept.Exception)
 	Type() string
 }
 
@@ -240,7 +240,7 @@ func (a *Pool) ToString(prefix string) string {
 	return fmt.Sprintf("%v > %v", a.local.ToString(prefix), a.parent.ToString(prefix))
 }
 
-func (f *Pool) ToLanguage(language string, space concept.Pool) string {
+func (f *Pool) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }
 
@@ -254,7 +254,7 @@ type PoolCreatorParam struct {
 }
 
 type PoolCreator struct {
-	Seeds map[string]func(string, concept.Pool, *Pool) string
+	Seeds map[string]func(concept.Pool, *Pool) (string, concept.Exception)
 	Inits []func(*Pool)
 	param *PoolCreatorParam
 }
@@ -285,12 +285,12 @@ func (s *PoolCreator) New(parent concept.Pool) *Pool {
 	return pool
 }
 
-func (s *PoolCreator) ToLanguage(language string, space concept.Pool, instance *Pool) string {
+func (s *PoolCreator) ToLanguage(language string, space concept.Pool, instance *Pool) (string, concept.Exception) {
 	seed := s.Seeds[language]
 	if seed == nil {
-		return instance.ToString("")
+		return instance.ToString(""), nil
 	}
-	return seed(language, space, instance)
+	return seed(space, instance)
 }
 
 func (s *PoolCreator) Type() string {
