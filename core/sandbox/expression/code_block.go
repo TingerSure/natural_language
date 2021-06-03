@@ -51,6 +51,11 @@ func (c *CodeBlock) ToString(prefix string) string {
 	}
 	return fmt.Sprintf("{\n%v\n%v}", strings.Join(flowToStrings, "\n"), prefix)
 }
+
+func (c *CodeBlock) Steps() []concept.Pipe {
+	return c.flow
+}
+
 func (c *CodeBlock) AddStep(steps ...concept.Pipe) {
 	c.flow = append(c.flow, steps...)
 }

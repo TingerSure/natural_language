@@ -23,5 +23,21 @@ func NewBind(libs *tree.LibraryManager) *Bind {
 		),
 	)
 
+	instance.SetPublic(
+		libs.Sandbox.Variable.String.New("expression"),
+		libs.Sandbox.Index.PublicIndex.New(
+			"expression",
+			libs.Sandbox.Index.ConstIndex.New(newExpressionCreator(libs)),
+		),
+	)
+
+	instance.SetPublic(
+		libs.Sandbox.Variable.String.New("index"),
+		libs.Sandbox.Index.PublicIndex.New(
+			"index",
+			libs.Sandbox.Index.ConstIndex.New(newIndexCreator(libs)),
+		),
+	)
+
 	return instance
 }

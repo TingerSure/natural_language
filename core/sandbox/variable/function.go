@@ -37,7 +37,7 @@ func (o *Function) Call(specimen concept.String, param concept.Param) (concept.P
 }
 
 func (f *Function) ToLanguage(language string, space concept.Pool) string {
-	return f.seed.ToLanguage(language, space, f)
+	return f.body.ToLanguage(language, f.parent)
 }
 
 func (f *Function) ToCallLanguage(language string, space concept.Pool, self string, param concept.Param) string {
