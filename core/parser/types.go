@@ -76,10 +76,8 @@ func (t *Types) GetTypes(name string) *tree.PhraseType {
 	return t.values[name]
 }
 
-func (t *Types) AddTypes(values []*tree.PhraseType) {
-	for _, value := range values {
-		t.values[value.Name()] = value
-	}
+func (t *Types) AddTypes(value *tree.PhraseType) {
+	t.values[value.Name()] = value
 }
 
 func (t *Types) RemoveTypes(need func(types *tree.PhraseType) bool) {

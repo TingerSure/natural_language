@@ -6,17 +6,13 @@ import (
 )
 
 type LibraryManager struct {
-	pages   map[string]concept.Pipe
-	Sandbox *creator.SandboxCreator
-	sources []Source
-}
-
-func (p *LibraryManager) GetSources() []Source {
-	return p.sources
-}
-
-func (p *LibraryManager) AddSource(source Source) {
-	p.sources = append(p.sources, source)
+	pages       map[string]concept.Pipe
+	Sandbox     *creator.SandboxCreator
+	Vocabularys VocabularyRuleManager
+	Structs     StructRuleManager
+	Priorities  PriorityRuleManager
+	Types       TypesManager
+	Duties      DutyRuleManager
 }
 
 func (l *LibraryManager) GetPage(name string) concept.Pipe {
@@ -27,10 +23,21 @@ func (l *LibraryManager) AddPage(name string, page concept.Pipe) {
 	l.pages[name] = page
 }
 
-func NewLibraryManager() *LibraryManager {
+func NewLibraryManager(
+	Sandbox *creator.SandboxCreator,
+	Vocabularys VocabularyRuleManager,
+	Structs StructRuleManager,
+	Priorities PriorityRuleManager,
+	Types TypesManager,
+	Duties DutyRuleManager,
+) *LibraryManager {
 	return &LibraryManager{
-		pages:   map[string]concept.Pipe{},
-		Sandbox: creator.NewSandboxCreator(),
-		sources: []Source{},
+		pages:       map[string]concept.Pipe{},
+		Sandbox:     Sandbox,
+		Vocabularys: Vocabularys,
+		Structs:     Structs,
+		Priorities:  Priorities,
+		Types:       Types,
+		Duties:      Duties,
 	}
 }

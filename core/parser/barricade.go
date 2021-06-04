@@ -70,11 +70,11 @@ leftLoop:
 	return result, abandons
 }
 
-func (a *Barricade) AddRule(rules []*tree.PriorityRule) {
-	if rules == nil {
+func (a *Barricade) AddRule(rule *tree.PriorityRule) {
+	if rule == nil {
 		return
 	}
-	a.rules = append(a.rules, rules...)
+	a.rules = append(a.rules, rule)
 }
 
 func (a *Barricade) RemoveRule(need func(rule *tree.PriorityRule) bool) {

@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
-	// "github.com/TingerSure/natural_language/language/chinese"
-	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/library/system"
 	lib_runtime "github.com/TingerSure/natural_language/library/system/runtime"
 	"github.com/TingerSure/natural_language/library/system/std"
@@ -57,13 +56,10 @@ func getVM() (*runtime.Runtime, error) {
 			RootSpace: VM.GetRootSpace(),
 		},
 	})
-	// chinese.BindRule(VM.GetLibraryManager(), ChineseName)
-	// chinese.BindLanguage(VM.GetLibraryManager(), ChineseName)
 	err := VM.Read("main/main")
 	if err != nil {
 		return nil, err
 	}
-	VM.Bind()
 	VM.SetDefaultLanguage(ChineseName)
 	return VM, nil
 }

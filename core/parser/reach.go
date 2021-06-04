@@ -26,11 +26,11 @@ func (g *Reach) GetRulesByLastType(given string) []*tree.StructRule {
 	return back
 }
 
-func (g *Reach) AddRule(rules []*tree.StructRule) {
-	if rules == nil {
+func (g *Reach) AddRule(rule *tree.StructRule) {
+	if rule == nil {
 		return
 	}
-	g.structs = append(g.structs, rules...)
+	g.structs = append(g.structs, rule)
 }
 
 func (g *Reach) RemoveRule(need func(rule *tree.StructRule) bool) {

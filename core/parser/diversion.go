@@ -27,11 +27,11 @@ func (d *Diversion) Match(value tree.Phrase) (string, error) {
 	return "", fmt.Errorf("This Phrase has no DutyRule to match!\nphrase : %v\nanticipate : %v", value.ToString(), wanted.ToString(""))
 }
 
-func (a *Diversion) AddRule(rules []*tree.DutyRule) {
-	if rules == nil {
+func (a *Diversion) AddRule(rule *tree.DutyRule) {
+	if rule == nil {
 		return
 	}
-	a.rules = append(a.rules, rules...)
+	a.rules = append(a.rules, rule)
 }
 
 func (a *Diversion) RemoveRule(need func(rule *tree.DutyRule) bool) {
