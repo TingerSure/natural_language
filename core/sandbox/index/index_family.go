@@ -59,6 +59,17 @@ func (v *IndexFamily) IsConstIndex(value concept.Pipe) (*ConstIndex, bool) {
 	return nil, false
 }
 
+func (v *IndexFamily) IsBubbleIndex(value concept.Pipe) (*BubbleIndex, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == IndexBubbleType {
+		index, yes := value.(*BubbleIndex)
+		return index, yes
+	}
+	return nil, false
+}
+
 func (v *IndexFamily) IsImportIndex(value concept.Pipe) (*ImportIndex, bool) {
 	if value == nil {
 		return nil, false

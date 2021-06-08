@@ -76,19 +76,9 @@ func (s *SystemFunction) FunctionType() string {
 }
 
 type SystemFunctionCreatorParam struct {
-	NullCreator           func() concept.Null
-	ParamCreator          func() concept.Param
-	ExceptionCreator      func(string, string) concept.Exception
-	StringCreator         func(string) concept.String
-	DelayStringCreator    func(string) concept.String
-	DelayFunctionCreator  func(func() concept.Function) concept.Function
-	ArrayCreator          func() concept.Array
-	SystemFunctionCreator func(
-		funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
-		anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
-		paramNames []concept.String,
-		returnNames []concept.String,
-	) concept.Function
+	NullCreator      func() concept.Null
+	ParamCreator     func() concept.Param
+	ExceptionCreator func(string, string) concept.Exception
 }
 
 type SystemFunctionCreator struct {
@@ -105,14 +95,9 @@ func (s *SystemFunctionCreator) New(
 ) *SystemFunction {
 	system := &SystemFunction{
 		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
-			NullCreator:           s.param.NullCreator,
-			ParamCreator:          s.param.ParamCreator,
-			ExceptionCreator:      s.param.ExceptionCreator,
-			SystemFunctionCreator: s.param.SystemFunctionCreator,
-			ArrayCreator:          s.param.ArrayCreator,
-			DelayFunctionCreator:  s.param.DelayFunctionCreator,
-			DelayStringCreator:    s.param.DelayStringCreator,
-			StringCreator:         s.param.StringCreator,
+			NullCreator:      s.param.NullCreator,
+			ParamCreator:     s.param.ParamCreator,
+			ExceptionCreator: s.param.ExceptionCreator,
 		}),
 		funcs:           funcs,
 		anticipateFuncs: anticipateFuncs,

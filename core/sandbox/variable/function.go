@@ -32,6 +32,10 @@ type Function struct {
 	seed           FunctionSeed
 }
 
+func (o *Function) Parent() concept.Pool {
+	return o.parent
+}
+
 func (o *Function) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
 	return o.CallAdaptor(specimen, param, o)
 }
@@ -158,20 +162,11 @@ func (s *Function) Type() string {
 }
 
 type FunctionCreatorParam struct {
-	CodeBlockCreator      func() concept.CodeBlock
-	StringCreator         func(string) concept.String
-	ParamCreator          func() concept.Param
-	ExceptionCreator      func(string, string) concept.Exception
-	NullCreator           func() concept.Null
-	DelayStringCreator    func(string) concept.String
-	DelayFunctionCreator  func(func() concept.Function) concept.Function
-	ArrayCreator          func() concept.Array
-	SystemFunctionCreator func(
-		funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
-		anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
-		paramNames []concept.String,
-		returnNames []concept.String,
-	) concept.Function
+	CodeBlockCreator func() concept.CodeBlock
+	StringCreator    func(string) concept.String
+	ParamCreator     func() concept.Param
+	ExceptionCreator func(string, string) concept.Exception
+	NullCreator      func() concept.Null
 }
 
 type FunctionCreator struct {
@@ -183,14 +178,9 @@ type FunctionCreator struct {
 func (s *FunctionCreator) New(parent concept.Pool) *Function {
 	funcs := &Function{
 		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
-			NullCreator:           s.param.NullCreator,
-			ExceptionCreator:      s.param.ExceptionCreator,
-			ParamCreator:          s.param.ParamCreator,
-			SystemFunctionCreator: s.param.SystemFunctionCreator,
-			ArrayCreator:          s.param.ArrayCreator,
-			DelayFunctionCreator:  s.param.DelayFunctionCreator,
-			DelayStringCreator:    s.param.DelayStringCreator,
-			StringCreator:         s.param.StringCreator,
+			NullCreator:      s.param.NullCreator,
+			ExceptionCreator: s.param.ExceptionCreator,
+			ParamCreator:     s.param.ParamCreator,
 		}),
 		parent:         parent,
 		body:           s.param.CodeBlockCreator(),

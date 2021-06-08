@@ -41,7 +41,7 @@ func getVM() (*runtime.Runtime, error) {
 					VMParam.OnError(suspend)
 					return
 				}
-				os.Stdout.WriteString(fmt.Sprintf("\033[1;35m[NL]:\033[00m %v\n", message))
+				os.Stdout.WriteString(fmt.Sprintf("\033[1;31m[ERR]:\033[00m %v\n", message))
 			},
 			Print: func(value concept.Variable) {
 				message, suspend := value.ToLanguage(ChineseName, nil)
@@ -50,6 +50,9 @@ func getVM() (*runtime.Runtime, error) {
 					return
 				}
 				os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[NL]:\033[00m %v\n", message))
+			},
+			Log: func(value concept.Variable) {
+				os.Stdout.WriteString(fmt.Sprintf("\033[1;35m[LOG]:\033[00m %v\n", value.ToString("")))
 			},
 		},
 		RuntimeParam: &lib_runtime.RuntimeParam{

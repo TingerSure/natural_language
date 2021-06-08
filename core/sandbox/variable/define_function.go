@@ -15,7 +15,6 @@ type DefineFunctionSeed interface {
 	ToLanguage(string, concept.Pool, *DefineFunction) (string, concept.Exception)
 	Type() string
 	NewParam() concept.Param
-	NewNull() concept.Null
 	NewException(string, string) concept.Exception
 }
 
@@ -57,19 +56,9 @@ func (s *DefineFunction) FunctionType() string {
 }
 
 type DefineFunctionCreatorParam struct {
-	NullCreator           func() concept.Null
-	ParamCreator          func() concept.Param
-	ExceptionCreator      func(string, string) concept.Exception
-	StringCreator         func(string) concept.String
-	DelayStringCreator    func(string) concept.String
-	DelayFunctionCreator  func(func() concept.Function) concept.Function
-	ArrayCreator          func() concept.Array
-	SystemFunctionCreator func(
-		funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
-		anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
-		paramNames []concept.String,
-		returnNames []concept.String,
-	) concept.Function
+	NullCreator      func() concept.Null
+	ParamCreator     func() concept.Param
+	ExceptionCreator func(string, string) concept.Exception
 }
 
 type DefineFunctionCreator struct {
@@ -81,14 +70,9 @@ type DefineFunctionCreator struct {
 func (s *DefineFunctionCreator) New(paramNames []concept.String, returnNames []concept.String) *DefineFunction {
 	define := &DefineFunction{
 		AdaptorFunction: adaptor.NewAdaptorFunction(&adaptor.AdaptorFunctionParam{
-			NullCreator:           s.param.NullCreator,
-			ParamCreator:          s.param.ParamCreator,
-			ExceptionCreator:      s.param.ExceptionCreator,
-			SystemFunctionCreator: s.param.SystemFunctionCreator,
-			ArrayCreator:          s.param.ArrayCreator,
-			DelayFunctionCreator:  s.param.DelayFunctionCreator,
-			DelayStringCreator:    s.param.DelayStringCreator,
-			StringCreator:         s.param.StringCreator,
+			NullCreator:      s.param.NullCreator,
+			ParamCreator:     s.param.ParamCreator,
+			ExceptionCreator: s.param.ExceptionCreator,
 		}),
 		seed: s,
 	}
@@ -111,10 +95,6 @@ func (s *DefineFunctionCreator) ToLanguage(language string, space concept.Pool, 
 
 func (s *DefineFunctionCreator) Type() string {
 	return VariableDefineFunctionType
-}
-
-func (s *DefineFunctionCreator) NewNull() concept.Null {
-	return s.param.NullCreator()
 }
 
 func (s *DefineFunctionCreator) NewParam() concept.Param {

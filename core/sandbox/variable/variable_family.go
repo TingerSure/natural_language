@@ -121,6 +121,17 @@ func (v *VariableFamily) IsDelayFunction(value concept.Variable) (*DelayFunction
 	return nil, false
 }
 
+func (v *VariableFamily) IsValueLanguageFunction(value concept.Variable) (*ValueLanguageFunction, bool) {
+	if value == nil {
+		return nil, false
+	}
+	if value.Type() == VariableValueLanguageFunctionType {
+		function, yes := value.(*ValueLanguageFunction)
+		return function, yes
+	}
+	return nil, false
+}
+
 func (v *VariableFamily) IsParam(value concept.Variable) (*Param, bool) {
 	if value == nil {
 		return nil, false
@@ -209,6 +220,11 @@ func (v *VariableFamily) IsFunctionHome(value concept.Variable) (concept.Functio
 	defineFunction, yes := v.IsDefineFunction(value)
 	if yes {
 		return defineFunction, yes
+	}
+
+	valueLanguageFunction, yes := v.IsValueLanguageFunction(value)
+	if yes {
+		return valueLanguageFunction, yes
 	}
 
 	return nil, false

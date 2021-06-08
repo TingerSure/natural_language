@@ -5,19 +5,9 @@ import (
 )
 
 type AdaptorFunctionParam struct {
-	NullCreator           func() concept.Null
-	ExceptionCreator      func(string, string) concept.Exception
-	ParamCreator          func() concept.Param
-	DelayStringCreator    func(string) concept.String
-	StringCreator         func(string) concept.String
-	DelayFunctionCreator  func(func() concept.Function) concept.Function
-	ArrayCreator          func() concept.Array
-	SystemFunctionCreator func(
-		funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
-		anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
-		paramNames []concept.String,
-		returnNames []concept.String,
-	) concept.Function
+	NullCreator      func() concept.Null
+	ExceptionCreator func(string, string) concept.Exception
+	ParamCreator     func() concept.Param
 }
 
 type AdaptorFunction struct {

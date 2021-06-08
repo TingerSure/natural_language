@@ -98,6 +98,40 @@ func (s *CallCreator) toSeedLanguage(language string, space concept.Pool, instan
 	return seed(space, instance)
 }
 
+func (s *CallCreator) paramPathForToLanguage(language string, funcs concept.Function, space concept.Pool, instance *Call) (concept.Param, concept.Exception) {
+	param := s.param.ParamCreator()
+	var value string
+	var exception concept.Exception
+	instance.param.Iterate(funcs.ParamNames(), func(key concept.String, item concept.Pipe) bool {
+		value, exception = item.ToLanguage(language, space)
+		if !nl_interface.IsNil(exception) {
+			return true
+		}
+		param.Set(key, s.param.StringCreator(value))
+		return false
+	})
+	return param, exception
+}
+
+func (s *CallCreator) paramValueForToLanguage(language string, funcs concept.Function, space concept.Pool, instance *Call) (concept.Param, concept.Exception) {
+	param := s.param.ParamCreator()
+	var exception concept.Exception
+	instance.param.Iterate(funcs.ParamNames(), func(key concept.String, item concept.Pipe) bool {
+		value, suspend := item.Get(space)
+		if !nl_interface.IsNil(suspend) {
+			exception = suspend.(concept.Exception)
+			return true
+		}
+		languageValue, exception := value.ToLanguage(language, space)
+		if !nl_interface.IsNil(exception) {
+			return true
+		}
+		param.Set(key, s.param.StringCreator(languageValue))
+		return false
+	})
+	return param, exception
+}
+
 func (s *CallCreator) ToLanguage(language string, space concept.Pool, instance *Call) (string, concept.Exception) {
 	funcPre, suspend := instance.funcs.Get(space)
 	if !nl_interface.IsNil(suspend) {
@@ -107,17 +141,15 @@ func (s *CallCreator) ToLanguage(language string, space concept.Pool, instance *
 	if !yes {
 		return "", s.param.ExceptionCreator("type error", "Funcs is not function in call.")
 	}
-	param := s.param.ParamCreator()
-	var value string
+	var param concept.Param
 	var exception concept.Exception
-	if instance.param.Iterate(funcs.ParamNames(), func(key concept.String, item concept.Pipe) bool {
-		value, exception = item.ToLanguage(language, space)
-		if !nl_interface.IsNil(exception) {
-			return true
-		}
-		param.Set(key, s.param.StringCreator(value))
-		return false
-	}) {
+	_, yes = variable.VariableFamilyInstance.IsValueLanguageFunction(funcPre)
+	if yes {
+		param, exception = s.paramValueForToLanguage(language, funcs, space, instance)
+	} else {
+		param, exception = s.paramPathForToLanguage(language, funcs, space, instance)
+	}
+	if !nl_interface.IsNil(exception) {
 		return "", exception
 	}
 	name, exception := instance.funcs.ToLanguage(language, space)

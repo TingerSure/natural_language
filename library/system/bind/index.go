@@ -84,11 +84,7 @@ func indexBubbleBind(libs *tree.LibraryManager, indexes concept.Object) {
 				}
 				libs.Sandbox.Index.BubbleIndex.Seeds[language.Value()] = func(pool concept.Pool, instance *index.BubbleIndex) (string, concept.Exception) {
 					seedInput := libs.Sandbox.Variable.Param.New()
-					bubble, suspend := instance.Get(pool)
-					if !nl_interface.IsNil(suspend) {
-						return "", suspend.(concept.Exception)
-					}
-					bubbleValue, exception := bubble.ToLanguage(language.Value(), pool)
+					bubbleValue, exception := pool.KeyBubble(instance.Key()).ToLanguage(language.Value(), pool)
 					if !nl_interface.IsNil(exception) {
 						return "", exception
 					}

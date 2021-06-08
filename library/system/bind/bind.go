@@ -15,6 +15,15 @@ func NewBind(libs *tree.LibraryManager) *Bind {
 		libs: libs,
 		Page: libs.Sandbox.Variable.Page.New(),
 	}
+
+	instance.SetPublic(
+		libs.Sandbox.Variable.String.New("valueLanguage"),
+		libs.Sandbox.Index.PublicIndex.New(
+			"valueLanguage",
+			libs.Sandbox.Index.ConstIndex.New(newValueLanguage(libs)),
+		),
+	)
+
 	instance.SetPublic(
 		libs.Sandbox.Variable.String.New("variable"),
 		libs.Sandbox.Index.PublicIndex.New(
