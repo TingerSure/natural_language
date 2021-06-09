@@ -118,26 +118,6 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		ExceptionCreator: func(name string, message string) concept.Exception {
 			return instance.Exception.NewOriginal(name, message)
 		},
-		StringCreator: func(value string) concept.String {
-			return instance.String.New(value)
-		},
-		ParamCreator: func() concept.Param {
-			return instance.Param.New()
-		},
-		DelayStringCreator: func(original string) concept.String {
-			return instance.DelayString.New(original)
-		},
-		DelayFunctionCreator: func(create func() concept.Function) concept.Function {
-			return instance.DelayFunction.New(create)
-		},
-		SystemFunctionCreator: func(
-			funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
-			anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
-			paramNames []concept.String,
-			returnNames []concept.String,
-		) concept.Function {
-			return instance.SystemFunction.New(funcs, anticipateFuncs, paramNames, returnNames)
-		},
 	})
 	instance.Number = variable.NewNumberCreator(&variable.NumberCreatorParam{
 		NullCreator: func() concept.Null {

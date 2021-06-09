@@ -18,6 +18,14 @@ type Component struct {
 	seed   ComponentSeed
 }
 
+func (f *Component) Object() concept.Pipe {
+	return f.object
+}
+
+func (f *Component) Field() concept.String {
+	return f.field
+}
+
 func (f *Component) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
 	return f.seed.ToLanguage(language, space, f)
 }

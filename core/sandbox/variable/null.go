@@ -35,6 +35,10 @@ func (o *Null) GetField(specimen concept.String) (concept.Variable, concept.Exce
 	return nil, o.seed.GetNullPointerException().Copy()
 }
 
+func (o *Null) KeyField(specimen concept.String) concept.String {
+	return specimen
+}
+
 func (o *Null) SizeField() int {
 	return 0
 }
@@ -74,13 +78,6 @@ type NullCreator struct {
 	nullPointerException concept.Exception
 }
 
-func (s *NullCreator) GetException() concept.Exception {
-	if nl_interface.IsNil(s.nullPointerException) {
-		s.nullPointerException = s.param.ExceptionCreator("runtime error", "null pointer exception.")
-	}
-	return s.nullPointerException
-}
-
 func (s *NullCreator) New() *Null {
 	return s.onlyInstance
 }
@@ -98,6 +95,9 @@ func (s *NullCreator) Type() string {
 }
 
 func (s *NullCreator) GetNullPointerException() concept.Exception {
+	if nl_interface.IsNil(s.nullPointerException) {
+		s.nullPointerException = s.param.ExceptionCreator("runtime error", "null pointer exception.")
+	}
 	return s.nullPointerException
 }
 

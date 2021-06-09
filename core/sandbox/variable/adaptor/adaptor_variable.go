@@ -36,6 +36,11 @@ func (o *AdaptorVariable) CallAdaptor(specimen concept.String, param concept.Par
 	return value.(concept.Function).Exec(param, this)
 }
 
+func (o *AdaptorVariable) KeyField(specimen concept.String) concept.String {
+	o.initFields()
+	return o.fields.Key(specimen).(concept.String)
+}
+
 func (o *AdaptorVariable) SetField(specimen concept.String, value concept.Variable) concept.Exception {
 	o.initFields()
 	o.fields.Set(specimen, value)

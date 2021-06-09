@@ -85,6 +85,13 @@ func (o *Page) HasField(specimen concept.String) bool {
 	return o.publics.Has(specimen)
 }
 
+func (o *Page) KeyField(specimen concept.String) concept.String {
+	if !o.publics.Has(specimen) {
+		return specimen
+	}
+	return o.space.KeyLocal(specimen)
+}
+
 func (o *Page) SizeField() int {
 	return o.publics.Size()
 }

@@ -25,26 +25,42 @@ func NewBind(libs *tree.LibraryManager) *Bind {
 	)
 
 	instance.SetPublic(
-		libs.Sandbox.Variable.String.New("variable"),
+		libs.Sandbox.Variable.String.New("keyBind"),
 		libs.Sandbox.Index.PublicIndex.New(
-			"variable",
-			libs.Sandbox.Index.ConstIndex.New(newVariableCreator(libs)),
+			"keyBind",
+			libs.Sandbox.Index.ConstIndex.New(newKeyBind(libs)),
 		),
 	)
 
 	instance.SetPublic(
-		libs.Sandbox.Variable.String.New("expression"),
+		libs.Sandbox.Variable.String.New("codeBlockBind"),
 		libs.Sandbox.Index.PublicIndex.New(
-			"expression",
-			libs.Sandbox.Index.ConstIndex.New(newExpressionCreator(libs)),
+			"codeBlockBind",
+			libs.Sandbox.Index.ConstIndex.New(newCodeBlockBind(libs)),
 		),
 	)
 
 	instance.SetPublic(
-		libs.Sandbox.Variable.String.New("index"),
+		libs.Sandbox.Variable.String.New("bubbleIndexBind"),
 		libs.Sandbox.Index.PublicIndex.New(
-			"index",
-			libs.Sandbox.Index.ConstIndex.New(newIndexCreator(libs)),
+			"bubbleIndexBind",
+			libs.Sandbox.Index.ConstIndex.New(newBubbleIndexBind(libs)),
+		),
+	)
+
+	instance.SetPublic(
+		libs.Sandbox.Variable.String.New("constIndexBind"),
+		libs.Sandbox.Index.PublicIndex.New(
+			"constIndexBind",
+			libs.Sandbox.Index.ConstIndex.New(newConstIndexBind(libs)),
+		),
+	)
+
+	instance.SetPublic(
+		libs.Sandbox.Variable.String.New("stringBind"),
+		libs.Sandbox.Index.PublicIndex.New(
+			"stringBind",
+			libs.Sandbox.Index.ConstIndex.New(newStringBind(libs)),
 		),
 	)
 

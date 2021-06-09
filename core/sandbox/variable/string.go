@@ -96,18 +96,8 @@ func (s *String) CloneTo(instance concept.String) {
 }
 
 type StringCreatorParam struct {
-	NullCreator           func() concept.Null
-	ExceptionCreator      func(string, string) concept.Exception
-	ParamCreator          func() concept.Param
-	StringCreator         func(string) concept.String
-	DelayStringCreator    func(string) concept.String
-	DelayFunctionCreator  func(func() concept.Function) concept.Function
-	SystemFunctionCreator func(
-		funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
-		anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
-		paramNames []concept.String,
-		returnNames []concept.String,
-	) concept.Function
+	NullCreator      func() concept.Null
+	ExceptionCreator func(string, string) concept.Exception
 }
 
 type StringCreator struct {

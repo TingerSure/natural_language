@@ -50,6 +50,11 @@ func (o *DelayFunction) HasField(specimen concept.String) bool {
 	return o.funcs.HasField(specimen)
 }
 
+func (o *DelayFunction) KeyField(specimen concept.String) concept.String {
+	o.init()
+	return o.funcs.KeyField(specimen)
+}
+
 func (o *DelayFunction) SizeField() int {
 	o.init()
 	return o.funcs.SizeField()

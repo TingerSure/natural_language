@@ -105,6 +105,16 @@ func (m *MappingObject) GetField(specimen concept.String) (concept.Variable, con
 	return nil, m.seed.NewException("system error", "Mapping object cannot get field.")
 }
 
+func (o *MappingObject) KeyField(specimen concept.String) concept.String {
+	if o.class.HasRequire(specimen) || o.class.HasProvide(specimen) {
+		if !o.mapping.Has(specimen) {
+			o.mapping.Set(specimen, specimen)
+		}
+		return o.mapping.Key(specimen).(concept.String)
+	}
+	return specimen
+}
+
 func (o *MappingObject) SizeField() int {
 	return 0
 }

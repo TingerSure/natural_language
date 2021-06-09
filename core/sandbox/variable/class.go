@@ -64,6 +64,10 @@ func (c *Class) HasProvide(specimen concept.String) bool {
 	return c.provide.Has(specimen)
 }
 
+func (c *Class) KeyProvide(specimen concept.String) concept.String {
+	return c.provide.Key(specimen).(concept.String)
+}
+
 func (c *Class) IterateProvide(on func(key concept.String, value concept.Function) bool) bool {
 	return c.provide.Iterate(func(key nl_interface.Key, value interface{}) bool {
 		return on(key.(concept.String), value.(concept.Function))
@@ -80,6 +84,10 @@ func (c *Class) GetRequire(specimen concept.String) concept.Function {
 
 func (c *Class) HasRequire(specimen concept.String) bool {
 	return c.require.Has(specimen)
+}
+
+func (c *Class) KeyRequire(specimen concept.String) concept.String {
+	return c.require.Key(specimen).(concept.String)
 }
 
 func (c *Class) IterateRequire(on func(key concept.String, value concept.Function) bool) bool {

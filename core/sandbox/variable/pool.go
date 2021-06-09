@@ -214,6 +214,10 @@ func (o *Pool) HasField(specimen concept.String) bool {
 	return o.HasBubble(specimen)
 }
 
+func (o *Pool) KeyField(specimen concept.String) concept.String {
+	return o.KeyBubble(specimen)
+}
+
 func (o *Pool) SizeField() int {
 	return 0
 }
