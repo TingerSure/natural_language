@@ -10,7 +10,7 @@ import (
 type Lexer struct {
 	rules []*Rule
 	trims []int
-	eof   *Token
+	eof   func() *Token
 }
 
 func NewLexer() *Lexer {
@@ -23,7 +23,7 @@ func (l *Lexer) AddTrim(trims ...int) {
 	l.trims = append(l.trims, trims...)
 }
 
-func (l *Lexer) SetEof(eof *Token) {
+func (l *Lexer) SetEof(eof func() *Token) {
 	l.eof = eof
 }
 
@@ -52,22 +52,30 @@ func (l *Lexer) Read(source *os.File, path string) (*TokenList, error) {
 	row := 0
 	col := 0
 	tokens := NewTokenList()
-	tokens.SetEof(l.eof)
 	tokens.AddTrims(l.trims...)
+	startLine := NewLine(path, content)
+	startLine.SetStart(0, 0, 0)
+	startLine.SetEnd(0, 0, 0)
+	tokens.SetStartLine(startLine)
 	for cursor < size {
 		token := l.next(content, cursor)
+		line := NewLine(path, content)
+		line.SetStart(row, col, cursor)
 		if token == nil {
-			return nil, fmt.Errorf("invalid character: '%v'\n%v", string(content[cursor]), token.ToLineStatic(path, row, col, cursor, content))
+			return nil, fmt.Errorf("invalid character: '%v'\n%v", string(content[cursor]), line.ToString())
 		}
-		token.SetPath(path)
-		token.SetContent(content)
-		token.SetCursor(cursor)
-		token.SetRow(row)
-		token.SetCol(col)
 		row, col = l.updateRowCol(row, col, token)
 		cursor += token.Size()
+		line.SetEnd(row, col, cursor)
+		token.SetLine(line)
 		tokens.AddToken(token)
 	}
+	eofLine := NewLine(path, content)
+	eofLine.SetStart(row, col, cursor)
+	eofLine.SetEnd(row, col, cursor)
+	eof := l.eof()
+	eof.SetLine(eofLine)
+	tokens.SetEof(eof)
 	return tokens, nil
 }
 

@@ -87,7 +87,9 @@ const (
 )
 
 var (
-	LexerEof = lexer.NewToken(TypeEof, KeyEof, "EOF")
+	LexerEof = func() *lexer.Token {
+		return lexer.NewToken(TypeEof, KeyEof, "EOF")
+	}
 
 	LexerTrim = []int{TypeSpace, TypeComment}
 

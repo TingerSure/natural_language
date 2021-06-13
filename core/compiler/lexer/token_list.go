@@ -1,10 +1,11 @@
 package lexer
 
 type TokenList struct {
-	tokens []*Token
-	index  int
-	eof    *Token
-	trims  map[int]bool
+	tokens    []*Token
+	index     int
+	eof       *Token
+	startLine *Line
+	trims     map[int]bool
 }
 
 func NewTokenList() *TokenList {
@@ -12,6 +13,14 @@ func NewTokenList() *TokenList {
 		index: 0,
 		trims: map[int]bool{},
 	}
+}
+
+func (t *TokenList) StartLine() *Line {
+	return t.startLine
+}
+
+func (t *TokenList) SetStartLine(startLine *Line) {
+	t.startLine = startLine
 }
 
 func (t *TokenList) AddToken(token *Token) {

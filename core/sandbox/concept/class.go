@@ -12,6 +12,5 @@ type Class interface {
 	GetRequire(key String) Function
 	HasRequire(key String) bool
 	KeyRequire(key String) String
-
 	IterateRequire(func(key String, value Function) bool) bool
 }
