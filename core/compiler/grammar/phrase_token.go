@@ -37,6 +37,14 @@ func (p *PhraseToken) GetChild(int) Phrase {
 	panic("complier.PhraseToken cannot get child")
 }
 
+func (p *PhraseToken) SetStartLine(*lexer.Line) {
+	//Do nothing
+}
+
+func (p *PhraseToken) GetLine() *lexer.Line {
+	return p.token.Line()
+}
+
 func (p *PhraseToken) GetToken() *lexer.Token {
 	return p.token
 }

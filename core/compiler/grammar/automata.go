@@ -43,9 +43,9 @@ func (a *Automata) Run(tokens *lexer.TokenList) (Phrase, error) {
 			next = tokens.Next()
 			if next == nil {
 				if phrase.GetToken() != tokens.Eof() {
-					return nil, fmt.Errorf("automata error : illegal token list.\n%v", line.ToString())
+					return nil, fmt.Errorf("automata error : illegal token list.")
 				}
-				return nil, fmt.Errorf("automata error : illegal status table.\n%v", line.ToString())
+				return nil, fmt.Errorf("automata error : illegal status table.")
 			}
 			phrase = NewPhraseToken(next)
 			continue
@@ -58,9 +58,12 @@ func (a *Automata) Run(tokens *lexer.TokenList) (Phrase, error) {
 			phraseList = phraseList[:len(phraseList)-size]
 			statusList = statusList[:len(statusList)-size]
 			status = statusList[len(statusList)-1]
+			if result.Size() == 0 {
+				result.SetStartLine(line.End())
+			}
 			gotos := a.table.GetGoto(status, result.Type())
 			if gotos == nil {
-				return nil, fmt.Errorf("syntax error : unexpected block.\n%v", line.ToString())
+				return nil, fmt.Errorf("automata error : illegal status table.")
 			}
 			status = gotos.Status()
 			phraseList = append(phraseList, result)
@@ -69,10 +72,10 @@ func (a *Automata) Run(tokens *lexer.TokenList) (Phrase, error) {
 		}
 		if action.Type() == ActionAcceptType {
 			if len(phraseList) != 1 || phrase.GetToken() != tokens.Eof() {
-				return nil, fmt.Errorf("automata error : illegal status table.\n%v", line.ToString())
+				return nil, fmt.Errorf("automata error : illegal status table.")
 			}
 			if !tokens.IsEof() {
-				return nil, fmt.Errorf("automata error : illegal token list.\n%v", line.ToString())
+				return nil, fmt.Errorf("automata error : illegal token list.")
 			}
 			break
 		}

@@ -39,17 +39,17 @@ func (o *Operator) NewNumberOperatorNumberItem(exec func(*variable.Number, *vari
 			leftPre := input.Get(instance.Left)
 			rightPre := input.Get(instance.Right)
 			if leftPre.IsNull() || rightPre.IsNull() {
-				return nil, o.OperatorParamMissingExceptionTemplate.Copy().AddStack(instance.Func)
+				return nil, o.OperatorParamMissingExceptionTemplate.Copy()
 			}
 
 			left, yesLeft := variable.VariableFamilyInstance.IsNumber(leftPre)
 			right, yesRight := variable.VariableFamilyInstance.IsNumber(rightPre)
 			if !yesLeft || !yesRight {
-				return nil, o.OperatorTypeErrorExceptionTemplate.Copy().AddStack(instance.Func)
+				return nil, o.OperatorTypeErrorExceptionTemplate.Copy()
 			}
 			result, exception := exec(left, right)
 			if !nl_interface.IsNil(exception) {
-				return nil, exception.Copy().AddStack(instance.Func)
+				return nil, exception.Copy()
 			}
 			param := o.Libs.Sandbox.Variable.Param.New()
 			param.Set(instance.Result, result)
@@ -82,17 +82,17 @@ func (o *Operator) NewBoolOperatorBoolItem(exec func(*variable.Bool, *variable.B
 			leftPre := input.Get(instance.Left)
 			rightPre := input.Get(instance.Right)
 			if leftPre.IsNull() || rightPre.IsNull() {
-				return nil, o.OperatorParamMissingExceptionTemplate.Copy().AddStack(instance.Func)
+				return nil, o.OperatorParamMissingExceptionTemplate.Copy()
 			}
 
 			left, yesLeft := variable.VariableFamilyInstance.IsBool(leftPre)
 			right, yesRight := variable.VariableFamilyInstance.IsBool(rightPre)
 			if !yesLeft || !yesRight {
-				return nil, o.OperatorTypeErrorExceptionTemplate.Copy().AddStack(instance.Func)
+				return nil, o.OperatorTypeErrorExceptionTemplate.Copy()
 			}
 			result, exception := exec(left, right)
 			if !nl_interface.IsNil(exception) {
-				return nil, exception.Copy().AddStack(instance.Func)
+				return nil, exception.Copy()
 			}
 			param := o.Libs.Sandbox.Variable.Param.New()
 			param.Set(instance.Result, result)
@@ -123,16 +123,16 @@ func (o *Operator) NewOperatorBoolItem(exec func(*variable.Bool) (concept.Variab
 		func(input concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 			rightPre := input.Get(instance.Right)
 			if rightPre.IsNull() {
-				return nil, o.OperatorParamMissingExceptionTemplate.Copy().AddStack(instance.Func)
+				return nil, o.OperatorParamMissingExceptionTemplate.Copy()
 			}
 			right, yesRight := variable.VariableFamilyInstance.IsBool(rightPre)
 
 			if !yesRight {
-				return nil, o.OperatorTypeErrorExceptionTemplate.Copy().AddStack(instance.Func)
+				return nil, o.OperatorTypeErrorExceptionTemplate.Copy()
 			}
 			result, exception := exec(right)
 			if !nl_interface.IsNil(exception) {
-				return nil, exception.Copy().AddStack(instance.Func)
+				return nil, exception.Copy()
 			}
 			param := o.Libs.Sandbox.Variable.Param.New()
 			param.Set(instance.Result, result)

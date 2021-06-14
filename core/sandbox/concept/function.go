@@ -2,7 +2,6 @@ package concept
 
 type Function interface {
 	Variable
-	ExceptionStack
 	Exec(Param, Variable) (Param, Exception)
 	Anticipate(Param, Variable) Param
 	FunctionType() string

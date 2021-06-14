@@ -22,7 +22,7 @@ type Exception struct {
 	*adaptor.AdaptorVariable
 	name    concept.String
 	message concept.String
-	stacks  []concept.ExceptionStack
+	lines   []concept.Line
 	seed    ExceptionSeed
 }
 
@@ -34,24 +34,24 @@ func (f *Exception) ToLanguage(language string, space concept.Pool) (string, con
 	return f.seed.ToLanguage(language, space, f)
 }
 
-func (e *Exception) IterateStacks(listener func(concept.ExceptionStack) bool) bool {
-	for _, stack := range e.stacks {
-		if listener(stack) {
+func (e *Exception) IterateLines(listener func(concept.Line) bool) bool {
+	for _, line := range e.lines {
+		if listener(line) {
 			return true
 		}
 	}
 	return false
 }
 
-func (e *Exception) AddStack(stack concept.ExceptionStack) concept.Exception {
-	e.stacks = append(e.stacks, stack)
+func (e *Exception) AddLine(line concept.Line) concept.Exception {
+	e.lines = append(e.lines, line)
 	return e
 }
 
 func (e *Exception) Copy() concept.Exception {
 	newOne := e.seed.New(e.name.Clone(), e.message.Clone())
-	e.IterateStacks(func(stack concept.ExceptionStack) bool {
-		newOne.AddStack(stack)
+	e.IterateLines(func(line concept.Line) bool {
+		newOne.AddLine(line)
 		return false
 	})
 	return newOne
@@ -99,7 +99,7 @@ func (s *ExceptionCreator) NewOriginal(name string, message string) concept.Exce
 		}),
 		name:    s.param.StringCreator(name),
 		message: s.param.StringCreator(message),
-		stacks:  make([]concept.ExceptionStack, 0),
+		lines:   make([]concept.Line, 0),
 		seed:    s,
 	}
 }
@@ -112,7 +112,7 @@ func (s *ExceptionCreator) New(name concept.String, message concept.String) conc
 		}),
 		name:    name,
 		message: message,
-		stacks:  make([]concept.ExceptionStack, 0),
+		lines:   make([]concept.Line, 0),
 		seed:    s,
 	}
 }

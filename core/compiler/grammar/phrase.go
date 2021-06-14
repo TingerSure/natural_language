@@ -11,6 +11,8 @@ type Phrase interface {
 	AddChild(children ...Phrase)
 	SetChild(int, Phrase)
 	GetChild(int) Phrase
+	SetStartLine(*lexer.Line)
+	GetLine() *lexer.Line
 	GetToken() *lexer.Token
 	GetRule() *Rule
 	ToString(string) string

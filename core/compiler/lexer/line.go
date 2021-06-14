@@ -23,6 +23,22 @@ func NewLine(path string, content []byte) *Line {
 	}
 }
 
+func NewLineFromTo(from, to *Line) *Line {
+	if from == to {
+		return from
+	}
+	return &Line{
+		content:     from.content,
+		path:        from.path,
+		rowStart:    from.rowStart,
+		colStart:    from.colStart,
+		cursorStart: from.cursorStart,
+		rowEnd:      to.rowEnd,
+		colEnd:      to.colEnd,
+		cursorEnd:   to.cursorEnd,
+	}
+}
+
 func (l *Line) Path() string {
 	return l.path
 }

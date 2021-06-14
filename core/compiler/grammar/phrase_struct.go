@@ -7,8 +7,9 @@ import (
 )
 
 type PhraseStruct struct {
-	children []Phrase
-	rule     *Rule
+	children  []Phrase
+	rule      *Rule
+	startLine *lexer.Line
 }
 
 const (
@@ -37,6 +38,20 @@ func (p *PhraseStruct) SetChild(index int, child Phrase) {
 
 func (p *PhraseStruct) GetChild(index int) Phrase {
 	return p.children[index]
+}
+
+func (p *PhraseStruct) SetStartLine(start *lexer.Line) {
+	p.startLine = start
+}
+
+func (p *PhraseStruct) GetLine() *lexer.Line {
+	if p.Size() == 0 {
+		return p.startLine
+	}
+	if p.Size() == 1 {
+		return p.GetChild(0).GetLine()
+	}
+	return lexer.NewLineFromTo(p.GetChild(0).GetLine(), p.GetChild(p.Size()-1).GetLine())
 }
 
 func (p *PhraseStruct) GetToken() *lexer.Token {
