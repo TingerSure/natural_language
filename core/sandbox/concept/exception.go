@@ -7,6 +7,5 @@ type Exception interface {
 	Name() String
 	Message() String
 	Copy() Exception
-	IterateLines(func(Line) bool) bool
-	AddLine(Line) Exception
+	AddExceptionLine(Line) Exception
 }

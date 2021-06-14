@@ -18,8 +18,14 @@ type Line struct {
 
 func NewLine(path string, content []byte) *Line {
 	return &Line{
-		content: content,
-		path:    path,
+		content:     content,
+		path:        path,
+		rowStart:    0,
+		colStart:    0,
+		cursorStart: 0,
+		rowEnd:      0,
+		colEnd:      0,
+		cursorEnd:   0,
 	}
 }
 
@@ -37,6 +43,10 @@ func NewLineFromTo(from, to *Line) *Line {
 		colEnd:      to.colEnd,
 		cursorEnd:   to.cursorEnd,
 	}
+}
+
+func NewLineList(list []*Line) *Line {
+	return NewLineFromTo(list[0], list[len(list)-1])
 }
 
 func (l *Line) Path() string {

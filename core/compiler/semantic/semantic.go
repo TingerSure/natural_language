@@ -22,9 +22,9 @@ func NewSemantic(libs *tree.LibraryManager, getPage func(path string) (concept.P
 	}
 }
 
-func (s *Semantic) Read(phrase grammar.Phrase) (concept.Pipe, error) {
-	context := NewContext(s.libs, s.getPage, s.rules)
-	pageIndex, err := context.Deal(phrase)
+func (s *Semantic) Read(phrase grammar.Phrase, path string, content []byte) (concept.Pipe, error) {
+	context := NewContext(s.libs, s.getPage, s.rules, path, content)
+	pageIndex, _, err := context.Deal(phrase)
 	if err != nil {
 		return nil, err
 	}

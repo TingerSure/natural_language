@@ -25,6 +25,14 @@ func (e *Break) Tag() concept.String {
 	return e.tag
 }
 
+func (e *Break) IterateLines(func(concept.Line) bool) bool {
+	return false
+}
+
+func (e *Break) AddLine(concept.Line) concept.Interrupt {
+	return e
+}
+
 type BreakCreatorParam struct {
 }
 

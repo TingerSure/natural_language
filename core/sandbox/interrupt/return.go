@@ -1,5 +1,9 @@
 package interrupt
 
+import (
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
+)
+
 const (
 	ReturnInterruptType = "return"
 )
@@ -14,6 +18,14 @@ type Return struct {
 
 func (e *Return) InterruptType() string {
 	return e.seed.Type()
+}
+
+func (e *Return) IterateLines(func(concept.Line) bool) bool {
+	return false
+}
+
+func (e *Return) AddLine(concept.Line) concept.Interrupt {
+	return e
 }
 
 type ReturnCreatorParam struct {

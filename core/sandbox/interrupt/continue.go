@@ -25,6 +25,14 @@ func (e *Continue) Tag() concept.String {
 	return e.tag
 }
 
+func (e *Continue) IterateLines(func(concept.Line) bool) bool {
+	return false
+}
+
+func (e *Continue) AddLine(concept.Line) concept.Interrupt {
+	return e
+}
+
 type ContinueCreatorParam struct {
 }
 

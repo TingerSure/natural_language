@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/TingerSure/natural_language/core/compiler/grammar"
+	"github.com/TingerSure/natural_language/core/compiler/lexer"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
 )
@@ -12,14 +13,32 @@ type Context struct {
 	rules   map[*grammar.Rule]*Rule
 	getPage func(path string) (concept.Pipe, error)
 	libs    *tree.LibraryManager
+	path    string
+	content []byte
 }
 
-func NewContext(libs *tree.LibraryManager, getPage func(path string) (concept.Pipe, error), rules map[*grammar.Rule]*Rule) *Context {
+func NewContext(
+	libs *tree.LibraryManager,
+	getPage func(path string) (concept.Pipe, error),
+	rules map[*grammar.Rule]*Rule,
+	path string,
+	content []byte,
+) *Context {
 	return &Context{
-		rules:   rules,
-		getPage: getPage,
-		libs:    libs,
+		rules,
+		getPage,
+		libs,
+		path,
+		content,
 	}
+}
+
+func (c *Context) Path() string {
+	return c.path
+}
+
+func (c *Context) Content() []byte {
+	return c.content
 }
 
 func (c *Context) FormatSymbolString(value string) string {
@@ -34,10 +53,10 @@ func (c *Context) GetPage(path string) (concept.Pipe, error) {
 	return c.getPage(path)
 }
 
-func (c *Context) Deal(phrase grammar.Phrase) ([]concept.Pipe, error) {
+func (c *Context) Deal(phrase grammar.Phrase) ([]concept.Pipe, []*lexer.Line, error) {
 	rule, err := c.GetRule(phrase)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	return rule.Deal(phrase, c)
 }

@@ -2,8 +2,6 @@ package lexer
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
 	"strings"
 )
 
@@ -42,11 +40,7 @@ func (l *Lexer) next(content []byte, cursor int) *Token {
 	return nil
 }
 
-func (l *Lexer) Read(source *os.File, path string) (*TokenList, error) {
-	content, err := ioutil.ReadAll(source)
-	if err != nil {
-		return nil, err
-	}
+func (l *Lexer) Read(content []byte, path string) (*TokenList, error) {
 	size := len(content)
 	cursor := 0
 	row := 0

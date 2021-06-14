@@ -10,6 +10,7 @@ import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -93,7 +94,11 @@ func (c *Compiler) ReadPage(path string) (concept.Pipe, error) {
 	if err != nil {
 		return nil, err
 	}
-	tokens, err := c.lexer.Read(source, path)
+	content, err := ioutil.ReadAll(source)
+	if err != nil {
+		return nil, err
+	}
+	tokens, err := c.lexer.Read(content, path)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +106,7 @@ func (c *Compiler) ReadPage(path string) (concept.Pipe, error) {
 	if err != nil {
 		return nil, err
 	}
-	page, err := c.semantic.Read(phrase)
+	page, err := c.semantic.Read(phrase, path, content)
 	if err != nil {
 		return nil, err
 	}

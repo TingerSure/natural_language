@@ -43,7 +43,11 @@ func (e *Exception) IterateLines(listener func(concept.Line) bool) bool {
 	return false
 }
 
-func (e *Exception) AddLine(line concept.Line) concept.Exception {
+func (e *Exception) AddLine(line concept.Line) concept.Interrupt {
+	return e.AddExceptionLine(line)
+}
+
+func (e *Exception) AddExceptionLine(line concept.Line) concept.Exception {
 	e.lines = append(e.lines, line)
 	return e
 }
