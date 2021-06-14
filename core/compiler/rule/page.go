@@ -548,15 +548,15 @@ var (
 			}
 			newParam := context.GetLibraryManager().Sandbox.Expression.NewParam.New()
 			newParam.SetArray(params)
-			return []concept.Pipe{
-					context.GetLibraryManager().Sandbox.Expression.Call.New(
-						funcs[0],
-						newParam,
-					),
-				}, []*lexer.Line{lexer.NewLineFromTo(
-					phrase.GetChild(0).GetLine(),
-					phrase.GetChild(3).GetLine(),
-				)}, nil
+			call := context.GetLibraryManager().Sandbox.Expression.Call.New(
+				funcs[0],
+				newParam,
+			)
+			call.SetCallLine(phrase.GetChild(3).GetLine())
+			return []concept.Pipe{call}, []*lexer.Line{lexer.NewLineFromTo(
+				phrase.GetChild(0).GetLine(),
+				phrase.GetChild(3).GetLine(),
+			)}, nil
 		}),
 		semantic.NewRule(PolymerizeCallWithKeyValueList, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			//SymbolExpressionFloor -> SymbolExpression1 SymbolLeftParenthesis SymbolKeyValueList SymbolRightParenthesis
@@ -570,15 +570,15 @@ var (
 			}
 			newParam := context.GetLibraryManager().Sandbox.Expression.NewParam.New()
 			newParam.SetKeyValue(params)
-			return []concept.Pipe{
-					context.GetLibraryManager().Sandbox.Expression.Call.New(
-						funcs[0],
-						newParam,
-					),
-				}, []*lexer.Line{lexer.NewLineFromTo(
-					phrase.GetChild(0).GetLine(),
-					phrase.GetChild(3).GetLine(),
-				)}, nil
+			call := context.GetLibraryManager().Sandbox.Expression.Call.New(
+				funcs[0],
+				newParam,
+			)
+			call.SetCallLine(phrase.GetChild(3).GetLine())
+			return []concept.Pipe{call}, []*lexer.Line{lexer.NewLineFromTo(
+				phrase.GetChild(0).GetLine(),
+				phrase.GetChild(3).GetLine(),
+			)}, nil
 		}),
 		semantic.NewRule(PolymerizeAssignment, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			//SymbolExpressionIndependent -> SymbolExpressionCeil SymbolEqual SymbolExpressionCeil

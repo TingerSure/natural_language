@@ -8,6 +8,7 @@ import (
 	"github.com/TingerSure/natural_language/core/compiler/rule"
 	"github.com/TingerSure/natural_language/core/compiler/semantic"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/interrupt/message"
 	"github.com/TingerSure/natural_language/core/sandbox/variable"
 	"github.com/TingerSure/natural_language/core/tree"
 	"io/ioutil"
@@ -138,7 +139,7 @@ func (c *Compiler) initPage(pageIndex concept.Pipe, path string) error {
 	}
 	_, exception = page.Call(initKey, c.libs.Sandbox.Variable.Param.New())
 	if !nl_interface.IsNil(exception) {
-		return exception.(concept.Exception)
+		return exception.(concept.Exception).AddExceptionLine(message.NewMessage(fmt.Sprintf("%v:[system_auto_init]", path), ""))
 	}
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable/adaptor"
+	"strings"
 )
 
 const (
@@ -78,7 +79,18 @@ func (e *Exception) Message() concept.String {
 }
 
 func (e *Exception) ToString(prefix string) string {
-	return fmt.Sprintf("[%v] %v", e.name.Value(), e.message.Value())
+	values := []string{}
+	values = append(values, fmt.Sprintf("[%v] %v", e.name.Value(), e.message.Value()))
+	once := true
+	e.IterateLines(func(line concept.Line) bool {
+		if once {
+			values = append(values, line.ToLine())
+			once = false
+		}
+		values = append(values, line.ToPath())
+		return false
+	})
+	return strings.Join(values, "\n")
 }
 
 func (e *Exception) Error() string {

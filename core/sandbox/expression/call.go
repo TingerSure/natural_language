@@ -18,9 +18,14 @@ type CallSeed interface {
 
 type Call struct {
 	*adaptor.ExpressionIndex
-	funcs concept.Pipe
-	param *NewParam
-	seed  CallSeed
+	callLine concept.Line
+	funcs    concept.Pipe
+	param    *NewParam
+	seed     CallSeed
+}
+
+func (c *Call) SetCallLine(callLine concept.Line) {
+	c.callLine = callLine
 }
 
 func (c *Call) Function() concept.Pipe {
@@ -58,7 +63,11 @@ func (a *Call) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 		return nil, a.seed.NewException("type error", "Only Param can are passed to a Function")
 	}
 
-	return a.funcs.Call(space, param)
+	value, exception := a.funcs.Call(space, param)
+	if !nl_interface.IsNil(exception) {
+		exception.AddExceptionLine(a.callLine)
+	}
+	return value, exception
 }
 
 type CallCreatorParam struct {
