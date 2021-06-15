@@ -60,7 +60,7 @@ func (a *Call) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	}
 	param, yesParam := variable.VariableFamilyInstance.IsParam(preParam)
 	if !yesParam {
-		return nil, a.seed.NewException("type error", "Only Param can are passed to a Function")
+		return nil, a.seed.NewException("type error", "Only Param can are passed to a Function").AddExceptionLine(a.callLine)
 	}
 
 	value, exception := a.funcs.Call(space, param)

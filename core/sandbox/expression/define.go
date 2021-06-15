@@ -17,7 +17,12 @@ type Define struct {
 	*adaptor.ExpressionIndex
 	defaultValue concept.Pipe
 	key          concept.String
+	line         concept.Line
 	seed         DefineSeed
+}
+
+func (f *Define) SetLine(line concept.Line) {
+	f.line = line
 }
 
 func (f *Define) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
@@ -37,7 +42,7 @@ func (e *Define) Anticipate(space concept.Pool) concept.Variable {
 
 func (a *Define) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	if space.HasLocal(a.key) {
-		return nil, a.seed.NewException("semantic error", fmt.Sprintf("Duplicate local definition : %v", a.key.Value()))
+		return nil, a.seed.NewException("semantic error", fmt.Sprintf("Duplicate local definition : %v", a.key.Value())).AddLine(a.line)
 	}
 	var defaultValue concept.Variable
 	var suspend concept.Interrupt

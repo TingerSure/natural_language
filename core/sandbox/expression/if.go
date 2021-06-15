@@ -20,7 +20,12 @@ type If struct {
 	condition concept.Pipe
 	primary   concept.CodeBlock
 	secondary concept.CodeBlock
+	line      concept.Line
 	seed      IfSeed
+}
+
+func (f *If) SetLine(line concept.Line) {
+	f.line = line
 }
 
 func (f *If) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
@@ -40,7 +45,7 @@ func (e *If) Anticipate(space concept.Pool) concept.Variable {
 func (f *If) Exec(parent concept.Pool) (concept.Variable, concept.Interrupt) {
 
 	if nl_interface.IsNil(f.condition) {
-		return nil, f.seed.NewException("system error", "No condition for judgment.")
+		return nil, f.seed.NewException("system error", "No condition for judgment.").AddLine(f.line)
 	}
 	initSpace := f.seed.NewPool(parent)
 	defer initSpace.Clear()
@@ -52,7 +57,7 @@ func (f *If) Exec(parent concept.Pool) (concept.Variable, concept.Interrupt) {
 
 	condition, yes := variable.VariableFamilyInstance.IsBool(preCondition)
 	if !yes {
-		return nil, f.seed.NewException("type error", "Only bool can be judged.")
+		return nil, f.seed.NewException("type error", "Only bool can be judged.").AddLine(f.line)
 	}
 
 	var active concept.CodeBlock

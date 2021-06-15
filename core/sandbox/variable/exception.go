@@ -2,6 +2,7 @@ package variable
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/sandbox/variable/adaptor"
 	"strings"
@@ -100,6 +101,9 @@ func (e *Exception) ToString(prefix string) string {
 	values = append(values, fmt.Sprintf("[%v] %v", e.name.Value(), e.message.Value()))
 	once := true
 	e.IterateLines(func(line concept.Line) bool {
+		if nl_interface.IsNil(line) {
+			return false
+		}
 		if once {
 			values = append(values, line.ToLine())
 			once = false

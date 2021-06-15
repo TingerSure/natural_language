@@ -15,9 +15,14 @@ type IndexComponentSeed interface {
 
 type IndexComponent struct {
 	*adaptor.ExpressionIndex
-	field  concept.Pipe
-	object concept.Pipe
-	seed   IndexComponentSeed
+	field     concept.Pipe
+	object    concept.Pipe
+	fieldLine concept.Line
+	seed      IndexComponentSeed
+}
+
+func (f *IndexComponent) SetFieldLine(fieldLine concept.Line) {
+	f.fieldLine = fieldLine
 }
 
 func (f *IndexComponent) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
@@ -70,7 +75,7 @@ func (a *IndexComponent) Exec(space concept.Pool) (concept.Variable, concept.Int
 	if yes {
 		return a.stringGet(space, fieldString)
 	}
-	return nil, a.seed.NewException("runtime error", fmt.Sprintf("%v is not a string or number.", a.field.ToString("")))
+	return nil, a.seed.NewException("runtime error", fmt.Sprintf("%v is not a string or number.", a.field.ToString(""))).AddExceptionLine(a.fieldLine)
 }
 
 func (a *IndexComponent) stringGet(space concept.Pool, field concept.String) (concept.Variable, concept.Interrupt) {
@@ -78,7 +83,11 @@ func (a *IndexComponent) stringGet(space concept.Pool, field concept.String) (co
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
 	}
-	return object.GetField(field)
+	value, suspend := object.GetField(field)
+	if !nl_interface.IsNil(suspend) {
+		suspend.AddLine(a.fieldLine)
+	}
+	return value, suspend
 }
 
 func (a *IndexComponent) indexGet(space concept.Pool, field concept.Number) (concept.Variable, concept.Interrupt) {
@@ -88,9 +97,13 @@ func (a *IndexComponent) indexGet(space concept.Pool, field concept.Number) (con
 	}
 	array, yes := variable.VariableFamilyInstance.IsArray(arrayPre)
 	if !yes {
-		return nil, a.seed.NewException("runtime error", fmt.Sprintf("%v is not an array.", a.object.ToString("")))
+		return nil, a.seed.NewException("runtime error", fmt.Sprintf("%v is not an array.", a.object.ToString(""))).AddLine(a.fieldLine)
 	}
-	return array.Get(int(field.Value()))
+	value, suspend := array.Get(int(field.Value()))
+	if !nl_interface.IsNil(suspend) {
+		suspend.AddLine(a.fieldLine)
+	}
+	return value, suspend
 }
 
 func (a *IndexComponent) Set(space concept.Pool, value concept.Variable) concept.Interrupt {
@@ -106,7 +119,7 @@ func (a *IndexComponent) Set(space concept.Pool, value concept.Variable) concept
 	if yes {
 		return a.stringSet(space, fieldString, value)
 	}
-	return a.seed.NewException("runtime error", fmt.Sprintf("%v is not a string or number.", a.field.ToString("")))
+	return a.seed.NewException("runtime error", fmt.Sprintf("%v is not a string or number.", a.field.ToString(""))).AddExceptionLine(a.fieldLine)
 }
 
 func (a *IndexComponent) stringSet(space concept.Pool, field concept.String, value concept.Variable) concept.Interrupt {
@@ -114,7 +127,11 @@ func (a *IndexComponent) stringSet(space concept.Pool, field concept.String, val
 	if !nl_interface.IsNil(suspend) {
 		return suspend
 	}
-	return object.SetField(field, value)
+	suspend = object.SetField(field, value)
+	if !nl_interface.IsNil(suspend) {
+		return suspend.AddLine(a.fieldLine)
+	}
+	return nil
 }
 
 func (a *IndexComponent) indexSet(space concept.Pool, field concept.Number, value concept.Variable) concept.Interrupt {
@@ -124,9 +141,13 @@ func (a *IndexComponent) indexSet(space concept.Pool, field concept.Number, valu
 	}
 	array, yes := variable.VariableFamilyInstance.IsArray(arrayPre)
 	if !yes {
-		return a.seed.NewException("runtime error", fmt.Sprintf("%v is not an array.", a.object.ToString("")))
+		return a.seed.NewException("runtime error", fmt.Sprintf("%v is not an array.", a.object.ToString(""))).AddLine(a.fieldLine)
 	}
-	return array.Set(int(field.Value()), value)
+	suspend = array.Set(int(field.Value()), value)
+	if !nl_interface.IsNil(suspend) {
+		return suspend.AddLine(a.fieldLine)
+	}
+	return nil
 }
 
 func (a *IndexComponent) Call(space concept.Pool, param concept.Param) (concept.Param, concept.Exception) {
@@ -142,7 +163,7 @@ func (a *IndexComponent) Call(space concept.Pool, param concept.Param) (concept.
 	if yes {
 		return a.stringCall(space, fieldString, param)
 	}
-	return nil, a.seed.NewException("runtime error", fmt.Sprintf("%v is not a string or number.", a.field.ToString("")))
+	return nil, a.seed.NewException("runtime error", fmt.Sprintf("%v is not a string or number.", a.field.ToString(""))).AddExceptionLine(a.fieldLine)
 }
 
 func (a *IndexComponent) stringCall(space concept.Pool, field concept.String, param concept.Param) (concept.Param, concept.Exception) {
@@ -160,15 +181,15 @@ func (a *IndexComponent) indexCall(space concept.Pool, field concept.Number, par
 	}
 	array, yes := variable.VariableFamilyInstance.IsArray(arrayPre)
 	if !yes {
-		return nil, a.seed.NewException("runtime error", fmt.Sprintf("%v is not an array.", a.object.ToString("")))
+		return nil, a.seed.NewException("runtime error", fmt.Sprintf("%v is not an array.", a.object.ToString(""))).AddExceptionLine(a.fieldLine)
 	}
 	funcsPre, suspend := array.Get(int(field.Value()))
 	if !nl_interface.IsNil(suspend) {
-		return nil, suspend.(concept.Exception)
+		return nil, suspend.(concept.Exception).AddExceptionLine(a.fieldLine)
 	}
 	funcs, yes := variable.VariableFamilyInstance.IsFunctionHome(funcsPre)
 	if !yes {
-		return nil, a.seed.NewException("runtime error", fmt.Sprintf("%v is not a function.", a.ToString("")))
+		return nil, a.seed.NewException("runtime error", fmt.Sprintf("%v is not a function.", a.ToString(""))).AddExceptionLine(a.fieldLine)
 	}
 	return funcs.Exec(param, nil)
 }

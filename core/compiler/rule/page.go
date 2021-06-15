@@ -95,12 +95,17 @@ var (
 		}),
 		semantic.NewRule(PolymerizeClassGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			// SymbolClassGroup -> SymbolClass SymbolLeftBrace SymbolClassItemList SymbolRightBrace
-			items, _, err := context.Deal(phrase.GetChild(2))
+			items, prelines, err := context.Deal(phrase.GetChild(2))
 			if err != nil {
 				return nil, nil, err
 			}
 			newClass := context.GetLibraryManager().Sandbox.Expression.NewClass.New()
-			newClass.SetLines(items)
+			newClass.SetItems(items)
+			lines := make([]concept.Line, len(prelines))
+			for _, line := range prelines {
+				lines = append(lines, line)
+			}
+			newClass.SetLines(lines)
 			return []concept.Pipe{newClass}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
 				phrase.GetChild(3).GetLine(),
@@ -236,15 +241,15 @@ var (
 		}),
 		semantic.NewRule(PolymerizeExpressionFromIdentifier, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			//SymbolExpressionFloor -> SymbolIdentifier
-			return []concept.Pipe{
-					context.GetLibraryManager().Sandbox.Index.BubbleIndex.New(
-						context.GetLibraryManager().Sandbox.Variable.String.New(
-							phrase.GetChild(0).GetToken().Value(),
-						),
-					),
-				}, []*lexer.Line{
-					phrase.GetChild(0).GetLine(),
-				}, nil
+			bubble := context.GetLibraryManager().Sandbox.Index.BubbleIndex.New(
+				context.GetLibraryManager().Sandbox.Variable.String.New(
+					phrase.GetChild(0).GetToken().Value(),
+				),
+			)
+			bubble.SetLine(phrase.GetChild(0).GetLine())
+			return []concept.Pipe{bubble}, []*lexer.Line{
+				phrase.GetChild(0).GetLine(),
+			}, nil
 		}),
 		semantic.NewRule(PolymerizeExpressionFromVariable, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			//SymbolExpressionFloor -> SymbolVariable
@@ -552,7 +557,7 @@ var (
 				funcs[0],
 				newParam,
 			)
-			call.SetCallLine(phrase.GetChild(3).GetLine())
+			call.SetCallLine(phrase.GetChild(1).GetLine())
 			return []concept.Pipe{call}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
 				phrase.GetChild(3).GetLine(),
@@ -574,7 +579,7 @@ var (
 				funcs[0],
 				newParam,
 			)
-			call.SetCallLine(phrase.GetChild(3).GetLine())
+			call.SetCallLine(phrase.GetChild(1).GetLine())
 			return []concept.Pipe{call}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
 				phrase.GetChild(3).GetLine(),
@@ -590,12 +595,12 @@ var (
 			if err != nil {
 				return nil, nil, err
 			}
-			return []concept.Pipe{
-					context.GetLibraryManager().Sandbox.Expression.Assignment.New(froms[0], toes[0]),
-				}, []*lexer.Line{lexer.NewLineFromTo(
-					phrase.GetChild(0).GetLine(),
-					phrase.GetChild(2).GetLine(),
-				)}, nil
+			instance := context.GetLibraryManager().Sandbox.Expression.Assignment.New(froms[0], toes[0])
+			instance.SetLine(phrase.GetChild(1).GetLine())
+			return []concept.Pipe{instance}, []*lexer.Line{lexer.NewLineFromTo(
+				phrase.GetChild(0).GetLine(),
+				phrase.GetChild(2).GetLine(),
+			)}, nil
 		}),
 		semantic.NewRule(PolymerizeAppend, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			//SymbolExpressionCeil -> SymbolExpressionCeil SymbolLeftArrow SymbolExpression1
@@ -607,12 +612,13 @@ var (
 			if err != nil {
 				return nil, nil, err
 			}
-			return []concept.Pipe{
-					context.GetLibraryManager().Sandbox.Expression.Append.New(array[0], item[0]),
-				}, []*lexer.Line{lexer.NewLineFromTo(
-					phrase.GetChild(0).GetLine(),
-					phrase.GetChild(2).GetLine(),
-				)}, nil
+
+			instance := context.GetLibraryManager().Sandbox.Expression.Append.New(array[0], item[0])
+			instance.SetLine(phrase.GetChild(1).GetLine())
+			return []concept.Pipe{instance}, []*lexer.Line{lexer.NewLineFromTo(
+				phrase.GetChild(0).GetLine(),
+				phrase.GetChild(2).GetLine(),
+			)}, nil
 		}),
 		semantic.NewRule(PolymerizeComponent, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			//SymbolExpressionFloor -> SymbolExpressionFloor SymbolDot SymbolIdentifier
@@ -620,17 +626,18 @@ var (
 			if err != nil {
 				return nil, nil, err
 			}
-			return []concept.Pipe{
-					context.GetLibraryManager().Sandbox.Expression.Component.New(
-						indexes[0],
-						context.GetLibraryManager().Sandbox.Variable.String.New(
-							phrase.GetChild(2).GetToken().Value(),
-						),
-					),
-				}, []*lexer.Line{lexer.NewLineFromTo(
-					phrase.GetChild(0).GetLine(),
-					phrase.GetChild(2).GetLine(),
-				)}, nil
+
+			component := context.GetLibraryManager().Sandbox.Expression.Component.New(
+				indexes[0],
+				context.GetLibraryManager().Sandbox.Variable.String.New(
+					phrase.GetChild(2).GetToken().Value(),
+				),
+			)
+			component.SetFieldLine(phrase.GetChild(1).GetLine())
+			return []concept.Pipe{component}, []*lexer.Line{lexer.NewLineFromTo(
+				phrase.GetChild(0).GetLine(),
+				phrase.GetChild(2).GetLine(),
+			)}, nil
 		}),
 		semantic.NewRule(PolymerizeIndexComponent, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			//SymbolExpressionFloor -> SymbolExpressionFloor SymbolLeftBracket SymbolExpressionCeil SymbolRightBracket
@@ -642,29 +649,30 @@ var (
 			if err != nil {
 				return nil, nil, err
 			}
-			return []concept.Pipe{
-					context.GetLibraryManager().Sandbox.Expression.IndexComponent.New(
-						indexes[0],
-						field[0],
-					),
-				}, []*lexer.Line{lexer.NewLineFromTo(
-					phrase.GetChild(0).GetLine(),
-					phrase.GetChild(3).GetLine(),
-				)}, nil
+
+			component := context.GetLibraryManager().Sandbox.Expression.IndexComponent.New(
+				indexes[0],
+				field[0],
+			)
+			component.SetFieldLine(phrase.GetChild(1).GetLine())
+			return []concept.Pipe{component}, []*lexer.Line{lexer.NewLineFromTo(
+				phrase.GetChild(0).GetLine(),
+				phrase.GetChild(3).GetLine(),
+			)}, nil
 		}),
 		semantic.NewRule(PolymerizeDefine, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			//SymbolExpressionIndependent -> SymbolVar SymbolIdentifier
-			return []concept.Pipe{
-					context.GetLibraryManager().Sandbox.Expression.Define.New(
-						context.GetLibraryManager().Sandbox.Variable.String.New(
-							phrase.GetChild(1).GetToken().Value(),
-						),
-						nil,
-					),
-				}, []*lexer.Line{lexer.NewLineFromTo(
-					phrase.GetChild(0).GetLine(),
-					phrase.GetChild(1).GetLine(),
-				)}, nil
+			instance := context.GetLibraryManager().Sandbox.Expression.Define.New(
+				context.GetLibraryManager().Sandbox.Variable.String.New(
+					phrase.GetChild(1).GetToken().Value(),
+				),
+				nil,
+			)
+			instance.SetLine(phrase.GetChild(1).GetLine())
+			return []concept.Pipe{instance}, []*lexer.Line{lexer.NewLineFromTo(
+				phrase.GetChild(0).GetLine(),
+				phrase.GetChild(1).GetLine(),
+			)}, nil
 		}),
 
 		semantic.NewRule(PolymerizeDefineAndInit, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
@@ -673,17 +681,17 @@ var (
 			if err != nil {
 				return nil, nil, err
 			}
-			return []concept.Pipe{
-					context.GetLibraryManager().Sandbox.Expression.Define.New(
-						context.GetLibraryManager().Sandbox.Variable.String.New(
-							phrase.GetChild(1).GetToken().Value(),
-						),
-						defaultValue[0],
-					),
-				}, []*lexer.Line{lexer.NewLineFromTo(
-					phrase.GetChild(0).GetLine(),
-					phrase.GetChild(3).GetLine(),
-				)}, nil
+			instance := context.GetLibraryManager().Sandbox.Expression.Define.New(
+				context.GetLibraryManager().Sandbox.Variable.String.New(
+					phrase.GetChild(1).GetToken().Value(),
+				),
+				defaultValue[0],
+			)
+			instance.SetLine(phrase.GetChild(1).GetLine())
+			return []concept.Pipe{instance}, []*lexer.Line{lexer.NewLineFromTo(
+				phrase.GetChild(0).GetLine(),
+				phrase.GetChild(3).GetLine(),
+			)}, nil
 		}),
 		semantic.NewRule(PolymerizeParentheses, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			// SymbolExpressionFloor -> SymbolLeftParenthesis SymbolExpressionCeil SymbolRightParenthesis
@@ -711,6 +719,7 @@ var (
 			eif := context.GetLibraryManager().Sandbox.Expression.If.New()
 			eif.SetCondition(condition[0])
 			eif.Primary().AddStep(steps...)
+			eif.SetLine(phrase.GetChild(1).GetLine())
 			return []concept.Pipe{eif}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
 				phrase.GetChild(6).GetLine(),
@@ -734,6 +743,7 @@ var (
 			eif.SetCondition(condition[0])
 			eif.Primary().AddStep(primarySteps...)
 			eif.Secondary().AddStep(secondarySteps...)
+			eif.SetLine(phrase.GetChild(1).GetLine())
 			return []concept.Pipe{eif}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
 				phrase.GetChild(10).GetLine(),
@@ -762,6 +772,7 @@ var (
 			efor.Init().AddStep(initSteps...)
 			efor.End().AddStep(endSteps...)
 			efor.Body().AddStep(bodySteps...)
+			efor.SetLine(phrase.GetChild(1).GetLine())
 			return []concept.Pipe{efor}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
 				phrase.GetChild(10).GetLine(),
@@ -793,6 +804,7 @@ var (
 			efor.Init().AddStep(initSteps...)
 			efor.End().AddStep(endSteps...)
 			efor.Body().AddStep(bodySteps...)
+			efor.SetLine(phrase.GetChild(3).GetLine())
 			return []concept.Pipe{efor}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
 				phrase.GetChild(12).GetLine(),
@@ -811,6 +823,7 @@ var (
 			efor := context.GetLibraryManager().Sandbox.Expression.For.New()
 			efor.SetCondition(condition[0])
 			efor.Body().AddStep(bodySteps...)
+			efor.SetLine(phrase.GetChild(1).GetLine())
 			return []concept.Pipe{efor}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
 				phrase.GetChild(6).GetLine(),
@@ -832,6 +845,7 @@ var (
 			))
 			efor.SetCondition(condition[0])
 			efor.Body().AddStep(bodySteps...)
+			efor.SetLine(phrase.GetChild(3).GetLine())
 			return []concept.Pipe{efor}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
 				phrase.GetChild(8).GetLine(),

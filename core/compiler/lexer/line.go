@@ -101,5 +101,5 @@ func (l *Line) ToLine() string {
 }
 
 func (l *Line) ToString() string {
-	return fmt.Sprintf("%v:\n%v", l.ToPath(), l.ToLine())
+	return fmt.Sprintf("%v\n%v", l.ToLine(), l.ToPath())
 }

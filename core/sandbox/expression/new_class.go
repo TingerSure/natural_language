@@ -19,11 +19,16 @@ type NewClassSeed interface {
 
 type NewClass struct {
 	*adaptor.ExpressionIndex
-	lines []concept.Pipe
+	items []concept.Pipe
+	lines []concept.Line
 	seed  NewClassSeed
 }
 
-func (f *NewClass) SetLines(lines []concept.Pipe) {
+func (f *NewClass) SetItems(items []concept.Pipe) {
+	f.items = items
+}
+
+func (f *NewClass) SetLines(lines []concept.Line) {
 	f.lines = lines
 }
 
@@ -33,16 +38,16 @@ func (f *NewClass) ToLanguage(language string, space concept.Pool) (string, conc
 
 func (a *NewClass) ToString(prefix string) string {
 	subPrefix := fmt.Sprintf("%v\t", prefix)
-	lines := []string{}
-	for _, line := range a.lines {
-		lines = append(lines, fmt.Sprintf("%v%v", subPrefix, line.ToString(subPrefix)))
+	items := []string{}
+	for _, line := range a.items {
+		items = append(items, fmt.Sprintf("%v%v", subPrefix, line.ToString(subPrefix)))
 	}
-	return fmt.Sprintf("class {\n%v\n%v}", strings.Join(lines, "\n"), prefix)
+	return fmt.Sprintf("class {\n%v\n%v}", strings.Join(items, "\n"), prefix)
 }
 
 func (a *NewClass) Anticipate(space concept.Pool) concept.Variable {
 	class := a.seed.NewClass()
-	for _, linePre := range a.lines {
+	for _, linePre := range a.items {
 		lineProvide, yes := index.IndexFamilyInstance.IsProvideIndex(linePre)
 		if yes {
 			funcsPre := lineProvide.Anticipate(space)
@@ -67,7 +72,7 @@ func (a *NewClass) Anticipate(space concept.Pool) concept.Variable {
 
 func (a *NewClass) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	class := a.seed.NewClass()
-	for _, linePre := range a.lines {
+	for cursor, linePre := range a.items {
 		lineProvide, yes := index.IndexFamilyInstance.IsProvideIndex(linePre)
 		if yes {
 			funcsPre, suspend := lineProvide.Get(space)
@@ -76,7 +81,7 @@ func (a *NewClass) Exec(space concept.Pool) (concept.Variable, concept.Interrupt
 			}
 			funcs, yes := variable.VariableFamilyInstance.IsFunctionHome(funcsPre)
 			if !yes {
-				return nil, a.seed.NewException("runtime error", fmt.Sprintf("Unsupported variable type in NewClass.provide : %v", funcsPre.Type()))
+				return nil, a.seed.NewException("runtime error", fmt.Sprintf("Unsupported variable type in NewClass.provide : %v", funcsPre.Type())).AddExceptionLine(a.lines[cursor])
 			}
 			class.SetProvide(a.seed.NewString(lineProvide.Name()), funcs)
 			continue
@@ -89,12 +94,12 @@ func (a *NewClass) Exec(space concept.Pool) (concept.Variable, concept.Interrupt
 			}
 			funcs, yes := variable.VariableFamilyInstance.IsDefineFunction(funcsPre)
 			if !yes {
-				return nil, a.seed.NewException("runtime error", fmt.Sprintf("Unsupported variable type in NewClass.require : %v", funcsPre.Type()))
+				return nil, a.seed.NewException("runtime error", fmt.Sprintf("Unsupported variable type in NewClass.require : %v", funcsPre.Type())).AddExceptionLine(a.lines[cursor])
 			}
 			class.SetRequire(a.seed.NewString(lineRequire.Name()), funcs)
 			continue
 		}
-		return nil, a.seed.NewException("runtime error", fmt.Sprintf("Unsupported index type in NewClass : %v", linePre.Type()))
+		return nil, a.seed.NewException("runtime error", fmt.Sprintf("Unsupported index type in NewClass : %v", linePre.Type())).AddExceptionLine(a.lines[cursor])
 	}
 	return class, nil
 }

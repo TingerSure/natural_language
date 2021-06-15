@@ -25,7 +25,12 @@ type For struct {
 	init      concept.CodeBlock
 	end       concept.CodeBlock
 	body      concept.CodeBlock
+	line      concept.Line
 	seed      ForSeed
+}
+
+func (f *For) SetLine(line concept.Line) {
+	f.line = line
 }
 
 func (f *For) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
@@ -72,7 +77,7 @@ body:
 
 		condition, yes := variable.VariableFamilyInstance.IsBool(preCondition)
 		if !yes {
-			return nil, f.seed.NewException("type error", "Only bool can be judged.")
+			return nil, f.seed.NewException("type error", "Only bool can be judged.").AddExceptionLine(f.line)
 		}
 
 		if !condition.Value() {
@@ -86,7 +91,7 @@ body:
 			case interrupt.BreakInterruptType:
 				breaks, yes := interrupt.InterruptFamilyInstance.IsBreak(suspend)
 				if !yes {
-					return nil, f.seed.NewException("system panic", fmt.Sprintf("BreakInterruptType does not mean a Break anymore.\n%+v", suspend))
+					return nil, f.seed.NewException("system panic", fmt.Sprintf("BreakInterruptType does not mean a Break anymore.\n%+v", suspend)).AddExceptionLine(f.line)
 				}
 				if !f.IsMyTag(breaks.Tag()) {
 					return nil, suspend
@@ -95,7 +100,7 @@ body:
 			case interrupt.ContinueInterruptType:
 				continues, yes := interrupt.InterruptFamilyInstance.IsContinue(suspend)
 				if !yes {
-					return nil, f.seed.NewException("system panic", fmt.Sprintf("ContinueInterruptType does not mean a Continue anymore.\n%+v", suspend))
+					return nil, f.seed.NewException("system panic", fmt.Sprintf("ContinueInterruptType does not mean a Continue anymore.\n%+v", suspend)).AddExceptionLine(f.line)
 				}
 				if !f.IsMyTag(continues.Tag()) {
 					return nil, suspend

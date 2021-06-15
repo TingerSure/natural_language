@@ -17,7 +17,12 @@ type Append struct {
 	*adaptor.ExpressionIndex
 	array concept.Pipe
 	item  concept.Pipe
+	line  concept.Line
 	seed  AppendSeed
+}
+
+func (f *Append) SetLine(line concept.Line) {
+	f.line = line
 }
 
 func (f *Append) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
@@ -43,7 +48,7 @@ func (a *Append) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) 
 	}
 	array, yes := variable.VariableFamilyInstance.IsArray(arrayPre)
 	if !yes {
-		return nil, a.seed.NewException("runtime error", fmt.Sprintf("%v is not an array", a.array.ToString("")))
+		return nil, a.seed.NewException("runtime error", fmt.Sprintf("%v is not an array", a.array.ToString(""))).AddLine(a.line)
 	}
 	array.Append(item)
 	return array, nil

@@ -16,12 +16,17 @@ type BubbleIndexSeed interface {
 
 type BubbleIndex struct {
 	key  concept.String
+	line concept.Line
 	seed BubbleIndexSeed
 }
 
 const (
 	IndexBubbleType = "Bubble"
 )
+
+func (f *BubbleIndex) SetLine(line concept.Line) {
+	f.line = line
+}
 
 func (f *BubbleIndex) Type() string {
 	return f.seed.Type()
@@ -60,7 +65,11 @@ func (s *BubbleIndex) CallAnticipate(space concept.Pool, param concept.Param) co
 }
 
 func (s *BubbleIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
-	return space.GetBubble(s.key)
+	value, suspend := space.GetBubble(s.key)
+	if !nl_interface.IsNil(suspend) {
+		suspend.AddLine(s.line)
+	}
+	return value, suspend
 }
 
 func (s *BubbleIndex) Anticipate(space concept.Pool) concept.Variable {

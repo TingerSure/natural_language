@@ -15,7 +15,12 @@ type Assignment struct {
 	*adaptor.ExpressionIndex
 	from concept.Pipe
 	to   concept.Pipe
+	line concept.Line
 	seed AssignmentSeed
+}
+
+func (f *Assignment) SetLine(line concept.Line) {
+	f.line = line
 }
 
 func (f *Assignment) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
@@ -35,7 +40,11 @@ func (a *Assignment) Exec(space concept.Pool) (concept.Variable, concept.Interru
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend
 	}
-	return preFrom, a.to.Set(space, preFrom)
+	suspend = a.to.Set(space, preFrom)
+	if !nl_interface.IsNil(suspend) {
+		suspend.AddLine(a.line)
+	}
+	return preFrom, suspend
 }
 
 type AssignmentCreatorParam struct {
