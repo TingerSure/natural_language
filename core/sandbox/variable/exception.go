@@ -7,6 +7,23 @@ import (
 	"strings"
 )
 
+type Line struct {
+	path string
+	line string
+}
+
+func (l *Line) ToPath() string {
+	return l.path
+}
+
+func (l *Line) ToLine() string {
+	return l.line
+}
+
+func (l *Line) ToString() string {
+	return fmt.Sprintf("%v:\n%v", l.path, l.line)
+}
+
 const (
 	ExceptionInterruptType = "exception"
 	VariableExceptionType  = "exception"
@@ -105,6 +122,13 @@ type ExceptionCreatorParam struct {
 type ExceptionCreator struct {
 	Seeds map[string]func(concept.Pool, *Exception) (string, concept.Exception)
 	param *ExceptionCreatorParam
+}
+
+func (s *ExceptionCreator) NewLine(path string, line string) *Line {
+	return &Line{
+		path,
+		line,
+	}
 }
 
 func (s *ExceptionCreator) NewOriginal(name string, message string) concept.Exception {
