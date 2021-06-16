@@ -11,23 +11,33 @@ import (
 
 type NewObjectSeed interface {
 	ToLanguage(string, concept.Pool, *NewObject) (string, concept.Exception)
+	NewException(string, string) concept.Exception
 	NewObject() concept.Object
 }
 
 type NewObject struct {
 	*adaptor.ExpressionIndex
-	fields *nl_interface.Mapping
+	fields []*index.KeyValueIndex
+	lines  []concept.Line
 	seed   NewObjectSeed
 }
 
-func (f *NewObject) SetKeyValue(keyValues []concept.Pipe) {
-	for _, keyValuePre := range keyValues {
+func (f *NewObject) SetKeyValue(keyValues []concept.Pipe, lines []concept.Line) error {
+	f.lines = lines
+	fieldMap := map[string]bool{}
+	f.fields = []*index.KeyValueIndex{}
+	for cursor, keyValuePre := range keyValues {
 		keyValue, yes := index.IndexFamilyInstance.IsKeyValueIndex(keyValuePre)
 		if !yes {
-			panic(fmt.Sprintf("Unsupported index type in NewObject.SetKeyValue : %v", keyValuePre.Type()))
+			return fmt.Errorf("Unsupported index type in NewObject.SetKeyValue : %v\n%v", keyValuePre.Type(), lines[cursor].ToString())
 		}
-		f.fields.Set(keyValue.Key(), keyValue.Value())
+		if fieldMap[keyValue.Key().Value()] {
+			return fmt.Errorf("Duplicate field: '%v'\n%v", keyValue.Key().Value(), lines[cursor].ToString())
+		}
+		fieldMap[keyValue.Key().Value()] = true
+		f.fields = append(f.fields, keyValue)
 	}
+	return nil
 }
 
 func (f *NewObject) ToLanguage(language string, space concept.Pool) (string, concept.Exception) {
@@ -37,23 +47,22 @@ func (f *NewObject) ToLanguage(language string, space concept.Pool) (string, con
 func (a *NewObject) ToString(prefix string) string {
 	subPrefix := fmt.Sprintf("%v\t", prefix)
 
-	if a.fields.Size() == 0 {
+	if len(a.fields) == 0 {
 		return "{}"
 	}
-	paramsToString := make([]string, 0, a.fields.Size())
-	a.fields.Iterate(func(key nl_interface.Key, value interface{}) bool {
-		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, key.(concept.String).Value(), value.(concept.ToString).ToString(subPrefix)))
-		return false
-	})
+	paramsToString := make([]string, 0, len(a.fields))
+	for _, field := range a.fields {
+		paramsToString = append(paramsToString, fmt.Sprintf("%v%v : %v", subPrefix, field.Key().Value(), field.Value().ToString(subPrefix)))
+	}
 	return fmt.Sprintf("{%v\n%v\n%v}", prefix, strings.Join(paramsToString, ",\n"), prefix)
 
 }
 
 func (a *NewObject) Anticipate(space concept.Pool) concept.Variable {
 	object := a.seed.NewObject()
-	a.fields.Iterate(func(key nl_interface.Key, value interface{}) bool {
-		return !nl_interface.IsNil(object.SetField(key.(concept.String), value.(concept.Pipe).Anticipate(space)))
-	})
+	for _, field := range a.fields {
+		object.SetField(field.Key(), field.Value().Anticipate(space))
+	}
 	return object
 }
 
@@ -61,22 +70,22 @@ func (a *NewObject) Exec(space concept.Pool) (concept.Variable, concept.Interrup
 	object := a.seed.NewObject()
 	var suspend concept.Interrupt = nil
 	var value concept.Variable = nil
-	if a.fields.Iterate(func(key nl_interface.Key, item interface{}) bool {
-		value, suspend = item.(concept.Pipe).Get(space)
+	for cursor, field := range a.fields {
+		value, suspend = field.Value().Get(space)
 		if !nl_interface.IsNil(suspend) {
-			return true
+			return nil, suspend
 		}
-		suspend = object.SetField(key.(concept.String), value)
-		return !nl_interface.IsNil(suspend)
-
-	}) {
-		return nil, suspend
+		suspend = object.SetField(field.Key(), value)
+		if !nl_interface.IsNil(suspend) {
+			return nil, suspend.AddLine(a.lines[cursor])
+		}
 	}
 	return object, nil
 }
 
 type NewObjectCreatorParam struct {
 	ExpressionIndexCreator func(concept.Expression) *adaptor.ExpressionIndex
+	ExceptionCreator       func(string, string) concept.Exception
 	ObjectCreator          func() concept.Object
 	NullCreator            func() concept.Null
 }
@@ -88,14 +97,16 @@ type NewObjectCreator struct {
 
 func (s *NewObjectCreator) New() *NewObject {
 	back := &NewObject{
-		seed: s,
-		fields: nl_interface.NewMapping(&nl_interface.MappingParam{
-			AutoInit:   true,
-			EmptyValue: s.param.NullCreator(),
-		}),
+		fields: []*index.KeyValueIndex{},
+		lines:  []concept.Line{},
+		seed:   s,
 	}
 	back.ExpressionIndex = s.param.ExpressionIndexCreator(back)
 	return back
+}
+
+func (s *NewObjectCreator) NewException(name string, message string) concept.Exception {
+	return s.param.ExceptionCreator(name, message)
 }
 
 func (s *NewObjectCreator) NewObject() concept.Object {

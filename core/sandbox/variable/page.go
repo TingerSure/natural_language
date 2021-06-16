@@ -32,7 +32,7 @@ func (o *Page) Call(specimen concept.String, param concept.Param) (concept.Param
 		return nil, exception
 	}
 	if !value.IsFunction() {
-		return nil, o.seed.NewException("runtime error", fmt.Sprintf("There is no public function called %v to be called here.", specimen.ToString("")))
+		return nil, o.seed.NewException("runtime error", fmt.Sprintf("There is no public function called '%v' to be called here.", specimen.Value()))
 	}
 	return value.(concept.Function).Exec(param, nil)
 }
@@ -52,7 +52,7 @@ func (o *Page) SetPublic(specimen concept.String, indexes concept.Pipe) error {
 
 func (o *Page) SetPrivate(specimen concept.String, indexes concept.Pipe) error {
 	if o.space.HasLocal(specimen) {
-		return o.seed.NewException("runtime error", fmt.Sprintf("Duplicate identifier: %v.", specimen.ToString("")))
+		return o.seed.NewException("runtime error", fmt.Sprintf("Duplicate identifier: '%v'.", specimen.Value()))
 	}
 	value, suspend := indexes.Get(o.space)
 	if !nl_interface.IsNil(suspend) {
@@ -60,7 +60,7 @@ func (o *Page) SetPrivate(specimen concept.String, indexes concept.Pipe) error {
 		if yes {
 			return exception.(concept.Exception)
 		}
-		return fmt.Errorf("An illegal interrupt \"%v\" was thrown while declaring variable : %v.", suspend.InterruptType(), specimen.ToString(""))
+		return fmt.Errorf("An illegal interrupt \"%v\" was thrown while declaring variable : '%v'.", suspend.InterruptType(), specimen.Value())
 	}
 	o.privates = append(o.privates, indexes)
 	o.space.InitLocal(specimen, value)
@@ -69,7 +69,7 @@ func (o *Page) SetPrivate(specimen concept.String, indexes concept.Pipe) error {
 
 func (o *Page) SetField(specimen concept.String, value concept.Variable) concept.Exception {
 	if !o.publics.Has(specimen) {
-		return o.seed.NewException("runtime error", fmt.Sprintf("There is no public field called %v to be set here.", specimen.ToString("")))
+		return o.seed.NewException("runtime error", fmt.Sprintf("There is no public field called '%v' to be set here.", specimen.Value()))
 	}
 	return o.space.SetLocal(specimen, value)
 }

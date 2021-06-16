@@ -22,24 +22,26 @@ type NewFunction struct {
 	seed    NewFunctionSeed
 }
 
-func (f *NewFunction) SetReturns(returns []concept.Pipe) {
-	for _, keyPre := range returns {
+func (f *NewFunction) SetReturns(returns []concept.Pipe, lines []concept.Line) error {
+	for cursor, keyPre := range returns {
 		key, yes := index.IndexFamilyInstance.IsKeyIndex(keyPre)
 		if !yes {
-			panic(fmt.Sprintf("Unsupported index type in NewFunction.SetReturn : %v", keyPre.Type()))
+			return fmt.Errorf("Unsupported index type in NewDefineFunction.SetReturn : %v\n%v", keyPre.Type(), lines[cursor].ToString())
 		}
 		f.returns = append(f.returns, key.Key())
 	}
+	return nil
 }
 
-func (f *NewFunction) SetParams(params []concept.Pipe) {
-	for _, keyPre := range params {
+func (f *NewFunction) SetParams(params []concept.Pipe, lines []concept.Line) error {
+	for cursor, keyPre := range params {
 		key, yes := index.IndexFamilyInstance.IsKeyIndex(keyPre)
 		if !yes {
-			panic(fmt.Sprintf("Unsupported index type in NewFunction.SetParam : %v", keyPre.Type()))
+			return fmt.Errorf("Unsupported index type in NewDefineFunction.SetParam : %v\n%v", keyPre.Type(), lines[cursor].ToString())
 		}
 		f.params = append(f.params, key.Key())
 	}
+	return nil
 }
 
 func (f *NewFunction) SetSteps(steps []concept.Pipe) {

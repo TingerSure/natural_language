@@ -123,6 +123,7 @@ func NewExpressionCreator(param *ExpressionCreatorParam) *ExpressionCreator {
 	})
 	instance.NewObject = expression.NewNewObjectCreator(&expression.NewObjectCreatorParam{
 		ObjectCreator:          param.ObjectCreator,
+		ExceptionCreator:       param.ExceptionCreator,
 		NullCreator:            param.NullCreator,
 		ExpressionIndexCreator: instance.ExpressionIndex.New,
 	})

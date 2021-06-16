@@ -18,10 +18,20 @@ type NewMappingObjectSeed interface {
 
 type NewMappingObject struct {
 	*adaptor.ExpressionIndex
-	object  concept.Pipe
-	class   concept.Pipe
-	mapping []concept.Pipe
-	seed    NewMappingObjectSeed
+	object       concept.Pipe
+	class        concept.Pipe
+	mapping      []concept.Pipe
+	line         concept.Line
+	mappingLines []concept.Line
+	seed         NewMappingObjectSeed
+}
+
+func (f *NewMappingObject) SetLine(line concept.Line) {
+	f.line = line
+}
+
+func (f *NewMappingObject) SetMappingLines(mappingLines []concept.Line) {
+	f.mappingLines = mappingLines
 }
 
 func (f *NewMappingObject) SetMapping(mapping []concept.Pipe) {
@@ -79,13 +89,13 @@ func (a *NewMappingObject) Exec(space concept.Pool) (concept.Variable, concept.I
 	}
 	class, yes := variable.VariableFamilyInstance.IsClass(classPre)
 	if !yes {
-		return nil, a.seed.NewException("runtime error", fmt.Sprintf("Unsupported variable type as class in NewMappingObject: %v", classPre.Type()))
+		return nil, a.seed.NewException("runtime error", fmt.Sprintf("Unsupported variable type as class in NewMappingObject: %v", classPre.Type())).AddExceptionLine(a.line)
 	}
 	mappingObject := a.seed.NewMappingObject(object, class)
-	for _, keykeyPre := range a.mapping {
+	for cursor, keykeyPre := range a.mapping {
 		keykey, yes := index.IndexFamilyInstance.IsKeyKeyIndex(keykeyPre)
 		if !yes {
-			return nil, a.seed.NewException("runtime error", fmt.Sprintf("Unsupported index type in NewMappingObject : %v", keykeyPre.Type()))
+			return nil, a.seed.NewException("runtime error", fmt.Sprintf("Unsupported index type in NewMappingObject : %v", keykeyPre.Type())).AddExceptionLine(a.mappingLines[cursor])
 		}
 		mappingObject.SetMapping(keykey.From(), keykey.To())
 	}

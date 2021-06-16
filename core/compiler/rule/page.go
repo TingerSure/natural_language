@@ -102,8 +102,8 @@ var (
 			newClass := context.GetLibraryManager().Sandbox.Expression.NewClass.New()
 			newClass.SetItems(items)
 			lines := make([]concept.Line, len(prelines))
-			for _, line := range prelines {
-				lines = append(lines, line)
+			for cursor, line := range prelines {
+				lines[cursor] = line
 			}
 			newClass.SetLines(lines)
 			return []concept.Pipe{newClass}, []*lexer.Line{lexer.NewLineFromTo(
@@ -342,12 +342,19 @@ var (
 		}),
 		semantic.NewRule(PolymerizeObject, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			//SymbolObject -> SymbolLeftBrace SymbolKeyValueList SymbolRightBrace
-			fields, _, err := context.Deal(phrase.GetChild(1))
+			fields, preLines, err := context.Deal(phrase.GetChild(1))
 			if err != nil {
 				return nil, nil, err
 			}
 			newObject := context.GetLibraryManager().Sandbox.Expression.NewObject.New()
-			newObject.SetKeyValue(fields)
+			lines := make([]concept.Line, len(preLines))
+			for cursor, line := range preLines {
+				lines[cursor] = line
+			}
+			err = newObject.SetKeyValue(fields, lines)
+			if err != nil {
+				return nil, nil, err
+			}
 			return []concept.Pipe{newObject}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
 				phrase.GetChild(2).GetLine(),
@@ -355,11 +362,11 @@ var (
 		}),
 		semantic.NewRule(PolymerizeFunctionGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			//SymbolFunctionGroup -> SymbolFunction SymbolLeftParenthesis SymbolKeyList SymbolRightParenthesis SymbolKeyList SymbolLeftBrace SymbolExpressionList SymbolRightBrace
-			params, _, err := context.Deal(phrase.GetChild(2))
+			params, preParamLines, err := context.Deal(phrase.GetChild(2))
 			if err != nil {
 				return nil, nil, err
 			}
-			returns, _, err := context.Deal(phrase.GetChild(4))
+			returns, preReturnLines, err := context.Deal(phrase.GetChild(4))
 			if err != nil {
 				return nil, nil, err
 			}
@@ -368,8 +375,22 @@ var (
 				return nil, nil, err
 			}
 			newFunction := context.GetLibraryManager().Sandbox.Expression.NewFunction.New()
-			newFunction.SetParams(params)
-			newFunction.SetReturns(returns)
+			paramLines := make([]concept.Line, len(preParamLines))
+			for cursor, paramLine := range preParamLines {
+				paramLines[cursor] = paramLine
+			}
+			returnLines := make([]concept.Line, len(preReturnLines))
+			for cursor, returnLine := range preReturnLines {
+				returnLines[cursor] = returnLine
+			}
+			err = newFunction.SetParams(params, paramLines)
+			if err != nil {
+				return nil, nil, err
+			}
+			err = newFunction.SetReturns(returns, returnLines)
+			if err != nil {
+				return nil, nil, err
+			}
 			newFunction.SetSteps(steps)
 			return []concept.Pipe{newFunction}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
@@ -378,17 +399,31 @@ var (
 		}),
 		semantic.NewRule(PolymerizeDefineFunctionGroup, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			//SymbolDefineFunctionGroup -> SymbolFunction SymbolLeftParenthesis SymbolKeyList SymbolRightParenthesis SymbolKeyList
-			params, _, err := context.Deal(phrase.GetChild(2))
+			params, preParamLines, err := context.Deal(phrase.GetChild(2))
 			if err != nil {
 				return nil, nil, err
 			}
-			returns, _, err := context.Deal(phrase.GetChild(4))
+			returns, preReturnLines, err := context.Deal(phrase.GetChild(4))
 			if err != nil {
 				return nil, nil, err
 			}
 			newFunction := context.GetLibraryManager().Sandbox.Expression.NewDefineFunction.New()
-			newFunction.SetParams(params)
-			newFunction.SetReturns(returns)
+			paramLines := make([]concept.Line, len(preParamLines))
+			for cursor, paramLine := range preParamLines {
+				paramLines[cursor] = paramLine
+			}
+			returnLines := make([]concept.Line, len(preReturnLines))
+			for cursor, returnLine := range preReturnLines {
+				returnLines[cursor] = returnLine
+			}
+			err = newFunction.SetParams(params, paramLines)
+			if err != nil {
+				return nil, nil, err
+			}
+			err = newFunction.SetReturns(returns, returnLines)
+			if err != nil {
+				return nil, nil, err
+			}
 			return []concept.Pipe{newFunction}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
 				phrase.GetChild(4).GetLine(),
@@ -510,14 +545,20 @@ var (
 			if err != nil {
 				return nil, nil, err
 			}
-			mapping, _, err := context.Deal(phrase.GetChild(4))
+			mapping, preMappingLines, err := context.Deal(phrase.GetChild(4))
 			if err != nil {
 				return nil, nil, err
+			}
+			mappingLines := make([]concept.Line, len(preMappingLines))
+			for cursor, mappingLine := range preMappingLines {
+				preMappingLines[cursor] = mappingLine
 			}
 			newMappingObject := context.GetLibraryManager().Sandbox.Expression.NewMappingObject.New()
 			newMappingObject.SetObject(object[0])
 			newMappingObject.SetClass(class[0])
 			newMappingObject.SetMapping(mapping)
+			newMappingObject.SetLine(phrase.GetChild(1).GetLine())
+			newMappingObject.SetMappingLines(mappingLines)
 			return []concept.Pipe{newMappingObject}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
 				phrase.GetChild(5).GetLine(),
@@ -536,6 +577,7 @@ var (
 			newMappingObject := context.GetLibraryManager().Sandbox.Expression.NewMappingObject.New()
 			newMappingObject.SetObject(object[0])
 			newMappingObject.SetClass(class[0])
+			newMappingObject.SetLine(phrase.GetChild(1).GetLine())
 			return []concept.Pipe{newMappingObject}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
 				phrase.GetChild(2).GetLine(),
@@ -569,12 +611,19 @@ var (
 			if err != nil {
 				return nil, nil, err
 			}
-			params, _, err := context.Deal(phrase.GetChild(2))
+			params, preLines, err := context.Deal(phrase.GetChild(2))
 			if err != nil {
 				return nil, nil, err
 			}
+			lines := make([]concept.Line, len(preLines))
+			for cursor, line := range preLines {
+				lines[cursor] = line
+			}
 			newParam := context.GetLibraryManager().Sandbox.Expression.NewParam.New()
-			newParam.SetKeyValue(params)
+			err = newParam.SetKeyValue(params, lines)
+			if err != nil {
+				return nil, nil, err
+			}
 			call := context.GetLibraryManager().Sandbox.Expression.Call.New(
 				funcs[0],
 				newParam,
