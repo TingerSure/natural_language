@@ -118,7 +118,9 @@ type NewClassCreator struct {
 
 func (s *NewClassCreator) New() *NewClass {
 	back := &NewClass{
-		seed: s,
+		items: []concept.Pipe{},
+		lines: []concept.Line{},
+		seed:  s,
 	}
 	back.ExpressionIndex = s.param.ExpressionIndexCreator(back)
 	return back

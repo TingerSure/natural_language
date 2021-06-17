@@ -58,16 +58,17 @@ var (
 				}
 				return nil, nil, fmt.Errorf("Unsupported pipe to be set to page: %v\n%v", item.ToString(""), lines[cursor].ToString())
 			}
-			return []concept.Pipe{
-					context.GetLibraryManager().Sandbox.Index.ConstIndex.New(page),
-				}, []*lexer.Line{
-					func() *lexer.Line {
-						if len(lines) == 0 {
-							return lexer.NewLine(context.Path(), context.Content())
-						}
-						return lexer.NewLineList(lines)
-					}(),
-				}, nil
+			var line *lexer.Line
+
+			if len(lines) == 0 {
+				line = lexer.NewLine(context.Path(), context.Content())
+			} else {
+				line = lexer.NewLineList(lines)
+			}
+
+			instance := context.GetLibraryManager().Sandbox.Index.ConstIndex.New(page)
+			instance.SetLine(line)
+			return []concept.Pipe{instance}, []*lexer.Line{line}, nil
 		}),
 		semantic.NewRule(PolymerizePageItemList, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			// SymbolPageItemList -> SymbolPageItemArray
@@ -1056,19 +1057,19 @@ var (
 		}),
 		semantic.NewRule(PolymerizeThis, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			//SymbolExpressionFloor -> SymbolThis
-			return []concept.Pipe{
-					context.GetLibraryManager().Sandbox.Index.ThisIndex.New(),
-				}, []*lexer.Line{
-					phrase.GetChild(0).GetLine(),
-				}, nil
+			this := context.GetLibraryManager().Sandbox.Index.ThisIndex.New()
+			this.SetLine(phrase.GetChild(0).GetLine())
+			return []concept.Pipe{this}, []*lexer.Line{
+				phrase.GetChild(0).GetLine(),
+			}, nil
 		}),
 		semantic.NewRule(PolymerizeSelf, func(phrase grammar.Phrase, context *semantic.Context) ([]concept.Pipe, []*lexer.Line, error) {
 			//SymbolExpressionFloor -> SymbolSelf
-			return []concept.Pipe{
-					context.GetLibraryManager().Sandbox.Index.SelfIndex.New(),
-				}, []*lexer.Line{
-					phrase.GetChild(0).GetLine(),
-				}, nil
+			self := context.GetLibraryManager().Sandbox.Index.SelfIndex.New()
+			self.SetLine(phrase.GetChild(0).GetLine())
+			return []concept.Pipe{self}, []*lexer.Line{
+				phrase.GetChild(0).GetLine(),
+			}, nil
 		}),
 	}
 )

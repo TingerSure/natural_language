@@ -51,7 +51,7 @@ func (s *BubbleIndex) Call(space concept.Pool, param concept.Param) (concept.Par
 		return nil, interrupt.(concept.Exception)
 	}
 	if !funcs.IsFunction() {
-		return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString("")))
+		return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString(""))).AddExceptionLine(s.line)
 	}
 	return funcs.(concept.Function).Exec(param, nil)
 }

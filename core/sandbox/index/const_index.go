@@ -15,12 +15,17 @@ type ConstIndexSeed interface {
 
 type ConstIndex struct {
 	value concept.Variable
+	line  concept.Line
 	seed  ConstIndexSeed
 }
 
 const (
 	IndexConstType = "Const"
 )
+
+func (f *ConstIndex) SetLine(line concept.Line) {
+	f.line = line
+}
 
 func (f *ConstIndex) Type() string {
 	return f.seed.Type()
@@ -40,7 +45,7 @@ func (s *ConstIndex) Value() concept.Variable {
 
 func (s *ConstIndex) Call(space concept.Pool, param concept.Param) (concept.Param, concept.Exception) {
 	if !s.value.IsFunction() {
-		return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString("")))
+		return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString(""))).AddExceptionLine(s.line)
 	}
 	return s.value.(concept.Function).Exec(param, nil)
 }
@@ -61,7 +66,7 @@ func (s *ConstIndex) Anticipate(space concept.Pool) concept.Variable {
 }
 
 func (s *ConstIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {
-	return s.seed.NewException("read only", "Constants cannot be changed.")
+	return s.seed.NewException("read only", "Constants cannot be changed.").AddExceptionLine(s.line)
 }
 
 type ConstIndexCreatorParam struct {

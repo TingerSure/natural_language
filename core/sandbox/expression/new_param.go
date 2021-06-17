@@ -37,7 +37,7 @@ func (f *NewParam) SetKeyValue(keyValues []concept.Pipe, lines []concept.Line) e
 			return fmt.Errorf("Unsupported index type in NewParam.SetKeyValue : %v\n%v", keyValuePre.Type(), lines[cursor].ToString())
 		}
 		if valueMap[keyValue.Key().Value()] {
-			return fmt.Errorf("Duplicate param: '%v'\n%v", keyValue.Key().Value(), lines[cursor].ToString())
+			return fmt.Errorf("Duplicate key: '%v'\n%v", keyValue.Key().Value(), lines[cursor].ToString())
 		}
 		valueMap[keyValue.Key().Value()] = true
 		f.values = append(f.values, keyValue)

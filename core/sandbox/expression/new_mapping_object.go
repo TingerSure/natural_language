@@ -115,7 +115,8 @@ type NewMappingObjectCreator struct {
 
 func (s *NewMappingObjectCreator) New() *NewMappingObject {
 	back := &NewMappingObject{
-		seed: s,
+		mappingLines: []concept.Line{},
+		seed:         s,
 	}
 	back.ExpressionIndex = s.param.ExpressionIndexCreator(back)
 	return back

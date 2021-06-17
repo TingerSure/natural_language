@@ -20,12 +20,17 @@ type SelfIndexSeed interface {
 }
 
 type SelfIndex struct {
+	line concept.Line
 	seed SelfIndexSeed
 }
 
 const (
 	IndexSelfType = "Self"
 )
+
+func (f *SelfIndex) SetLine(line concept.Line) {
+	f.line = line
+}
 
 func (f *SelfIndex) Type() string {
 	return f.seed.Type()
@@ -45,7 +50,7 @@ func (s *SelfIndex) Call(space concept.Pool, param concept.Param) (concept.Param
 		return nil, interrupt.(concept.Exception)
 	}
 	if !funcs.IsFunction() {
-		return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString("")))
+		return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString(""))).AddExceptionLine(s.line)
 	}
 	return funcs.(concept.Function).Exec(param, nil)
 }
@@ -68,7 +73,7 @@ func (s *SelfIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt
 }
 
 func (s *SelfIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {
-	return s.seed.NewException("read only", "Self cannot be changed.")
+	return s.seed.NewException("read only", "Self cannot be changed.").AddExceptionLine(s.line)
 }
 
 type SelfIndexCreatorParam struct {
