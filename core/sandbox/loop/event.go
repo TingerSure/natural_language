@@ -8,6 +8,7 @@ import (
 type Event struct {
 	index concept.Pipe
 	space concept.Pool
+	line  concept.Line
 }
 
 func (e *Event) Exec() concept.Interrupt {
@@ -16,13 +17,13 @@ func (e *Event) Exec() concept.Interrupt {
 		e.space.AddExtempore(e.index, resault)
 		return nil
 	}
-	return suspend
+	return suspend.AddLine(e.line)
 }
 
-func NewEvent(index concept.Pipe, space concept.Pool) *Event {
-
+func NewEvent(index concept.Pipe, line concept.Line, space concept.Pool) *Event {
 	return &Event{
 		index: index,
 		space: space,
+		line:  line,
 	}
 }

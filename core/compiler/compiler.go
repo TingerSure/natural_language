@@ -138,7 +138,7 @@ func (c *Compiler) initPage(pageIndex concept.Pipe, path string) error {
 	}
 	_, exception = page.Call(initKey, c.libs.Sandbox.Variable.Param.New())
 	if !nl_interface.IsNil(exception) {
-		return exception.(concept.Exception).AddExceptionLine(c.libs.Sandbox.Variable.Exception.NewLine(fmt.Sprintf("%v:[auto_init]", path), ""))
+		return exception.(concept.Exception).AddExceptionLine(tree.NewLine(fmt.Sprintf("[auto_init]:%v", path), ""))
 	}
 	return nil
 }

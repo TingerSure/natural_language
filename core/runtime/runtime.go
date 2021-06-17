@@ -106,8 +106,8 @@ func (r *Runtime) Stop() error {
 	return r.box.Stop()
 }
 
-func (r *Runtime) Exec(hand concept.Pipe) {
-	r.box.Exec(hand)
+func (r *Runtime) Exec(hand concept.Pipe, line concept.Line) {
+	r.box.Exec(hand, line)
 }
 
 type RuntimeParam struct {

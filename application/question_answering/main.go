@@ -5,6 +5,7 @@ import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/runtime"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/tree"
 	"github.com/TingerSure/natural_language/library/system"
 	lib_runtime "github.com/TingerSure/natural_language/library/system/runtime"
 	"github.com/TingerSure/natural_language/library/system/std"
@@ -93,7 +94,7 @@ func test() {
 			}
 
 			fmt.Printf("\033[1;32m[LOG]:\033[00m %v\n", index.ToString(""))
-			VM.Exec(index)
+			VM.Exec(index, tree.NewLine(fmt.Sprintf("[scan_input]:%v", input), ""))
 			return true
 		},
 		BeforeReader: func() {
