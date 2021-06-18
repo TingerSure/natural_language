@@ -31,7 +31,7 @@ func (o *AdaptorVariable) CallAdaptor(specimen concept.String, param concept.Par
 		return nil, exception
 	}
 	if !value.IsFunction() {
-		return nil, o.param.ExceptionCreator("runtime error", fmt.Sprintf("There is no function called \"%v\" to be called here.", specimen.ToString("")))
+		return nil, o.param.ExceptionCreator("runtime error", fmt.Sprintf("There is no function called '%v' to be called here.", specimen.Value()))
 	}
 	return value.(concept.Function).Exec(param, this)
 }

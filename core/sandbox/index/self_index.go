@@ -50,7 +50,7 @@ func (s *SelfIndex) Call(space concept.Pool, param concept.Param) (concept.Param
 		return nil, interrupt.(concept.Exception)
 	}
 	if !funcs.IsFunction() {
-		return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString(""))).AddExceptionLine(s.line)
+		return nil, s.seed.NewException("runtime error", fmt.Sprintf("The \"%v\" is not a function.", s.ToString("")))
 	}
 	return funcs.(concept.Function).Exec(param, nil)
 }
@@ -69,11 +69,15 @@ func (s *SelfIndex) Anticipate(space concept.Pool) concept.Variable {
 }
 
 func (s *SelfIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
-	return space.GetBubble(s.seed.NewString(selfIndexKey))
+	value, suspend := space.GetBubble(s.seed.NewString(selfIndexKey))
+	if nl_interface.IsNil(suspend) {
+		return nil, suspend.AddLine(s.line)
+	}
+	return value, nil
 }
 
 func (s *SelfIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {
-	return s.seed.NewException("read only", "Self cannot be changed.").AddExceptionLine(s.line)
+	return s.seed.NewException("read only", "Self cannot be changed.")
 }
 
 type SelfIndexCreatorParam struct {

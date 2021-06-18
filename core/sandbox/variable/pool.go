@@ -232,7 +232,7 @@ func (o *Pool) Call(specimen concept.String, param concept.Param) (concept.Param
 		return nil, exception
 	}
 	if !value.IsFunction() {
-		return nil, o.seed.NewException("runtime error", fmt.Sprintf("There is no function called \"%v\" to be called in pool.", specimen.ToString("")))
+		return nil, o.seed.NewException("runtime error", fmt.Sprintf("There is no function called '%v' to be called in pool.", specimen.Value()))
 	}
 	return value.(concept.Function).Exec(param, nil)
 }

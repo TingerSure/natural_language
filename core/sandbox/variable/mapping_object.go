@@ -40,7 +40,7 @@ func (o *MappingObject) Call(specimen concept.String, param concept.Param) (conc
 	if o.class.HasProvide(specimen) {
 		return o.callProvide(specimen, param)
 	}
-	return nil, o.seed.NewException("runtime error", fmt.Sprintf("There is no function called \"%v\" to be called here.", specimen.ToString("")))
+	return nil, o.seed.NewException("runtime error", fmt.Sprintf("There is no function called '%v' to be called here.", specimen.Value()))
 }
 
 func (o *MappingObject) callRequire(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {

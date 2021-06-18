@@ -61,11 +61,7 @@ func (a *Component) Set(space concept.Pool, value concept.Variable) concept.Inte
 	if !nl_interface.IsNil(suspend) {
 		return suspend
 	}
-	suspend = object.SetField(a.field, value)
-	if !nl_interface.IsNil(suspend) {
-		return suspend.AddLine(a.fieldLine)
-	}
-	return nil
+	return object.SetField(a.field, value)
 }
 
 func (a *Component) Call(space concept.Pool, param concept.Param) (concept.Param, concept.Exception) {
@@ -73,11 +69,7 @@ func (a *Component) Call(space concept.Pool, param concept.Param) (concept.Param
 	if !nl_interface.IsNil(suspend) {
 		return nil, suspend.(concept.Exception)
 	}
-	value, exception := object.Call(a.field, param)
-	if !nl_interface.IsNil(exception) {
-		exception.AddLine(a.fieldLine)
-	}
-	return value, exception
+	return object.Call(a.field, param)
 }
 
 type ComponentCreatorParam struct {

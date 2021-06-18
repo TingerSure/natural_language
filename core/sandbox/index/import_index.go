@@ -45,7 +45,7 @@ func (f *ImportIndex) ToLanguage(language string, space concept.Pool) (string, c
 }
 
 func (s *ImportIndex) ToString(prefix string) string {
-	return fmt.Sprintf("import %v \"%v\"", s.name, s.path)
+	return fmt.Sprintf("import %v '%v'", s.name, s.path)
 }
 
 func (s *ImportIndex) Call(space concept.Pool, param concept.Param) (concept.Param, concept.Exception) {

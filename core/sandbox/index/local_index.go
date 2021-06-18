@@ -16,12 +16,17 @@ type LocalIndexSeed interface {
 
 type LocalIndex struct {
 	key  concept.String
+	line concept.Line
 	seed LocalIndexSeed
 }
 
 const (
 	IndexLocalType = "Local"
 )
+
+func (f *LocalIndex) SetLine(line concept.Line) {
+	f.line = line
+}
 
 func (f *LocalIndex) Type() string {
 	return f.seed.Type()
@@ -64,7 +69,11 @@ func (s *LocalIndex) Anticipate(space concept.Pool) concept.Variable {
 }
 
 func (s *LocalIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
-	return space.GetLocal(s.key)
+	value, suspend := space.GetLocal(s.key)
+	if !nl_interface.IsNil(suspend) {
+		suspend.AddLine(s.line)
+	}
+	return value, suspend
 }
 
 func (s *LocalIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {
