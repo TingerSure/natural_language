@@ -557,9 +557,8 @@ var (
 			newMappingObject := context.GetLibraryManager().Sandbox.Expression.NewMappingObject.New()
 			newMappingObject.SetObject(object[0])
 			newMappingObject.SetClass(class[0])
-			newMappingObject.SetMapping(mapping)
+			newMappingObject.SetMapping(mapping, mappingLines)
 			newMappingObject.SetLine(phrase.GetChild(1).GetLine())
-			newMappingObject.SetMappingLines(mappingLines)
 			return []concept.Pipe{newMappingObject}, []*lexer.Line{lexer.NewLineFromTo(
 				phrase.GetChild(0).GetLine(),
 				phrase.GetChild(5).GetLine(),

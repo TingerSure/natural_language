@@ -30,12 +30,9 @@ func (f *NewMappingObject) SetLine(line concept.Line) {
 	f.line = line
 }
 
-func (f *NewMappingObject) SetMappingLines(mappingLines []concept.Line) {
-	f.mappingLines = mappingLines
-}
-
-func (f *NewMappingObject) SetMapping(mapping []concept.Pipe) {
+func (f *NewMappingObject) SetMapping(mapping []concept.Pipe, mappingLines []concept.Line) {
 	f.mapping = mapping
+	f.mappingLines = mappingLines
 }
 
 func (f *NewMappingObject) SetObject(object concept.Pipe) {
