@@ -34,7 +34,7 @@ func (p *PhrasePriority) ContentSize() int {
 	return p.values[0].ContentSize()
 }
 
-func (p *PhrasePriority) GetContent() *Vocabulary {
+func (p *PhrasePriority) GetContent() string {
 	return p.values[0].GetContent()
 }
 

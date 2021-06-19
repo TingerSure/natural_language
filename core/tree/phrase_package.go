@@ -47,7 +47,7 @@ func (p *PhrasePackage) Copy() Phrase {
 	return substitute
 }
 
-func (p *PhrasePackage) GetContent() *Vocabulary {
+func (p *PhrasePackage) GetContent() string {
 	return p.value.GetContent()
 }
 

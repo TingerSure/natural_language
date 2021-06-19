@@ -4,21 +4,20 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/tree"
 	"regexp"
+	"strings"
 )
 
 type Lexer struct {
-	rules           []*tree.VocabularyRule
-	wordCache       map[byte]map[*tree.Vocabulary]bool
-	vocabularyCache map[*tree.Vocabulary]*tree.VocabularyRule
-	matchCache      map[*tree.VocabularyRule]*regexp.Regexp
+	rules      []*tree.VocabularyRule
+	wordCache  map[byte]map[string]map[*tree.VocabularyRule]bool
+	matchCache map[*tree.VocabularyRule]*regexp.Regexp
 }
 
 func NewLexer() *Lexer {
 	return &Lexer{
-		rules:           []*tree.VocabularyRule{},
-		wordCache:       map[byte]map[*tree.Vocabulary]bool{},
-		vocabularyCache: map[*tree.Vocabulary]*tree.VocabularyRule{},
-		matchCache:      map[*tree.VocabularyRule]*regexp.Regexp{},
+		rules:      []*tree.VocabularyRule{},
+		wordCache:  map[byte]map[string]map[*tree.VocabularyRule]bool{},
+		matchCache: map[*tree.VocabularyRule]*regexp.Regexp{},
 	}
 }
 
@@ -61,9 +60,11 @@ func (p *Lexer) getPhrases(sentence string) []tree.Phrase {
 }
 
 func (p *Lexer) getPhrasesByWords(sentence string, phrases []tree.Phrase) []tree.Phrase {
-	for candidate, _ := range p.wordCache[sentence[0]] {
-		if candidate.StartFor(sentence) {
-			phrases = append(phrases, p.vocabularyCache[candidate].Create(candidate))
+	for candidate, rules := range p.wordCache[sentence[0]] {
+		if p.startFor(candidate, sentence) {
+			for rule, _ := range rules {
+				phrases = append(phrases, rule.Create(candidate))
+			}
 		}
 	}
 	return phrases
@@ -73,10 +74,14 @@ func (p *Lexer) getPhrasesByMatch(sentence string, phrases []tree.Phrase) []tree
 	for rule, match := range p.matchCache {
 		value := match.FindString(sentence)
 		if value != "" {
-			phrases = append(phrases, rule.Create(tree.NewVocabulary(value)))
+			phrases = append(phrases, rule.Create(value))
 		}
 	}
 	return phrases
+}
+
+func (p *Lexer) startFor(vocabulary, sentence string) bool {
+	return 0 == strings.Index(sentence, vocabulary)
 }
 
 func (p *Lexer) AddRule(rule *tree.VocabularyRule) {
@@ -84,16 +89,20 @@ func (p *Lexer) AddRule(rule *tree.VocabularyRule) {
 		return
 	}
 	p.rules = append(p.rules, rule)
-	words := rule.Words()
-	for _, word := range words {
-		if word.Len() > 0 {
-			start := word.GetContext()[0]
-			if p.wordCache[start] == nil {
-				p.wordCache[start] = map[*tree.Vocabulary]bool{}
-			}
-			p.wordCache[start][word] = true
-			p.vocabularyCache[word] = rule
+	for _, word := range rule.Words() {
+		if word == "" {
+			continue
 		}
+		start := word[0]
+		if p.wordCache[start] == nil {
+			p.wordCache[start] = map[string]map[*tree.VocabularyRule]bool{}
+		}
+		if p.wordCache[start][word] == nil {
+			p.wordCache[start][word] = map[*tree.VocabularyRule]bool{}
+
+		}
+		p.wordCache[start][word][rule] = true
+
 	}
 	template := rule.Match()
 	if template != "" {
@@ -102,7 +111,7 @@ func (p *Lexer) AddRule(rule *tree.VocabularyRule) {
 	}
 }
 
-func (p *Lexer) RemoveRule(need func(rule *tree.VocabularyRule) bool) {
+func (p *Lexer) RemoveRule(need func(*tree.VocabularyRule) bool) {
 	for index := 0; index < len(p.rules); index++ {
 		rule := p.rules[index]
 		if !need(rule) {
@@ -111,12 +120,17 @@ func (p *Lexer) RemoveRule(need func(rule *tree.VocabularyRule) bool) {
 		p.rules = append(p.rules[:index], p.rules[index+1:]...)
 		index--
 		for _, word := range rule.Words() {
-			if word.Len() <= 0 {
+			if word == "" {
 				continue
 			}
-			start := word.GetContext()[0]
-			delete(p.wordCache[start], word)
-			delete(p.vocabularyCache, word)
+			start := word[0]
+			delete(p.wordCache[start][word], rule)
+			if len(p.wordCache[start][word]) == 0 {
+				delete(p.wordCache[start], word)
+			}
+			if len(p.wordCache[start]) == 0 {
+				delete(p.wordCache, start)
+			}
 		}
 		delete(p.matchCache, rule)
 	}

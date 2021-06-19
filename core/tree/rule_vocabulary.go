@@ -1,8 +1,8 @@
 package tree
 
 type VocabularyRuleParam struct {
-	Create func(*Vocabulary) Phrase
-	Words  []*Vocabulary
+	Create func(string) Phrase
+	Words  []string
 	Match  string
 	From   string
 }
@@ -19,11 +19,11 @@ func (r *VocabularyRule) Match() string {
 	return r.param.Match
 }
 
-func (r *VocabularyRule) Words() []*Vocabulary {
+func (r *VocabularyRule) Words() []string {
 	return r.param.Words
 }
 
-func (r *VocabularyRule) Create(treasure *Vocabulary) Phrase {
+func (r *VocabularyRule) Create(treasure string) Phrase {
 	return r.param.Create(treasure)
 }
 

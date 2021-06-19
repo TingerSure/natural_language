@@ -67,8 +67,8 @@ func (p *PhraseStruct) Copy() Phrase {
 	return substitute
 }
 
-func (p *PhraseStruct) GetContent() *Vocabulary {
-	return nil
+func (p *PhraseStruct) GetContent() string {
+	return ""
 }
 
 func (p *PhraseStruct) GetChild(index int) Phrase {

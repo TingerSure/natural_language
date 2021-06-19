@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"strings"
+	"unicode/utf8"
 )
 
 type PhraseVocabularyParam struct {
 	Index   func() concept.Pipe
-	Content *Vocabulary
+	Content string
 	Types   string
 	From    string
 }
@@ -42,10 +43,10 @@ func (p *PhraseVocabulary) Size() int {
 }
 
 func (p *PhraseVocabulary) ContentSize() int {
-	return p.param.Content.Len()
+	return utf8.RuneCountInString(p.param.Content)
 }
 
-func (p *PhraseVocabulary) GetContent() *Vocabulary {
+func (p *PhraseVocabulary) GetContent() string {
 	return p.param.Content
 }
 
@@ -63,7 +64,7 @@ func (p *PhraseVocabulary) ToString() string {
 }
 
 func (p *PhraseVocabulary) ToContent() string {
-	content := p.param.Content.GetContext()
+	content := p.param.Content
 	content = strings.Replace(content, "\\", "\\\\", -1)
 	content = strings.Replace(content, ",", "\\,", -1)
 	content = strings.Replace(content, "(", "\\(", -1)
@@ -74,7 +75,7 @@ func (p *PhraseVocabulary) ToContent() string {
 }
 
 func (p *PhraseVocabulary) ToStringOffset(index int) string {
-	return fmt.Sprintf("%v%v ( %v )\n", strings.Repeat("\t", index), p.param.Types, p.param.Content.ToString())
+	return fmt.Sprintf("%v%v ( %v )\n", strings.Repeat("\t", index), p.param.Types, p.param.Content)
 }
 
 func (p *PhraseVocabulary) From() string {
