@@ -7,6 +7,7 @@ import (
 	"github.com/TingerSure/natural_language/library/system/parser"
 	"github.com/TingerSure/natural_language/library/system/runtime"
 	"github.com/TingerSure/natural_language/library/system/std"
+	"github.com/TingerSure/natural_language/library/system/variable"
 )
 
 type SystemLibraryParam struct {
@@ -24,4 +25,6 @@ func BindSystem(libs *tree.LibraryManager, param *SystemLibraryParam) {
 	libs.AddPage("system/bind", libs.Sandbox.Index.ConstIndex.New(bind.NewBind(libs)))
 
 	libs.AddPage("system/parser", libs.Sandbox.Index.ConstIndex.New(parser.NewParser(libs)))
+
+	libs.AddPage("system/variable", libs.Sandbox.Index.ConstIndex.New(variable.NewVariable(libs)))
 }

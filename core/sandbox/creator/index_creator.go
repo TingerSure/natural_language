@@ -6,19 +6,20 @@ import (
 )
 
 type IndexCreator struct {
-	ConstIndex    *index.ConstIndexCreator
-	ThisIndex     *index.ThisIndexCreator
-	SelfIndex     *index.SelfIndexCreator
-	BubbleIndex   *index.BubbleIndexCreator
-	LocalIndex    *index.LocalIndexCreator
-	ImportIndex   *index.ImportIndexCreator
-	PublicIndex   *index.PublicIndexCreator
-	PrivateIndex  *index.PrivateIndexCreator
-	ProvideIndex  *index.ProvideIndexCreator
-	RequireIndex  *index.RequireIndexCreator
-	KeyValueIndex *index.KeyValueIndexCreator
-	KeyKeyIndex   *index.KeyKeyIndexCreator
-	KeyIndex      *index.KeyIndexCreator
+	ExceptionIndex *index.ExceptionIndexCreator
+	ConstIndex     *index.ConstIndexCreator
+	ThisIndex      *index.ThisIndexCreator
+	SelfIndex      *index.SelfIndexCreator
+	BubbleIndex    *index.BubbleIndexCreator
+	LocalIndex     *index.LocalIndexCreator
+	ImportIndex    *index.ImportIndexCreator
+	PublicIndex    *index.PublicIndexCreator
+	PrivateIndex   *index.PrivateIndexCreator
+	ProvideIndex   *index.ProvideIndexCreator
+	RequireIndex   *index.RequireIndexCreator
+	KeyValueIndex  *index.KeyValueIndexCreator
+	KeyKeyIndex    *index.KeyKeyIndexCreator
+	KeyIndex       *index.KeyIndexCreator
 }
 
 type IndexCreatorParam struct {
@@ -93,6 +94,10 @@ func NewIndexCreator(param *IndexCreatorParam) *IndexCreator {
 		ExceptionCreator: param.ExceptionCreator,
 		ParamCreator:     param.ParamCreator,
 		NullCreator:      param.NullCreator,
+	})
+	instance.ExceptionIndex = index.NewExceptionIndexCreator(&index.ExceptionIndexCreatorParam{
+		ParamCreator: param.ParamCreator,
+		NullCreator:  param.NullCreator,
 	})
 	return instance
 }
