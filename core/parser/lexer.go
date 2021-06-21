@@ -99,10 +99,8 @@ func (p *Lexer) AddRule(rule *tree.VocabularyRule) {
 		}
 		if p.wordCache[start][word] == nil {
 			p.wordCache[start][word] = map[*tree.VocabularyRule]bool{}
-
 		}
 		p.wordCache[start][word][rule] = true
-
 	}
 	template := rule.Match()
 	if template != "" {

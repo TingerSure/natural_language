@@ -70,7 +70,7 @@ func (s *ThisIndex) Anticipate(space concept.Pool) concept.Variable {
 
 func (s *ThisIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	value, suspend := space.GetBubble(s.seed.NewString(thisIndexKey))
-	if nl_interface.IsNil(suspend) {
+	if !nl_interface.IsNil(suspend) {
 		return nil, suspend.AddLine(s.line)
 	}
 	return value, nil

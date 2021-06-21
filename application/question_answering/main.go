@@ -10,7 +10,6 @@ import (
 	lib_runtime "github.com/TingerSure/natural_language/library/system/runtime"
 	"github.com/TingerSure/natural_language/library/system/std"
 	"os"
-	"time"
 )
 
 const (
@@ -83,11 +82,7 @@ func test() {
 	cli := runtime.NewScan(&runtime.ScanParam{
 		Stream: os.Stdin,
 		OnReader: func(input string) bool {
-			startTime := time.Now().Unix()
 			index, err := VM.Deal(input)
-
-			fmt.Printf("\033[1;32m[TIME]:\033[00m %vs\n", time.Now().Unix()-startTime)
-
 			if err != nil {
 				fmt.Printf("\033[1;32m[ERROR]:\033[00m %v\n", err.Error())
 				return true
