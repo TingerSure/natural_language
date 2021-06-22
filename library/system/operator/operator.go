@@ -154,26 +154,26 @@ func (o *Operator) NewOperatorBoolItem(exec func(*variable.Bool) (concept.Variab
 }
 
 const (
-	AdditionName             = "Addition"
-	DivisionName             = "Division"
-	MultiplicationName       = "Multiplication"
-	SubtractionName          = "Subtraction"
-	EqualToName              = "EqualTo"
-	NotEqualToName           = "NotEqualTo"
-	GreaterThanName          = "GreaterThan"
-	LessThanName             = "LessThan"
-	GreaterThanOrEqualToName = "GreaterThanOrEqualTo"
-	LessThanOrEqualToName    = "LessThanOrEqualTo"
-	OrName                   = "Or"
-	AndName                  = "And"
-	NotName                  = "Not"
+	AdditionName             = "addition"
+	DivisionName             = "division"
+	MultiplicationName       = "multiplication"
+	SubtractionName          = "subtraction"
+	EqualToName              = "equalTo"
+	NotEqualToName           = "notEqualTo"
+	GreaterThanName          = "greaterThan"
+	LessThanName             = "lessThan"
+	GreaterThanOrEqualToName = "greaterThanOrEqualTo"
+	LessThanOrEqualToName    = "lessThanOrEqualTo"
+	OrName                   = "or"
+	AndName                  = "and"
+	NotName                  = "not"
 )
 
 const (
-	FuncName   = "Func"
-	LeftName   = "Left"
-	RightName  = "Right"
-	ResultName = "Result"
+	FuncName   = "func"
+	LeftName   = "left"
+	RightName  = "right"
+	ResultName = "result"
 )
 
 type Operator struct {
