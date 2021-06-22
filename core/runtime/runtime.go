@@ -72,7 +72,7 @@ func (r *Runtime) GetLibraryManager() *tree.LibraryManager {
 	return r.libs
 }
 
-func (r *Runtime) Deal(sentence string) (concept.Pipe, error) {
+func (r *Runtime) Deal(sentence string) (concept.Function, error) {
 	road, err := r.parser.Instance(sentence)
 
 	if err != nil {
@@ -106,7 +106,7 @@ func (r *Runtime) Stop() error {
 	return r.box.Stop()
 }
 
-func (r *Runtime) Exec(hand concept.Pipe, line concept.Line) {
+func (r *Runtime) Exec(hand concept.Function, line concept.Line) {
 	r.box.Exec(hand, line)
 }
 
@@ -125,7 +125,7 @@ func NewRuntime(param *RuntimeParam) *Runtime {
 		priorityErrorFormat: runtimePriorityErrorFormatDefault,
 	}
 	runtime.rootSpace = sandboxCreator.Variable.Pool.New(nil)
-	runtime.parser = parser.NewParser(runtime.rootSpace)
+	runtime.parser = parser.NewParser(runtime.rootSpace, sandboxCreator)
 	runtime.box = sandbox.NewSandbox(&sandbox.SandboxParam{
 		Root:      runtime.rootSpace,
 		OnError:   param.OnError,

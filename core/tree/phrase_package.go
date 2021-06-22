@@ -7,7 +7,7 @@ import (
 )
 
 type PhrasePackageParam struct {
-	Index func(Phrase) concept.Pipe
+	Index func(Phrase) concept.Function
 	Types string
 	From  string
 }
@@ -18,7 +18,7 @@ type PhrasePackage struct {
 	param *PhrasePackageParam
 }
 
-func (p *PhrasePackage) Index() concept.Pipe {
+func (p *PhrasePackage) Index() concept.Function {
 	return p.param.Index(p.value)
 }
 

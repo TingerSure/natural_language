@@ -42,6 +42,9 @@ func (f *SystemFunction) ToString(prefix string) string {
 }
 
 func (f *SystemFunction) Anticipate(params concept.Param, object concept.Variable) concept.Param {
+	if nl_interface.IsNil(params) {
+		params = f.seed.NewParam()
+	}
 	if f.anticipateFuncs == nil {
 		back, suspend := f.Exec(params, object)
 		if !nl_interface.IsNil(suspend) {
@@ -53,6 +56,9 @@ func (f *SystemFunction) Anticipate(params concept.Param, object concept.Variabl
 }
 
 func (f *SystemFunction) Exec(params concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
+	if nl_interface.IsNil(params) {
+		params = f.seed.NewParam()
+	}
 	return f.funcs(f.paramFormat(params), object)
 }
 

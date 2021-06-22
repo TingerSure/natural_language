@@ -30,12 +30,12 @@ func newConstIndexBind(libs *tree.LibraryManager) *variable.SystemFunction {
 				if !nl_interface.IsNil(suspend) {
 					return "", suspend
 				}
-				seedInput.Set(libs.Sandbox.Variable.String.New("value"), libs.Sandbox.Variable.String.New(inputValue))
+				seedInput.SetOriginal("value", libs.Sandbox.Variable.String.New(inputValue))
 				seedOutput, suspend := seed.Exec(seedInput, nil)
 				if !nl_interface.IsNil(suspend) {
 					return "", suspend
 				}
-				valuePre := seedOutput.Get(libs.Sandbox.Variable.String.New("value"))
+				valuePre := seedOutput.GetOriginal("value")
 				value, yes := variable.VariableFamilyInstance.IsStringHome(valuePre)
 				if !yes {
 					return "", libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param value is not a string: %v", valuePre.ToString("")))
@@ -76,12 +76,12 @@ func newBubbleIndexBind(libs *tree.LibraryManager) *variable.SystemFunction {
 				if !nl_interface.IsNil(exception) {
 					return "", exception
 				}
-				seedInput.Set(libs.Sandbox.Variable.String.New("value"), libs.Sandbox.Variable.String.New(bubbleValue))
+				seedInput.SetOriginal("value", libs.Sandbox.Variable.String.New(bubbleValue))
 				seedOutput, exception := seed.Exec(seedInput, nil)
 				if !nl_interface.IsNil(exception) {
 					return "", exception
 				}
-				valuePre := seedOutput.Get(libs.Sandbox.Variable.String.New("value"))
+				valuePre := seedOutput.GetOriginal("value")
 				value, yes := variable.VariableFamilyInstance.IsStringHome(valuePre)
 				if !yes {
 					return "", libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param value is not a string: %v", valuePre.ToString("")))

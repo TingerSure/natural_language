@@ -7,6 +7,8 @@ const (
 
 type Param interface {
 	Variable
+	SetOriginal(string, Variable)
+	GetOriginal(string) Variable
 	Set(String, Variable)
 	Get(String) Variable
 	SizeIndex() int

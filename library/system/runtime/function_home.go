@@ -41,14 +41,14 @@ func FunctionHomeSetLanguageOnCallSeed(libs *tree.LibraryManager, instance conce
 				}
 				instance.SetLanguageOnCallSeed(language.Value(), func(_ concept.Function, pool concept.Pool, name string, params concept.Param) (string, concept.Exception) {
 					seedInput := libs.Sandbox.Variable.Param.New()
-					seedInput.Set(libs.Sandbox.Variable.String.New("instance"), instance)
-					seedInput.Set(libs.Sandbox.Variable.String.New("name"), libs.Sandbox.Variable.String.New(name))
-					seedInput.Set(libs.Sandbox.Variable.String.New("params"), params)
+					seedInput.SetOriginal("instance", instance)
+					seedInput.SetOriginal("name", libs.Sandbox.Variable.String.New(name))
+					seedInput.SetOriginal("params", params)
 					seedOutput, suspend := seed.Exec(seedInput, nil)
 					if !nl_interface.IsNil(suspend) {
 						return "", suspend
 					}
-					valuePre := seedOutput.Get(libs.Sandbox.Variable.String.New("value"))
+					valuePre := seedOutput.GetOriginal("value")
 					value, yes := variable.VariableFamilyInstance.IsStringHome(valuePre)
 					if !yes {
 						return "", libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param value is not a string: %v", valuePre.ToString("")))

@@ -2,6 +2,7 @@ package parser
 
 import (
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/creator"
 )
 
 type Parser struct {
@@ -14,10 +15,10 @@ type Parser struct {
 	rootSpace concept.Pool
 }
 
-func NewParser(rootSpace concept.Pool) *Parser {
+func NewParser(rootSpace concept.Pool, sandbox *creator.SandboxCreator) *Parser {
 	types := NewTypes()
 	barricade := NewBarricade()
-	diversion := NewDiversion(rootSpace)
+	diversion := NewDiversion(rootSpace, sandbox)
 	reach := NewReach(types)
 	return &Parser{
 		rootSpace: rootSpace,

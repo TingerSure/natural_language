@@ -143,6 +143,9 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		ExceptionCreator: func(name string, message string) concept.Exception {
 			return instance.Exception.NewOriginal(name, message)
 		},
+		StringCreator: func(value string) concept.String {
+			return instance.String.New(value)
+		},
 	})
 
 	instance.Function = variable.NewFunctionCreator(&variable.FunctionCreatorParam{

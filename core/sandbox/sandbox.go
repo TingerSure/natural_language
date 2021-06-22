@@ -25,7 +25,7 @@ func (s *Sandbox) GetEventLoop() *loop.Loop {
 	return s.eventLoop
 }
 
-func (s *Sandbox) Exec(index concept.Pipe, line concept.Line) {
+func (s *Sandbox) Exec(index concept.Function, line concept.Line) {
 	s.eventLoop.Append(loop.NewEvent(index, line, s.param.Root))
 }
 

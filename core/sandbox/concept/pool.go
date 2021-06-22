@@ -16,8 +16,8 @@ type Pool interface {
 	HasBubble(String) bool
 	SetBubble(String, Variable) Exception
 	IterateBubble(func(String, Variable) bool) bool
-	AddExtempore(Pipe, Variable)
+	AddExtempore(Function, Variable)
 	IterateHistory(func(String, Variable) bool) bool
-	IterateExtempore(func(Pipe, Variable) bool) bool
+	IterateExtempore(func(Function, Variable) bool) bool
 	Clear()
 }

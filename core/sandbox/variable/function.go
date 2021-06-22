@@ -61,6 +61,9 @@ func (f *Function) AnticipateBody() concept.CodeBlock {
 }
 
 func (f *Function) Anticipate(params concept.Param, object concept.Variable) concept.Param {
+	if nl_interface.IsNil(params) {
+		params = f.seed.NewParam()
+	}
 	space, suspend := f.anticipateBody.ExecWithInit(f.parent, func(space concept.Pool) concept.Interrupt {
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
@@ -108,6 +111,9 @@ func (f *Function) Body() concept.CodeBlock {
 }
 
 func (f *Function) Exec(params concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
+	if nl_interface.IsNil(params) {
+		params = f.seed.NewParam()
+	}
 	space, suspend := f.body.ExecWithInit(f.parent, func(space concept.Pool) concept.Interrupt {
 		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
 		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)

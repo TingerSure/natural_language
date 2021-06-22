@@ -14,9 +14,6 @@ func newAddVocabularyWordsRule(libs *tree.LibraryManager) concept.Function {
 	wordsParam := libs.Sandbox.Variable.String.New("words")
 	createParam := libs.Sandbox.Variable.String.New("create")
 
-	contentParam := libs.Sandbox.Variable.String.New("content")
-	pipeParam := libs.Sandbox.Variable.String.New("pipe")
-
 	valueParam := libs.Sandbox.Variable.String.New("value")
 
 	instance := libs.Sandbox.Variable.SystemFunction.New(
@@ -62,20 +59,33 @@ func newAddVocabularyWordsRule(libs *tree.LibraryManager) concept.Function {
 						Content: treasure,
 						Types:   types.Value(),
 						From:    name.Value(),
-						Index: func() concept.Pipe {
+						Index: func() concept.Function {
 							line := tree.NewLine(fmt.Sprintf("[vocabulary_parse]:%v ( %v )", treasure, name.Value()), "")
 							param := libs.Sandbox.Variable.Param.New()
-							param.Set(contentParam, libs.Sandbox.Variable.String.New(treasure))
+							param.SetOriginal("content", libs.Sandbox.Variable.String.New(treasure))
 							output, exception := create.Exec(param, nil)
 							if !nl_interface.IsNil(exception) {
-								return libs.Sandbox.Index.ExceptionIndex.New(exception.AddExceptionLine(line))
+								return libs.Sandbox.Variable.SystemFunction.New(
+									func(input concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
+										return nil, exception.AddExceptionLine(line)
+									},
+									nil,
+									[]concept.String{},
+									[]concept.String{valueParam},
+								)
 							}
-							call := libs.Sandbox.Expression.Call.New(
-								libs.Sandbox.Index.ConstIndex.New(output.Get(pipeParam)),
-								libs.Sandbox.Expression.NewParam.New(),
-							)
-							call.SetCallLine(line)
-							return libs.Sandbox.Expression.Component.New(call, valueParam)
+							pipe, yes := variable.VariableFamilyInstance.IsFunctionHome(output.GetOriginal("pipe"))
+							if !yes {
+								return libs.Sandbox.Variable.SystemFunction.New(
+									func(input concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
+										return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", "vocabulary parse pipe must be defined as 'function()value'.").AddExceptionLine(line)
+									},
+									nil,
+									[]concept.String{},
+									[]concept.String{valueParam},
+								)
+							}
+							return pipe
 						},
 					})
 				},
@@ -101,9 +111,6 @@ func newAddVocabularyMatchRule(libs *tree.LibraryManager) concept.Function {
 	typesParam := libs.Sandbox.Variable.String.New("types")
 	matchParam := libs.Sandbox.Variable.String.New("match")
 	createParam := libs.Sandbox.Variable.String.New("create")
-
-	contentParam := libs.Sandbox.Variable.String.New("content")
-	pipeParam := libs.Sandbox.Variable.String.New("pipe")
 
 	valueParam := libs.Sandbox.Variable.String.New("value")
 
@@ -138,20 +145,33 @@ func newAddVocabularyMatchRule(libs *tree.LibraryManager) concept.Function {
 						Content: treasure,
 						Types:   types.Value(),
 						From:    name.Value(),
-						Index: func() concept.Pipe {
+						Index: func() concept.Function {
 							line := tree.NewLine(fmt.Sprintf("[vocabulary_parse]:%v ( %v )", treasure, name.Value()), "")
 							param := libs.Sandbox.Variable.Param.New()
-							param.Set(contentParam, libs.Sandbox.Variable.String.New(treasure))
+							param.SetOriginal("content", libs.Sandbox.Variable.String.New(treasure))
 							output, exception := create.Exec(param, nil)
 							if !nl_interface.IsNil(exception) {
-								return libs.Sandbox.Index.ExceptionIndex.New(exception.AddExceptionLine(line))
+								return libs.Sandbox.Variable.SystemFunction.New(
+									func(input concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
+										return nil, exception.AddExceptionLine(line)
+									},
+									nil,
+									[]concept.String{},
+									[]concept.String{valueParam},
+								)
 							}
-							call := libs.Sandbox.Expression.Call.New(
-								libs.Sandbox.Index.ConstIndex.New(output.Get(pipeParam)),
-								libs.Sandbox.Expression.NewParam.New(),
-							)
-							call.SetCallLine(line)
-							return libs.Sandbox.Expression.Component.New(call, valueParam)
+							pipe, yes := variable.VariableFamilyInstance.IsFunctionHome(output.GetOriginal("pipe"))
+							if !yes {
+								return libs.Sandbox.Variable.SystemFunction.New(
+									func(input concept.Param, _ concept.Variable) (concept.Param, concept.Exception) {
+										return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", "vocabulary parse pipe must be defined as 'function()value'.").AddExceptionLine(line)
+									},
+									nil,
+									[]concept.String{},
+									[]concept.String{valueParam},
+								)
+							}
+							return pipe
 						},
 					})
 				},

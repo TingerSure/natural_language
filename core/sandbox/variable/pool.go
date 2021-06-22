@@ -55,7 +55,7 @@ func (c *Pool) IterateHistory(match func(concept.String, concept.Variable) bool)
 	})
 }
 
-func (c *Pool) IterateExtempore(match func(concept.Pipe, concept.Variable) bool) bool {
+func (c *Pool) IterateExtempore(match func(concept.Function, concept.Variable) bool) bool {
 	return c.extempore.Iterate(match)
 }
 
@@ -89,7 +89,7 @@ func (c *Pool) SetParent(parent concept.Pool) {
 	c.parent = parent
 }
 
-func (c *Pool) AddExtempore(index concept.Pipe, value concept.Variable) {
+func (c *Pool) AddExtempore(index concept.Function, value concept.Variable) {
 	c.extempore.Add(index, value)
 }
 

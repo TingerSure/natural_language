@@ -2,23 +2,32 @@ package parser
 
 import (
 	"fmt"
+	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
 	"github.com/TingerSure/natural_language/core/sandbox/concept"
+	"github.com/TingerSure/natural_language/core/sandbox/creator"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
 type Diversion struct {
 	rules     []*tree.DutyRule
 	rootSpace concept.Pool
+	sandbox   *creator.SandboxCreator
 }
 
-func NewDiversion(rootSpace concept.Pool) *Diversion {
+func NewDiversion(rootSpace concept.Pool, sandbox *creator.SandboxCreator) *Diversion {
 	return &Diversion{
 		rootSpace: rootSpace,
+		sandbox:   sandbox,
 	}
 }
 
 func (d *Diversion) Match(value tree.Phrase) (string, error) {
-	wanted := value.Index().Anticipate(d.rootSpace)
+	param, exception := value.Index().Exec(d.sandbox.Variable.Param.New(), nil)
+	if !nl_interface.IsNil(exception) {
+		exception.AddExceptionLine(tree.NewLine("[diversion_match]", ""))
+		return "", exception
+	}
+	wanted := param.Get(d.sandbox.Variable.String.New("value"))
 	for _, rule := range d.rules {
 		if rule.Match(wanted) {
 			return rule.Create(wanted), nil

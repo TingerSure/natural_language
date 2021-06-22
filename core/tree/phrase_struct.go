@@ -8,7 +8,7 @@ import (
 )
 
 type PhraseStructParam struct {
-	Index        func([]Phrase) concept.Pipe
+	Index        func([]Phrase) concept.Function
 	Size         int
 	Types        string
 	DynamicTypes func([]Phrase) string
@@ -22,7 +22,7 @@ type PhraseStruct struct {
 	types       string
 }
 
-func (p *PhraseStruct) Index() concept.Pipe {
+func (p *PhraseStruct) Index() concept.Function {
 	return p.param.Index(p.children)
 }
 

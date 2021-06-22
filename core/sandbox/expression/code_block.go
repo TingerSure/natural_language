@@ -80,11 +80,10 @@ func (f *CodeBlock) ExecWithInit(
 		}
 	}
 	for _, step := range f.flow {
-		value, suspend := step.Get(space)
+		_, suspend := step.Get(space)
 		if !nl_interface.IsNil(suspend) {
 			return space, suspend
 		}
-		space.AddExtempore(step, value)
 	}
 	return space, nil
 }

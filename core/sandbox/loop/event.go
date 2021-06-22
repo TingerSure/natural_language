@@ -6,21 +6,31 @@ import (
 )
 
 type Event struct {
-	index concept.Pipe
+	index concept.Function
 	space concept.Pool
 	line  concept.Line
 }
 
-func (e *Event) Exec() concept.Interrupt {
-	resault, suspend := e.index.Get(e.space)
-	if !nl_interface.IsNil(suspend) {
-		return suspend.AddLine(e.line)
+func (e *Event) Exec() concept.Exception {
+	resault, exception := e.index.Exec(nil, nil)
+	if !nl_interface.IsNil(exception) {
+		return exception.AddExceptionLine(e.line)
 	}
-	e.space.AddExtempore(e.index, resault)
+	if nl_interface.IsNil(resault) {
+		return nil
+	}
+	value := resault.GetOriginal("value")
+	if nl_interface.IsNil(value) {
+		return nil
+	}
+	if value.IsNull() {
+		return nil
+	}
+	e.space.AddExtempore(e.index, value)
 	return nil
 }
 
-func NewEvent(index concept.Pipe, line concept.Line, space concept.Pool) *Event {
+func NewEvent(index concept.Function, line concept.Line, space concept.Pool) *Event {
 	return &Event{
 		index: index,
 		space: space,

@@ -16,6 +16,7 @@ type ParamSeed interface {
 	ToLanguage(string, concept.Pool, *Param) (string, concept.Exception)
 	Type() string
 	NewNull() concept.Null
+	NewString(string) concept.String
 	New() *Param
 }
 
@@ -71,7 +72,15 @@ func (o *Param) Set(key concept.String, value concept.Variable) {
 
 func (o *Param) Get(key concept.String) concept.Variable {
 	value, _ := o.GetField(key)
-	return value.(concept.Variable)
+	return value
+}
+
+func (o *Param) SetOriginal(key string, value concept.Variable) {
+	o.Set(o.seed.NewString(key), value)
+}
+
+func (o *Param) GetOriginal(key string) concept.Variable {
+	return o.Get(o.seed.NewString(key))
 }
 
 func (o *Param) SizeIndex() int {
@@ -98,6 +107,7 @@ func (o *Param) ParamType() int {
 
 type ParamCreatorParam struct {
 	NullCreator      func() concept.Null
+	StringCreator    func(string) concept.String
 	ExceptionCreator func(string, string) concept.Exception
 }
 
@@ -131,6 +141,10 @@ func (s *ParamCreator) Type() string {
 
 func (s *ParamCreator) NewNull() concept.Null {
 	return s.param.NullCreator()
+}
+
+func (s *ParamCreator) NewString(value string) concept.String {
+	return s.param.StringCreator(value)
 }
 
 func NewParamCreator(param *ParamCreatorParam) *ParamCreator {

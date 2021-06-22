@@ -25,12 +25,12 @@ func newStringBind(libs *tree.LibraryManager) *variable.SystemFunction {
 			}
 			libs.Sandbox.Variable.String.Seeds[language.Value()] = func(pool concept.Pool, instance *variable.String) (string, concept.Exception) {
 				seedInput := libs.Sandbox.Variable.Param.New()
-				seedInput.Set(libs.Sandbox.Variable.String.New("instance"), instance)
+				seedInput.SetOriginal("instance", instance)
 				seedOutput, suspend := seed.Exec(seedInput, nil)
 				if !nl_interface.IsNil(suspend) {
 					return "", suspend
 				}
-				valuePre := seedOutput.Get(libs.Sandbox.Variable.String.New("value"))
+				valuePre := seedOutput.GetOriginal("value")
 				value, yes := variable.VariableFamilyInstance.IsStringHome(valuePre)
 				if !yes {
 					return "", libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param value is not a string: %v", valuePre.ToString("")))
