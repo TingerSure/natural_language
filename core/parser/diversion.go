@@ -22,9 +22,15 @@ func NewDiversion(rootSpace concept.Pool, sandbox *creator.SandboxCreator) *Dive
 }
 
 func (d *Diversion) Match(value tree.Phrase) (string, error) {
-	param, exception := value.Index().Exec(d.sandbox.Variable.Param.New(), nil)
+	line := tree.NewLine("[diversion_match]", "")
+	pipe, exception := value.Index()
 	if !nl_interface.IsNil(exception) {
-		exception.AddExceptionLine(tree.NewLine("[diversion_match]", ""))
+		exception.AddExceptionLine(line)
+		return "", exception
+	}
+	param, exception := pipe.Exec(d.sandbox.Variable.Param.New(), nil)
+	if !nl_interface.IsNil(exception) {
+		exception.AddExceptionLine(line)
 		return "", exception
 	}
 	wanted := param.Get(d.sandbox.Variable.String.New("value"))

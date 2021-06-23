@@ -25,18 +25,18 @@ func NewParser(libs *tree.LibraryManager) *Parser {
 	)
 
 	instance.SetPublic(
-		libs.Sandbox.Variable.DelayString.New("addVocabularyWordsRule"),
+		libs.Sandbox.Variable.DelayString.New("addVocabularyRule"),
 		libs.Sandbox.Index.PublicIndex.New(
-			"addVocabularyWordsRule",
-			libs.Sandbox.Index.ConstIndex.New(newAddVocabularyWordsRule(libs)),
+			"addVocabularyRule",
+			libs.Sandbox.Index.ConstIndex.New(newAddVocabularyRule(libs)),
 		),
 	)
 
 	instance.SetPublic(
-		libs.Sandbox.Variable.DelayString.New("addVocabularyMatchRule"),
+		libs.Sandbox.Variable.DelayString.New("addStructRule"),
 		libs.Sandbox.Index.PublicIndex.New(
-			"addVocabularyMatchRule",
-			libs.Sandbox.Index.ConstIndex.New(newAddVocabularyMatchRule(libs)),
+			"addStructRule",
+			libs.Sandbox.Index.ConstIndex.New(newAddStructRule(libs)),
 		),
 	)
 

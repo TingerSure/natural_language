@@ -8,7 +8,7 @@ type Phrase interface {
 	Copy() Phrase
 	Size() int
 	ContentSize() int
-	Types() string
+	Types() (string, concept.Exception)
 	SetTypes(types string)
 	GetContent() string
 	GetChild(index int) Phrase
@@ -16,7 +16,7 @@ type Phrase interface {
 	ToString() string
 	ToContent() string
 	ToStringOffset(index int) string
-	Index() concept.Function
+	Index() (concept.Function, concept.Exception)
 	From() string
 	HasPriority() bool
 	DependencyCheckValue() Phrase

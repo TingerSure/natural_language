@@ -8,10 +8,10 @@ import (
 )
 
 type PhraseStructParam struct {
-	Index        func([]Phrase) concept.Function
+	Index        func([]Phrase) (concept.Function, concept.Exception)
 	Size         int
 	Types        string
-	DynamicTypes func([]Phrase) string
+	DynamicTypes func([]Phrase) (string, concept.Exception)
 	From         string
 }
 
@@ -22,19 +22,21 @@ type PhraseStruct struct {
 	types       string
 }
 
-func (p *PhraseStruct) Index() concept.Function {
+func (p *PhraseStruct) Index() (concept.Function, concept.Exception) {
 	return p.param.Index(p.children)
 }
 
-func (p *PhraseStruct) Types() string {
+func (p *PhraseStruct) Types() (string, concept.Exception) {
 	if p.types != "" {
-		return p.types
+		return p.types, nil
 	}
+
 	if p.param.DynamicTypes != nil {
-		p.types = p.param.DynamicTypes(p.children)
-		return p.types
+		var exception concept.Exception
+		p.types, exception = p.param.DynamicTypes(p.children)
+		return p.types, exception
 	}
-	return p.param.Types
+	return p.param.Types, nil
 }
 
 func (p *PhraseStruct) SetTypes(types string) {
@@ -106,7 +108,14 @@ func (p *PhraseStruct) ToString() string {
 
 func (p *PhraseStruct) ToStringOffset(index int) string {
 	var space = strings.Repeat("\t", index)
-	info := fmt.Sprintf("%v%v (\n", space, p.Types())
+	types := p.types
+	if types == "" {
+		types = p.param.Types
+	}
+	if types == "" {
+		types = "[dynamic_types]"
+	}
+	info := fmt.Sprintf("%v%v (\n", space, types)
 	for i := 0; i < len(p.children); i++ {
 		info += p.GetChild(i).ToStringOffset(index + 1)
 	}

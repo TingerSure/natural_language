@@ -91,7 +91,7 @@ func (r *Runtime) Deal(sentence string) (concept.Function, error) {
 		return nil, errors.New(r.priorityErrorFormat(road))
 	}
 
-	return roots[0].Index(), nil
+	return roots[0].Index()
 }
 
 func (r *Runtime) Read(path string) error {

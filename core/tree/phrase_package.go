@@ -7,7 +7,7 @@ import (
 )
 
 type PhrasePackageParam struct {
-	Index func(Phrase) concept.Function
+	Index func(Phrase) (concept.Function, concept.Exception)
 	Types string
 	From  string
 }
@@ -18,15 +18,15 @@ type PhrasePackage struct {
 	param *PhrasePackageParam
 }
 
-func (p *PhrasePackage) Index() concept.Function {
+func (p *PhrasePackage) Index() (concept.Function, concept.Exception) {
 	return p.param.Index(p.value)
 }
 
-func (p *PhrasePackage) Types() string {
+func (p *PhrasePackage) Types() (string, concept.Exception) {
 	if p.types != "" {
-		return p.types
+		return p.types, nil
 	}
-	return p.param.Types
+	return p.param.Types, nil
 }
 
 func (p *PhrasePackage) SetTypes(types string) {
@@ -70,7 +70,8 @@ func (p *PhrasePackage) ToString() string {
 
 func (p *PhrasePackage) ToStringOffset(index int) string {
 	var space = strings.Repeat("\t", index)
-	return fmt.Sprintf("%v%v (\n %v%v)\n", space, p.Types(), p.value.ToStringOffset(index+1), space)
+	types, _ := p.Types()
+	return fmt.Sprintf("%v%v (\n %v%v)\n", space, types, p.value.ToStringOffset(index+1), space)
 }
 
 func (p *PhrasePackage) From() string {

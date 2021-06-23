@@ -43,8 +43,11 @@ func (p *Lexer) parseVocabularyStep(road *Road, index int) error {
 	}
 
 	for _, phrase := range phrases {
-		road.AddSection(index+phrase.ContentSize()-1, phrase)
-		err := p.parseVocabularyStep(road, index+phrase.ContentSize())
+		err := road.AddSection(index+phrase.ContentSize()-1, phrase)
+		if err != nil {
+			return err
+		}
+		err = p.parseVocabularyStep(road, index+phrase.ContentSize())
 		if err != nil {
 			return err
 		}

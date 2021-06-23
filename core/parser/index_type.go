@@ -22,13 +22,16 @@ func (t *IndexType) Get(index int, types string) map[tree.Phrase]bool {
 	return t.values[index][types]
 }
 
-func (t *IndexType) Add(index int, section tree.Phrase) {
+func (t *IndexType) Add(index int, section tree.Phrase) error {
 
 	if t.values[index] == nil {
 		t.values[index] = make(map[string]map[tree.Phrase]bool)
 	}
 
-	types := section.Types()
+	types, err := section.Types()
+	if err != nil {
+		return err
+	}
 
 	t.types.IterateParentsDistinct(types, func(parent string) bool {
 		if t.values[index][parent] == nil {
@@ -41,18 +44,22 @@ func (t *IndexType) Add(index int, section tree.Phrase) {
 		t.values[index][types] = make(map[tree.Phrase]bool)
 	}
 	t.values[index][types][section] = true
+	return nil
 }
 
-func (t *IndexType) Remove(index int, section tree.Phrase) {
+func (t *IndexType) Remove(index int, section tree.Phrase) error {
 	if t.values[index] == nil {
-		return
+		return nil
 	}
 
-	types := section.Types()
-
+	types, err := section.Types()
+	if err != nil {
+		return err
+	}
 	t.types.IterateParentsDistinct(types, func(parent string) bool {
 		delete(t.values[index][parent], section)
 		return false
 	})
 	delete(t.values[index][types], section)
+	return nil
 }

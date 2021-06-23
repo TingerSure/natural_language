@@ -35,7 +35,11 @@ func (g *Grammar) ParseStruct(road *Road) error {
 		activeTargets := map[tree.Phrase]bool{}
 		for len(origins) > 0 {
 			for origin, _ := range origins {
-				rules := g.reach.GetRulesByLastType(origin.Types())
+				originTypes, err := origin.Types()
+				if err != nil {
+					return err
+				}
+				rules := g.reach.GetRulesByLastType(originTypes)
 				for _, rule := range rules {
 					err := g.match(road, index, origin, rule, targets)
 					if err != nil {
@@ -47,9 +51,19 @@ func (g *Grammar) ParseStruct(road *Road) error {
 				if !road.DependencyCheck(target) {
 					continue
 				}
-				olds := road.GetSectionByTypesAndSize(index, target.Types(), target.ContentSize())
+				targetTypes, err := target.Types()
+				if err != nil {
+					return err
+				}
+				olds, oldsErr := road.GetSectionByTypesAndSize(index, targetTypes, target.ContentSize())
+				if oldsErr != nil {
+					return oldsErr
+				}
 				if len(olds) == 0 {
-					road.AddSection(index, target)
+					err := road.AddSection(index, target)
+					if err != nil {
+						return err
+					}
 					activeTargets[target] = true
 					continue
 				}
@@ -57,7 +71,10 @@ func (g *Grammar) ParseStruct(road *Road) error {
 				targetNeed := true
 				for _, old := range olds {
 					results, abandons := g.barricade.Check(old, target)
-					g.cut(road, index, abandons)
+					err := g.cut(road, index, abandons)
+					if err != nil {
+						return err
+					}
 					switch results {
 					case 0:
 						break
@@ -65,12 +82,18 @@ func (g *Grammar) ParseStruct(road *Road) error {
 						targetNeed = false
 						break
 					case 1:
-						road.RemoveSection(index, old)
+						err := road.RemoveSection(index, old)
+						if err != nil {
+							return err
+						}
 						break
 					}
 				}
 				if targetNeed {
-					road.AddSection(index, target)
+					err := road.AddSection(index, target)
+					if err != nil {
+						return err
+					}
 					activeTargets[target] = true
 				}
 			}
@@ -82,25 +105,37 @@ func (g *Grammar) ParseStruct(road *Road) error {
 	return nil
 }
 
-func (g *Grammar) cut(road *Road, index int, abandons *tree.AbandonGroup) {
+func (g *Grammar) cut(road *Road, index int, abandons *tree.AbandonGroup) error {
 	if abandons == nil {
-		return
+		return nil
 	}
 	for _, abandon := range abandons.Values() {
-		road.RemoveSection(index+abandon.Offset, abandon.Value)
+		err := road.RemoveSection(index+abandon.Offset, abandon.Value)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 func (g *Grammar) match(road *Road, roadIndex int, last tree.Phrase, rule *tree.StructRule, back map[tree.Phrase]bool) error {
 	size := rule.Size()
 	treasures := make([]tree.Phrase, size, size)
-	treasures[size-1] = g.types.Package(rule.Types()[size-1], last.Types(), last)
+	lastTypes, err := last.Types()
+	if err != nil {
+		return err
+	}
+	treasures[size-1] = g.types.Package(rule.Types()[size-1], lastTypes, last)
 	if size == 1 {
 		section := rule.Create(treasures)
-		if section.Types() == "" {
-			sectionTypes, err := g.diversion.Match(section)
-			if err != nil {
-				return err
+		sectionTypes, err := section.Types()
+		if err != nil {
+			return err
+		}
+		if sectionTypes == "" {
+			sectionTypes, matchErr := g.diversion.Match(section)
+			if matchErr != nil {
+				return matchErr
 			}
 			section.SetTypes(sectionTypes)
 		}
@@ -116,13 +151,21 @@ func (g *Grammar) matchStep(road *Road, index int, cursor int, treasures []tree.
 	}
 	phrases := road.GetSectionByTypes(cursor, rule.Types()[index])
 	for phrase, _ := range phrases {
-		treasures[index] = g.types.Package(rule.Types()[index], phrase.Types(), phrase)
+		phraseTypes, err := phrase.Types()
+		if err != nil {
+			return err
+		}
+		treasures[index] = g.types.Package(rule.Types()[index], phraseTypes, phrase)
 		if index == 0 {
 			section := rule.Create(treasures)
-			if section.Types() == "" {
-				sectionTypes, err := g.diversion.Match(section)
-				if err != nil {
-					return err
+			sectionTypes, err := section.Types()
+			if err != nil {
+				return err
+			}
+			if sectionTypes == "" {
+				sectionTypes, matchErr := g.diversion.Match(section)
+				if matchErr != nil {
+					return matchErr
 				}
 				section.SetTypes(sectionTypes)
 			}

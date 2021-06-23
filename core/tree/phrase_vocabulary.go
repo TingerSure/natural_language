@@ -8,7 +8,7 @@ import (
 )
 
 type PhraseVocabularyParam struct {
-	Index   func() concept.Function
+	Index   func() (concept.Function, concept.Exception)
 	Content string
 	Types   string
 	From    string
@@ -19,15 +19,15 @@ type PhraseVocabulary struct {
 	types string
 }
 
-func (p *PhraseVocabulary) Index() concept.Function {
+func (p *PhraseVocabulary) Index() (concept.Function, concept.Exception) {
 	return p.param.Index()
 }
 
-func (p *PhraseVocabulary) Types() string {
+func (p *PhraseVocabulary) Types() (string, concept.Exception) {
 	if p.types != "" {
-		return p.types
+		return p.types, nil
 	}
-	return p.param.Types
+	return p.param.Types, nil
 }
 
 func (p *PhraseVocabulary) SetTypes(types string) {

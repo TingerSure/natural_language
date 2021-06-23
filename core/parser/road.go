@@ -39,28 +39,31 @@ func NewRoad(sentence string, types *Types) *Road {
 	return road
 }
 
-func (r *Road) AddSection(index int, section tree.Phrase) {
+func (r *Road) AddSection(index int, section tree.Phrase) error {
 	r.leftCount.Add(index - section.ContentSize() + 1)
 	r.right.Add(index, section)
-	r.rightType.Add(index, section)
 	r.rightMap.Add(index, section)
+	return r.rightType.Add(index, section)
 }
 
-func (r *Road) removeSection(index int, value tree.Phrase) {
+func (r *Road) removeSection(index int, value tree.Phrase) error {
 	r.leftCount.Remove(index - value.ContentSize() + 1)
 	r.right.Remove(index, value)
-	r.rightType.Remove(index, value)
 	r.rightMap.Remove(value)
+	return r.rightType.Remove(index, value)
 }
 
-func (r *Road) RemoveSection(index int, value tree.Phrase) {
+func (r *Road) RemoveSection(index int, value tree.Phrase) error {
 	parents := r.rightMap.Get(value)
 	if parents != nil && len(parents) != 0 {
 		for parent, parentIndex := range parents {
-			r.RemoveSection(parentIndex, parent)
+			err := r.RemoveSection(parentIndex, parent)
+			if err != nil {
+				return err
+			}
 		}
 	}
-	r.removeSection(index, value)
+	return r.removeSection(index, value)
 }
 
 func (r *Road) GetActiveSection() []tree.Phrase {
@@ -71,7 +74,7 @@ func (r *Road) GetSectionBySize(index int, size int) []tree.Phrase {
 	return r.right.GetBySize(index, size)
 }
 
-func (r *Road) GetSectionByTypesAndSize(index int, types string, size int) []tree.Phrase {
+func (r *Road) GetSectionByTypesAndSize(index int, types string, size int) ([]tree.Phrase, error) {
 	return r.right.GetByTypesAndSize(index, types, size)
 }
 

@@ -10,11 +10,11 @@ type PhrasePriority struct {
 	values []Phrase
 }
 
-func (p *PhrasePriority) Index() concept.Function {
+func (p *PhrasePriority) Index() (concept.Function, concept.Exception) {
 	return p.values[0].Index()
 }
 
-func (p *PhrasePriority) Types() string {
+func (p *PhrasePriority) Types() (string, concept.Exception) {
 	return p.values[0].Types()
 }
 
@@ -60,7 +60,7 @@ func (p *PhrasePriority) ToString() string {
 
 func (p *PhrasePriority) ToStringOffset(index int) string {
 	var space = strings.Repeat("\t", index)
-	info := fmt.Sprintf("%v%v [\n", space, p.Types())
+	info := fmt.Sprintf("%v[\n", space)
 	for i := 0; i < p.ValueSize(); i++ {
 		info += p.GetValue(i).ToStringOffset(index + 1)
 	}
