@@ -63,11 +63,7 @@ func newAddStructRule(libs *tree.LibraryManager) concept.Function {
 					line := tree.NewLine("[dynamic_type]", "")
 					contents := libs.Sandbox.Variable.Array.New()
 					for _, phrase := range phrases {
-						content, exception := phrase.Types()
-						if !nl_interface.IsNil(exception) {
-							return "", exception.AddExceptionLine(line)
-						}
-						contents.Append(libs.Sandbox.Variable.String.New(content))
+						contents.Append(newPhrase(libs, phrase))
 					}
 					param := libs.Sandbox.Variable.Param.New()
 					param.SetOriginal("contents", contents)
@@ -96,11 +92,7 @@ func newAddStructRule(libs *tree.LibraryManager) concept.Function {
 							line := tree.NewLine(fmt.Sprintf("[struct_parse]:%v", name.Value()), "")
 							contents := libs.Sandbox.Variable.Array.New()
 							for _, phrase := range phrases {
-								content, exception := phrase.Index()
-								if !nl_interface.IsNil(exception) {
-									return nil, exception.AddExceptionLine(line)
-								}
-								contents.Append(content)
+								contents.Append(newPhrase(libs, phrase))
 							}
 							param := libs.Sandbox.Variable.Param.New()
 							param.SetOriginal("contents", contents)
