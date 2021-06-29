@@ -2,6 +2,7 @@ package parser
 
 import (
 	"github.com/TingerSure/natural_language/core/adaptor/nl_interface"
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
 	"github.com/TingerSure/natural_language/core/tree"
 )
 
@@ -34,40 +35,17 @@ func (a *Barricade) Diff(left tree.Phrase, right tree.Phrase) (tree.Phrase, tree
 	return diffLeft, diffRight
 }
 
-func (a *Barricade) Check(left, right tree.Phrase) (int, *tree.AbandonGroup) {
+func (a *Barricade) Check(left, right tree.Phrase) (*tree.PriorityResult, concept.Exception) {
 	for _, rule := range a.rules {
-		if rule.Match(left, right) {
+		yes, exception := rule.Match(left, right)
+		if !nl_interface.IsNil(exception) {
+			return nil, exception
+		}
+		if yes {
 			return rule.Choose(left, right)
 		}
 	}
-	return 0, nil
-}
-
-func (a *Barricade) TargetFilter(phrases []tree.Phrase, target tree.Phrase) ([]tree.Phrase, *tree.AbandonGroup) {
-	result := []tree.Phrase{}
-	abandons := tree.NewAbandonGroup()
-	obsolete := false
-leftLoop:
-	for _, left := range phrases {
-		choose, abandon := a.Check(left, target)
-		switch choose {
-		case 0:
-			result = append(result, left)
-			continue leftLoop
-		case -1:
-			result = append(result, left)
-			obsolete = true
-			abandons.Merge(abandon)
-			continue leftLoop
-		case 1:
-			abandons.Merge(abandon)
-			continue leftLoop
-		}
-	}
-	if !obsolete {
-		result = append(result, target)
-	}
-	return result, abandons
+	return tree.NewPriorityResult(0), nil
 }
 
 func (a *Barricade) AddRule(rule *tree.PriorityRule) {

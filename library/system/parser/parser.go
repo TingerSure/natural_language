@@ -40,5 +40,13 @@ func NewParser(libs *tree.LibraryManager) *Parser {
 		),
 	)
 
+	instance.SetPublic(
+		libs.Sandbox.Variable.DelayString.New("addPriorityRule"),
+		libs.Sandbox.Index.PublicIndex.New(
+			"addPriorityRule",
+			libs.Sandbox.Index.ConstIndex.New(newAddPriorityRule(libs)),
+		),
+	)
+
 	return instance
 }

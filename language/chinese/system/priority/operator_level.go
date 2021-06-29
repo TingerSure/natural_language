@@ -32,7 +32,7 @@ func (o *OperatorLevel) GetPriorityRules() []*tree.PriorityRule {
 				return left.From() == structs.NumberFromNumberArithmeticNumberName &&
 					right.From() == structs.NumberFromNumberArithmeticNumberName
 			},
-			Chooser: func(left tree.Phrase, right tree.Phrase) (int, *tree.AbandonGroup) {
+			Chooser: func(left tree.Phrase, right tree.Phrase) *tree.PriorityResult {
 
 				levelLeft := o.getLevel(left.GetChild(1).From())
 				levelRight := o.getLevel(right.GetChild(1).From())
@@ -41,40 +41,22 @@ func (o *OperatorLevel) GetPriorityRules() []*tree.PriorityRule {
 
 				if levelLeft > levelRight {
 					if indexLeft.ContentSize() < indexRight.ContentSize() {
-						return 1, tree.NewAbandonGroup().Add(&tree.Abandon{
-							Offset: 0,
-							Value:  left.GetChild(2),
-						})
+						return tree.NewPriorityResult(1).AddAbandon(2)
 					}
-					return 1, tree.NewAbandonGroup().Add(&tree.Abandon{
-						Offset: indexLeft.ContentSize() - left.ContentSize(),
-						Value:  indexLeft,
-					})
+					return tree.NewPriorityResult(1).AddAbandon(0)
 				}
 				if levelLeft < levelRight {
 					if indexLeft.ContentSize() > indexRight.ContentSize() {
-						return -1, tree.NewAbandonGroup().Add(&tree.Abandon{
-							Offset: 0,
-							Value:  right.GetChild(2),
-						})
+						return tree.NewPriorityResult(-1).AddAbandon(2)
 					}
-					return -1, tree.NewAbandonGroup().Add(&tree.Abandon{
-						Offset: indexRight.ContentSize() - right.ContentSize(),
-						Value:  indexRight,
-					})
+					return tree.NewPriorityResult(-1).AddAbandon(0)
 				}
 
 				if indexLeft.ContentSize() < indexRight.ContentSize() {
-					return 1, tree.NewAbandonGroup().Add(&tree.Abandon{
-						Offset: 0,
-						Value:  left.GetChild(2),
-					})
+					return tree.NewPriorityResult(1).AddAbandon(2)
 				}
 				if indexLeft.ContentSize() > indexRight.ContentSize() {
-					return -1, tree.NewAbandonGroup().Add(&tree.Abandon{
-						Offset: 0,
-						Value:  right.GetChild(2),
-					})
+					return tree.NewPriorityResult(-1).AddAbandon(2)
 				}
 				return 0, nil
 			},

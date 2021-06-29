@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	VariableDelayStringType = "string"
+	VariableDelayStringType = "delay_string"
 )
 
 type DelayStringSeed interface {

@@ -25,34 +25,34 @@ var (
 			for cursor, item := range items {
 				importIndex, yes := index.IndexFamilyInstance.IsImportIndex(item)
 				if yes {
-					err := page.SetImport(
+					exception := page.SetImport(
 						context.GetLibraryManager().Sandbox.Variable.String.New(importIndex.Name()),
 						importIndex,
 					)
-					if !nl_interface.IsNil(err) {
-						return nil, nil, err
+					if !nl_interface.IsNil(exception) {
+						return nil, nil, exception.AddExceptionLine(lines[cursor])
 					}
 					continue
 				}
 				publicIndex, yes := index.IndexFamilyInstance.IsPublicIndex(item)
 				if yes {
-					err := page.SetPublic(
+					exception := page.SetPublic(
 						context.GetLibraryManager().Sandbox.Variable.String.New(publicIndex.Name()),
 						publicIndex,
 					)
-					if !nl_interface.IsNil(err) {
-						return nil, nil, err
+					if !nl_interface.IsNil(exception) {
+						return nil, nil, exception.AddExceptionLine(lines[cursor])
 					}
 					continue
 				}
 				privateIndex, yes := index.IndexFamilyInstance.IsPrivateIndex(item)
 				if yes {
-					err := page.SetPrivate(
+					exception := page.SetPrivate(
 						context.GetLibraryManager().Sandbox.Variable.String.New(privateIndex.Name()),
 						privateIndex,
 					)
-					if !nl_interface.IsNil(err) {
-						return nil, nil, err
+					if !nl_interface.IsNil(exception) {
+						return nil, nil, exception.AddExceptionLine(lines[cursor])
 					}
 					continue
 				}

@@ -70,12 +70,15 @@ func (g *Grammar) ParseStruct(road *Road) error {
 
 				targetNeed := true
 				for _, old := range olds {
-					results, abandons := g.barricade.Check(old, target)
-					err := g.cut(road, index, abandons)
+					results, checkErr := g.barricade.Check(old, target)
+					if checkErr != nil {
+						return checkErr
+					}
+					err := g.cut(road, index, results, old, target)
 					if err != nil {
 						return err
 					}
-					switch results {
+					switch results.Result() {
 					case 0:
 						break
 					case -1:
@@ -105,12 +108,24 @@ func (g *Grammar) ParseStruct(road *Road) error {
 	return nil
 }
 
-func (g *Grammar) cut(road *Road, index int, abandons *tree.AbandonGroup) error {
-	if abandons == nil {
+func (g *Grammar) cut(road *Road, index int, results *tree.PriorityResult, left tree.Phrase, right tree.Phrase) error {
+	var target tree.Phrase
+	switch results.Result() {
+	case 0:
 		return nil
+	case -1:
+		target = right
+		break
+	case 1:
+		target = left
+		break
 	}
-	for _, abandon := range abandons.Values() {
-		err := road.RemoveSection(index+abandon.Offset, abandon.Value)
+	for _, abandon := range results.Abandons() {
+		abandonIndex := index
+		for cursor := target.Size() - 1; cursor > abandon; cursor-- {
+			abandonIndex -= target.GetChild(cursor).ContentSize()
+		}
+		err := road.RemoveSection(abandonIndex, target.GetChild(abandon))
 		if err != nil {
 			return err
 		}

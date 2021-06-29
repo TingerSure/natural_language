@@ -37,20 +37,20 @@ func (o *Page) Call(specimen concept.String, param concept.Param) (concept.Param
 	return value.(concept.Function).Exec(param, nil)
 }
 
-func (o *Page) SetImport(specimen concept.String, indexes concept.Pipe) error {
+func (o *Page) SetImport(specimen concept.String, indexes concept.Pipe) concept.Exception {
 	return o.SetPrivate(specimen, indexes)
 }
 
-func (o *Page) SetPublic(specimen concept.String, indexes concept.Pipe) error {
-	err := o.SetPrivate(specimen, indexes)
-	if err != nil {
-		return err
+func (o *Page) SetPublic(specimen concept.String, indexes concept.Pipe) concept.Exception {
+	exception := o.SetPrivate(specimen, indexes)
+	if !nl_interface.IsNil(exception) {
+		return exception
 	}
 	o.publics.Set(specimen, indexes)
 	return nil
 }
 
-func (o *Page) SetPrivate(specimen concept.String, indexes concept.Pipe) error {
+func (o *Page) SetPrivate(specimen concept.String, indexes concept.Pipe) concept.Exception {
 	if o.space.HasLocal(specimen) {
 		return o.seed.NewException("runtime error", fmt.Sprintf("Duplicate identifier: '%v'.", specimen.Value()))
 	}
@@ -58,9 +58,9 @@ func (o *Page) SetPrivate(specimen concept.String, indexes concept.Pipe) error {
 	if !nl_interface.IsNil(suspend) {
 		exception, yes := interrupt.InterruptFamilyInstance.IsException(suspend)
 		if yes {
-			return exception.(concept.Exception)
+			return exception
 		}
-		return fmt.Errorf("An illegal interrupt \"%v\" was thrown while declaring variable : '%v'.", suspend.InterruptType(), specimen.Value())
+		return o.seed.NewException("runtime error", fmt.Sprintf("An illegal interrupt \"%v\" was thrown while declaring variable : '%v'.", suspend.InterruptType(), specimen.Value()))
 	}
 	o.privates = append(o.privates, indexes)
 	o.space.InitLocal(specimen, value)

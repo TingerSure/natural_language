@@ -87,8 +87,6 @@ func test() {
 				fmt.Printf("\033[1;32m[ERROR]:\033[00m %v\n", err.Error())
 				return true
 			}
-
-			fmt.Printf("\033[1;32m[LOG]:\033[00m %v\n", index.ToString(""))
 			VM.Exec(index, tree.NewLine(fmt.Sprintf("[scan_input]:%v", input), ""))
 			return true
 		},

@@ -1,8 +1,12 @@
 package tree
 
+import (
+	"github.com/TingerSure/natural_language/core/sandbox/concept"
+)
+
 type PriorityRuleParam struct {
-	Match   func(Phrase, Phrase) bool
-	Chooser func(Phrase, Phrase) (int, *AbandonGroup)
+	Match   func(Phrase, Phrase) (bool, concept.Exception)
+	Chooser func(Phrase, Phrase) (*PriorityResult, concept.Exception)
 	From    string
 }
 
@@ -14,11 +18,11 @@ func (r *PriorityRule) GetFrom() string {
 	return r.param.From
 }
 
-func (p *PriorityRule) Match(left, right Phrase) bool {
+func (p *PriorityRule) Match(left, right Phrase) (bool, concept.Exception) {
 	return p.param.Match(left, right)
 }
 
-func (p *PriorityRule) Choose(left, right Phrase) (int, *AbandonGroup) {
+func (p *PriorityRule) Choose(left, right Phrase) (*PriorityResult, concept.Exception) {
 	return p.param.Chooser(left, right)
 }
 
