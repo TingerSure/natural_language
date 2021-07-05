@@ -36,10 +36,15 @@ type Runtime struct {
 	compiler            *compiler.Compiler
 	libs                *tree.LibraryManager
 	box                 *sandbox.Sandbox
+	rootPipeCache       *tree.PipeCache
 	rootSpace           concept.Pool
 	defaultLanguage     string
 	structErrorFormat   func(*parser.Road) string
 	priorityErrorFormat func(*parser.Road) string
+}
+
+func (r *Runtime) GetRootPipeCache() *tree.PipeCache {
+	return r.rootPipeCache
 }
 
 func (r *Runtime) GetRootSpace() concept.Pool {
@@ -124,12 +129,16 @@ func NewRuntime(param *RuntimeParam) *Runtime {
 		structErrorFormat:   runtimeStructErrorFormatDefault,
 		priorityErrorFormat: runtimePriorityErrorFormatDefault,
 	}
+	runtime.rootPipeCache = tree.NewPipeCache(&tree.PipeCacheParam{})
 	runtime.rootSpace = sandboxCreator.Variable.Pool.New(nil)
 	runtime.parser = parser.NewParser(runtime.rootSpace, sandboxCreator)
 	runtime.box = sandbox.NewSandbox(&sandbox.SandboxParam{
-		Root:      runtime.rootSpace,
-		OnError:   param.OnError,
-		OnPrint:   param.OnPrint,
+		Root:    runtime.rootSpace,
+		OnError: param.OnError,
+		OnPrint: param.OnPrint,
+		OnExec: func(pipe concept.Function, value concept.Variable) {
+			runtime.rootPipeCache.Add(pipe, value)
+		},
 		EventSize: param.EventSize,
 	})
 	runtime.libs = tree.NewLibraryManager(

@@ -24,11 +24,10 @@ type PoolSeed interface {
 }
 
 type Pool struct {
-	local     *nl_interface.Mapping
-	parent    concept.Pool
-	history   *pool.History
-	extempore *pool.Extempore
-	seed      PoolSeed
+	local   *nl_interface.Mapping
+	parent  concept.Pool
+	history *pool.History
+	seed    PoolSeed
 }
 
 func (c *Pool) IterateHistory(match func(concept.String, concept.Variable) bool) bool {
@@ -53,10 +52,6 @@ func (c *Pool) IterateHistory(match func(concept.String, concept.Variable) bool)
 		}
 		return false
 	})
-}
-
-func (c *Pool) IterateExtempore(match func(concept.Function, concept.Variable) bool) bool {
-	return c.extempore.Iterate(match)
 }
 
 func (c *Pool) IterateLocal(match func(concept.String, concept.Variable) bool) bool {
@@ -87,10 +82,6 @@ func (c *Pool) IterateBubble(match func(concept.String, concept.Variable) bool) 
 
 func (c *Pool) SetParent(parent concept.Pool) {
 	c.parent = parent
-}
-
-func (c *Pool) AddExtempore(index concept.Function, value concept.Variable) {
-	c.extempore.Add(index, value)
 }
 
 func (c *Pool) InitLocal(key concept.String, defaultValue concept.Variable) {
@@ -273,9 +264,8 @@ func (s *PoolCreator) NewNull() concept.Null {
 
 func (s *PoolCreator) New(parent concept.Pool) *Pool {
 	pool := &Pool{
-		parent:    parent,
-		history:   pool.NewHistory(),
-		extempore: pool.NewExtempore(),
+		parent:  parent,
+		history: pool.NewHistory(),
 		local: nl_interface.NewMapping(&nl_interface.MappingParam{
 			AutoInit:   false,
 			EmptyValue: s.NewNull(),
