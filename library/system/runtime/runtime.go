@@ -7,22 +7,25 @@ import (
 )
 
 type RuntimeParam struct {
-	RootSpace concept.Pool
+	RootSpace     concept.Pool
+	RootPipeCache *tree.PipeCache
 }
 
 type Runtime struct {
 	concept.Page
-	param     *RuntimeParam
-	libs      *tree.LibraryManager
-	rootSpace concept.Variable
+	param         *RuntimeParam
+	libs          *tree.LibraryManager
+	rootSpace     concept.Pool
+	rootPipeCache *tree.PipeCache
 }
 
 func NewRuntime(libs *tree.LibraryManager, param *RuntimeParam) *Runtime {
 	instance := &Runtime{
-		libs:      libs,
-		param:     param,
-		Page:      libs.Sandbox.Variable.Page.New(),
-		rootSpace: param.RootSpace,
+		libs:          libs,
+		param:         param,
+		Page:          libs.Sandbox.Variable.Page.New(),
+		rootSpace:     param.RootSpace,
+		rootPipeCache: param.RootPipeCache,
 	}
 	instance.fieldInit()
 	instance.SetPublic(
@@ -30,6 +33,20 @@ func NewRuntime(libs *tree.LibraryManager, param *RuntimeParam) *Runtime {
 		libs.Sandbox.Index.PublicIndex.New(
 			"rootSpace",
 			libs.Sandbox.Index.ConstIndex.New(instance.rootSpace),
+		),
+	)
+	instance.SetPublic(
+		libs.Sandbox.Variable.DelayString.New("findHistory"),
+		libs.Sandbox.Index.PublicIndex.New(
+			"findHistory",
+			libs.Sandbox.Index.ConstIndex.New(newFindHistory(libs, instance.rootSpace)),
+		),
+	)
+	instance.SetPublic(
+		libs.Sandbox.Variable.DelayString.New("findPipeCache"),
+		libs.Sandbox.Index.PublicIndex.New(
+			"findPipeCache",
+			libs.Sandbox.Index.ConstIndex.New(newFindPipeCache(libs, instance.rootPipeCache)),
 		),
 	)
 

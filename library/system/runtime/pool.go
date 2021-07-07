@@ -10,7 +10,7 @@ import (
 
 func PoolInit(libs *tree.LibraryManager, instance *variable.Pool) {
 	instance.SetField(
-		libs.Sandbox.Variable.DelayString.New("GetLocal"),
+		libs.Sandbox.Variable.DelayString.New("getLocal"),
 		libs.Sandbox.Variable.DelayFunction.New(PoolGetLocal(libs, instance)),
 	)
 }

@@ -56,7 +56,8 @@ func getVM() (*runtime.Runtime, error) {
 			},
 		},
 		RuntimeParam: &lib_runtime.RuntimeParam{
-			RootSpace: VM.GetRootSpace(),
+			RootSpace:     VM.GetRootSpace(),
+			RootPipeCache: VM.GetRootPipeCache(),
 		},
 	})
 	err := VM.Read("main/main")
