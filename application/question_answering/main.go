@@ -27,7 +27,6 @@ func getVM() (*runtime.Runtime, error) {
 		EventSize: 1024,
 		SourceRoots: []string{
 			"./",
-			"../../library/second/",
 		},
 		SourceExtension: ".nl",
 	}
@@ -87,6 +86,12 @@ func test() {
 			if err != nil {
 				fmt.Printf("\033[1;32m[ERROR]:\033[00m %v\n", err.Error())
 				return true
+			}
+			message, suspend := index.ToCallLanguage(ChineseName, VM.GetRootSpace(), "", nil)
+			if !nl_interface.IsNil(suspend) {
+				os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[AUTO-LOG-ERROR]:\033[00m %v\n", suspend.Error()))
+			} else {
+				os.Stdout.WriteString(fmt.Sprintf("\033[1;36m[AUTO-LOG]:\033[00m %v\n", message))
 			}
 			VM.Exec(index, tree.NewLine(fmt.Sprintf("[scan_input]:%v", input), ""))
 			return true

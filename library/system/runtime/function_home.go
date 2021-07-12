@@ -21,6 +21,65 @@ func FunctionHomeInit(libs *tree.LibraryManager, instance concept.Function) {
 		libs.Sandbox.Variable.DelayString.New("setLanguageOnCallSeed"),
 		libs.Sandbox.Variable.DelayFunction.New(FunctionHomeSetLanguageOnCallSeed(libs, instance)),
 	)
+	instance.SetField(
+		libs.Sandbox.Variable.DelayString.New("toCallLanguage"),
+		libs.Sandbox.Variable.DelayFunction.New(FunctionHomeToCallLanguage(libs, instance)),
+	)
+}
+
+func FunctionHomeToCallLanguage(libs *tree.LibraryManager, instance concept.Function) func() concept.Function {
+	return func() concept.Function {
+		languageParam := libs.Sandbox.Variable.String.New("language")
+		poolParam := libs.Sandbox.Variable.String.New("pool")
+		nameParam := libs.Sandbox.Variable.String.New("name")
+		paramsParam := libs.Sandbox.Variable.String.New("params")
+		valueParam := libs.Sandbox.Variable.String.New("value")
+		return libs.Sandbox.Variable.SystemFunction.New(
+			func(input concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
+				languagePre := input.Get(languageParam)
+				language, yes := variable.VariableFamilyInstance.IsStringHome(languagePre)
+				if !yes {
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param language is not a string: %v", languagePre.ToString("")))
+				}
+				poolPre := input.Get(poolParam)
+				pool, yes := variable.VariableFamilyInstance.IsPool(poolPre)
+				if !yes {
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param pool is not a pool: %v", poolPre.ToString("")))
+				}
+				namePre := input.Get(nameParam)
+				name, yes := variable.VariableFamilyInstance.IsStringHome(namePre)
+				if !yes {
+					return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param name is not a string: %v", namePre.ToString("")))
+				}
+				paramsPre := input.Get(paramsParam)
+				var params concept.Param = nil
+				if !paramsPre.IsNull() {
+					params, yes = variable.VariableFamilyInstance.IsParam(paramsPre)
+					if !yes {
+						return nil, libs.Sandbox.Variable.Exception.NewOriginal("type error", fmt.Sprintf("Param params is not a Param: %v", paramsPre.ToString("")))
+					}
+				}
+
+				value, exception := instance.ToCallLanguage(language.Value(), pool, name.Value(), params)
+				if exception != nil {
+					return nil, exception
+				}
+				output := libs.Sandbox.Variable.Param.New()
+				output.SetField(valueParam, libs.Sandbox.Variable.String.New(value))
+				return output, nil
+			},
+			nil,
+			[]concept.String{
+				languageParam,
+				poolParam,
+				nameParam,
+				paramsParam,
+			},
+			[]concept.String{
+				valueParam,
+			},
+		)
+	}
 }
 
 func FunctionHomeSetLanguageOnCallSeed(libs *tree.LibraryManager, instance concept.Function) func() concept.Function {
@@ -44,6 +103,7 @@ func FunctionHomeSetLanguageOnCallSeed(libs *tree.LibraryManager, instance conce
 					seedInput.SetOriginal("instance", instance)
 					seedInput.SetOriginal("name", libs.Sandbox.Variable.String.New(name))
 					seedInput.SetOriginal("params", params)
+					seedInput.SetOriginal("pool", pool)
 					seedOutput, suspend := seed.Exec(seedInput, nil)
 					if !nl_interface.IsNil(suspend) {
 						return "", suspend

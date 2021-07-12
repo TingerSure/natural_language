@@ -47,6 +47,9 @@ func (a *AdaptorFunction) SetLanguageOnCallSeed(language string, seed func(conce
 }
 
 func (a *AdaptorFunction) ToCallLanguageAdaptor(funcs concept.Function, language string, space concept.Pool, self string, param concept.Param) (string, concept.Exception) {
+	if param == nil {
+		param = a.param.ParamCreator()
+	}
 	seed := funcs.GetLanguageOnCallSeed(language)
 	if seed == nil {
 		return funcs.ToLanguage(language, space)
