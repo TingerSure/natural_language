@@ -49,6 +49,13 @@ func NewRuntime(libs *tree.LibraryManager, param *RuntimeParam) *Runtime {
 			libs.Sandbox.Index.ConstIndex.New(newFindPipeCache(libs, instance.rootPipeCache)),
 		),
 	)
+	instance.SetPublic(
+		libs.Sandbox.Variable.DelayString.New("throw"),
+		libs.Sandbox.Index.PublicIndex.New(
+			"throw",
+			libs.Sandbox.Index.ConstIndex.New(newThrow(libs)),
+		),
+	)
 
 	return instance
 }
