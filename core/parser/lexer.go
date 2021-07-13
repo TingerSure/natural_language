@@ -9,25 +9,88 @@ import (
 
 type Lexer struct {
 	rules      []*tree.VocabularyRule
-	wordCache  map[byte]map[string]map[*tree.VocabularyRule]bool
+	wordCache  map[rune]map[string]map[*tree.VocabularyRule]bool
 	matchCache map[*tree.VocabularyRule]*regexp.Regexp
 }
 
 func NewLexer() *Lexer {
 	return &Lexer{
 		rules:      []*tree.VocabularyRule{},
-		wordCache:  map[byte]map[string]map[*tree.VocabularyRule]bool{},
+		wordCache:  map[rune]map[string]map[*tree.VocabularyRule]bool{},
 		matchCache: map[*tree.VocabularyRule]*regexp.Regexp{},
 	}
 }
 
-func (p *Lexer) ParseVocabulary(road *Road) error {
-	return p.parseVocabularyStep(road, 0)
+type lexerUnknownSection struct {
+	left  int
+	right int
 }
 
-func (p *Lexer) parseVocabularyStep(road *Road, index int) error {
-	if index >= road.SentenceSize() || road.HasLeftSection(index) {
+func (p *Lexer) ParseVocabulary(road *Road) error {
+	unknowns := []*lexerUnknownSection{}
+	unknowns, err := p.parseVocabularyStep(road, unknowns, 0)
+	if err != nil {
+		return err
+	}
+
+	realUnknowns := []*lexerUnknownSection{}
+	for cursor := len(unknowns) - 1; cursor >= 0; cursor-- {
+		unknown := unknowns[cursor]
+		if !p.existNext(road, unknown.right) {
+			realUnknowns = append(realUnknowns, unknown)
+			continue
+		}
+		err = p.removeUniqueVocabularyStep(road, unknown.left-1)
+		if err != nil {
+			return err
+		}
+	}
+	if len(realUnknowns) != 0 {
+		max := realUnknowns[0]
+		for cursor := 1; cursor < len(realUnknowns); cursor++ {
+			unknown := realUnknowns[cursor]
+			if unknown.left > max.left {
+				max = unknown
+			}
+		}
+		return fmt.Errorf("This vocabulary has no rules to parse! (%v)\n\"%v\":%v", road.SubSentence(max.left, max.right+1), road.GetSentence(), max.left)
+	}
+	return nil
+}
+
+func (p *Lexer) removeUniqueVocabularyStep(road *Road, index int) error {
+	if index < 0 {
 		return nil
+	}
+	vocabularies := road.GetSections(index)
+	for _, vocabulary := range vocabularies {
+		left := index - vocabulary.ContentSize() + 1
+		if road.GetLeftSectionSize(left) == 1 {
+			err := p.removeUniqueVocabularyStep(road, left-1)
+			if err != nil {
+				return err
+			}
+		}
+		err := road.RemoveSection(index, vocabulary)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (p *Lexer) existNext(road *Road, index int) bool {
+	for cursor := index; cursor < road.SentenceSize(); cursor++ {
+		if road.HasRightSection(cursor) {
+			return true
+		}
+	}
+	return false
+}
+
+func (p *Lexer) parseVocabularyStep(road *Road, unknowns []*lexerUnknownSection, index int) ([]*lexerUnknownSection, error) {
+	if index >= road.SentenceSize() || road.HasLeftSection(index) {
+		return unknowns, nil
 	}
 
 	phrases := p.getPhrases(road.SubSentenceFrom(index))
@@ -39,20 +102,23 @@ func (p *Lexer) parseVocabularyStep(road *Road, index int) error {
 				break
 			}
 		}
-		return fmt.Errorf("This vocabulary has no rules to parse! ( %v )", road.SubSentence(index, end))
+		return append(unknowns, &lexerUnknownSection{
+			left:  index,
+			right: end - 1,
+		}), nil
 	}
 
 	for _, phrase := range phrases {
 		err := road.AddSection(index+phrase.ContentSize()-1, phrase)
 		if err != nil {
-			return err
+			return unknowns, err
 		}
-		err = p.parseVocabularyStep(road, index+phrase.ContentSize())
+		unknowns, err = p.parseVocabularyStep(road, unknowns, index+phrase.ContentSize())
 		if err != nil {
-			return err
+			return unknowns, err
 		}
 	}
-	return nil
+	return unknowns, nil
 }
 
 func (p *Lexer) getPhrases(sentence string) []tree.Phrase {
@@ -63,7 +129,7 @@ func (p *Lexer) getPhrases(sentence string) []tree.Phrase {
 }
 
 func (p *Lexer) getPhrasesByWords(sentence string, phrases []tree.Phrase) []tree.Phrase {
-	for candidate, rules := range p.wordCache[sentence[0]] {
+	for candidate, rules := range p.wordCache[[]rune(sentence)[0]] {
 		if p.startFor(candidate, sentence) {
 			for rule, _ := range rules {
 				phrases = append(phrases, rule.Create(candidate))
@@ -96,7 +162,7 @@ func (p *Lexer) AddRule(rule *tree.VocabularyRule) {
 		if word == "" {
 			continue
 		}
-		start := word[0]
+		start := []rune(word)[0]
 		if p.wordCache[start] == nil {
 			p.wordCache[start] = map[string]map[*tree.VocabularyRule]bool{}
 		}
@@ -124,7 +190,7 @@ func (p *Lexer) RemoveRule(need func(*tree.VocabularyRule) bool) {
 			if word == "" {
 				continue
 			}
-			start := word[0]
+			start := []rune(word)[0]
 			delete(p.wordCache[start][word], rule)
 			if len(p.wordCache[start][word]) == 0 {
 				delete(p.wordCache[start], word)

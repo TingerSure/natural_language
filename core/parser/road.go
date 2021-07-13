@@ -90,6 +90,10 @@ func (r *Road) GetSections(index int) []tree.Phrase {
 	return r.right.GetAll(index)
 }
 
+func (r *Road) GetLeftSectionSize(index int) int {
+	return r.leftCount.Get(index)
+}
+
 func (r *Road) HasLeftSection(index int) bool {
 	return r.leftCount.Get(index) != 0
 }
