@@ -3,7 +3,6 @@ package concept
 type Function interface {
 	Variable
 	Exec(Param, Variable) (Param, Exception)
-	Anticipate(Param, Variable) Param
 	FunctionType() string
 	AddParamName(...String)
 	AddReturnName(...String)

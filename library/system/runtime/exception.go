@@ -24,7 +24,6 @@ func newThrow(libs *tree.LibraryManager) concept.Function {
 			}
 			return nil, libs.Sandbox.Variable.Exception.New(name, message)
 		},
-		nil,
 		[]concept.String{
 			nameParam,
 			messageParam,

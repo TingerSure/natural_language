@@ -45,31 +45,6 @@ func (a *NewClass) ToString(prefix string) string {
 	return fmt.Sprintf("class {\n%v\n%v}", strings.Join(items, "\n"), prefix)
 }
 
-func (a *NewClass) Anticipate(space concept.Pool) concept.Variable {
-	class := a.seed.NewClass()
-	for _, linePre := range a.items {
-		lineProvide, yes := index.IndexFamilyInstance.IsProvideIndex(linePre)
-		if yes {
-			funcsPre := lineProvide.Anticipate(space)
-			funcs, yes := variable.VariableFamilyInstance.IsFunctionHome(funcsPre)
-			if yes {
-				class.SetProvide(a.seed.NewString(lineProvide.Name()), funcs)
-			}
-			continue
-		}
-		lineRequire, yes := index.IndexFamilyInstance.IsRequireIndex(linePre)
-		if yes {
-			funcsPre := lineRequire.Anticipate(space)
-			funcs, yes := variable.VariableFamilyInstance.IsDefineFunction(funcsPre)
-			if yes {
-				class.SetRequire(a.seed.NewString(lineRequire.Name()), funcs)
-			}
-			continue
-		}
-	}
-	return class
-}
-
 func (a *NewClass) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	class := a.seed.NewClass()
 	for cursor, linePre := range a.items {

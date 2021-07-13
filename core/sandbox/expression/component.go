@@ -39,11 +39,6 @@ func (a *Component) ToString(prefix string) string {
 	return fmt.Sprintf("%v.%v", a.object.ToString(prefix), a.field.Value())
 }
 
-func (a *Component) Anticipate(space concept.Pool) concept.Variable {
-	value, _ := a.object.Anticipate(space).GetField(a.field)
-	return value
-}
-
 func (a *Component) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	object, suspend := a.object.Get(space)
 	if !nl_interface.IsNil(suspend) {

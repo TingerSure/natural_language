@@ -206,11 +206,10 @@ func NewVariableCreator(param *VariableCreatorParam) *VariableCreator {
 		},
 		SystemFunctionCreator: func(
 			funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
-			anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
 			paramNames []concept.String,
 			returnNames []concept.String,
 		) concept.Function {
-			return instance.SystemFunction.New(funcs, anticipateFuncs, paramNames, returnNames)
+			return instance.SystemFunction.New(funcs, paramNames, returnNames)
 		},
 	})
 	return instance

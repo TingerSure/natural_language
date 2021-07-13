@@ -60,10 +60,6 @@ func (c *CodeBlock) AddStep(steps ...concept.Pipe) {
 	c.flow = append(c.flow, steps...)
 }
 
-func (a *CodeBlock) Anticipate(space concept.Pool) concept.Variable {
-	return a.seed.NewPool(space)
-}
-
 func (a *CodeBlock) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return a.ExecWithInit(space, nil)
 }

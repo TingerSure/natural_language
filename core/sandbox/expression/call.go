@@ -44,15 +44,6 @@ func (a *Call) ToString(prefix string) string {
 	return fmt.Sprintf("%v(%v)", a.funcs.ToString(prefix), a.param.ToString(prefix))
 }
 
-func (a *Call) Anticipate(space concept.Pool) concept.Variable {
-	preParam := a.param.Anticipate(space)
-	param, yesParam := variable.VariableFamilyInstance.IsParam(preParam)
-	if !yesParam {
-		return a.seed.NewParam()
-	}
-	return a.funcs.CallAnticipate(space, param)
-}
-
 func (a *Call) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	preParam, suspend := a.param.Get(space)
 	if !nl_interface.IsNil(suspend) {

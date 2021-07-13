@@ -58,14 +58,6 @@ func (a *NewObject) ToString(prefix string) string {
 
 }
 
-func (a *NewObject) Anticipate(space concept.Pool) concept.Variable {
-	object := a.seed.NewObject()
-	for _, field := range a.fields {
-		object.SetField(field.Key(), field.Value().Anticipate(space))
-	}
-	return object
-}
-
 func (a *NewObject) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	object := a.seed.NewObject()
 	var suspend concept.Interrupt = nil

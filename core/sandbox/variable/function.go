@@ -26,10 +26,9 @@ type FunctionSeed interface {
 
 type Function struct {
 	*adaptor.AdaptorFunction
-	body           concept.CodeBlock
-	anticipateBody concept.CodeBlock
-	parent         concept.Pool
-	seed           FunctionSeed
+	body   concept.CodeBlock
+	parent concept.Pool
+	seed   FunctionSeed
 }
 
 func (o *Function) Parent() concept.Pool {
@@ -54,56 +53,6 @@ func (s *Function) FunctionType() string {
 
 func (f *Function) ToString(prefix string) string {
 	return fmt.Sprintf("function (%v) %v %v", StringJoin(f.ParamNames(), ", "), StringJoin(f.ReturnNames(), ", "), f.body.ToString(prefix))
-}
-
-func (f *Function) AnticipateBody() concept.CodeBlock {
-	return f.anticipateBody
-}
-
-func (f *Function) Anticipate(params concept.Param, object concept.Variable) concept.Param {
-	if nl_interface.IsNil(params) {
-		params = f.seed.NewParam()
-	}
-	space, suspend := f.anticipateBody.ExecWithInit(f.parent, func(space concept.Pool) concept.Interrupt {
-		space.InitLocal(f.seed.NewString(FunctionAutoParamSelf), f)
-		space.InitLocal(f.seed.NewString(FunctionAutoParamThis), object)
-		if params.ParamType() == concept.ParamTypeList {
-			for index, name := range f.ParamNames() {
-				if index < params.SizeIndex() {
-					space.InitLocal(name, params.GetIndex(index))
-				} else {
-					space.InitLocal(name, params.Get(name))
-				}
-			}
-		}
-		if params.ParamType() == concept.ParamTypeKeyValue {
-			for _, name := range f.ParamNames() {
-				space.InitLocal(name, params.Get(name))
-			}
-		}
-		for _, name := range f.ReturnNames() {
-			space.InitLocal(name, f.seed.NewNull())
-		}
-		return nil
-	})
-	defer space.Clear()
-
-	if !nl_interface.IsNil(suspend) {
-		switch suspend.InterruptType() {
-		case ExceptionInterruptType:
-			return f.seed.NewParam()
-		case interrupt.ReturnInterruptType:
-			//Do Nothing
-		default:
-			return f.seed.NewParam()
-		}
-	}
-	returnParams := f.seed.NewParam()
-	for _, name := range f.ReturnNames() {
-		value, _ := space.PeekLocal(name)
-		returnParams.Set(name, value)
-	}
-	return returnParams
 }
 
 func (f *Function) Body() concept.CodeBlock {
@@ -188,10 +137,9 @@ func (s *FunctionCreator) New(parent concept.Pool) *Function {
 			ExceptionCreator: s.param.ExceptionCreator,
 			ParamCreator:     s.param.ParamCreator,
 		}),
-		parent:         parent,
-		body:           s.param.CodeBlockCreator(),
-		anticipateBody: s.param.CodeBlockCreator(),
-		seed:           s,
+		parent: parent,
+		body:   s.param.CodeBlockCreator(),
+		seed:   s,
 	}
 
 	for _, init := range s.Inits {

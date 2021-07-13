@@ -33,10 +33,6 @@ func (a *Append) ToString(prefix string) string {
 	return fmt.Sprintf("%v <- %v", a.array.ToString(prefix), a.item.ToString(prefix))
 }
 
-func (e *Append) Anticipate(space concept.Pool) concept.Variable {
-	return e.array.Anticipate(space)
-}
-
 func (a *Append) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	item, suspend := a.item.Get(space)
 	if !nl_interface.IsNil(suspend) {

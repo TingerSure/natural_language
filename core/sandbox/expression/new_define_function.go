@@ -59,11 +59,6 @@ func (a *NewDefineFunction) ToString(prefix string) string {
 	return fmt.Sprintf("function(%v) %v", strings.Join(params, ", "), strings.Join(returns, ", "))
 }
 
-func (a *NewDefineFunction) Anticipate(space concept.Pool) concept.Variable {
-	function := a.seed.NewDefineFunction(a.params, a.returns)
-	return function
-}
-
 func (a *NewDefineFunction) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	function := a.seed.NewDefineFunction(a.params, a.returns)
 	return function, nil

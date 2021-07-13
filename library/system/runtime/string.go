@@ -37,7 +37,6 @@ func StringAppend(libs *tree.LibraryManager, instance *variable.String) func() c
 				output.Set(valueBack, libs.Sandbox.Variable.String.New(instance.Value()+subString.Value()))
 				return output, nil
 			},
-			nil,
 			[]concept.String{
 				subStringParam,
 			},
@@ -67,9 +66,6 @@ func StringSetLanguage(libs *tree.LibraryManager, instance *variable.String) fun
 				instance.SetLanguage(language.Value(), value.Value())
 				return libs.Sandbox.Variable.Param.New(), nil
 			},
-			func(param concept.Param, _ concept.Variable) concept.Param {
-				return libs.Sandbox.Variable.Param.New()
-			},
 			[]concept.String{
 				languageParam,
 				valueParam,
@@ -95,7 +91,6 @@ func StringGetLanguage(libs *tree.LibraryManager, instance *variable.String) fun
 				output.Set(valueBack, libs.Sandbox.Variable.String.New(value))
 				return output, nil
 			},
-			nil,
 			[]concept.String{
 				languageParam,
 			},

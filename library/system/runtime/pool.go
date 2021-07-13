@@ -34,7 +34,6 @@ func PoolGetLocal(libs *tree.LibraryManager, instance *variable.Pool) func() con
 				output.Set(valueParam, back)
 				return output, nil
 			},
-			nil,
 			[]concept.String{keyParam},
 			[]concept.String{valueParam},
 		)

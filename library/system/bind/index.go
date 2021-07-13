@@ -44,9 +44,6 @@ func newConstIndexBind(libs *tree.LibraryManager) *variable.SystemFunction {
 			}
 			return libs.Sandbox.Variable.Param.New(), nil
 		},
-		func(input concept.Param, object concept.Variable) concept.Param {
-			return libs.Sandbox.Variable.Param.New()
-		},
 		[]concept.String{
 			languageParam,
 			seedParam,
@@ -89,9 +86,6 @@ func newBubbleIndexBind(libs *tree.LibraryManager) *variable.SystemFunction {
 				return value.Value(), nil
 			}
 			return libs.Sandbox.Variable.Param.New(), nil
-		},
-		func(input concept.Param, object concept.Variable) concept.Param {
-			return libs.Sandbox.Variable.Param.New()
 		},
 		[]concept.String{
 			languageParam,

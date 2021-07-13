@@ -53,7 +53,6 @@ func newStringToNumber(libs *tree.LibraryManager) concept.Function {
 			output.Set(valueParam, libs.Sandbox.Variable.Number.New(value))
 			return output, nil
 		},
-		nil,
 		[]concept.String{
 			fromParam,
 		},
@@ -77,7 +76,6 @@ func newNumberToString(libs *tree.LibraryManager) concept.Function {
 			output.Set(valueParam, libs.Sandbox.Variable.String.New(strconv.FormatFloat(from.Value(), 'E', -1, 64)))
 			return output, nil
 		},
-		nil,
 		[]concept.String{
 			fromParam,
 		},

@@ -22,7 +22,6 @@ func ArraySize(libs *tree.LibraryManager, instance *variable.Array) func() conce
 				back.Set(backSize, libs.Sandbox.Variable.Number.New(float64(instance.Length())))
 				return back, nil
 			},
-			nil,
 			[]concept.String{},
 			[]concept.String{
 				backSize,

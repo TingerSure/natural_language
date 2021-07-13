@@ -24,10 +24,6 @@ func (a *Parenthesis) ToString(prefix string) string {
 	return fmt.Sprintf("(%v)", a.target.ToString(prefix))
 }
 
-func (a *Parenthesis) Anticipate(space concept.Pool) concept.Variable {
-	return a.target.Anticipate(space)
-}
-
 func (a *Parenthesis) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return a.target.Get(space)
 }

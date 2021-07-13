@@ -55,19 +55,6 @@ func (s *ThisIndex) Call(space concept.Pool, param concept.Param) (concept.Param
 	return funcs.(concept.Function).Exec(param, nil)
 }
 
-func (s *ThisIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
-	funcs := s.Anticipate(space)
-	if !funcs.IsFunction() {
-		return s.seed.NewParam()
-	}
-	return funcs.(concept.Function).Anticipate(param, nil)
-}
-
-func (s *ThisIndex) Anticipate(space concept.Pool) concept.Variable {
-	value, _ := space.PeekBubble(s.seed.NewString(thisIndexKey))
-	return value
-}
-
 func (s *ThisIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	value, suspend := space.GetBubble(s.seed.NewString(thisIndexKey))
 	if !nl_interface.IsNil(suspend) {

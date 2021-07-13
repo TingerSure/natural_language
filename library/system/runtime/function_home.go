@@ -68,7 +68,6 @@ func FunctionHomeToCallLanguage(libs *tree.LibraryManager, instance concept.Func
 				output.SetField(valueParam, libs.Sandbox.Variable.String.New(value))
 				return output, nil
 			},
-			nil,
 			[]concept.String{
 				languageParam,
 				poolParam,
@@ -117,9 +116,6 @@ func FunctionHomeSetLanguageOnCallSeed(libs *tree.LibraryManager, instance conce
 				})
 				return libs.Sandbox.Variable.Param.New(), nil
 			},
-			func(input concept.Param, object concept.Variable) concept.Param {
-				return libs.Sandbox.Variable.Param.New()
-			},
 			[]concept.String{
 				languageParam,
 				seedParam,
@@ -142,7 +138,6 @@ func FunctionHomeParamList(libs *tree.LibraryManager, instance concept.Function)
 				back.Set(backList, paramNames)
 				return back, nil
 			},
-			nil,
 			[]concept.String{},
 			[]concept.String{
 				backList,
@@ -164,7 +159,6 @@ func FunctionHomeReturnList(libs *tree.LibraryManager, instance concept.Function
 				back.Set(backList, returnNames)
 				return back, nil
 			},
-			nil,
 			[]concept.String{},
 			[]concept.String{
 				backList,

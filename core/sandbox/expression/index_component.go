@@ -33,35 +33,6 @@ func (a *IndexComponent) ToString(prefix string) string {
 	return fmt.Sprintf("%v[%v]", a.object.ToString(prefix), a.field.ToString(prefix))
 }
 
-func (a *IndexComponent) Anticipate(space concept.Pool) concept.Variable {
-	fieldPre := a.field.Anticipate(space)
-	fieldNumber, yes := variable.VariableFamilyInstance.IsNumber(fieldPre)
-	if yes {
-		return a.indexAnticipate(space, fieldNumber)
-	}
-	fieldString, yes := variable.VariableFamilyInstance.IsStringHome(fieldPre)
-	if yes {
-		return a.stringAnticipate(space, fieldString)
-	}
-	return nil
-}
-
-func (a *IndexComponent) stringAnticipate(space concept.Pool, field concept.String) concept.Variable {
-	object := a.object.Anticipate(space)
-	value, _ := object.GetField(field)
-	return value
-}
-
-func (a *IndexComponent) indexAnticipate(space concept.Pool, field concept.Number) concept.Variable {
-	arrayPre := a.object.Anticipate(space)
-	array, yes := variable.VariableFamilyInstance.IsArray(arrayPre)
-	if !yes {
-		return nil
-	}
-	value, _ := array.Get(int(field.Value()))
-	return value
-}
-
 func (a *IndexComponent) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	fieldPre, suspend := a.field.Get(space)
 	if !nl_interface.IsNil(suspend) {

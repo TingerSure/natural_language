@@ -50,19 +50,8 @@ func (s *ConstIndex) Call(space concept.Pool, param concept.Param) (concept.Para
 	return s.value.(concept.Function).Exec(param, nil)
 }
 
-func (s *ConstIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
-	if !s.value.IsFunction() {
-		return s.seed.NewParam()
-	}
-	return s.value.(concept.Function).Anticipate(param, nil)
-}
-
 func (s *ConstIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return s.value, nil
-}
-
-func (s *ConstIndex) Anticipate(space concept.Pool) concept.Variable {
-	return s.value
 }
 
 func (s *ConstIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {

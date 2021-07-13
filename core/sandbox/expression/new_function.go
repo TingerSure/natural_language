@@ -74,14 +74,6 @@ func (a *NewFunction) ToString(prefix string) string {
 	)
 }
 
-func (a *NewFunction) Anticipate(space concept.Pool) concept.Variable {
-	function := a.seed.NewFunction(space)
-	function.AddParamName(a.params...)
-	function.AddReturnName(a.returns...)
-	function.AnticipateBody().AddStep(a.steps...)
-	return function
-}
-
 func (a *NewFunction) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	function := a.seed.NewFunction(space)
 	function.AddParamName(a.params...)

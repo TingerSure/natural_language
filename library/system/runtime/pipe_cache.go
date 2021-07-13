@@ -43,7 +43,6 @@ func newFindPipeCache(libs *tree.LibraryManager, rootPipeCache *tree.PipeCache) 
 			}
 			return libs.Sandbox.Variable.Param.New(), nil
 		},
-		nil,
 		[]concept.String{matchParam},
 		[]concept.String{},
 	)

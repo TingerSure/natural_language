@@ -47,16 +47,8 @@ func (s *PrivateIndex) Call(space concept.Pool, param concept.Param) (concept.Pa
 	return nil, s.seed.NewException("runtime error", "PrivateIndex cannot be called.")
 }
 
-func (s *PrivateIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
-	return s.seed.NewParam()
-}
-
 func (s *PrivateIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return s.originator.Get(space)
-}
-
-func (s *PrivateIndex) Anticipate(space concept.Pool) concept.Variable {
-	return s.originator.Anticipate(space)
 }
 
 func (s *PrivateIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {

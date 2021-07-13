@@ -27,10 +27,6 @@ func (a *NewContinue) ToString(prefix string) string {
 	return fmt.Sprintf("continue %v", a.tag.Value())
 }
 
-func (a *NewContinue) Anticipate(space concept.Pool) concept.Variable {
-	return a.seed.NewNull()
-}
-
 func (a *NewContinue) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return nil, a.seed.NewContinue(a.tag)
 }

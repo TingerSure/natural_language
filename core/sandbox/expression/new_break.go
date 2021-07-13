@@ -27,10 +27,6 @@ func (a *NewBreak) ToString(prefix string) string {
 	return fmt.Sprintf("break %v", a.tag.Value())
 }
 
-func (a *NewBreak) Anticipate(space concept.Pool) concept.Variable {
-	return a.seed.NewNull()
-}
-
 func (a *NewBreak) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return nil, a.seed.NewBreak(a.tag)
 }

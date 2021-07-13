@@ -46,16 +46,8 @@ func (s *KeyKeyIndex) Call(space concept.Pool, param concept.Param) (concept.Par
 	return nil, s.seed.NewException("runtime error", "KeyKeyIndex cannot be called.")
 }
 
-func (s *KeyKeyIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
-	return s.seed.NewParam()
-}
-
 func (s *KeyKeyIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return s.to, nil
-}
-
-func (s *KeyKeyIndex) Anticipate(space concept.Pool) concept.Variable {
-	return s.to
 }
 
 func (s *KeyKeyIndex) Set(space concept.Pool, to concept.Variable) concept.Interrupt {

@@ -64,17 +64,6 @@ func (a *NewMappingObject) ToString(prefix string) string {
 	)
 }
 
-func (a *NewMappingObject) Anticipate(space concept.Pool) concept.Variable {
-	object := a.object.Anticipate(space)
-	class, _ := variable.VariableFamilyInstance.IsClass(a.class.Anticipate(space))
-	mappingObject := a.seed.NewMappingObject(object, class)
-	for _, keykeyPre := range a.mapping {
-		keykey, _ := index.IndexFamilyInstance.IsKeyKeyIndex(keykeyPre)
-		mappingObject.SetMapping(keykey.From(), keykey.To())
-	}
-	return mappingObject
-}
-
 func (a *NewMappingObject) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	object, suspend := a.object.Get(space)
 	if !nl_interface.IsNil(suspend) {

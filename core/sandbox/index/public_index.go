@@ -48,16 +48,8 @@ func (s *PublicIndex) Call(space concept.Pool, param concept.Param) (concept.Par
 
 }
 
-func (s *PublicIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
-	return s.seed.NewParam()
-}
-
 func (s *PublicIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return s.originator.Get(space)
-}
-
-func (s *PublicIndex) Anticipate(space concept.Pool) concept.Variable {
-	return s.originator.Anticipate(space)
 }
 
 func (s *PublicIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {

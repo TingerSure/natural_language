@@ -59,9 +59,6 @@ func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 	}
 	instance.SetPublic(libs.Sandbox.Variable.String.New("print"), libs.Sandbox.Index.PublicIndex.New("print", libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		instance.Print,
-		func(input concept.Param, _ concept.Variable) concept.Param {
-			return libs.Sandbox.Variable.Param.New()
-		},
 		[]concept.String{
 			instance.PrintContent,
 		},
@@ -69,9 +66,6 @@ func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 	))))
 	instance.SetPublic(libs.Sandbox.Variable.String.New("error"), libs.Sandbox.Index.PublicIndex.New("error", libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		instance.Error,
-		func(input concept.Param, _ concept.Variable) concept.Param {
-			return libs.Sandbox.Variable.Param.New()
-		},
 		[]concept.String{
 			instance.ErrorContent,
 		},
@@ -79,9 +73,6 @@ func NewStd(libs *tree.LibraryManager, param *StdParam) *Std {
 	))))
 	instance.SetPublic(libs.Sandbox.Variable.String.New("log"), libs.Sandbox.Index.PublicIndex.New("log", libs.Sandbox.Index.ConstIndex.New(libs.Sandbox.Variable.SystemFunction.New(
 		instance.Log,
-		func(input concept.Param, _ concept.Variable) concept.Param {
-			return libs.Sandbox.Variable.Param.New()
-		},
 		[]concept.String{
 			instance.LogContent,
 		},

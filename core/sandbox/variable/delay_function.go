@@ -124,11 +124,6 @@ func (s *DelayFunction) ReturnNames() []concept.String {
 	return s.funcs.ReturnNames()
 }
 
-func (f *DelayFunction) Anticipate(params concept.Param, object concept.Variable) concept.Param {
-	f.init()
-	return f.funcs.Anticipate(params, object)
-}
-
 func (f *DelayFunction) Exec(params concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 	f.init()
 	return f.funcs.Exec(params, object)

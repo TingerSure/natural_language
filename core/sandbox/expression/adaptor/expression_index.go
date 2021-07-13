@@ -35,14 +35,6 @@ func (s *ExpressionIndex) Call(space concept.Pool, param concept.Param) (concept
 	return funcs.(concept.Function).Exec(param, nil)
 }
 
-func (s *ExpressionIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
-	funcs := s.expression.Anticipate(space)
-	if !funcs.IsFunction() {
-		return s.seed.NewParam()
-	}
-	return funcs.(concept.Function).Anticipate(param, nil)
-}
-
 func (e *ExpressionIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return e.expression.Exec(space)
 }

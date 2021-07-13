@@ -48,9 +48,6 @@ func newCodeBlockBind(libs *tree.LibraryManager) *variable.SystemFunction {
 			}
 			return libs.Sandbox.Variable.Param.New(), nil
 		},
-		func(input concept.Param, object concept.Variable) concept.Param {
-			return libs.Sandbox.Variable.Param.New()
-		},
 		[]concept.String{
 			languageParam,
 			seedParam,

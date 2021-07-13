@@ -29,7 +29,6 @@ func VariableHomeToString(libs *tree.LibraryManager, instance concept.Variable) 
 				output.Set(valueParam, libs.Sandbox.Variable.String.New(instance.ToString(prefix.Value())))
 				return output, nil
 			},
-			nil,
 			[]concept.String{
 				prefixParam,
 			},

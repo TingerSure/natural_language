@@ -23,10 +23,6 @@ func (a *NewNull) ToString(prefix string) string {
 	return "null"
 }
 
-func (a *NewNull) Anticipate(space concept.Pool) concept.Variable {
-	return a.seed.NewNull()
-}
-
 func (a *NewNull) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return a.seed.NewNull(), nil
 }

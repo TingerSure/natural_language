@@ -50,7 +50,6 @@ func newPhraseHasPriority(libs *tree.LibraryManager, source tree.Phrase) concept
 			output.Set(valueParam, libs.Sandbox.Variable.Bool.New(source.HasPriority()))
 			return output, nil
 		},
-		nil,
 		[]concept.String{},
 		[]concept.String{valueParam},
 	)
@@ -64,7 +63,6 @@ func newPhraseFrom(libs *tree.LibraryManager, source tree.Phrase) concept.Functi
 			output.Set(fromParam, libs.Sandbox.Variable.String.New(source.From()))
 			return output, nil
 		},
-		nil,
 		[]concept.String{},
 		[]concept.String{fromParam},
 	)
@@ -82,7 +80,6 @@ func newPhraseIndex(libs *tree.LibraryManager, source tree.Phrase) concept.Funct
 			output.Set(indexParam, funcs)
 			return output, nil
 		},
-		nil,
 		[]concept.String{},
 		[]concept.String{indexParam},
 	)
@@ -96,7 +93,6 @@ func newPhraseToContent(libs *tree.LibraryManager, source tree.Phrase) concept.F
 			output.Set(contentParam, libs.Sandbox.Variable.String.New(source.ToContent()))
 			return output, nil
 		},
-		nil,
 		[]concept.String{},
 		[]concept.String{contentParam},
 	)
@@ -110,7 +106,6 @@ func newPhraseToString(libs *tree.LibraryManager, source tree.Phrase) concept.Fu
 			output.Set(valueParam, libs.Sandbox.Variable.String.New(source.ToString()))
 			return output, nil
 		},
-		nil,
 		[]concept.String{},
 		[]concept.String{valueParam},
 	)
@@ -131,7 +126,6 @@ func newPhraseGetChild(libs *tree.LibraryManager, source tree.Phrase) concept.Fu
 			output.Set(childParam, newPhrase(libs, child))
 			return output, nil
 		},
-		nil,
 		[]concept.String{indexParam},
 		[]concept.String{childParam},
 	)
@@ -145,7 +139,6 @@ func newPhraseGetContent(libs *tree.LibraryManager, source tree.Phrase) concept.
 			output.Set(contentParam, libs.Sandbox.Variable.String.New(source.GetContent()))
 			return output, nil
 		},
-		nil,
 		[]concept.String{},
 		[]concept.String{contentParam},
 	)
@@ -163,7 +156,6 @@ func newPhraseTypes(libs *tree.LibraryManager, source tree.Phrase) concept.Funct
 			output.Set(typesParam, libs.Sandbox.Variable.String.New(types))
 			return output, nil
 		},
-		nil,
 		[]concept.String{},
 		[]concept.String{typesParam},
 	)
@@ -177,7 +169,6 @@ func newPhraseContentSize(libs *tree.LibraryManager, source tree.Phrase) concept
 			output.Set(sizeParam, libs.Sandbox.Variable.Number.New(float64(source.ContentSize())))
 			return output, nil
 		},
-		nil,
 		[]concept.String{},
 		[]concept.String{sizeParam},
 	)
@@ -191,7 +182,6 @@ func newPhraseSize(libs *tree.LibraryManager, source tree.Phrase) concept.Functi
 			output.Set(sizeParam, libs.Sandbox.Variable.Number.New(float64(source.Size())))
 			return output, nil
 		},
-		nil,
 		[]concept.String{},
 		[]concept.String{sizeParam},
 	)

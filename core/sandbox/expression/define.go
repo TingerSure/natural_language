@@ -36,10 +36,6 @@ func (a *Define) ToString(prefix string) string {
 	return fmt.Sprintf("var %v = %v", a.key.Value(), a.defaultValue.ToString(prefix))
 }
 
-func (e *Define) Anticipate(space concept.Pool) concept.Variable {
-	return e.defaultValue.Anticipate(space)
-}
-
 func (a *Define) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	if space.HasLocal(a.key) {
 		return nil, a.seed.NewException("semantic error", fmt.Sprintf("Duplicate local definition: '%v'.", a.key.Value())).AddLine(a.line)

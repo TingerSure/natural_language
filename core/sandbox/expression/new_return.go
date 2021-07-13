@@ -25,10 +25,6 @@ func (a *NewReturn) ToString(prefix string) string {
 	return "return"
 }
 
-func (a *NewReturn) Anticipate(space concept.Pool) concept.Variable {
-	return a.seed.NewNull()
-}
-
 func (a *NewReturn) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return nil, a.seed.NewReturn()
 }

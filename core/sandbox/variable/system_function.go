@@ -20,9 +20,8 @@ type SystemFunctionSeed interface {
 
 type SystemFunction struct {
 	*adaptor.AdaptorFunction
-	funcs           func(concept.Param, concept.Variable) (concept.Param, concept.Exception)
-	anticipateFuncs func(concept.Param, concept.Variable) concept.Param
-	seed            SystemFunctionSeed
+	funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception)
+	seed  SystemFunctionSeed
 }
 
 func (o *SystemFunction) Call(specimen concept.String, param concept.Param) (concept.Param, concept.Exception) {
@@ -39,20 +38,6 @@ func (f *SystemFunction) ToCallLanguage(language string, space concept.Pool, sel
 
 func (f *SystemFunction) ToString(prefix string) string {
 	return fmt.Sprintf("system_function (%v) %v {}", StringJoin(f.ParamNames(), ", "), StringJoin(f.ReturnNames(), ", "))
-}
-
-func (f *SystemFunction) Anticipate(params concept.Param, object concept.Variable) concept.Param {
-	if nl_interface.IsNil(params) {
-		params = f.seed.NewParam()
-	}
-	if f.anticipateFuncs == nil {
-		back, suspend := f.Exec(params, object)
-		if !nl_interface.IsNil(suspend) {
-			return f.seed.NewParam()
-		}
-		return back
-	}
-	return f.anticipateFuncs(f.paramFormat(params), object)
 }
 
 func (f *SystemFunction) Exec(params concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
@@ -95,7 +80,6 @@ type SystemFunctionCreator struct {
 
 func (s *SystemFunctionCreator) New(
 	funcs func(concept.Param, concept.Variable) (concept.Param, concept.Exception),
-	anticipateFuncs func(concept.Param, concept.Variable) concept.Param,
 	paramNames []concept.String,
 	returnNames []concept.String,
 ) *SystemFunction {
@@ -105,9 +89,8 @@ func (s *SystemFunctionCreator) New(
 			ParamCreator:     s.param.ParamCreator,
 			ExceptionCreator: s.param.ExceptionCreator,
 		}),
-		funcs:           funcs,
-		anticipateFuncs: anticipateFuncs,
-		seed:            s,
+		funcs: funcs,
+		seed:  s,
 	}
 	system.AddParamName(paramNames...)
 	system.AddReturnName(returnNames...)

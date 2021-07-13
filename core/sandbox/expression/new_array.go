@@ -37,14 +37,6 @@ func (a *NewArray) ToString(prefix string) string {
 	return fmt.Sprintf("[ %v ]", strings.Join(items, ", "))
 }
 
-func (a *NewArray) Anticipate(space concept.Pool) concept.Variable {
-	array := a.seed.NewArray()
-	for _, item := range a.items {
-		array.Append(item.Anticipate(space))
-	}
-	return array
-}
-
 func (a *NewArray) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	array := a.seed.NewArray()
 	for _, item := range a.items {

@@ -74,23 +74,6 @@ func (a *NewParam) ToString(prefix string) string {
 	return ""
 }
 
-func (a *NewParam) Anticipate(space concept.Pool) concept.Variable {
-	param := a.seed.NewParam()
-	if a.types == concept.ParamTypeList {
-		for _, item := range a.list {
-			param.AppendIndex(item.Anticipate(space))
-		}
-		return param
-	}
-	if a.types == concept.ParamTypeKeyValue {
-		for _, keyValue := range a.values {
-			param.Set(keyValue.Key(), keyValue.Value().Anticipate(space))
-		}
-		return param
-	}
-	return param
-}
-
 func (a *NewParam) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	param := a.seed.NewParam()
 	var suspend concept.Interrupt = nil

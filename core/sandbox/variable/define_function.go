@@ -39,10 +39,6 @@ func (f *DefineFunction) ToString(prefix string) string {
 	return fmt.Sprintf("function (%v) %v", StringJoin(f.ParamNames(), ", "), StringJoin(f.ReturnNames(), ", "))
 }
 
-func (f *DefineFunction) Anticipate(params concept.Param, object concept.Variable) concept.Param {
-	return f.seed.NewParam()
-}
-
 func (f *DefineFunction) Exec(params concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 	return nil, f.seed.NewException("runtime err", "define_function cannot be executed directly.")
 }

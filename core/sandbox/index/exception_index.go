@@ -40,16 +40,8 @@ func (s *ExceptionIndex) Call(space concept.Pool, param concept.Param) (concept.
 	return nil, s.value
 }
 
-func (s *ExceptionIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
-	return s.seed.NewParam()
-}
-
 func (s *ExceptionIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return nil, s.value
-}
-
-func (s *ExceptionIndex) Anticipate(space concept.Pool) concept.Variable {
-	return s.seed.NewNull()
 }
 
 func (s *ExceptionIndex) Set(space concept.Pool, value concept.Variable) concept.Interrupt {

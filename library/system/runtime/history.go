@@ -43,7 +43,6 @@ func newFindHistory(libs *tree.LibraryManager, rootSpace concept.Pool) concept.F
 			}
 			return libs.Sandbox.Variable.Param.New(), nil
 		},
-		nil,
 		[]concept.String{matchParam},
 		[]concept.String{},
 	)

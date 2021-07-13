@@ -55,19 +55,6 @@ func (s *LocalIndex) Call(space concept.Pool, param concept.Param) (concept.Para
 	return funcs.(concept.Function).Exec(param, nil)
 }
 
-func (s *LocalIndex) CallAnticipate(space concept.Pool, param concept.Param) concept.Param {
-	funcs := s.Anticipate(space)
-	if !funcs.IsFunction() {
-		return s.seed.NewParam()
-	}
-	return funcs.(concept.Function).Anticipate(param, nil)
-}
-
-func (s *LocalIndex) Anticipate(space concept.Pool) concept.Variable {
-	value, _ := space.PeekLocal(s.key)
-	return value
-}
-
 func (s *LocalIndex) Get(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	value, suspend := space.GetLocal(s.key)
 	if !nl_interface.IsNil(suspend) {

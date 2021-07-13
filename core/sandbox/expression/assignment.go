@@ -31,10 +31,6 @@ func (a *Assignment) ToString(prefix string) string {
 	return fmt.Sprintf("%v = %v", a.to.ToString(prefix), a.from.ToString(prefix))
 }
 
-func (e *Assignment) Anticipate(space concept.Pool) concept.Variable {
-	return e.from.Anticipate(space)
-}
-
 func (a *Assignment) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	preFrom, suspend := a.from.Get(space)
 	if !nl_interface.IsNil(suspend) {

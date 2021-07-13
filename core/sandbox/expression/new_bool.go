@@ -25,10 +25,6 @@ func (a *NewBool) ToString(prefix string) string {
 	return fmt.Sprintf("%v", a.value)
 }
 
-func (a *NewBool) Anticipate(space concept.Pool) concept.Variable {
-	return a.seed.NewBool(a.value)
-}
-
 func (a *NewBool) Exec(space concept.Pool) (concept.Variable, concept.Interrupt) {
 	return a.seed.NewBool(a.value), nil
 }

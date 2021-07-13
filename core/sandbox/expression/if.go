@@ -39,9 +39,7 @@ func (f *If) ToString(prefix string) string {
 	}
 	return fmt.Sprintf("%v else %v", primaryToString, f.secondary.ToString(prefix))
 }
-func (e *If) Anticipate(space concept.Pool) concept.Variable {
-	return e.seed.NewNull()
-}
+
 func (f *If) Exec(parent concept.Pool) (concept.Variable, concept.Interrupt) {
 
 	if nl_interface.IsNil(f.condition) {

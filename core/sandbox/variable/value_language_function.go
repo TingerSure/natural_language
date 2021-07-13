@@ -53,10 +53,6 @@ func (f *ValueLanguageFunction) ToString(prefix string) string {
 	return fmt.Sprintf("value_language_function (%v) %v {}", StringJoin(f.ParamNames(), ", "), StringJoin(f.ReturnNames(), ", "))
 }
 
-func (f *ValueLanguageFunction) Anticipate(params concept.Param, object concept.Variable) concept.Param {
-	return params
-}
-
 func (f *ValueLanguageFunction) Exec(params concept.Param, object concept.Variable) (concept.Param, concept.Exception) {
 	return params, nil
 }

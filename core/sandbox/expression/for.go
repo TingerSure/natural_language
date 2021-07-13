@@ -52,10 +52,6 @@ func (f *For) ToString(prefix string) string {
 	return fmt.Sprintf("%v %v", back, f.body.ToString(prefix))
 }
 
-func (e *For) Anticipate(space concept.Pool) concept.Variable {
-	return e.seed.NewNull()
-}
-
 func (f *For) Exec(parent concept.Pool) (concept.Variable, concept.Interrupt) {
 
 	if nl_interface.IsNil(f.condition) {

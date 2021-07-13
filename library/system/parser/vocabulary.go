@@ -91,9 +91,6 @@ func newAddVocabularyRule(libs *tree.LibraryManager) concept.Function {
 			}))
 			return libs.Sandbox.Variable.Param.New(), nil
 		},
-		func(input concept.Param, _ concept.Variable) concept.Param {
-			return libs.Sandbox.Variable.Param.New()
-		},
 		[]concept.String{
 			nameParam,
 			typesParam,
