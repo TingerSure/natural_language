@@ -6,6 +6,7 @@ import (
 )
 
 type Road struct {
+	source    string
 	sentence  []rune
 	leftCount *IndexCount
 	right     *IndexList
@@ -28,6 +29,7 @@ func (r *Road) ToString() string {
 
 func NewRoad(sentence string, types *Types) *Road {
 	road := &Road{
+		source:   sentence,
 		sentence: []rune(sentence),
 		types:    types,
 	}
@@ -113,7 +115,7 @@ func (r *Road) DependencyCheck(value tree.Phrase) bool {
 }
 
 func (r *Road) GetSentence() string {
-	return string(r.sentence)
+	return r.source
 }
 
 func (r *Road) SubSentenceFrom(from int) string {
